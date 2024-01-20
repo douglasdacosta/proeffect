@@ -15,7 +15,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE CardRefresh.js
+   * AdminLTE .jsCardRefresh
    * License MIT
    * --------------------------------------------
    */
@@ -3067,3 +3067,4 @@
 
 }));
 //# sourceMappingURL=adminlte.js.map
+alert('aqui');

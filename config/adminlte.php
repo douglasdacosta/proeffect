@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'AdminLTE 3',
+    'title' => 'Pro Effect',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>4</b>Jur',
+    'logo' => '<b>Pro</b> Effect',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'Admin Logo',
+    'logo_img_alt' => 'Pro Effect',
 
     /*
     |--------------------------------------------------------------------------
@@ -275,7 +275,7 @@ return [
 
     'enabled_laravel_mix' => false,
     'laravel_mix_css_path' => 'css/app.css',
-    'laravel_mix_js_path' => 'js/app.js',
+    'laravel_mix_js_path' => 'resouces/js/app.js',
 
     /*
     |--------------------------------------------------------------------------
@@ -312,22 +312,43 @@ return [
             'can'  => 'manage-blog',
         ],
         [
-            'text'        => 'Materiais',
-            'url'         => 'andamentos',
+            'text'        => 'Pedidos',
+            'url'         => 'pedidos',
             'icon'        => 'fa fa-fw fa-arrow-right',
             'label'       => '',
             'label_color' => 'success',
         ],
         [
-            'text'        => 'Produtos',
-            'url'         => 'eventos',
+            'text'        => 'Followup',
+            'url'         => 'followup',
             'icon'        => 'far fa-fw fa-calendar',
             'label'       => '',
             'label_color' => 'success',
         ],
         [
-            'text'        => 'Followup',
-            'url'         => 'publicacoes',
+            'text'        => 'Materiais',
+            'url'         => 'materiais',
+            'icon'        => 'far fa-fw fa-file',
+            'label'       => '',
+            'label_color' => 'success',
+        ],
+        [
+            'text'        => 'Ficha técnica',
+            'url'         => 'fichatecnica',
+            'icon'        => 'far fa-fw fa-file',
+            'label'       => '',
+            'label_color' => 'success',
+        ],
+        [
+            'text'        => 'Status',
+            'url'         => 'status',
+            'icon'        => 'far fa-fw fa-file',
+            'label'       => '',
+            'label_color' => 'success',
+        ],
+        [
+            'text'        => 'Clientes',
+            'url'         => 'clientes',
             'icon'        => 'far fa-fw fa-file',
             'label'       => '',
             'label_color' => 'success',

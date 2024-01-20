@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '4Jur')
+@section('title', 'Pro Effect')
 
 @section('content_header')
     <h1 class="m-0 text-dark">Configuração da conta</h1>

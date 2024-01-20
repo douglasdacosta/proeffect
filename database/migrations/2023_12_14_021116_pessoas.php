@@ -16,24 +16,21 @@ return new class extends Migration
         Schema::create('pessoas', function (Blueprint $table) {
             $table->id();
             $table->string('nome',100);
-            $table->string('tipo_pessoa');
-            $table->string('documento',20);
-            $table->string('endereco', 200);
-            $table->string('numero', 10);
-            $table->string('cep', 9);
-            $table->string('bairro', 150);
-            $table->string('cidade', 150);
-            $table->string('estado', 150);
-            $table->string('telefone1', 11);
-            $table->string('telefone2', 11);
-            $table->string('telefone3', 11);
-            $table->date('data_cadastro');
-            $table->longText('observacoes');            
+            $table->string('documento',20)->nullable();
+            $table->string('endereco', 200)->nullable();
+            $table->string('numero', 10)->nullable();
+            $table->string('cep', 9)->nullable();
+            $table->string('bairro', 150)->nullable();
+            $table->string('cidade', 150)->nullable();
+            $table->string('estado', 150)->nullable();
+            $table->string('telefone', 11)->nullable();
+            $table->string('email', 100)->nullable();                 
             $table->boolean('status');
             $table->timestamps();
         });
     }
 
+    
     /**
      * Reverse the migrations.
      *
