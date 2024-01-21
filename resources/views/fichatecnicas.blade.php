@@ -18,19 +18,14 @@
     @section('content')
         <div class="right_col" role="main">
 
-            <form id="filtro" action="fichatecnicas" method="get" data-parsley-validate=""
+            <form id="filtro" action="fichatecnica" method="get" data-parsley-validate=""
                 class="form-horizontal form-label-left" novalidate="">
                 <div class="form-group row">
-                    <label for="codigo" class="col-sm-2 col-form-label">Código</label>
+                    <label for="ep" class="col-sm-2 col-form-label">EP</label>
                     <div class="col-sm-2">
-                        <input type="text" id="codigo" name="codigo" class="form-control col-md-7 col-xs-12"
-                            value="@if (isset($request) && $request->input('codigo') != '') {{ $request->input('codigo') }}@else @endif">
-                    </div>
-                    <label for="codigo" class="col-sm-1 col-form-label">Nome</label>
-                    <div class="col-sm-5">
-                        <input type="text" id="nome" name="nome" class="form-control col-md-7 col-xs-12"
-                            value="@if (isset($request) && trim($request->input('nome')) != '') {{ $request->input('nome') }}@else @endif">
-                    </div>
+                        <input type="text" id="ep" name="ep" class="form-control col-md-7 col-xs-12"
+                            value="@if (isset($request) && $request->input('ep') != '') {{ $request->input('ep') }}@else @endif">
+                    </div>                    
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-5">
@@ -64,7 +59,7 @@
                                                 <th scope="row"><a
                                                         href={{ URL::route($rotaAlterar, ['id' => $fichatecnica->id]) }}>{{ $fichatecnica->id }}</a>
                                                 </th>
-                                                <td>{{ $fichatecnica->EP }}</td>
+                                                <td>{{ $fichatecnica->ep }}</td>
                                                 <td>
                                                     @if ($fichatecnica->status == 1)
                                                         <span class='label label-success'>Ativo</span>
@@ -87,7 +82,8 @@
 @else
     @section('content')
         <div id="toastsContainerTopRight" class="toasts-top-right fixed">
-            <div class="toast bg-danger fade show" role="alert" style="width: 350px" aria-live="assertive" aria-atomic="true">
+            <div class="toast bg-danger fade show" role="alert" style="width: 350px" aria-live="assertive"
+                aria-atomic="true">
                 <div class="toast-header">
                     <strong class="mr-auto">Alerta!</strong>
                     <small></small>
@@ -95,7 +91,8 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="toast-body textoAlerta" style="text-decoration-style: solid; font-weight: bold; font-size: larger;"></div>
+                <div class="toast-body textoAlerta"
+                    style="text-decoration-style: solid; font-weight: bold; font-size: larger;"></div>
             </div>
         </div>
         @if ($tela == 'alterar')
@@ -123,7 +120,7 @@
         <div class="form-group row">
             <label for="ep" class="col-sm-2 col-form-label text-right">EP*</label>
             <div class="col-sm-1">
-                <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
+                <input type="text" id="ep" name="ep" class="form-control col-md-13" value="@if (isset($fichatecnicas[0]->ep)) {{$fichatecnicas[0]->ep}} @else{{ '' }}@endif">
             </div>
             <label for="blank" class="col-sm-2 col-form-label text-right">Blank</label>
             <div class="col-sm-1">
@@ -160,31 +157,31 @@
             </div>
             <label for="tempo_usinagem" class="col-sm-2 col-form-label text-right">Tmp usinagem</label>
             <div class="col-sm-1">
-                <input type="text" id="tempo_usinagem" name="tempo_usinagem" class="form-control col-md-13 mask_minutos"
-                    value="">
+                <input type="text" id="tempo_usinagem" name="tempo_usinagem"
+                    class="form-control col-md-13 mask_minutos" value="">
             </div>
 
         </div>
         <div class="form-group row">
             <label for="tempo_acabamento" class="col-sm-2 col-form-label text-right">Tmp acabamento</label>
             <div class="col-sm-1">
-                <input type="text" id="tempo_acabamento" name="tempo_acabamento" class="form-control col-md-13 mask_minutos"
-                    value="">
+                <input type="text" id="tempo_acabamento" name="tempo_acabamento"
+                    class="form-control col-md-13 mask_minutos" value="">
             </div>
             <label for="tempo_montagem" class="col-sm-2 col-form-label text-right">Tmp montagem</label>
             <div class="col-sm-1">
-                <input type="text" id="tempo_montagem" name="tempo_montagem" class="form-control col-md-13 mask_minutos"
-                    value="">
+                <input type="text" id="tempo_montagem" name="tempo_montagem"
+                    class="form-control col-md-13 mask_minutos" value="">
             </div>
             <label for="tempo_montagem" class="col-sm-2 col-form-label text-right">Tmp montagem torre</label>
             <div class="col-sm-1">
                 <input type="text" id="tempo_montagem_torre" name="tempo_montagem_torre"
-                    class="form-control col-md-13" value="">
+                    class="form-control col-md-13 mask_minutos" value="">
             </div>
             <label for="tempo_inspecao" class="col-sm-2 col-form-label text-right">Tmp inspeção</label>
             <div class="col-sm-1">
-                <input type="text" id="tempo_inspecao" name="tempo_inspecao" class="form-control col-md-13 mask_minutos"
-                    value="">
+                <input type="text" id="tempo_inspecao" name="tempo_inspecao"
+                    class="form-control col-md-13 mask_minutos" value="">
             </div>
         </div>
         <div class="form-group row">
@@ -214,6 +211,28 @@
                     </tr>
                 </thead>
                 <tbody>
+
+                    @if (isset($fichatecnicasitens))
+                        @foreach ($fichatecnicasitens as $fichatecnicaitem)
+                        <tr class="{{ 'blank_' . $fichatecnicaitem->blank}}{{$fichatecnicaitem->materiais_id }}">
+                            <td data-name="blank" class="blank" scope="row">{{trim($fichatecnicaitem->blank)}}</td>
+                            <td data-name="qtde" class="qtde">{{trim($fichatecnicaitem->qtde_blank)}}</td>
+                            <td data-name="material_id" class="material_id" data-materialid="{{trim($fichatecnicaitem->materiais_id)}}" >{{trim($fichatecnicaitem->materiais->material)}}</td>
+                            <td data-name="medidax" class="medidax">{{trim($fichatecnicaitem->medidax)}}</td>
+                            <td data-name="mediday" class="mediday">{{trim($fichatecnicaitem->mediday)}}</td>
+                            <td data-name="tempo_usinagem" class="tempo_usinagem">{{$fichatecnicaitem->tempo_usinagem}}</td>
+                            <td data-name="tempo_acabamento" class="tempo_acabamento">{{$fichatecnicaitem->tempo_acabamento}}</td>
+                            <td data-name="tempo_montagem" class="tempo_montagem">{{$fichatecnicaitem->tempo_montagem}}</td>
+                            <td data-name="tempo_montagem_torre" class="tempo_montagem_torre">{{$fichatecnicaitem->tempo_montagem_torre}}</td>
+                            <td data-name="tempo_inspecao" class="tempo_inspecao">{{$fichatecnicaitem->tempo_inspecao}}</td>
+                            <td><button type="button" class="close" aria-label="Close" data-blank="{{$fichatecnicaitem->blank}}{{$fichatecnicaitem->materiais_id}}"><span aria-hidden="true">&times;</span></button></td> 
+                        </tr>
+                        @endforeach
+                    @endif
+                    
+
+                    
+
                 </tbody>
             </table>
         </div>
@@ -252,7 +271,7 @@
             <input type="hidden" id='composicoes' name="composicoes" value=''>
             <div class="custom-control custom-switch">
                 <input type="checkbox" class="custom-control-input" id="status" name="status"
-                    @if (!isset($materiais[0]->status) || $materiais[0]->status == 1) checked @else{{ '' }} @endif>
+                    @if (!isset($fichatecnicas[0]->status) || $fichatecnicas[0]->status == 1) checked @else{{ '' }} @endif>
                 <label class="custom-control-label" for="status">Ativo/Inativo</label>
             </div>
         </div>

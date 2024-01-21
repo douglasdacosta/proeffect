@@ -1,6 +1,9 @@
 
 $(function () {
+
+    calculaTempos()
     $('.toast').hide();
+    
     function bloqueiaEP() {
         if ($('#table_composicao tbody tr').length > 0) {
             $('#ep').attr('readonly', true);
@@ -11,7 +14,9 @@ $(function () {
 
     $("#material_id").change(function () {
         $('.overlay').show();
-        $('#blank, #medidax, #mediday, #qtde ,#tempo_usinagem #tempo_acabamento #tempo_montagem #tempo_montagem_torre #tempo_inspecao').val('');
+        $('#blank, #medidax, #mediday, #qtde').val('');
+        $('#tempo_usinagem, #tempo_acabamento, #tempo_montagem, #tempo_montagem_torre, #tempo_inspecao').val('00:00');
+
         $.ajax({
             type: "POST",
             url: '/ajax-fichatecnica',
@@ -20,14 +25,12 @@ $(function () {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (data) {
-                $('#tempo_montagem_torre').val(data[0].tempo_montagem_torre);
+                $('#tempo_montagem_torre').val(data[0].tempo_montagem_torre.toString().substring(8, 3));
                 $('.overlay').hide();
                 $('#blank').val('');
             },
             error: function (data, textStatus, errorThrown) {
                 $('.overlay').hide();
-                console.log('Erro na alteração');
-
             },
 
         });
@@ -52,21 +55,21 @@ $(function () {
             return false;
         }
         $('#table_composicao tbody').append(
-            '<tr class="blank_' + $('#blank').val() + '">' +
-            '<th data-name="blank" class="blank" scope="row">' + $('#blank').val() + '</th>' +
-            '<td data-name="qtde" class="qtde">' + $('#qtde').val() + '</td>' +
-            '<td data-name="material_id" class="material_id" data-materialid="' + $('#material_id option:selected').val() + '" >' + $('#material_id option:selected').text() + '</td>' +
-            '<td data-name="medidax" class="medidax">' + $('#medidax').val() + '</td>' +
-            '<td data-name="mediday" class="mediday">' + $('#mediday').val() + '</td>' +
-            '<td data-name="tempo_usinagem" class="tempo_usinagem">' + $('#tempo_usinagem').val() + '</td>' +
-            '<td data-name="tempo_acabamento" class="tempo_acabamento">' + $('#tempo_acabamento').val() + '</td>' +
-            '<td data-name="tempo_montagem" class="tempo_montagem">' + $('#tempo_montagem').val() + '</td>' +
-            '<td data-name="tempo_montagem_torre" class="tempo_montagem_torre">' + $('#tempo_montagem_torre').val() + '</td>' +
-            '<td data-name="tempo_inspecao" class="tempo_inspecao">' + $('#tempo_inspecao').val() + '</td>' +
-            '<td><button type="button" class="close" aria-label="Close" data-blank="' + $('#blank').val() + '">' +
-            '<span aria-hidden="true">&times;</span>' +
-            '</button>' +
-            '</td>' +
+            '<tr class="blank_' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
+                '<td data-name="blank" class="blank" scope="row">' + $('#blank').val() + '</td>' +
+                '<td data-name="qtde" class="qtde">' + $('#qtde').val() + '</td>' +
+                '<td data-name="material_id" class="material_id" data-materialid="' + $('#material_id option:selected').val() + '" >' + $('#material_id option:selected').text() + '</td>' +
+                '<td data-name="medidax" class="medidax">' + $('#medidax').val() + '</td>' +
+                '<td data-name="mediday" class="mediday">' + $('#mediday').val() + '</td>' +
+                '<td data-name="tempo_usinagem" class="tempo_usinagem">' + $('#tempo_usinagem').val() + '</td>' +
+                '<td data-name="tempo_acabamento" class="tempo_acabamento">' + $('#tempo_acabamento').val() + '</td>' +
+                '<td data-name="tempo_montagem" class="tempo_montagem">' + $('#tempo_montagem').val() + '</td>' +
+                '<td data-name="tempo_montagem_torre" class="tempo_montagem_torre">' + $('#tempo_montagem_torre').val() + '</td>' +
+                '<td data-name="tempo_inspecao" class="tempo_inspecao">' + $('#tempo_inspecao').val() + '</td>' +
+                '<td><button type="button" class="close" aria-label="Close" data-blank="' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
+                    '<span aria-hidden="true">&times;</span>' +
+                    '</button>' +
+                '</td>' +
             '</tr>');
 
         calculaTempos();
@@ -92,76 +95,135 @@ $(function () {
 
 
     function calculaTempos() {
-        somatempo_usinagem = somatempo_acabamento = somatempo_montagem = somamontagem_torre = somatempo_inspecao = 0;
+        somatempo_usinagem_total = somatempo_acabamento_total = somatempo_montagem_total = somamontagem_torre_total = somatempo_inspecao_total = '00:00:00';
         $('.tempo_usinagem').each(function (i, e) {
-            if (e.textContent != '') {
-                valor = parseFloat(e.textContent.replace(',', '.'));
-                somatempo_usinagem = somatempo_usinagem + valor;
-                somatempo_usinagem = calculaQuantidade(i, somatempo_usinagem);
+            if (e.textContent != '') {                                
+                somatempo_usinagem_linha = multiplicaMinutos(i, e.textContent);
+                somatempo_usinagem_total = somarHoras(somatempo_usinagem_total, somatempo_usinagem_linha);
             }
         });
 
         $('.tempo_acabamento').each(function (i, e) {
             if (e.textContent != '') {
-                valor = parseFloat(e.textContent.replace(',', '.'));
-                somatempo_acabamento = somatempo_acabamento + valor;
-                somatempo_acabamento = calculaQuantidade(i, somatempo_acabamento);
+                somatempo_acabamento_linha = multiplicaMinutos(i, e.textContent);
+                somatempo_acabamento_total = somarHoras(somatempo_acabamento_total, somatempo_acabamento_linha);
             }
         });
 
         $('.tempo_montagem').each(function (i, e) {
             if (e.textContent != '') {
-                valor = parseFloat(e.textContent.replace(',', '.'));
-                somatempo_montagem = somatempo_montagem + valor;
-                somatempo_montagem = calculaQuantidade(i, somatempo_montagem);
+                somatempo_montagem_linha = multiplicaMinutos(i, e.textContent);
+                somatempo_montagem_total = somarHoras(somatempo_montagem_total, somatempo_montagem_linha);
             }
         });
 
         $('.tempo_montagem_torre').each(function (i, e) {
             if (e.textContent != '') {
-                valor = parseFloat(e.textContent.replace(',', '.'));
-                somamontagem_torre = somamontagem_torre + valor;
-                somamontagem_torre = calculaQuantidade(i, somamontagem_torre);
+                somatempo_torre_linha = multiplicaMinutos(i, e.textContent);
+                somamontagem_torre_total = somarHoras(somamontagem_torre_total, somatempo_torre_linha);
             }
         });
 
         $('.tempo_inspecao').each(function (i, e) {
             if (e.textContent != '') {
-                valor = parseFloat(e.textContent.replace(',', '.'));
-                somatempo_inspecao = somatempo_inspecao + valor;
-                somatempo_inspecao = calculaQuantidade(i, somatempo_inspecao);
+                somatempo_inspecao_linha = multiplicaMinutos(i, e.textContent);
+                somatempo_inspecao_total = somarHoras(somatempo_inspecao_total, somatempo_inspecao_linha);
             }
         });
 
 
-        $('#soma_tempo_acabamento').val(somatempo_acabamento.toString().replace('.', ','));
-        $('#soma_tempo_montagem_torre').val(somamontagem_torre.toString().replace('.', ','));
-        $('#soma_tempo_montagem').val(somatempo_montagem.toString().replace('.', ','));
-        $('#soma_tempo_usinagem').val(somatempo_usinagem.toString().replace('.', ','));
-        $('#soma_tempo_inspecao').val(somatempo_inspecao.toString().replace('.', ','));
+        $('#soma_tempo_acabamento').val(somatempo_acabamento_total.toString().replace('.', ','));
+        $('#soma_tempo_montagem_torre').val(somamontagem_torre_total.toString().replace('.', ','));
+        $('#soma_tempo_montagem').val(somatempo_montagem_total.toString().replace('.', ','));
+        $('#soma_tempo_usinagem').val(somatempo_usinagem_total.toString().replace('.', ','));
+        $('#soma_tempo_inspecao').val(somatempo_inspecao_total.toString().replace('.', ','));
 
         bloqueiaEP();
     }
 
-    function calculaQuantidade(index, valor) {
+    /**
+     * Transforma um numero inteiro em formato de 00:00:00
+     * @param {*} numeroString 
+     * @returns 
+     */
+    function trataStringHora(numeroString) {
+        const numerosEncontrados = numeroString.match(/[0-9]/g);
 
-        qtde = $('.qtde').eq(index).text();
+        numerosString2 = numerosEncontrados ? numerosEncontrados.join('') : '';
 
-        var hms = valor;
-        var a = hms.split(':'); // split it at the colons
-
-        // minutes are worth 60 seconds. Hours are worth 60 minutes.
-        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
-
-        var newSeconds = seconds * qtde;
-
-        var t = new Date();
-        t.setSeconds(newSeconds);
-       
-        return t;
+        while (numerosString2.length < 6) {
+            numerosString2 = '0' + numerosString2;
+        }
+        return numerosString2.toString().substring(2, 0) + ':' + numerosString2.toString().substring(4, 2) + ':' + numerosString2.toString().substring(6, 4);
     }
 
-    
+    /**
+     * multiplica um valor em horas por um inteiro
+     * @param {*} index 
+     * @param {*} valor 
+     * @returns 
+     */
+    function multiplicaMinutos(index, valor) {
+
+        valor = trataStringHora(valor);
+        qtde = $('.qtde').eq(index).text();
+        valor = multiplicarHoras(valor, qtde);
+        return valor;
+    }
+
+    /**
+     * 
+     * @param {*} padraoHoras 
+     * @param {*} multiplicador 
+     * @returns 
+     */
+    function multiplicarHoras(padraoHoras, multiplicador) {
+
+        padraoHoras = trataStringHora(padraoHoras);
+
+        // Dividir as horas, minutos e segundos
+        const [horas, minutos, segundos] = padraoHoras.toString().split(':').map(Number);
+
+        // Converter tudo para segundos e multiplicar pelo fator
+        const totalSegundos = (horas * 3600 + minutos * 60 + segundos) * multiplicador;
+
+        // Converter de volta para o formato de horas
+        const novoHoras = Math.floor(totalSegundos / 3600);
+        const novoMinutos = Math.floor((totalSegundos % 3600) / 60);
+        const novoSegundos = totalSegundos % 60;
+
+        // Formatar e retornar o resultado
+        const resultado = novoHoras.toString().padStart(2, '0') + ':' + novoMinutos.toString().padStart(2, '0') + ':' + novoSegundos.toString().padStart(2, '0');
+
+        return resultado;
+    }
+
+    /**
+     * Soma dois valores de homas Ex: 00:00:10 + 00:00:10 = 00:00:20
+     * @param {*} hora1 
+     * @param {*} hora2 
+     * @returns 
+     */
+    function somarHoras(hora1, hora2) {
+
+        hora1 = trataStringHora(hora1);
+        hora2 = trataStringHora(hora2)
+        // Dividir as horas, minutos e segundos
+        const [h1, m1, s1] = hora1.toString().split(':').map(Number);
+        const [h2, m2, s2] = hora2.toString().split(':').map(Number);
+
+        // Somar as horas, minutos e segundos
+        const totalSegundos = (h1 * 3600 + m1 * 60 + s1) + (h2 * 3600 + m2 * 60 + s2);
+
+        // Converter de volta para o formato de horas
+        const novoHoras = Math.floor(totalSegundos / 3600);
+        const novoMinutos = Math.floor((totalSegundos % 3600) / 60);
+        const novoSegundos = totalSegundos % 60;
+
+        // Formatar e retornar o resultado
+        const resultado = novoHoras.toString().padStart(2, '0') + ':' + novoMinutos.toString().padStart(2, '0') + ':' + novoSegundos.toString().padStart(2, '0');
+        return resultado;
+    }
 
     $("#salvar_ficha").click(function () {
 

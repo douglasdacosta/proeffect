@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Fichastecnicas;
 use App\Models\Fichastecnicasitens;
 use App\Models\Materiais;
+use Illuminate\Support\Facades\DB;
 
 class FichatecnicaController extends Controller
 {
@@ -28,7 +29,7 @@ class FichatecnicaController extends Controller
     {
 
         $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
-        $codigo = !empty($request->input('codigo')) ? ($request->input('codigo')) : ( !empty($codigo) ? $codigo : false );
+        $ep = !empty($request->input('ep')) ? ($request->input('ep')) : ( !empty($ep) ? $ep : false );
 
         
         $fichatecnicas = new Fichastecnicas();
@@ -36,13 +37,9 @@ class FichatecnicaController extends Controller
         if ($id) {
         	$fichatecnicas = $fichatecnicas->where('id', '=', $id);
         }
-        if ($codigo) {
-        	$fichatecnicas = $fichatecnicas->where('codigo', '=', $codigo);
-        }
-
-        if ($request->input('nome') != '') {
-        	$fichatecnicas = $fichatecnicas->where('fichatecnica', 'like', '%'.$request->input('nome').'%');
-        }
+        if ($ep) {
+        	$fichatecnicas = $fichatecnicas->where('ep', '=', $ep);
+        }       
 
         $fichatecnicas = $fichatecnicas->get();
         $tela = 'pesquisa';
@@ -67,7 +64,6 @@ class FichatecnicaController extends Controller
     {
         $metodo = $request->method();
 
-        
     	if ($metodo == 'POST') {            
     		$fichatecnica_id = $this->salva($request);
 
@@ -94,25 +90,26 @@ class FichatecnicaController extends Controller
      */
     public function alterar(Request $request)
     {
-
-        $fichatecnicas = new Fichastecnicas();
-        
-
-        $fichatecnica= $fichatecnicas->where('id', '=', $request->input('id'))->get();
-
 		$metodo = $request->method();
+
 		if ($metodo == 'POST') {
 
     		$fichatecnica_id = $this->salva($request);
 
 	    	return redirect()->route('fichatecnica', [ 'id' => $fichatecnica_id ] );
-
     	}
+
+        $fichatecnicas = new Fichastecnicas();
+        $fichatecnicasitens = new Fichastecnicasitens();
+
+        $fichatecnica= $fichatecnicas->where('id', '=', $request->input('id'))->get();
+        $fichatecnicasitens= $fichatecnicasitens::with('materiais')->where('fichatecnica_id', '=', $request->input('id'))->get();
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,
                 'nome_tela' => 'ficha técnica',
 				'fichatecnicas'=> $fichatecnica,
+                'fichatecnicasitens' => $fichatecnicasitens,
 				'request' => $request,
                 'materiais' => $this->getAllMateriais(),
 				'rotaIncluir' => 'incluir-fichatecnica',
@@ -122,70 +119,73 @@ class FichatecnicaController extends Controller
         return view('fichatecnicas', $data);
     }
 
-    public function salva($request) {
-        $fichatecnicas = new Fichastecnicas();
-        $Fichastecnicasitens = new Fichastecnicasitens();
+    public function salva(Request  $request) {
 
-        if($request->input('id')) {
-            $fichatecnicas = $fichatecnicas::find($request->input('id'));
-            $Fichastecnicasitens::where('fichatecnica_id', '=', $request->input('id'))->delete();
-        }
-        // dd($request->input());
-        $fichatecnicas->ep = $request->input('ep');
-        $fichatecnicas->tempo_usinagem =  $request->input('soma_tempo_usinagem');
-        $fichatecnicas->tempo_acabamento =  $request->input('soma_tempo_acabamento');
-        $fichatecnicas->tempo_montagem =  $request->input('soma_tempo_montagem');
-        $fichatecnicas->tempo_montagem_torre =  $request->input('soma_tempo_montagem_torre');
-        $fichatecnicas->tempo_inspecao =  $request->input('soma_tempo_inspecao');
-        $fichatecnicas->status = $request->input('status') == 'on' ? 1 : 0;
-        $fichatecnicas->save();
+        DB::transaction(function () use ($request) {
 
-        $Fichastecnicasitens->fichatecnica_id = $fichatecnicas->id;
-        
-        $composicoes = json_decode($request->input('composicoes'));
-        $composicaoeps = json_decode($composicoes->composicaoep);
-        foreach ($composicaoeps as $key => $composicaoep) {
-            foreach ($composicaoep as $key => $value) {
-                // $value = json_decode($value);
-                $i = $value;
-
-                dd(($i));
-                // $dados[] =[ $value[0] => $value[1]];
+            $fichatecnicas = new Fichastecnicas();
+            $Fichastecnicasitens = new Fichastecnicasitens();
+            if($request->input('id')) {
+                $fichatecnicas = $fichatecnicas::find($request->input('id'));
+                $Fichastecnicasitens::where('fichatecnica_id', '=', $request->input('id'))->delete();
             }
+
+            $fichatecnicas->ep = $request->input('ep');
+            $fichatecnicas->tempo_usinagem =  $request->input('soma_tempo_usinagem');
+            $fichatecnicas->tempo_acabamento =  $request->input('soma_tempo_acabamento');
+            $fichatecnicas->tempo_montagem =  $request->input('soma_tempo_montagem');
+            $fichatecnicas->tempo_montagem_torre =  $request->input('soma_tempo_montagem_torre');
+            $fichatecnicas->tempo_inspecao =  $request->input('soma_tempo_inspecao');
+            $fichatecnicas->status = $request->input('status') == 'on' ? 1 : 0;
+            $fichatecnicas->save();
+            
+            $composicoes = json_decode($request->input('composicoes'));
+            $composicaoeps = json_decode($composicoes->composicaoep);            
+            foreach ($composicaoeps as $key1 => $composicaoep) {
+                foreach ($composicaoep as $key => $value) {
+                    $value_array = json_decode($value, true);
+                    $key = array_keys($value_array)[0];                    
+                    $dados[$key1][$key] =$value_array[$key];
+                }
+            }        
+
+            foreach ($dados as $key => $dado) {
+                
+                $inserts[] =[ 
+                    'fichatecnica_id' => $fichatecnicas->id,
+                    'materiais_id'=> $dado['material_id'],
+                    'blank'=> isset($dado['blank']) ? $dado['blank'] : null ,
+                    'qtde_blank'=> $dado['qtde'],
+                    'medidax'=> !empty($dado['medidax']) ? $dado['medidax'] : null ,
+                    'mediday'=> !empty($dado['mediday']) ? $dado['mediday'] : null ,
+                    'tempo_usinagem'=> !empty($dado['tempo_usinagem']) ? $this->trataStringHora($dado['tempo_usinagem']) : null ,
+                    'tempo_acabamento'=> !empty($dado['tempo_acabamento']) ? $this->trataStringHora($dado['tempo_acabamento']) : null ,
+                    'tempo_montagem'=> !empty($dado['tempo_montagem']) ? $this->trataStringHora($dado['tempo_montagem']) : null ,
+                    'tempo_montagem_torre'=> isset($dado['tempo_montagem_torre']) ? $this->trataStringHora($dado['tempo_montagem_torre']) : null ,
+                    'tempo_inspecao'=> !empty($dado['tempo_inspecao']) ? $this->trataStringHora($dado['tempo_inspecao']) : null ,
+                    'status' => 1,
+                ];
+            }
+            $Fichastecnicasitens->insert($inserts);
+            return $fichatecnicas->id;
+        });
+    }
+
+/**
+ * Transforma um numero inteiro em formato de 00:00:00
+ */
+    function trataStringHora($numeroString) {
+
+        preg_match_all('/[0-9]/', $numeroString, $numerosEncontrados);
+
+        $numerosString = $numerosEncontrados ? implode('', $numerosEncontrados[0]) : '';
+
+        while (strlen($numerosString) < 6) {
+            $numerosString = '0' . $numerosString;
         }
-
-        // dd($dados);
-        dd($composicoes);
-        // array:5 [▼ // app/Http/Controllers/FichatecnicaController.php:72
-//   0 => array:10 [▼
-//     0 => "{qtde:34}"
-//     1 => "{material_id:PR03 - PSAI Preto}"
-//     2 => "{medidax:34}"
-//     3 => "{mediday:34}"
-//     4 => "{tempo_usinagem:4}"
-//     5 => "{tempo_acabamento:3}"
-//     6 => "{tempo_montagem:2}"
-//     7 => "{tempo_montagem_torre:}"
-//     8 => "{tempo_inspecao:2}"
-//     9 => "{undefined:×}"
-//   ]
-        foreach ($composicaoeps as $key => $composicao) {
-            $Fichastecnicasitens->materiais_id = $dados['material_id'];
-            $Fichastecnicasitens->blank = $dados['blank'];
-            $Fichastecnicasitens->qtde_blank = $dados['qtde'];
-            $Fichastecnicasitens->medidax = $dados['medidax'];
-            $Fichastecnicasitens->mediday = $dados['mediday'];
-            $Fichastecnicasitens->tempo_usinagem = $dados['tempo_usinagem'];
-            $Fichastecnicasitens->tempo_acabamento = $dados['tempo_acabamento'];
-            $Fichastecnicasitens->tempo_montagem = $dados['tempo_montagem'];
-            $Fichastecnicasitens->tempo_montagem_torre = $dados['tempo_montagem_torre'];
-            $Fichastecnicasitens->tempo_inspecao = $dados['tempo_inspecao'];
-        }
-        
-
-        $Fichastecnicasitens->save();
-
-        return $fichatecnicas->id;
+        $horaFormatada = substr($numerosString, 0, 2) . ':' . substr($numerosString, 2, 2) . ':' . substr($numerosString, 4, 2);
+    
+        return $horaFormatada;
     }
 
     /**
