@@ -37,4 +37,5 @@ $(function ($) {
     $('.mask_minutos').mask('00:00', {reverse: true});
     $('.mask_horas').mask('00:00:00', {reverse: true});
     $('.mask_valor').mask("#.##0,00", {reverse: true});
+    $('.mask_date').mask('00/00/0000');
 });
