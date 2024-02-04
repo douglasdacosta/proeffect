@@ -22,7 +22,7 @@ class AjaxfichatecnicaController extends Controller
     /**
      * Create a new controller instance.
      *
-     * 
+     *
      */
     public function buscarMateriais(Request $request) {
 
@@ -31,8 +31,8 @@ class AjaxfichatecnicaController extends Controller
         if($request->input('id')) {
             $material= $materiais->where('id', '=', $request->input('id'))->get();
             return response($material);
-        } 
-        
+        }
+
         return response(null);
     }
 
@@ -43,7 +43,7 @@ class AjaxfichatecnicaController extends Controller
      */
     public function getAllMateriais() {
         $Materiais = new Materiais();
-        return $Materiais->where('status', '=', 1)->get();
+        return $Materiais->where('status', '=', 'A')->get();
 
     }
 }

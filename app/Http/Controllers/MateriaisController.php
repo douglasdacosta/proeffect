@@ -29,18 +29,22 @@ class MateriaisController extends Controller
         $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
         $codigo = !empty($request->input('codigo')) ? ($request->input('codigo')) : ( !empty($codigo) ? $codigo : false );
 
-        
+
         $materiais = new Materiais();
 
         if ($id) {
-        	$materiais = $materiais->where('id', '=', $id);
+        	$materiais->where('id', '=', $id);
         }
         if ($codigo) {
-        	$materiais = $materiais->where('codigo', '=', $codigo);
+        	$materiais->where('codigo', '=', $codigo);
         }
 
         if ($request->input('nome') != '') {
-        	$materiais = $materiais->where('material', 'like', '%'.$request->input('nome').'%');
+        	$materiais->where('material', 'like', '%'.$request->input('nome').'%');
+        }
+
+        if (!empty($request->input('status'))){
+            $materiais = $materiais->where('status', '=', $request->input('status'));
         }
 
         $materiais = $materiais->get();
@@ -94,7 +98,7 @@ class MateriaisController extends Controller
     {
 
         $materiais = new Materiais();
-        
+
 
         $material= $materiais->where('id', '=', $request->input('id'))->get();
 
@@ -130,9 +134,9 @@ class MateriaisController extends Controller
         $materiais->espessura = $request->input('espessura');
         $materiais->unidadex = $request->input('unidadex');
         $materiais->unidadey = $request->input('unidadey');
-        $materiais->tempo_montagem_torre = $request->input('tempo_montagem_torre');        
-        $materiais->valor = DateHelpers::formatFloatValue($request->input('valor'));        
-        $materiais->status = $request->input('status') == 'on' ? 1 : 0;
+        $materiais->tempo_montagem_torre = $request->input('tempo_montagem_torre');
+        $materiais->valor = DateHelpers::formatFloatValue($request->input('valor'));
+        $materiais->status = $request->input('status');
         $materiais->save();
 
         return $materiais->id;

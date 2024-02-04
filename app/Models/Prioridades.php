@@ -6,11 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Pessoas extends Model
-{    
+class Prioridades extends Model
+{
     use HasFactory;
 
-    public function pessoas(){
-        return $this->belongsTo(Pedidos::class);
-    }
 }

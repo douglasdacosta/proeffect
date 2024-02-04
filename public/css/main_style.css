@@ -1,0 +1,12 @@
+ .table tr td {    
+        border: 2px solid;
+ }
+
+
+ .table tr td .top_texto_qualidade {
+    margin-top: 30%;
+}
+
+.table tr td .top_texto_itens {
+    margin-top: 200%;
+}

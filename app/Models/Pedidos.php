@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 
 class Pedidos extends Model
-{    
+{
     use HasFactory;
 
     protected $table = 'pedidos';
@@ -22,4 +22,22 @@ class Pedidos extends Model
     {
         return $this->HasOne(Fichastecnicas::class, 'id', 'fichatecnica_id');
     }
+
+    public function tabelaPessoas(): HasOne
+    {
+        return $this->HasOne(Pessoas::class, 'id', 'pessoas_id');
+    }
+
+
+    public function tabelaTransportes(): HasOne
+    {
+        return $this->HasOne(Transportes::class, 'id', 'transporte_id');
+    }
+
+
+    public function tabelaPrioridades(): HasOne
+    {
+        return $this->HasOne(prioridades::class, 'id', 'prioridade_id');
+    }
+
 }

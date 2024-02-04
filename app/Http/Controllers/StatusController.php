@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\status;
+use App\Models\Status;
 class StatusController extends Controller
 {
     /**
@@ -23,17 +23,19 @@ class StatusController extends Controller
      */
     public function index(Request $request)
     {
-
-        $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
-        
         $status = new Status();
 
+        $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
+
         if ($id) {
-        	$status = $status->where('id', '=', $id);
+            $status = $status->where('id', '=', $id);
         }
 
+        if (!empty($request->input('status'))){
+            $status = $status->where('status', '=', $request->input('status'));
+        }
         if ($request->input('nome') != '') {
-        	$status = $status->where('status', 'like', '%'.$request->input('nome').'%');
+        	$status = $status->where('nome', 'like', '%'.$request->input('nome').'%');
         }
 
         $status = $status->get();
@@ -87,7 +89,7 @@ class StatusController extends Controller
     {
 
         $status = new Status();
-        
+
 
         $status= $status->where('id', '=', $request->input('id'))->get();
 
@@ -117,11 +119,12 @@ class StatusController extends Controller
 
         if($request->input('id')) {
             $status = $status::find($request->input('id'));
+        } else {
+            $status->nome = $request->input('nome');
         }
 
-        $status->nome = $request->input('nome');
         $status->alertacliente = $request->input('alertacliente') == 'on' ? 1 : 0;
-        $status->status = $request->input('status') == 'on' ? 1 : 0;
+        $status->status = $request->input('status');
         $status->save();
 
         return $status->id;

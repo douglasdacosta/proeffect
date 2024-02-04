@@ -3,7 +3,7 @@ $(function () {
 
     calculaTempos()
     $('.toast').hide();
-    
+
     function bloqueiaEP() {
         if ($('#table_composicao tbody tr').length > 0) {
             $('#ep').attr('readonly', true);
@@ -54,9 +54,10 @@ $(function () {
             $('#qtde').focus();
             return false;
         }
+        blank = $('#blank').val().toUpperCase();
         $('#table_composicao tbody').append(
             '<tr class="blank_' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
-                '<td data-name="blank" class="blank" scope="row">' + $('#blank').val() + '</td>' +
+                '<td data-name="blank" class="blank" scope="row">' + blank + '</td>' +
                 '<td data-name="qtde" class="qtde">' + $('#qtde').val() + '</td>' +
                 '<td data-name="material_id" class="material_id" data-materialid="' + $('#material_id option:selected').val() + '" >' + $('#material_id option:selected').text() + '</td>' +
                 '<td data-name="medidax" class="medidax">' + $('#medidax').val() + '</td>' +
@@ -97,7 +98,7 @@ $(function () {
     function calculaTempos() {
         somatempo_usinagem_total = somatempo_acabamento_total = somatempo_montagem_total = somamontagem_torre_total = somatempo_inspecao_total = '00:00:00';
         $('.tempo_usinagem').each(function (i, e) {
-            if (e.textContent != '') {                                
+            if (e.textContent != '') {
                 somatempo_usinagem_linha = multiplicaMinutos(i, e.textContent);
                 somatempo_usinagem_total = somarHoras(somatempo_usinagem_total, somatempo_usinagem_linha);
             }
@@ -143,8 +144,8 @@ $(function () {
 
     /**
      * Transforma um numero inteiro em formato de 00:00:00
-     * @param {*} numeroString 
-     * @returns 
+     * @param {*} numeroString
+     * @returns
      */
     function trataStringHora(numeroString) {
         const numerosEncontrados = numeroString.match(/[0-9]/g);
@@ -159,9 +160,9 @@ $(function () {
 
     /**
      * multiplica um valor em horas por um inteiro
-     * @param {*} index 
-     * @param {*} valor 
-     * @returns 
+     * @param {*} index
+     * @param {*} valor
+     * @returns
      */
     function multiplicaMinutos(index, valor) {
 
@@ -172,10 +173,10 @@ $(function () {
     }
 
     /**
-     * 
-     * @param {*} padraoHoras 
-     * @param {*} multiplicador 
-     * @returns 
+     *
+     * @param {*} padraoHoras
+     * @param {*} multiplicador
+     * @returns
      */
     function multiplicarHoras(padraoHoras, multiplicador) {
 
@@ -200,9 +201,9 @@ $(function () {
 
     /**
      * Soma dois valores de homas Ex: 00:00:10 + 00:00:10 = 00:00:20
-     * @param {*} hora1 
-     * @param {*} hora2 
-     * @returns 
+     * @param {*} hora1
+     * @param {*} hora2
+     * @returns
      */
     function somarHoras(hora1, hora2) {
 
@@ -243,7 +244,7 @@ $(function () {
             composicaoep.push(json);
         })
 
-        
+
 
 
 

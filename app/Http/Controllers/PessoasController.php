@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\pessoas;
-class pessoasController extends Controller
+use App\Models\Pessoas;
+class PessoasController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -25,22 +25,28 @@ class pessoasController extends Controller
     {
 
         $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
-        
+
         $pessoas = new Pessoas();
 
         if ($id) {
         	$pessoas = $pessoas->where('id', '=', $id);
         }
 
+
+
+        if (!empty($request->input('status'))){
+            $pessoas = $pessoas->where('status', '=', $request->input('status'));
+        }
+
         if ($request->input('nome') != '') {
-        	$pessoas = $pessoas->where('pessoa', 'like', '%'.$request->input('nome').'%');
+        	$pessoas = $pessoas->where('nome', 'like', '%'.$request->input('nome').'%');
         }
 
         $pessoas = $pessoas->get();
         $tela = 'pesquisa';
     	$data = array(
 				'tela' => $tela,
-                'nome_tela' => 'pessoas',
+                'nome_tela' => 'clientes',
 				'pessoas'=> $pessoas,
 				'request' => $request,
 				'rotaIncluir' => 'incluir-clientes',
@@ -69,7 +75,7 @@ class pessoasController extends Controller
         $tela = 'incluir';
     	$data = array(
 				'tela' => $tela,
-                'nome_tela' => 'pessoas',
+                'nome_tela' => 'clientes',
 				'request' => $request,
 				'rotaIncluir' => 'incluir-clientes',
 				'rotaAlterar' => 'alterar-clientes'
@@ -87,7 +93,7 @@ class pessoasController extends Controller
     {
 
         $pessoas = new Pessoas();
-        
+
 
         $pessoa= $pessoas->where('id', '=', $request->input('id'))->get();
 
@@ -102,7 +108,7 @@ class pessoasController extends Controller
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,
-                'nome_tela' => 'pessoas',
+                'nome_tela' => 'clientes',
 				'pessoas'=> $pessoa,
 				'request' => $request,
 				'rotaIncluir' => 'incluir-clientes',
@@ -119,17 +125,19 @@ class pessoasController extends Controller
             $pessoas = $pessoas::find($request->input('id'));
         }
 
-        $pessoas->nome = $request->input('nome');
-        $pessoas->documento = $request->input('documento');
+        $pessoas->codigo_cliente = $request->input('codigo_cliente');
+        $pessoas->nome_cliente = $request->input('nome_cliente');
+        $pessoas->nome_contato = $request->input('nome_contato');
+        $pessoas->nome_assistente = $request->input('nome_assistente');
         $pessoas->endereco = $request->input('endereco');
         $pessoas->numero = $request->input('numero');
         $pessoas->cep = $request->input('cep');
         $pessoas->bairro = $request->input('bairro');
         $pessoas->cidade = $request->input('cidade');
         $pessoas->estado = $request->input('estado');
-        $pessoas->telefone = $request->input('telefone');
+        $pessoas->telefone = preg_replace("/[^0-9]/", "", $request->input('telefone'));
         $pessoas->email = $request->input('email');
-        $pessoas->status = $request->input('status') == 'on' ? 1 : 0;
+        $pessoas->status = $request->input('status');
         $pessoas->save();
 
         return $pessoas->id;

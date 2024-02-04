@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('unidadey')->length(11)->nullable();
             $table->time('tempo_montagem_torre')->nullable();
             $table->float('valor',11, 2)->nullable();
-            $table->boolean('status')->nullable();
+            $table->string('status',1);
             $table->timestamps();
         });
 
@@ -31,56 +31,56 @@ return new class extends Migration
         DB::table('materiais')->insert(
             [
                 [
-                    'codigo'=>'T07', 
-                    'material'=>'Torre 07', 
-                    'tempo_montagem_torre'=> '00:07', 
+                    'codigo'=>'T07',
+                    'material'=>'Torre 07',
+                    'tempo_montagem_torre'=> '00:07',
                     'espessura' => null,
                     'unidadex' => null,
-                    'unidadey' => null,  
+                    'unidadey' => null,
                     'valor' => '1.50',
-                    'status' => 1
+                    'status' => 'A'
                 ],
                 [
-                    'codigo'=>'T08', 
-                    'material'=>'Torre 08', 
-                    'tempo_montagem_torre'=> '00:07', 
+                    'codigo'=>'T08',
+                    'material'=>'Torre 08',
+                    'tempo_montagem_torre'=> '00:07',
                     'espessura' => null,
                     'unidadex' => null,
-                    'unidadey' => null, 
+                    'unidadey' => null,
                     'valor' => '1.00',
-                    'status' => 1
+                    'status' => 'A'
                 ],
                 [
-                    'codigo'=>'PR03', 
+                    'codigo'=>'PR03',
                     'material'=>'PSAI Preto',
-                    'tempo_montagem_torre'=> '', 
+                    'tempo_montagem_torre'=> '',
                     'espessura' => '3',
                     'unidadex' => '1200',
-                    'unidadey' => '950',                  
+                    'unidadey' => '950',
                     'valor' => '95.50',
-                    'status' => 1
+                    'status' => 'A'
                 ],
                 [
-                    'codigo'=>'CZ03', 
+                    'codigo'=>'CZ03',
                     'material'=>'PSAI Cinza Claro',
-                    'tempo_montagem_torre'=> '', 
+                    'tempo_montagem_torre'=> '',
                     'espessura' => '3',
                     'unidadex' => '1000',
-                    'unidadey' => '1000',                  
+                    'unidadey' => '1000',
                     'valor' => '150.50',
-                    'status' => 1
+                    'status' => 'A'
                 ]
             ]
         );
     }
 
-    /**
+  /**
      * Reverse the migrations.
      *
      * @return void
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('materiais');
     }
 };

@@ -1,3 +1,4 @@
+
 // $(document).ready(function(){
 //     $('.date').mask('00/00/0000');
 //     $('.time').mask('00:00:00');
@@ -38,4 +39,28 @@ $(function ($) {
     $('.mask_horas').mask('00:00:00', {reverse: true});
     $('.mask_valor').mask("#.##0,00", {reverse: true});
     $('.mask_date').mask('00/00/0000');
+
+    var behavior = function (val) {
+        return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+    },
+    options = {
+        onKeyPress: function (val, e, field, options) {
+            field.mask(behavior.apply({}, arguments), options);
+        }
+    };
+    $('.mask_phone').mask(behavior, options);
+
+
 });
+
+
+function createPopupWin(pageURL, pageTitle,
+    popupWinWidth, popupWinHeight) {
+    let left = (screen.width);
+    let top = (screen.height);
+    let myWindow = window.open(pageURL, pageTitle,
+        'resizable=yes, width=' + popupWinWidth
+        + ', height=' + popupWinHeight + ', top='
+        + top + ', left=' + left);
+}
+

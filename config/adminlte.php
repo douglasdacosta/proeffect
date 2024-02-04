@@ -353,6 +353,13 @@ return [
             'label'       => '',
             'label_color' => 'success',
         ],
+        [
+            'text'        => 'Maquinas',
+            'url'         => 'maquinas',
+            'icon'        => 'far fa-fw fa-file',
+            'label'       => '',
+            'label_color' => 'success',
+        ],
         ['header' => 'Configurações'],
         [
             'text' => 'Conta',

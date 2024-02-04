@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Pedidos;
+use Illuminate\Http\Response;
 
 class HomeController extends Controller
 {
@@ -25,4 +26,24 @@ class HomeController extends Controller
     {
         return view('home');
     }
+
+    public function getProducao()
+    {
+        $pedidos = new Pedidos();
+        $pedidos = $pedidos::with('tabelaStatus')->where('status', '=', '1')->get();
+        $totais =[];
+        $total_pedidos = 0;
+        foreach ($pedidos as $key => $pedido) {
+            $total_pedidos++;
+            $totais[$pedido->tabelaStatus->nome]['qtde'] = (isset($totais[$pedido->tabelaStatus->nome]['qtde']) ? $totais[$pedido->tabelaStatus->nome]['qtde'] : 0) + 1;
+        }
+
+        $data  = [
+            'total_pedidos' => $total_pedidos,
+            'totais' => $totais,
+        ];
+        return response($data);
+    }
+
+
 }
