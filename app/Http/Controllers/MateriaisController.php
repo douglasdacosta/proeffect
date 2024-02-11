@@ -110,6 +110,7 @@ class MateriaisController extends Controller
 	    	return redirect()->route('materiais', [ 'id' => $material_id ] );
 
     	}
+
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,
