@@ -3,8 +3,8 @@
 @section('content')
 
 @foreach ($folhas as $key => $folha)
-    <div class="container" style="@if ($key >0 ) {{'margin-top: 620px'}} @else {{''}} @endif">
-        <table class="table text-center" style="font-size: 75%;  border-collapse: collapse; border: 2px solid black">
+    <div id="imprimir" class="contenedor">
+        <table class="table text-center">
             <tbody>
             <tr>
                 <td colspan="3" class="font-weight-bold">Eplax</td>
@@ -13,12 +13,12 @@
             </tr>
             <tr>
                 <td colspan="2" class="font-weight-bold">Processo</td>
-                <td >{{$folha['status']}}</td>
-                <td  class="font-weight-bold">Nº O.S</td>
-                <td >{{$pedidos[0]->os}}</td>
-                <td colspan="2" class="font-weight-bold">Código do produto(EP)</td>
-                <td >{{$pedidos[0]->tabelaFichastecnicas->ep}}</td>
-                <td class="font-weight-bold">Data </td>
+                <td>{{$folha['status']}}</td>
+                <td class="font-weight-bold">Nº O.S</td>
+                <td>{{$pedidos[0]->os}}</td>
+                <td colspan="3" class="font-weight-bold">Código do produto(EP)</td>
+                <td>{{$pedidos[0]->tabelaFichastecnicas->ep}}</td>
+                <td class="font-weight-bold">Data</td>
                 <td >{{ Carbon\Carbon::createFromDate(date('Y-m-d'))->format('d/m/Y') }}</td>
             </tr>
             <tr>
@@ -53,59 +53,35 @@
                 </tr>
             @endfor
             <tr>
-                <td colspan="2" rowspan="5" class="font-weight-bold "><p class='top_texto_qualidade'>Alertas de qualidade</p></td>
-                <td colspan="9">{{$folha['alerta1']}}</td>
+                <td colspan="2" rowspan="5" class="font-weight-bold ">
+                    <p class='top_texto_qualidade'>Alertas de qualidade</p>
+                </td>
+                <td colspan="9">@if ($folha['alerta1']) {{$folha['alerta1']}} @else &nbsp; @endif</td>
             </tr>
             <tr>
-                <td colspan="9">{{$folha['alerta2']}}</td>
+                <td colspan="9">@if ($folha['alerta2']) {{$folha['alerta2']}} @else &nbsp; @endif</td>
             </tr>
             <tr>
-                <td colspan="9">{{$folha['alerta3']}}</td>
+                <td colspan="9">@if ($folha['alerta3']) {{$folha['alerta3']}} @else &nbsp; @endif</td>
             </tr>
             <tr>
-                <td colspan="9">{{$folha['alerta4']}}</td>
+                <td colspan="9">@if ($folha['alerta4']) {{$folha['alerta4']}} @else &nbsp; @endif</td>
             </tr>
             <tr>
-                <td colspan="9">{{$folha['alerta5']}}</td>
+                <td colspan="9">@if ($folha['alerta5']) {{$folha['alerta5']}} @else &nbsp; @endif</td>
             </tr>
             <tr>
-                <td rowspan="6" class="font-weight-bold "><div class="top_texto_itens">Itens</p></td>
-            </tr>
-            <tr>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-                <td>Data</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
-                <td>Operador</td>
+                <td  rowspan="5" class="font-weight-bold "><p class="top_texto_itens">Itens</p></td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
+                <td >Data</td>
             </tr>
             <tr>
                 <td>&nbsp;</td>
@@ -120,6 +96,30 @@
                 <td></td>
             </tr>
             <tr>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+                <td>Operador</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
                 <td>Processo</td>
                 <td>Processo</td>
                 <td>Processo</td>
@@ -130,6 +130,19 @@
                 <td>Processo</td>
                 <td>Processo</td>
                 <td>Processo</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
             @for ($i = 1; $i < 5; $i++)
             <tr>

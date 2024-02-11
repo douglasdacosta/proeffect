@@ -37,7 +37,7 @@ class Pedidos extends Model
 
     public function tabelaPrioridades(): HasOne
     {
-        return $this->HasOne(prioridades::class, 'id', 'prioridade_id');
+        return $this->HasOne(Prioridades::class, 'id', 'prioridade_id');
     }
 
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alertas;
+use App\Models\HistoricosPedidos;
 use Illuminate\Support\Facades\DB;
 use App\Models\Fichastecnicas;
 use App\Models\Fichastecnicasitens;
@@ -14,6 +16,8 @@ use App\Models\Prioridades;
 use App\Models\Transportes;
 use App\Providers\DateHelpers;
 use App\Http\Controllers\MaquinasController;
+use App\Http\Controllers\ContatosController;
+use App\Http\Controllers\PDFController;
 use App\Models\Maquinas;
 
 class PedidosController extends Controller
@@ -43,11 +47,12 @@ class PedidosController extends Controller
         $nome_cliente = !empty($request->input('nome_cliente')) ? ($request->input('nome_cliente')) : (!empty($nome_cliente) ? $nome_cliente : false);
 
 
+
         $pedidos = DB::table('pedidos')
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome');
+            ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome' , 'status.id as id_status');
 
         if (!empty($request->input('status'))){
             $pedidos = $pedidos->where('pedidos.status', '=', $request->input('status'));
@@ -61,6 +66,15 @@ class PedidosController extends Controller
             $pedidos = $pedidos->where('pedidos.status_id', '=', $status_id);
         }
 
+        if(!empty($request->input('data_entrega')) && !empty($request->input('data_entrega_fim') )) {
+            $pedidos = $pedidos->whereBetween('pedidos.data_entrega', [DateHelpers::formatDate_dmY($request->input('data_entrega')), DateHelpers::formatDate_dmY($request->input('data_entrega_fim'))]);
+        }
+        if(!empty($request->input('data_entrega')) && empty($request->input('data_entrega_fim') )) {
+            $pedidos = $pedidos->where('pedidos.data_entrega', '>=', DateHelpers::formatDate_dmY($request->input('data_entrega')));
+        }
+        if(empty($request->input('data_entrega')) && !empty($request->input('data_entrega_fim') )) {
+            $pedidos = $pedidos->where('pedidos.data_entrega', '<=', DateHelpers::formatDate_dmY($request->input('data_entrega_fim')));
+        }
 
         if ($codigo_cliente) {
             $pedidos = $pedidos->where('pessoas.codigo_cliente', '=', $codigo_cliente);
@@ -78,7 +92,7 @@ class PedidosController extends Controller
             'nome_tela' => 'pedidos',
             'pedidos' => $pedidos,
             'request' => $request,
-            'status' => $this->getAllStatus(),
+            'AllStatus' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
             'rotaAlterar' => 'alterar-pedidos'
         );
@@ -97,8 +111,9 @@ class PedidosController extends Controller
 
         if ($metodo == 'POST') {
 
-            $pedidos_id = $this->salva($request);
 
+            $pedidos_id = $this->salva($request);
+            $this->historicosPedidos($pedidos_id, $request->input('status_id'));
             return redirect()->route('pedidos', ['id' => $pedidos_id]);
         }
 
@@ -131,8 +146,6 @@ class PedidosController extends Controller
         $historico = '';
         $pedidos = $pedidos->where('id', '=', $request->input('id'))->get();
 
-
-
         $metodo = $request->method();
         if ($metodo == 'POST') {
 
@@ -142,7 +155,16 @@ class PedidosController extends Controller
 
             }
 
+            if($pedidos[0]->status!= $request->input('status_id')) {
+
+                $this->historicosPedidos($request->input('id'), $request->input('status_id'));
+
+                $this->filaAlerta($request->input('id'),$pedidos[0]->status, $request->input('status_id'));
+
+            }
+
             $pedidos_id = $this->salva($request, $historico);
+            // $this->enviaEmail($request);
 
             return redirect()->route('pedidos', ['id' => $pedidos_id]);
         }
@@ -164,6 +186,76 @@ class PedidosController extends Controller
         );
 
         return view('pedidos', $data);
+    }
+
+    public function ajaxAlterar(Request $request) {
+        $pedidos = new Pedidos();
+
+        if($request->input('id')) {
+            $pedidos= $pedidos::find($request->input('id'));
+            $status_anterior = $pedidos->status_id;
+            $pedidos->status_id = $request->input('status');
+            $pedidos->save();
+
+            $this->historicosPedidos($request->input('id'), $request->input('status'));
+
+            $this->filaAlerta($request->input('id'),$status_anterior,$request->input('status'));
+            // $status = $status::find($request->input('status'));
+            // if($status->alertacliente == 1){
+            //     $this->enviaEmail($request);
+            // }
+
+            return response('Pedido alterado com sucesso!', 200);
+        }
+
+        return response('Erro para salvar', 501);
+    }
+
+    public function historicosPedidos($pedido_id, $status_id) {
+        $historicosPedidos = new HistoricosPedidos();
+        $historicosPedidos->pedidos_id = $pedido_id;
+        $historicosPedidos->status_id = $status_id;
+        $historicosPedidos->save();
+    }
+
+    public function filaAlerta($pedido_id, $status_id_anterior, $novo_status_id) {
+
+        $count = DB::table('alertas')->where('pedidos_id', '=', $pedido_id)->where('enviado', '=', 0)->count();
+
+        if($count == 0) {
+            $file = new Alertas();
+            $file->pedidos_id = $pedido_id;
+            $file->enviado = false;
+            $file->save();
+        }
+    }
+
+    public function enviaEmail(Request $request) {
+
+        $contatos = new ContatosController();
+
+        $pedido = $request->input('id');
+
+        $pedidos = DB::table('pedidos')
+        ->join('status', 'pedidos.status_id', '=', 'status.id')
+        ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
+        ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
+        ->select('pedidos.os', 'pedidos.id', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'pessoas.email','status.nome' );
+
+        $pedidos->where('pedidos.id', '=', $pedido);
+        $pedidos = $pedidos->get();
+
+        $dados = [
+            'fromName' => 'Eplax',
+            'fromEmail' => 'Eplax@eplax.com.br',
+            'assunto' => 'Atualização de status do seu pedido - Eplax',
+            'texto' => 'Seu pedido '. $pedidos[0]->os.' mudou de status para '. $pedidos[0]->nome,
+            'nome_cliente' => $pedidos[0]->nome_cliente,
+            'email_cliente' => $pedidos[0]->email,
+        ];
+        $contatos->store($dados);
+
+
     }
 
     public function salva($request, $historico='')
@@ -206,6 +298,8 @@ class PedidosController extends Controller
     */
     public function followup(Request $request)
     {
+
+
         $filtrado = 0;
         $pedidos = new Pedidos();
 
@@ -265,10 +359,15 @@ class PedidosController extends Controller
                 $pedidos_encontrados[] = $value->id;
             }
         }
-
+        $tela = 'pesquisa-followup';
+        $nome_tela = 'followup tempos';
+        if(\Request::route()->getName() == 'followup-geral'){
+            $tela = \Request::route()->getName();
+            $nome_tela = 'followup geral';
+        }
         $data = array(
-            'tela' => 'pesquisa-followup',
-            'nome_tela' => 'followup',
+            'tela' => $tela,
+            'nome_tela' =>$nome_tela,
             'pedidos_encontrados' => $pedidos_encontrados,
             'pedidos' => $pedidos,
             'request' => $request,
@@ -276,6 +375,7 @@ class PedidosController extends Controller
             'rotaIncluir' => 'incluir-pedidos',
             'rotaAlterar' => 'alterar-pedidos'
         );
+
 
         return view('pedidos', $data);
     }
@@ -289,12 +389,14 @@ class PedidosController extends Controller
     {
         $pedidos = new Pedidos();
 
+        $nome_tela = !empty($request->input('nome_tela')) ? $request->input('nome_tela') : 'tempos' ;
+
         if(empty($request->input('pedidos_encontrados'))) {
             return redirect()->route('followup');
         }
         $pedidos_encontrados = json_decode($request->input('pedidos_encontrados'));
 
-        $pedidos = $pedidos::with('tabelaStatus', 'tabelaFichastecnicas')->wherein('id', $pedidos_encontrados)->get();
+        $pedidos = $pedidos::with('tabelaStatus', 'tabelaFichastecnicas', 'tabelaPessoas')->wherein('id', $pedidos_encontrados)->get();
 
         $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
         $dados_pedido_status=[];
@@ -352,28 +454,37 @@ class PedidosController extends Controller
 
 
 
-            $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia, $horas_maquinas);
+            $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia.':00:00');
             $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia, $horas_dia);
             $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia, $horas_dia);
             $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia, $horas_dia);
         }
 
+
+
+        $tela = 'followup-detalhes';
+        $nome_da_tela ='followup tempos';
+        if($nome_tela == 'geral') {
+            $tela = 'followup-detalhes-geral';
+            $nome_da_tela ='followup geral';
+        }
+
         $data = array(
-            'tela' => 'followup-detalhes',
-            'nome_tela' => 'followup',
+            'tela' => $tela,
+            'nome_tela' => $nome_da_tela,
             'dados_pedido_status' => $dados_pedido_status,
             'request' => $request,
             'status' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
             'rotaAlterar' => 'alterar-pedidos'
         );
+
+
         return view('pedidos', $data);
     }
-    /**
-    * Show the application dashboard.
-    *
-    * @return \Illuminate\Contracts\Support\Renderable
-    */
+
+
+
     public function imprimirOS(Request $request)
     {
         $pedidos = new Pedidos();
@@ -441,7 +552,11 @@ class PedidosController extends Controller
             'qtde_blank' => $qdte_blank,
             'qtde_conjuntos' => count($conjuntos['conjuntos'])
         ];
-        return view('imprimir_os', $data);
+        $imprimirPDF = new PDFController();
+
+        return $imprimirPDF->generatePDF($data, 'imprimir_os');
+
+        // return view('imprimir_os', $data);
     }
 
     public function imprimirMP(Request $request)
@@ -454,7 +569,10 @@ class PedidosController extends Controller
             'fichastecnicasitens' => $fichastecnicasitens,
         ];
 
-        return view('imprimir_mp', $data);
+        $imprimirPDF = new PDFController();
+
+        return $imprimirPDF->generatePDF($data, 'imprimir_mp');
+        // return view('imprimir_mp', $data);
     }
     function divideHoursAndReturnWorkDays($totalHours, $smallerHours, $horas_diarias) {
         // Extrair as horas, minutos e segundos do total
@@ -467,38 +585,42 @@ class PedidosController extends Controller
         $smallerSeconds = $smallerHours * 3600;
 
         // Dividir o total de segundos pelo valor menor
-        $resultDays = $totalSeconds / $smallerSeconds / $horas_diarias;
+        $resultDays = $totalSeconds / $smallerSeconds ;
 
         // Formatar o resultado
-        $resultTime = sprintf("%.2f dias de trabalho", $resultDays);
+        $resultTime = sprintf("%.1f dias de trabalho", $resultDays);
 
         return $resultTime;
     }
 
+    static function formatarHoraMinuto($hora) {
+        // Separando as partes da hora
+        $partes = explode(":", $hora);
+
+        // Se houver mais de duas partes, mantenha apenas as duas primeiras
+        if (count($partes) > 2) {
+            return $partes[0] . ":" . $partes[1];
+        } else {
+            return $hora; // Já está no formato desejado
+        }
+    }
 
 
-    function divideHoursIntoDays($time, $divisor) {
-        // Extrair as horas, minutos e segundos
-        list($hours, $minutes, $seconds) = explode(':', $time);
+    function divideHoursIntoDays($tempoTotal, $tempoDiario) {
+        /// Convertendo os tempos para segundos
+        list($horasTotal, $minutosTotal, $segundosTotal) = explode(":", $tempoTotal);
+        $tempoTotalSegundos = $horasTotal * 3600 + $minutosTotal * 60 + $segundosTotal;
 
-        // Calcular o total de segundos
-        $totalSeconds = $hours * 3600 + $minutes * 60 + $seconds;
+        list($horasDiario, $minutosDiario, $segundosDiario) = explode(":", $tempoDiario);
+        $tempoDiarioSegundos = $horasDiario * 3600 + $minutosDiario * 60 + $segundosDiario;
 
-        // Dividir o total de segundos pelo divisor
-        $resultSeconds = $totalSeconds / $divisor;
+        // Calculando o resultado em dias
+        $resultadoDias = $tempoTotalSegundos / $tempoDiarioSegundos;
 
-        // Calcular dias, horas, minutos e segundos resultantes
-        $daysResult = floor($resultSeconds / (24 * 3600));
-        $resultSeconds %= (24 * 3600);
-        $hoursResult = floor($resultSeconds / 3600);
-        $resultSeconds %= 3600;
-        $minutesResult = floor($resultSeconds / 60);
-        $secondsResult = $resultSeconds % 60;
+        // Formatando o resultado
+        $mensagem = sprintf("%.1f dias de máquinas", $resultadoDias);
 
-        // Formatar o resultado
-        $resultTime = sprintf("%d dias %02d:%02d:%02d", $daysResult, $hoursResult, $minutesResult, $secondsResult);
-
-        return $resultTime;
+        return $mensagem;
     }
 
     /**

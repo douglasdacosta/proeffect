@@ -49,8 +49,39 @@ $(function ($) {
         }
     };
     $('.mask_phone').mask(behavior, options);
+    $('.toast').hide();
 
 
+    $(".alteracao_status_pedido").change(function () {
+        if (!confirm("Você deseja realmente alterar este pedido?")) {
+            $(this).val($(this).data('statusatual'));
+            return false;
+        }
+
+        $('.overlay').show();
+        var pedido = $(this).data('pedido');
+        var status = $(this).val();
+        alert()
+        $.ajax({
+            type: "POST",
+            url: '/alterar-pedidos-ajax',
+            data: {
+                'id': pedido,
+                'status': status,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                abreAlertSuccess(data, false);
+                $('.overlay').hide();
+            },
+            error: function (data, textStatus, errorThrown) {
+                abreAlertSuccess(data, true);
+                $('.overlay').hide();
+            },
+
+        });
+
+    })
 });
 
 
@@ -63,4 +94,19 @@ function createPopupWin(pageURL, pageTitle,
         + ', height=' + popupWinHeight + ', top='
         + top + ', left=' + left);
 }
+
+function abreAlertSuccess(texto, erro) {
+    if(erro) {
+        $('.toast').addClass('bg-danger')
+    } else {
+        $('.toast').addClass('bg-success')
+    }
+    $('.textoAlerta').text(texto);
+    $('.toast').show();
+    setTimeout(function () {
+        $('.toast').hide('slow');
+    }, 7000);
+};
+
+
 

@@ -17,7 +17,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Auth::routes();
+Auth::routes(['register' => false, 'reset' => false]);
 
 Route::get('admin/settings', [App\Http\Controllers\SettingsController::class, 'index'])->name('settings');
 Route::post('admin/alterar-senha', [App\Http\Controllers\SettingsController::class, 'edit'])->name('alterar-senha');
@@ -41,13 +41,21 @@ Route::match(['get', 'post'],'/ajax-fichatecnica', [App\Http\Controllers\Ajaxfic
 
 Route::match(['get', 'post'],'/ajax-getProducao', [App\Http\Controllers\HomeController::class, 'getProducao'])->name('ajax-getProducao');
 Route::match(['get', 'post'],'/followup', [App\Http\Controllers\PedidosController::class, 'followup'])->name('followup');
+Route::match(['get', 'post'],'/followup-geral', [App\Http\Controllers\PedidosController::class, 'followup'])->name('followup-geral');
 Route::match(['get', 'post'],'/imprimir-os', [App\Http\Controllers\PedidosController::class, 'imprimirOS'])->name('imprimirOS');
 Route::match(['get', 'post'],'/imprimir-mp', [App\Http\Controllers\PedidosController::class, 'imprimirMP'])->name('imprimirMP');
 Route::match(['get', 'post'],'/followup-detalhes', [App\Http\Controllers\PedidosController::class, 'followupDetalhes'])->name('followup-detalhes');
 Route::match(['get', 'post'],'/pedidos', [App\Http\Controllers\PedidosController::class, 'index'])->name('pedidos');
 Route::match(['get', 'post'],'/alterar-pedidos', [App\Http\Controllers\PedidosController::class, 'alterar'])->name('alterar-pedidos');
 Route::match(['get', 'post'],'/incluir-pedidos', [App\Http\Controllers\PedidosController::class, 'incluir'])->name('incluir-pedidos');
+Route::match(['post'],'/alterar-pedidos-ajax', [App\Http\Controllers\PedidosController::class, 'ajaxAlterar'])->name('alterar-pedidos-ajax');
 
+Route::match(['get',],'/contatos', [App\Http\Controllers\ContatosController::class, 'index'])->name('contatos');
+Route::match(['post',],'/enviar-contatos', [App\Http\Controllers\ContatosController::class, 'store'])->name('envia-contatos');
+
+
+Route::match(['get', 'post'],'/consumo-materiais', [App\Http\Controllers\ConsumoMateriaisController::class, 'index'])->name('consumo-materiais');
+Route::match(['get', 'post'],'/consumo-materiais-detalhes', [App\Http\Controllers\ConsumoMateriaisController::class, 'detalhes'])->name('consumo-materiais-detalhes');
 Route::match(['get', 'post'],'/maquinas', [App\Http\Controllers\MaquinasController::class, 'index'])->name('maquinas');
 
 

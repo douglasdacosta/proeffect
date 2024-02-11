@@ -15,8 +15,8 @@ return [
     */
 
     'title' => 'Pro Effect',
-    'title_prefix' => '',
-    'title_postfix' => '',
+    'title_prefix' => 'Pro Effect',
+    'title_postfix' => 'Pro Effect',
 
     /*
     |--------------------------------------------------------------------------
@@ -256,9 +256,12 @@ return [
     'dashboard_url' => 'home',
     'logout_url' => 'logout',
     'login_url' => 'login',
-    'register_url' => 'register',
-    'password_reset_url' => 'password/reset',
-    'password_email_url' => 'password/email',
+    //  'register_url' => 'register',
+     'register_url' => false,
+     'password_reset_url' => false,
+    //  'password_reset_url' => 'password/reset',
+    //  'password_email_url' => 'password/email',
+     'password_email_url' => false,
     'profile_url' => false,
 
     /*
@@ -291,21 +294,22 @@ return [
 
     'menu' => [
         // Navbar items:
-        [
-            'type'         => 'navbar-search',
-            'text'         => 'search',
-            'topnav_right' => true,
-        ],
+        // [
+        //     'type'         => 'navbar-search',
+        //     'text'         => 'search',
+        //     'topnav_right' => true,
+        // ],
         [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],
 
         // Sidebar items:
-        [
-            'type' => 'sidebar-menu-search',
-            'text' => 'search',
-        ],
+        // [
+        //     'type' => 'sidebar-menu-search',
+        //     'text' => 'search',
+        // ],
+        ['header' => 'Produção'],
         [
             'text' => 'blog',
             'url'  => 'admin/blog',
@@ -316,49 +320,56 @@ return [
             'url'         => 'pedidos',
             'icon'        => 'fa fa-fw fa-arrow-right',
             'label'       => '',
-            'label_color' => 'success',
+            'label_color' => '',
         ],
         [
             'text'        => 'Followup',
             'url'         => 'followup',
             'icon'        => 'far fa-fw fa-calendar',
             'label'       => '',
-            'label_color' => 'success',
+            'label_color' => '',
         ],
         [
             'text'        => 'Materiais',
             'url'         => 'materiais',
             'icon'        => 'far fa-fw fa-file',
             'label'       => '',
-            'label_color' => 'success',
+            'label_color' => '',
+        ],
+        [
+            'text'        => 'Consumo Materiais',
+            'url'         => 'consumo-materiais',
+            'icon'        => 'far fa-fw fa-file',
+            'label'       => '',
+            'label_color' => '',
         ],
         [
             'text'        => 'Ficha técnica',
             'url'         => 'fichatecnica',
             'icon'        => 'far fa-fw fa-file',
             'label'       => '',
-            'label_color' => 'success',
+            'label_color' => '',
         ],
         [
             'text'        => 'Status',
             'url'         => 'status',
             'icon'        => 'far fa-fw fa-file',
             'label'       => '',
-            'label_color' => 'success',
+            'label_color' => '',
         ],
         [
             'text'        => 'Clientes',
             'url'         => 'clientes',
             'icon'        => 'far fa-fw fa-file',
             'label'       => '',
-            'label_color' => 'success',
+            'label_color' => '',
         ],
         [
             'text'        => 'Maquinas',
             'url'         => 'maquinas',
             'icon'        => 'far fa-fw fa-file',
             'label'       => '',
-            'label_color' => 'success',
+            'label_color' => '',
         ],
         ['header' => 'Configurações'],
         [
