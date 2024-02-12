@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('maquinas', function (Blueprint $table) {
             $table->id();
             $table->integer('qtde_maquinas')->length(11);
-            $table->integer('horas_maquinas')->length(11);
+            $table->time('horas_maquinas')->length(11);
             $table->integer('pessoas_acabamento')->length(11);
             $table->integer('pessoas_montagem')->length(11);
             $table->integer('pessoas_inspecao')->length(11);
-            $table->integer('horas_dia')->length(11);
+            $table->time('horas_dia')->length(11);
             $table->timestamps();
         });
     }

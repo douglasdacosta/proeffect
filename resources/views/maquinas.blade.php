@@ -1,3 +1,5 @@
+<?php use \App\Http\Controllers\PedidosController; ?>
+
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
@@ -27,7 +29,7 @@
                 <div class="form-group row">
                     <label for="horas_maquinas" class="col-sm-3 col-form-label">Horas máquinas</label>
                     <div class="col-sm-1">
-                    <input type="text" class="form-control" id="horas_maquinas"  name="horas_maquinas" value="@if (isset($maquinas[0]->horas_maquinas)){{$maquinas[0]->horas_maquinas}}@else{{''}}@endif">
+                    <input type="text" class="form-control mask_minutos" id="horas_maquinas"  name="horas_maquinas" value="@if (isset($maquinas[0]->horas_maquinas)){{PedidosController::formatarHoraMinuto($maquinas[0]->horas_maquinas)}}@else{{''}}@endif">
                     </div>
                 </div>
 
@@ -55,7 +57,7 @@
                 <div class="form-group row">
                     <label for="horas_dia" class="col-sm-3 col-form-label">Horas dias</label>
                     <div class="col-sm-1">
-                    <input type="text" class="form-control" id="horas_dia"  name="horas_dia" value="@if (isset($maquinas[0]->horas_dia)){{$maquinas[0]->horas_dia}}@else{{''}}@endif">
+                    <input type="text" class="form-control mask_minutos" id="horas_dia"  name="horas_dia" value="@if (isset($maquinas[0]->horas_dia)){{PedidosController::formatarHoraMinuto($maquinas[0]->horas_dia)}}@else{{''}}@endif">
                     </div>
                 </div>
                 <div class="form-group row">

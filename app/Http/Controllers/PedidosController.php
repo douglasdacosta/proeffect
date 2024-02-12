@@ -18,6 +18,7 @@ use App\Providers\DateHelpers;
 use App\Http\Controllers\MaquinasController;
 use App\Http\Controllers\ContatosController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ConsumoMateriaisController;
 use App\Models\Maquinas;
 
 class PedidosController extends Controller
@@ -87,11 +88,14 @@ class PedidosController extends Controller
 
         $pedidos = $pedidos->get();
 
+        $alertasPendentes = DB::table('alertas')->where('enviado', '=', 0)->count();
+
         $data = array(
             'tela' => 'pesquisar',
             'nome_tela' => 'pedidos',
             'pedidos' => $pedidos,
             'request' => $request,
+            'alertasPendentes' => $alertasPendentes,
             'AllStatus' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
             'rotaAlterar' => 'alterar-pedidos'
@@ -113,6 +117,7 @@ class PedidosController extends Controller
 
 
             $pedidos_id = $this->salva($request);
+            // dd($pedidos_id);
             $this->historicosPedidos($pedidos_id, $request->input('status_id'));
             return redirect()->route('pedidos', ['id' => $pedidos_id]);
         }
@@ -200,10 +205,6 @@ class PedidosController extends Controller
             $this->historicosPedidos($request->input('id'), $request->input('status'));
 
             $this->filaAlerta($request->input('id'),$status_anterior,$request->input('status'));
-            // $status = $status::find($request->input('status'));
-            // if($status->alertacliente == 1){
-            //     $this->enviaEmail($request);
-            // }
 
             return response('Pedido alterado com sucesso!', 200);
         }
@@ -230,12 +231,9 @@ class PedidosController extends Controller
         }
     }
 
-    public function enviaEmail(Request $request) {
+    public function enviaEmail($pedido) {
 
         $contatos = new ContatosController();
-
-        $pedido = $request->input('id');
-
         $pedidos = DB::table('pedidos')
         ->join('status', 'pedidos.status_id', '=', 'status.id')
         ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
@@ -254,13 +252,11 @@ class PedidosController extends Controller
             'email_cliente' => $pedidos[0]->email,
         ];
         $contatos->store($dados);
-
-
     }
 
     public function salva($request, $historico='')
     {
-        DB::transaction(function () use ($request, $historico) {
+        $id = DB::transaction(function () use ($request, $historico) {
             $pedidos = new Pedidos();
 
             if ($request->input('id')) {
@@ -289,6 +285,8 @@ class PedidosController extends Controller
 
             return $pedidos->id;
         });
+
+        return $id;
     }
 
     /**
@@ -361,10 +359,6 @@ class PedidosController extends Controller
         }
         $tela = 'pesquisa-followup';
         $nome_tela = 'followup tempos';
-        if(\Request::route()->getName() == 'followup-geral'){
-            $tela = \Request::route()->getName();
-            $nome_tela = 'followup geral';
-        }
         $data = array(
             'tela' => $tela,
             'nome_tela' =>$nome_tela,
@@ -417,12 +411,10 @@ class PedidosController extends Controller
         $pessoas_montagem =$maquinas[0]->pessoas_montagem;
         $pessoas_inspecao =$maquinas[0]->pessoas_inspecao;
         $horas_dia =$maquinas[0]->horas_dia;
-
-        $total_horas_usinagem_maquinas_dia = $horas_maquinas * $qtde_maquinas;
-
-        $total_horas_pessoas_acabamento_dia = $pessoas_acabamento * $horas_dia;
-        $total_horas_pessoas_pessoas_montagem_dia = $pessoas_montagem * $horas_dia;
-        $total_horas_pessoas_inspecao_dia = $pessoas_inspecao * $horas_dia;
+        $total_horas_usinagem_maquinas_dia = $this->multiplyTimeByInteger($horas_maquinas, $qtde_maquinas);
+        $total_horas_pessoas_acabamento_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_acabamento);
+        $total_horas_pessoas_pessoas_montagem_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem);
+        $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
 
         foreach ($dados_pedido_status as $status => $pedidos) {
 
@@ -454,10 +446,10 @@ class PedidosController extends Controller
 
 
 
-            $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia.':00:00');
-            $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia, $horas_dia);
-            $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia, $horas_dia);
-            $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia, $horas_dia);
+            $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia);
+            $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia);
+            $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia);
+            $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia);
         }
 
 
@@ -483,6 +475,56 @@ class PedidosController extends Controller
         return view('pedidos', $data);
     }
 
+    public function alertasPedidos(Request $request){
+
+        if($request->input('enviar')){
+            foreach ($request->input('enviar') as $key => $pedido) {
+
+                $alertasPedido = DB::table('pedidos')
+                    ->select('pedidos.id', 'status.alertacliente', 'alertas.id as id_alerta')
+                    ->join('alertas', 'pedidos.id', '=', 'alertas.pedidos_id')
+                    ->join('status', 'pedidos.status_id', '=', 'status.id')
+                    ->where('alertas.enviado', '=', 0)
+                    ->where('pedidos.id', '=', $pedido)->get();
+
+                if($alertasPedido[0]->alertacliente == 1){
+                    $this->enviaEmail($alertasPedido[0]->id);
+                }
+            }
+        }
+
+        if($request->input('emails')){
+            foreach ($request->input('emails') as $key => $pedido) {
+
+                $alertasPedido = DB::table('pedidos')
+                    ->select('pedidos.id', 'status.alertacliente', 'alertas.id as id_alerta')
+                    ->join('alertas', 'pedidos.id', '=', 'alertas.pedidos_id')
+                    ->join('status', 'pedidos.status_id', '=', 'status.id')
+                    ->where('alertas.enviado', '=', 0)
+                    ->where('pedidos.id', '=', $pedido)->get();
+
+                $Alertas = new Alertas();
+                $Alertas = $Alertas::find($alertasPedido[0]->id_alerta);
+                $Alertas->enviado = 1;
+                $Alertas->save();
+            }
+        }
+
+        $alertasPedido = DB::table('pedidos')
+        ->join('alertas', 'pedidos.id', '=', 'alertas.pedidos_id')
+        ->join('status', 'pedidos.status_id', '=', 'status.id')
+        ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
+        ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
+        ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente','pessoas.nome_contato', 'pessoas.email', 'status.nome as nome_status')
+        ->where('enviado', '=', 0)->get();
+        $data = array(
+            'tela' =>'alerta-pedidos',
+            'nome_tela' => 'alerta de pedidos',
+            'pedidos' => $alertasPedido
+        );
+
+        return view('pedidos', $data);
+    }
 
 
     public function imprimirOS(Request $request)
@@ -561,20 +603,14 @@ class PedidosController extends Controller
 
     public function imprimirMP(Request $request)
     {
-        $Fichastecnicasitens = new Fichastecnicasitens();
+        $ConsumoMateriais = new ConsumoMateriaisController();
 
-        $fichastecnicasitens = $Fichastecnicasitens->where('fichatecnica_id', $request->input('id'))->get();
+        $dados = $ConsumoMateriais->detalhes($request, 1);
 
-        $data = [
-            'fichastecnicasitens' => $fichastecnicasitens,
-        ];
-
-        $imprimirPDF = new PDFController();
-
-        return $imprimirPDF->generatePDF($data, 'imprimir_mp');
-        // return view('imprimir_mp', $data);
+        return $dados;
     }
-    function divideHoursAndReturnWorkDays($totalHours, $smallerHours, $horas_diarias) {
+
+    function divideHoursAndReturnWorkDays($totalHours, $smallerHours) {
         // Extrair as horas, minutos e segundos do total
         list($totalHours, $totalMinutes, $totalSeconds) = explode(':', $totalHours);
 
@@ -582,10 +618,11 @@ class PedidosController extends Controller
         $totalSeconds = $totalHours * 3600 + $totalMinutes * 60 + $totalSeconds;
 
         // Calcular o valor menor em segundos
-        $smallerSeconds = $smallerHours * 3600;
+        list($tHours, $tMinutes, $tSeconds) = explode(':', $smallerHours);
+        $smallerseconds = $tHours * 3600 + $tMinutes * 60 + $tSeconds;
 
         // Dividir o total de segundos pelo valor menor
-        $resultDays = $totalSeconds / $smallerSeconds ;
+        $resultDays = $totalSeconds / $smallerseconds ;
 
         // Formatar o resultado
         $resultTime = sprintf("%.1f dias de trabalho", $resultDays);
@@ -721,5 +758,31 @@ class PedidosController extends Controller
         $resultTime = sprintf("%02d:%02d:%02d", $hoursDiff, $minutesDiff, $secondsDiff);
 
         return $resultTime;
+    }
+
+    function multiplyTime($time1, $time2) {
+        $seconds1 = strtotime($time1);
+        $seconds2 = strtotime($time2);
+
+        $result = $seconds1 * $seconds2;
+
+        return gmdate("H:i:s", $result);
+    }
+
+
+    function multiplyTimeByInteger($time, $factor) {
+        $parts = explode(':', $time);
+        $hours = $parts[0];
+        $minutes = $parts[1];
+        $seconds = $parts[2];
+
+        $totalSeconds = $hours * 3600 + $minutes * 60 + $seconds;
+        $resultSeconds = $totalSeconds * $factor;
+
+        $resultHours = floor($resultSeconds / 3600);
+        $resultMinutes = floor(($resultSeconds % 3600) / 60);
+        $resultSeconds = $resultSeconds % 60;
+
+        return sprintf("%02d:%02d:%02d", $resultHours, $resultMinutes, $resultSeconds);
     }
 }

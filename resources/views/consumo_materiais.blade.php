@@ -295,7 +295,7 @@
                                 </tbody>
                             </table>
                             <div class="form-group row">
-                                <p>
+                                <input type="hidden" value="{{$imprimir}}" id="imprimir" >
                             </div>
             @endif
         @stop

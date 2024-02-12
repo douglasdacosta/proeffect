@@ -19,7 +19,7 @@
                 <td colspan="3" class="font-weight-bold">Código do produto(EP)</td>
                 <td>{{$pedidos[0]->tabelaFichastecnicas->ep}}</td>
                 <td class="font-weight-bold">Data</td>
-                <td >{{ Carbon\Carbon::createFromDate(date('Y-m-d'))->format('d/m/Y') }}</td>
+                <td >{{ Carbon\Carbon::createFromDate($pedidos[0]->data_gerado)->format('d/m/Y') }}</td>
             </tr>
             <tr>
                 <td colspan="2" class="font-weight-bold">Quantidade</td>

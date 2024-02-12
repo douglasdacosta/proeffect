@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 use PDF;
 
-use Illuminate\Http\Request;
 
 class PDFController extends Controller
 {
@@ -17,11 +16,15 @@ class PDFController extends Controller
 
      */
 
-     public function generatePDF($data, $view)
+     public function generatePDF($data, $view, $type ='view')
      {
+        if($type == 'view') {
+            $pdf = PDF::loadView($view, $data)->setPaper('a4', 'landscape');
+            return $pdf->stream('ordendeservico.pdf');
 
-         $pdf = PDF::loadView($view, $data)->setPaper('a4', 'landscape');
+        } else{
+             return $data;
+        }
 
-         return $pdf->stream('ordendeservico.pdf');
      }
 }

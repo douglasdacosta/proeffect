@@ -5,20 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\PedidosController;
-use App\Models\Fichastecnicas;
-use App\Models\Fichastecnicasitens;
-use App\Models\Pedidos;
-use App\Models\Status;
-use App\Models\Historicos;
-use App\Models\Pessoas;
-use App\Models\Prioridades;
-use App\Models\Transportes;
 use App\Providers\DateHelpers;
-use App\Http\Controllers\MaquinasController;
-use App\Http\Controllers\ContatosController;
-use App\Http\Controllers\PDFController;
-use App\Mail\Contatos;
-use App\Models\Maquinas;
 
 class ConsumoMateriaisController extends Controller
 {
@@ -85,7 +72,10 @@ class ConsumoMateriaisController extends Controller
         return view('consumo_materiais', $data);
     }
 
-    function detalhes(Request $request) {
+    /**
+     *
+     */
+    public function detalhes(Request $request, $imprimir = 0) {
 
 
         $id = !empty($request->input('id')) ? ($request->input('id')) : (!empty($id) ? $id : false);
@@ -213,11 +203,13 @@ class ConsumoMateriaisController extends Controller
                 'calculos' => $materiais,
                 'totais' => $totais,
                 'request' => $request,
+                'imprimir' => $imprimir,
                 'AllStatus' => (new PedidosController)->getAllStatus(),
 				'rotaAlterar' => 'consumo-materiais-detalhes'
 			);
 
         return view('consumo_materiais', $data);
+
     }
 
     function calculaPecas($alturaChapa, $larguraChapa, $alturaPeca, $larguraPeca, $qtdePecas) {

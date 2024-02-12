@@ -25,11 +25,12 @@ return new class extends Migration
 
         DB::table('users')->insert(
                 array(
-                        'id' => 1, 
-                        'name'=>'Douglas da Costa', 
-                        'email'=> 'doug.d.costa@gmail.com', 
-                        'password' => '$2y$10$JuNPSfO.DYgE4OZ8aPq/6.ucGNXXVYUNsRt3PPus5YJvHf1lQDeDm'
+                        'id' => 1,
+                        'name'=>'Eplax',
+                        'email'=> 'eplax@eplax.com',
+                        'password' => '$2y$10$ONQmi2mWqaaXpE6UYUnhtOqExW2yOQVWYqwo/XMNVotHR5eFCWSSW'
                     )
+
         );
     }
 

@@ -52,6 +52,7 @@ Route::match(['post'],'/alterar-pedidos-ajax', [App\Http\Controllers\PedidosCont
 
 Route::match(['get',],'/contatos', [App\Http\Controllers\ContatosController::class, 'index'])->name('contatos');
 Route::match(['post',],'/enviar-contatos', [App\Http\Controllers\ContatosController::class, 'store'])->name('envia-contatos');
+Route::match(['get', 'post'],'/alertas-pedidos', [App\Http\Controllers\PedidosController::class, 'alertasPedidos'])->name('alertas-pedidos');
 
 
 Route::match(['get', 'post'],'/consumo-materiais', [App\Http\Controllers\ConsumoMateriaisController::class, 'index'])->name('consumo-materiais');

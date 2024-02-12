@@ -61,7 +61,6 @@ $(function ($) {
         $('.overlay').show();
         var pedido = $(this).data('pedido');
         var status = $(this).val();
-        alert()
         $.ajax({
             type: "POST",
             url: '/alterar-pedidos-ajax',
@@ -82,6 +81,13 @@ $(function ($) {
         });
 
     })
+    if($('#imprimir').length){
+        if($('#imprimir').val() ==1){
+
+            setTimeout(() => window.print(), 1000)
+        }
+    }
+
 });
 
 
