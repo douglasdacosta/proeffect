@@ -25,7 +25,9 @@ $(function () {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (data) {
-                $('#tempo_montagem_torre').val(data[0].tempo_montagem_torre.toString().substring(8, 3));
+                hora = data[0].tempo_montagem_torre.toString().substring(8, 3);
+                hora = (hora == '') ? hora : '00:00'
+                $('#tempo_montagem_torre').val(hora);
                 $('.overlay').hide();
                 $('#blank').val('');
             },
