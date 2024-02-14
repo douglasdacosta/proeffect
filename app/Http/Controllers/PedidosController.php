@@ -155,8 +155,8 @@ class PedidosController extends Controller
         if ($metodo == 'POST') {
 
             if(DateHelpers::formatDate_dmY($pedidos[0]->data_entrega) != DateHelpers::formatDate_dmY($request->input('data_entrega'))) {
-
-                $historico = "Data de entrega do pedido alterado de ".  DateHelpers::formatDate_ddmmYYYY($pedidos[0]->data_entrega) . " para " . DateHelpers::formatDate_ddmmYYYY($request->input("data_entrega"));
+                DateHelpers::formatDate_dmY($request->input("data_entrega"));
+                $historico = "Data de entrega do pedido alterado de ".  DateHelpers::formatDate_ddmmYYYY(DateHelpers::formatDate_dmY($pedidos[0]->data_entrega)) . " para " . DateHelpers::formatDate_dmY($request->input("data_entrega"));
 
             }
 
