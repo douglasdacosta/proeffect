@@ -568,26 +568,25 @@
                     <table class="table table-sm table-striped text-center" id="table_composicao">
                         <thead >
                             <tr style="background-color: #463a2a; color: #FFFFFF">
-                                <th scope="col">OS</th>
-                                <th scope="col">EP</th>
-                                <th scope="col">Qtde</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
                                 <th scope="col">Usinagem</th>
                                 <th scope="col">Acabamento</th>
                                 <th scope="col">Montagem</th>
                                 <th scope="col">Inspeção</th>
-                                <th scope="col">Data entrega</th>
-                                <th scope="col">Alerta de dias</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr style="">
-                                <th scope="col">Total geral de horas</th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                                <th scope="col">{{$totalGeral['totalGeralusinagens']}}</th>
-                                <th scope="col">{{$totalGeral['totalGeralacabamento']}}</th>
-                                <th scope="col">{{$totalGeral['totalGeralmontagem']}}</th>
-                                <th scope="col">{{$totalGeral['totalGeralinspecao']}}</th>
+                                <th scope="col" colspan="2">Total geral</th>
+                                <th scope="col">&nbsp;</th>
+                                <th scope="col">{{$totalGeral['totalGeralusinagens'] . ' dias de máquinas'}}</th>
+                                <th scope="col">{{$totalGeral['totalGeralacabamento'] . ' dias de trabalho'}}</th>
+                                <th scope="col">{{$totalGeral['totalGeralmontagem'] . ' dias de trabalho'}}</th>
+                                <th scope="col">{{$totalGeral['totalGeralinspecao'] . ' dias de trabalho'}}</th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                             </tr>
