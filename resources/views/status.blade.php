@@ -49,7 +49,7 @@
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
-                <table class="table table-striped">
+                <table class="table table-striped text-center">
                   <thead>
                     <tr>
                       <th>ID</th>

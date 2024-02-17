@@ -32,10 +32,10 @@
         </div>
         <div class="right_col" role="main">
 
-            <form id="filtro" action="pedidos" method="get" data-parsley-validate="" class="form-horizontal form-label-left"
+            <form id="filtro" action="consumo-materiais" method="get" data-parsley-validate="" class="form-horizontal form-label-left"
                 novalidate="">
                 <div class="form-group row">
-                    <label for="codigo_cliente" class="col-sm-1 col-form-label text-right">Código cliente</label>
+                    <label for="codigo_cliente" class="colrelatorio-producao-sm-1 col-form-label text-right">Código cliente</label>
                     <div class="col-sm-1">
                         <input type="text" id="codigo_cliente" name="codigo_cliente" class="form-control col-md-13"
                             value="">
@@ -110,7 +110,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <table class="table table-striped">
+                            <table class="table table-striped  text-center">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -156,7 +156,7 @@
             @if (isset($pedidos))
             @foreach ($pedidos as $key => $pedido)
                 <div class="form-group row">
-                    <table class="table table-sm table-striped " id="table_composicao">
+                    <table class="table table-sm table-striped text-center" id="table_composicao">
                         <thead class="">
                             <tr>
                                 <th scope="col">OS</th>
@@ -212,11 +212,11 @@
         @endif
 
 
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <h3 class="text-dark ">Cálculos das médias de consumo de materiais por pedido</h1>
             </div>
                 @if (!empty($calculos))
-                    <table class="table table-sm table-striped " id="table_composicao">
+                    <table class="table table-sm table-striped  text-center" id="table_composicao">
                         <thead class="">
                             <tr>
                                 <th scope="col">Material</th>
@@ -254,12 +254,12 @@
                     <div class="form-group row">
                         <p>
                     </div>
-                    @endif
+                    @endif --}}
                     <div class="form-group row">
                         <h3 class="text-dark ">Total de materiais</h1>
                     </div>
                         @if (!empty($calculos))
-                            <table class="table table-sm table-striped " id="table_composicao">
+                            <table class="table table-sm table-striped  text-center" id="table_composicao">
                                 <thead class="">
                                     <tr>
                                         <th scope="col">Material</th>

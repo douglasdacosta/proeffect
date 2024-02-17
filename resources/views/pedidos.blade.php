@@ -1,4 +1,9 @@
-<?php use \App\Http\Controllers\PedidosController; ?>
+<?php
+    use \App\Http\Controllers\PedidosController;
+    $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5',
+        5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 => '#c1d9d0',
+        10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071' ];
+?>
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
@@ -119,12 +124,13 @@
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
-                                <table class="table table-striped">
+                                <table class="table table-striped  text-center">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
                                             <th>OS</th>
                                             <th>EP</th>
+                                            <th>Qtde</th>
                                             <th>Cliente</th>
                                             <th>Status do pedido</th>
                                             <th>Data gerado</th>
@@ -143,12 +149,13 @@
                                                     </th>
                                                     <td>{{ $pedido->os }}</td>
                                                     <td>{{ $pedido->ep }}</td>
+                                                    <td>{{ $pedido->qtde }}</td>
                                                     <td>{{ $pedido->nome_cliente }}</td>
                                                     <td>
                                                         <select class="form-control alteracao_status_pedido" data-statusatual='{{$pedido->id_status}}' data-pedido="{{ $pedido->id }}" id="status_id" name="status_id">
                                                             @if (isset($AllStatus))
                                                                 @foreach ($AllStatus as $stats)
-                                                                    <option value="{{ $stats->id }}"
+                                                                    <option value="{{ $stats->id }}" @if ($stats->id < $pedido->id_status) {{'disabled'}} @else {{''}} @endif
                                                                         @if (isset($pedido->id_status) && $pedido->id_status == $stats->id) selected="selected" @else{{ '' }} @endif>
                                                                         {{ $stats->nome }}
                                                                     </option>
@@ -199,7 +206,7 @@
         <h1 class="m-0 text-dark">Alteração de {{ $nome_tela }}</h1>
         @stop
         <form id="alterar" action="{{ $rotaAlterar }}" data-parsley-validate="" class="form-horizontal form-label-left"
-        novalidate="" method="post">
+        method="post">
         <div class="form-group row">
             <label for="codigo" class="col-sm-2 col-form-label">Id</label>
             <div class="col-sm-2">
@@ -213,7 +220,7 @@
                         <h1 class="m-0 text-dark">Cadastro de {{ $nome_tela }}</h1>
                     @stop
                     <form id="incluir" action="{{ $rotaIncluir }}" data-parsley-validate=""
-                        class="form-horizontal form-label-left" novalidate="" method="post">
+                        class="form-horizontal form-label-left" method="post">
                         @endif
             @csrf <!--{{ csrf_field() }}-->
             <div class="form-group row">
@@ -226,7 +233,7 @@
             <div class="form-group row">
                 <label for="fichatecnica" class="col-sm-2 col-form-label">Produto (Ficha técnica)</label>
                 <div class="col-sm-2">
-                    <select class="form-control" id="fichatecnica" name="fichatecnica">
+                    <select class="form-control  is-invalid" id="fichatecnica" required name="fichatecnica">
                         <option value=""></option>
                         @if (isset($fichastecnicas))
                             @foreach ($fichastecnicas as $fichatecnica)
@@ -291,7 +298,7 @@
                 <div class="form-group row">
                 <label for="qtde" class="col-sm-2 col-form-label">Qtde</label>
                 <div class="col-sm-1">
-                    <input type="text" class="form-control" id="qtde" name="qtde"
+                    <input type="text" class="form-control sonumeros" id="qtde" name="qtde"
                         value="@if (isset($pedidos[0]->qtde)) {{ $pedidos[0]->qtde }}@else{{ '' }} @endif">
                 </div>
             </div>
@@ -490,10 +497,12 @@
                 @foreach ($dados_pedido_status as $key => $dado_pedido_status)
                     <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
                     <div class="form-group row">
-                        <table class="table table-sm table-striped " id="table_composicao">
-                            <thead class="thead-dark">
-                                <tr>
+                        <table class="table table-sm table-striped text-center" id="table_composicao">
+                            <thead >
+                                <tr style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
                                     <th scope="col">OS</th>
+                                    <th scope="col">EP</th>
+                                    <th scope="col">Qtde</th>
                                     <th scope="col">Usinagem</th>
                                     <th scope="col">Acabamento</th>
                                     <th scope="col">Montagem</th>
@@ -503,21 +512,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- {{dd($dado_pedido_status)}} --}}
                                @foreach ($dado_pedido_status['classe'] as $pedido)
+                                    <?php
+                                        $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
+                                        $hoje = date('Y-m-d');
+                                        $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                                        if($dias_alerta < 6) {
+                                            $class_dias_alerta ='text-danger';
+                                        } else {
+                                            $class_dias_alerta = 'text-primary';
+                                        }
+                                    ?>
                                     <tr>
-                                        <td>{{ $pedido->os }}</td>
+                                        <td>{{ $pedido->os }}
+                                        <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
+                                        <td>{{ $pedido->qtde }}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento'])  }}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem'])  }}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao'])  }}</td>
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y')}}</td>
-                                        <td class="@if (\Carbon\Carbon::createFromDate(date('Y-m-d'))->diffInDays(\Carbon\Carbon::createFromDate($pedido->data_entrega)) < 6 ) text-danger @else text-primary @endif" >
-                                             {{ \Carbon\Carbon::createFromDate(date('Y-m-d'))->diffInDays(\Carbon\Carbon::createFromDate($pedido->data_entrega)) }}
-                                        </td>
+                                        <td class="{{$class_dias_alerta}}" >{{$dias_alerta}}</td>
                                     </tr>
                                 @endforeach
                                 <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem'])}}</th>
                                     <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento'])}}</th>
@@ -528,6 +548,8 @@
                                 </tr>
                                 <tr>
                                     <th scope="col">Maquinas/pessoas</th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
                                     <th scope="col">{{$dado_pedido_status['maquinas_usinagens']}}</th>
                                     <th scope="col">{{$dado_pedido_status['pessoas_acabamento']}}</th>
                                     <th scope="col">{{$dado_pedido_status['pessoas_montagem']}}</th>
@@ -538,9 +560,40 @@
                             </tbody>
                         </table>
                     </div>
-
+                    
+                    
                     <hr class="my-4">
-                @endforeach
+                    @endforeach
+                    <div class="form-group row">
+                    <table class="table table-sm table-striped text-center" id="table_composicao">
+                        <thead >
+                            <tr style="background-color: #463a2a; color: #FFFFFF">
+                                <th scope="col">OS</th>
+                                <th scope="col">EP</th>
+                                <th scope="col">Qtde</th>
+                                <th scope="col">Usinagem</th>
+                                <th scope="col">Acabamento</th>
+                                <th scope="col">Montagem</th>
+                                <th scope="col">Inspeção</th>
+                                <th scope="col">Data entrega</th>
+                                <th scope="col">Alerta de dias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="">
+                                <th scope="col">Total geral de horas</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col">{{$totalGeral['totalGeralusinagens']}}</th>
+                                <th scope="col">{{$totalGeral['totalGeralacabamento']}}</th>
+                                <th scope="col">{{$totalGeral['totalGeralmontagem']}}</th>
+                                <th scope="col">{{$totalGeral['totalGeralinspecao']}}</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             @endif
             </div>
 
@@ -558,8 +611,8 @@
                 @foreach ($dados_pedido_status as $key => $dado_pedido_status)
                     <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
                     <div class="form-group row" style="overflow-x:auto;  ">
-                        <table class="table table-sm table-striped " id="table_composicao">
-                            <thead class="thead-dark" >
+                        <table class="table table-sm table-striped text-center" id="table_composicao">
+                            <thead style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}" >
                                 <tr>
                                     <th scope="col" title="Código do cliente">Cliente</th>
                                     <th scope="col">Assistente</th>
@@ -659,70 +712,70 @@
     @break
 
     @case('alerta-pedidos')
-    @section('content_header')
-    <div class="form-group row">
-        <h1 class="m-0 text-dark col-sm-6 col-form-label">Tela de envio de alertas ao cliente</h1>
-    </div>
-        @stop
-        @section('content')
-            @if (isset($pedidos))
-                <form id="filtro" action="alertas-pedidos" method="post" data-parsley-validate="" class="form-horizontal form-label-left">
-                    @csrf <!--{{ csrf_field() }}-->
-                    <table class="table table-sm table-striped ">
-                        <thead class="thead-dark" >
-                            <tr>
-                                <th scope="col" title="Código do cliente">Cliente</th>
-                                <th scope="col">Responsável</th>
-                                <th scope="col">OS</th>
-                                <th scope="col">Status do pedido</th>
-                                <th scope="col" title="Data da entrega">Data Entrega</th>
-                                <th scope="col" title="Alerta de dias">Alerta</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Enviar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                        @foreach ($pedidos as $pedido)
-                                <?php
-                                    $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
-                                    $hoje = date('Y-m-d');
-                                    $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
-                                    if($dias_alerta < 6) {
-                                        $class_dias_alerta ='text-danger';
-                                    } else {
-                                        $class_dias_alerta = 'text-primary';
-                                    }
-                                ?>
+        @section('content_header')
+        <div class="form-group row">
+            <h1 class="m-0 text-dark col-sm-6 col-form-label">Tela de envio de alertas ao cliente</h1>
+        </div>
+            @stop
+            @section('content')
+                @if (isset($pedidos))
+                    <form id="filtro" action="alertas-pedidos" method="post" data-parsley-validate="" class="form-horizontal form-label-left">
+                        @csrf <!--{{ csrf_field() }}-->
+                        <table class="table table-sm table-striped  text-center">
+                            <thead class="thead-dark" >
                                 <tr>
-                                    <td>{{ $pedido->nome_cliente }}</td>
-                                    <td>{{ $pedido->nome_contato }}</td>
-                                    <td>{{ $pedido->os }}</td>
-                                    <td>{{ $pedido->nome_status}}</td>
-                                    <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y')}}</td>
-                                    <td class="{{$class_dias_alerta}}" >{{$dias_alerta}}</td>
-                                    <td>{{ $pedido->email}}</td>
-                                    <td>
-                                        <input type="hidden" name="emails[]" value="{{$pedido->id}}">
-                                        <input type="checkbox" class="" checked value="{{$pedido->id}}" id="enviar" name="enviar[]">
-                                    </td>
+                                    <th scope="col" title="Código do cliente">Cliente</th>
+                                    <th scope="col">Responsável</th>
+                                    <th scope="col">OS</th>
+                                    <th scope="col">Status do pedido</th>
+                                    <th scope="col" title="Data da entrega">Data Entrega</th>
+                                    <th scope="col" title="Alerta de dias">Alerta</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Enviar</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                    <div class="form-group row">
-                        <div class="col-sm-5">
-                            <button class="btn btn-danger" onclick="window.history.back();" type="button">Cancelar</button>
-                        </div>
-                        <div class="col-sm-5">
-                            <button type="submit" class="btn btn-primary">Enviar Email</button>
-                        </div>
+                            </thead>
+                            <tbody>
+
+                            @foreach ($pedidos as $pedido)
+                                    <?php
+                                        $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
+                                        $hoje = date('Y-m-d');
+                                        $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                                        if($dias_alerta < 6) {
+                                            $class_dias_alerta ='text-danger';
+                                        } else {
+                                            $class_dias_alerta = 'text-primary';
+                                        }
+                                    ?>
+                                    <tr>
+                                        <td>{{ $pedido->nome_cliente }}</td>
+                                        <td>{{ $pedido->nome_contato }}</td>
+                                        <td>{{ $pedido->os }}</td>
+                                        <td>{{ $pedido->nome_status}}</td>
+                                        <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y')}}</td>
+                                        <td class="{{$class_dias_alerta}}" >{{$dias_alerta}}</td>
+                                        <td>{{ $pedido->email}}</td>
+                                        <td>
+                                            <input type="hidden" name="emails[]" value="{{$pedido->id}}">
+                                            <input type="checkbox" class="" checked value="{{$pedido->id}}" id="enviar" name="enviar[]">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                </form>
-            @else
-                Nenhum alerta pendente de envio!
-            @endif
-        @stop
+                        <div class="form-group row">
+                            <div class="col-sm-5">
+                                <button class="btn btn-danger" onclick="window.history.back();" type="button">Cancelar</button>
+                            </div>
+                            <div class="col-sm-5">
+                                <button type="submit" class="btn btn-primary">Enviar Email</button>
+                            </div>
+                        </div>
+                    </form>
+                @else
+                    Nenhum alerta pendente de envio!
+                @endif
+            @stop
     @break
 @endswitch

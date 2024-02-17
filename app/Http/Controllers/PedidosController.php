@@ -20,6 +20,7 @@ use App\Http\Controllers\ContatosController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ConsumoMateriaisController;
 use App\Models\Maquinas;
+use DateTime;
 
 class PedidosController extends Controller
 {
@@ -46,6 +47,8 @@ class PedidosController extends Controller
         $status_id = !empty($request->input('status_id')) ? ($request->input('status_id')) : (!empty($status_id) ? $status_id : false);
         $codigo_cliente = !empty($request->input('codigo_cliente')) ? ($request->input('codigo_cliente')) : (!empty($codigo_cliente) ? $codigo_cliente : false);
         $nome_cliente = !empty($request->input('nome_cliente')) ? ($request->input('nome_cliente')) : (!empty($nome_cliente) ? $nome_cliente : false);
+        $os = !empty($request->input('os')) ? ($request->input('os')) : (!empty($os) ? $os : false);
+        $ep = !empty($request->input('ep')) ? ($request->input('ep')) : (!empty($ep) ? $ep : false);
 
 
 
@@ -53,16 +56,23 @@ class PedidosController extends Controller
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome' , 'status.id as id_status');
-
+            ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome' , 'status.id as id_status')
+            ->orderby('pedidos.data_entrega');
         if (!empty($request->input('status'))){
             $pedidos = $pedidos->where('pedidos.status', '=', $request->input('status'));
+        }
+
+        if ($ep) {
+            $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $ep);
         }
 
         if ($id) {
             $pedidos = $pedidos->where('pedidos.id', '=', $id);
         }
 
+        if ($os) {
+            $pedidos = $pedidos->where('pedidos.os', '=', $os);
+        }
         if ($status_id) {
             $pedidos = $pedidos->where('pedidos.status_id', '=', $status_id);
         }
@@ -156,7 +166,7 @@ class PedidosController extends Controller
 
             if(DateHelpers::formatDate_dmY($pedidos[0]->data_entrega) != DateHelpers::formatDate_dmY($request->input('data_entrega'))) {
                 DateHelpers::formatDate_dmY($request->input("data_entrega"));
-                $historico = "Data de entrega do pedido alterado de ".  DateHelpers::formatDate_ddmmYYYY(DateHelpers::formatDate_dmY($pedidos[0]->data_entrega)) . " para " . DateHelpers::formatDate_dmY($request->input("data_entrega"));
+                $historico = "Data de entrega do pedido alterado de ".  DateHelpers::formatDate_ddmmYYYY(DateHelpers::formatDate_dmY($pedidos[0]->data_entrega)) . " para " . $request->input("data_entrega");
 
             }
 
@@ -299,7 +309,11 @@ class PedidosController extends Controller
 
 
         $filtrado = 0;
-        $pedidos = new Pedidos();
+        $pedidos = DB::table('pedidos')
+            ->join('status', 'pedidos.status_id', '=', 'status.id')
+            ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
+            ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
+            ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome' , 'status.id as id_status');
 
         if(!empty($request->input('status_id'))) {
             $pedidos = $pedidos->where('status_id', '=', $request->input('status_id'));
@@ -310,7 +324,7 @@ class PedidosController extends Controller
             $filtrado++;
         }
         if(!empty($request->input('ep'))) {
-            $pedidos = $pedidos->where('ep', '=', $request->input('ep'));
+            $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $request->input('ep'));
             $filtrado++;
         }
         if(!empty($request->input('id'))) {
@@ -390,13 +404,14 @@ class PedidosController extends Controller
         }
         $pedidos_encontrados = json_decode($request->input('pedidos_encontrados'));
 
-        $pedidos = $pedidos::with('tabelaStatus', 'tabelaFichastecnicas', 'tabelaPessoas')->wherein('id', $pedidos_encontrados)->get();
+        $pedidos = $pedidos::with('tabelaStatus', 'tabelaFichastecnicas', 'tabelaPessoas')->wherein('id', $pedidos_encontrados)->orderby('status_id', 'desc')->get();
 
         $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
         $dados_pedido_status=[];
 
         foreach ($pedidos as $pedido) {
             $dados_pedido_status[$pedido->tabelaStatus->nome]['classe'][] = $pedido;
+            $dados_pedido_status[$pedido->tabelaStatus->nome]['id_status'][] = $pedido->tabelaStatus->id;
         }
 
         $MaquinasController = new MaquinasController();
@@ -444,12 +459,20 @@ class PedidosController extends Controller
                 $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_inspecao']) ? $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] : "00:00:00", $total_tempo_inspecao);
             }
 
-
-
             $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia);
             $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia);
             $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia);
             $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia);
+
+
+            $totalGeral['totalGeralusinagens'] = ((!empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']) );
+            $totalGeral['totalGeralacabamento'] = ((!empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_acabamento']) );
+            $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
+            $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+
+            // \Log::info(print_r(preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']), true));
+            // \Log::info(print_r($totalGeral['totalGeralusinagens'], true));
+            // \Log::info(print_r($totalGeral, true));
         }
 
 
@@ -465,6 +488,7 @@ class PedidosController extends Controller
             'tela' => $tela,
             'nome_tela' => $nome_da_tela,
             'dados_pedido_status' => $dados_pedido_status,
+            'totalGeral' => $totalGeral,
             'request' => $request,
             'status' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
@@ -784,5 +808,20 @@ class PedidosController extends Controller
         $resultSeconds = $resultSeconds % 60;
 
         return sprintf("%02d:%02d:%02d", $resultHours, $resultMinutes, $resultSeconds);
+    }
+
+    function diferencaDatasEmHoras($data1, $data2) {
+        // Convertendo as strings de data para objetos DateTime
+        $data1_obj = new DateTime($data1);
+        $data2_obj = new DateTime($data2);
+
+        // Calculando a diferença entre as datas
+        $diferenca = $data1_obj->diff($data2_obj);
+
+        // Calculando a diferença total em horas
+        $horas = $diferenca->days * 24 + $diferenca->h;
+
+        // Formatando o resultado para o formato desejado
+        return sprintf("%02d:%02d:%02d", $horas, $diferenca->i, $diferenca->s);
     }
 }

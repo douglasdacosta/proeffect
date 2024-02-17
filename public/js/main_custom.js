@@ -35,9 +35,11 @@
 //     $('.selectonfocus').mask("00/00/0000", {selectOnFocus: true});
 //   });
 $(function ($) {
+    $('.cep').mask('00000-000', {reverse: true});
+    $('.sonumeros').mask('999999999999', {reverse: true});
     $('.mask_minutos').mask('00:00', {reverse: true});
     $('.mask_horas').mask('00:00:00', {reverse: true});
-    $('.mask_valor').mask("#.##0,00", {reverse: true});
+    $('.mask_valor').mask("###0,00", {reverse: true});
     $('.mask_date').mask('00/00/0000');
 
     var behavior = function (val) {

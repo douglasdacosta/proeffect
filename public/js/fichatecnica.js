@@ -72,11 +72,60 @@ $(function () {
                 '<td><button type="button" class="close" aria-label="Close" data-blank="' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
                     '<span aria-hidden="true">&times;</span>' +
                     '</button>' +
+                    '<button type="button" class="close edita_composicao" style="padding-right: 20px" data-blank="' + $('#blank').val()+$('#material_id option:selected').val() + '"><span aria-hidden="true">&#9998;</span></button>' +
                 '</td>' +
             '</tr>');
 
         calculaTempos();
     });
+
+    $(document).on('click', '#table_composicao .edita_composicao', function () {
+        id = $(this).data('blank');
+        blank = $('.blank_'+id+' td').eq(0).text();
+        qtde = $('.blank_'+id+' td').eq(1).text();
+        materialid = $('.blank_'+id+' td').eq(2).data('materialid');
+        medidax = $('.blank_'+id+' td').eq(3).text();
+        mediday = $('.blank_'+id+' td').eq(4).text();
+        tmpusinagem = $('.blank_'+id+' td').eq(5).text();
+        tmpacabamento = $('.blank_'+id+' td').eq(6).text();
+        tmpmontagem = $('.blank_'+id+' td').eq(7).text();
+        tmptorre = $('.blank_'+id+' td').eq(8).text();
+        tmpinspecao = $('.blank_'+id+' td').eq(9).text();
+
+        $('#blank').val(blank);
+        $('#material_id').val(materialid);
+        $('#medidax').val(medidax);
+        $('#mediday').val(mediday);
+        $('#qtde').val(qtde);
+        $('#tempo_usinagem').val(formata0000(tmpusinagem));
+        $('#tempo_acabamento').val(formata0000(tmpacabamento));
+        $('#tempo_montagem_torre').val(formata0000(tmptorre));
+        $('#tempo_montagem').val(formata0000(tmpmontagem));
+        $('#tempo_inspecao').val(formata0000(tmpinspecao));
+        calculaTempos();
+        $('.blank_' + id).remove();
+    });
+
+    /**
+     * Formata uma hora de 01:00 para 00:01:00
+     */
+    function formata000000(MinSeg) {
+        if(MinSeg.length < 6) {
+            return '00:'+MinSeg;
+        }
+        return MinSeg;
+    }
+
+    /**
+     * Formata uma hora de 00:01:00 para 01:00
+     */
+    function formata0000(horaMinSeg) {
+        if(horaMinSeg.length > 5) {
+            var partes = horaMinSeg.split(":");
+            return partes[1]+':'+partes[2];
+        }
+        return horaMinSeg;
+    }
 
     $(document).on('click', '#table_composicao .close', function () {
         id = $(this).data('blank');

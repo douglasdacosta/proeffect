@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('unidadey')->length(11)->nullable();
             $table->time('tempo_montagem_torre')->nullable();
             $table->float('valor',11, 2)->nullable();
+            $table->string('peca_padrao',1);
             $table->string('status',1);
             $table->timestamps();
         });
@@ -36,6 +37,7 @@ return new class extends Migration
                     'tempo_montagem_torre'=> '00:07',
                     'espessura' => null,
                     'unidadex' => null,
+                    'peca_padrao' => 1,
                     'unidadey' => null,
                     'valor' => '1.50',
                     'status' => 'A'
@@ -46,6 +48,7 @@ return new class extends Migration
                     'tempo_montagem_torre'=> '00:07',
                     'espessura' => null,
                     'unidadex' => null,
+                    'peca_padrao' => 1,
                     'unidadey' => null,
                     'valor' => '1.00',
                     'status' => 'A'
@@ -56,6 +59,7 @@ return new class extends Migration
                     'tempo_montagem_torre'=> '',
                     'espessura' => '3',
                     'unidadex' => '1200',
+                    'peca_padrao' => 2,
                     'unidadey' => '950',
                     'valor' => '95.50',
                     'status' => 'A'
@@ -67,6 +71,7 @@ return new class extends Migration
                     'espessura' => '3',
                     'unidadex' => '1000',
                     'unidadey' => '1000',
+                    'peca_padrao' => 2,
                     'valor' => '150.50',
                     'status' => 'A'
                 ]

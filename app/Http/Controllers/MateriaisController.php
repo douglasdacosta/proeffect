@@ -33,18 +33,18 @@ class MateriaisController extends Controller
         $materiais = new Materiais();
 
         if ($id) {
-        	$materiais->where('id', '=', $id);
+        	$materiais =$materiais->where('id', '=', $id);
         }
         if ($codigo) {
-        	$materiais->where('codigo', '=', $codigo);
+        	$materiais = $materiais->where('codigo', '=', $codigo);
         }
 
-        if ($request->input('nome') != '') {
-        	$materiais->where('material', 'like', '%'.$request->input('nome').'%');
+        if (!empty($request->input('nome'))) {
+        	$materiais = $materiais->where('material', 'like', '%'.$request->input('nome').'%');
         }
 
         if (!empty($request->input('status'))){
-            $materiais = $materiais->where('status', '=', $request->input('status'));
+            $materiais = $materiais = $materiais->where('status', '=', $request->input('status'));
         }
 
         $materiais = $materiais->get();
@@ -135,6 +135,7 @@ class MateriaisController extends Controller
         $materiais->espessura = $request->input('espessura');
         $materiais->unidadex = $request->input('unidadex');
         $materiais->unidadey = $request->input('unidadey');
+        $materiais->peca_padrao = $request->input('peca_padrao');
         $materiais->tempo_montagem_torre = $request->input('tempo_montagem_torre');
         $materiais->valor = DateHelpers::formatFloatValue($request->input('valor'));
         $materiais->status = $request->input('status');

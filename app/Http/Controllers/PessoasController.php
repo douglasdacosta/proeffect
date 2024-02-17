@@ -32,14 +32,20 @@ class PessoasController extends Controller
         	$pessoas = $pessoas->where('id', '=', $id);
         }
 
-
-
         if (!empty($request->input('status'))){
             $pessoas = $pessoas->where('status', '=', $request->input('status'));
         }
 
-        if ($request->input('nome') != '') {
-        	$pessoas = $pessoas->where('nome', 'like', '%'.$request->input('nome').'%');
+        if ($request->input('codigo_cliente') != '') {
+        	$pessoas = $pessoas->where('codigo_cliente', '=', $request->input('codigo_cliente'));
+        }
+
+        if ($request->input('nome_cliente') != '') {
+        	$pessoas = $pessoas->where('nome_cliente', 'like', '%'.$request->input('nome_cliente').'%');
+        }
+
+        if ($request->input('nome_contato') != '') {
+        	$pessoas = $pessoas->where('nome_contato', 'like', '%'.$request->input('nome_contato').'%');
         }
 
         $pessoas = $pessoas->get();

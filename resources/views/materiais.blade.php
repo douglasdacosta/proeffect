@@ -24,7 +24,7 @@
                 <div class="col-sm-2">
                     <input type="text" id="codigo" name="codigo" class="form-control col-md-7 col-xs-12" value="@if (isset($request) && $request->input('codigo') != ''){{$request->input('codigo')}}@else @endif">
                 </div>
-                <label for="codigo" class="col-sm-1 col-form-label">Nome</label>
+                <label for="codigo" class="col-sm-1 col-form-label">Materiais</label>
                 <div class="col-sm-5">
                     <input type="text" id="nome" name="nome" class="form-control col-md-7 col-xs-12" value="@if (isset($request) && trim($request->input('nome')) != ''){{$request->input('nome')}}@else @endif">
                 </div>
@@ -51,12 +51,13 @@
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
-                <table class="table table-striped">
+                <table class="table table-striped  text-center ">
                   <thead>
                     <tr>
                       <th>ID</th>
                       <th>Código</th>
                       <th>Material</th>
+                      <th>Valor</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -66,6 +67,8 @@
                             <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $material->id )) }}>{{$material->id}}</a></th>
                               <td>{{$material->codigo}}</td>
                               <td>{{$material->material}}</td>
+                              <td>{{number_format($material->valor,2, ',','.')}}</td>
+
                             </tr>
                         @endforeach
                     @endif
@@ -110,23 +113,29 @@
                 <input type="text" class="form-control is-invalid" required id="material"  name="material"  value="@if (isset($materiais[0]->material)){{$materiais[0]->material}}@else{{''}}@endif">
                 </div>
             </div>
-
+            <div class="form-group row">
+                <label for="peca_padrao" class="col-sm-2 col-form-label">Peça padrão</label>
+                <select class="form-control col-sm-1 custom-select" id="peca_padrao" name="peca_padrao">
+                    <option value="2" @if (($materiais[0]->peca_padrao == 2)){{"selected='selected'"}}@else{{''}}@endif>Não</option>
+                    <option value="1"@if (($materiais[0]->peca_padrao == 1)){{"selected='selected'"}}@else{{''}}@endif>Sim</option>
+                </select>
+            </div>
             <div class="form-group row">
                 <label for="espessura" class="col-sm-2 col-form-label">Espessura (mm)</label>
                 <div class="col-sm-2">
-                <input type="text" class="form-control" id="espessura" name="espessura" value="@if (isset($materiais[0]->espessura)){{$materiais[0]->espessura}}@else{{''}}@endif">
+                <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="espessura" name="espessura" value="@if (isset($materiais[0]->espessura)){{$materiais[0]->espessura}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="unidadex" class="col-sm-2 col-form-label">Tamanho placa X (mm)</label>
                 <div class="col-sm-2">
-                <input type="text" class="form-control" id="unidadex" name="unidadex" value="@if (isset($materiais[0]->unidadex)){{$materiais[0]->unidadex}}@else{{''}}@endif">
+                <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="unidadex" name="unidadex" value="@if (isset($materiais[0]->unidadex)){{$materiais[0]->unidadex}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="unidadey" class="col-sm-2 col-form-label">Tamanho placa Y (mm)</label>
                 <div class="col-sm-2">
-                <input type="text" class="form-control" id="unidadey" name="unidadey" value="@if (isset($materiais[0]->unidadey)){{$materiais[0]->unidadey}}@else{{''}}@endif">
+                <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="unidadey" name="unidadey" value="@if (isset($materiais[0]->unidadey)){{$materiais[0]->unidadey}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
@@ -142,8 +151,8 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label for="status" class="col-sm-2 col-form-label"></label>
-                <select class="form-control col-md-1" id="status" name="status">
+                <label for="status" class="col-sm-2 col-form-label">&nbsp;</label>
+                <select class="form-control custom-select col-md-1 " id="status" name="status">
                     <option value="A" @if (isset($materiais[0]->status) && $materiais[0]->status == 'A'){{ ' selected '}}@else @endif>Ativo</option>
                     <option value="I" @if (isset($materiais[0]->status) && $materiais[0]->status =='I'){{ ' selected '}}@else @endif>Inativo</option>
                 </select>

@@ -371,6 +371,13 @@ return [
             'label'       => '',
             'label_color' => '',
         ],
+        [
+            'text'        => 'Relatório produção',
+            'url'         => 'relatorio-producao',
+            'icon'        => 'far fa-fw fa-file',
+            'label'       => '',
+            'label_color' => '',
+        ],
         ['header' => 'Configurações'],
         [
             'text' => 'Conta',

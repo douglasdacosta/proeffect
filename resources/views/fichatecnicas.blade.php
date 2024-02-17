@@ -50,7 +50,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <table class="table table-striped">
+                            <table class="table table-striped  text-center">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -143,15 +143,15 @@
         <div class="form-group row">
             <label for="qtde" class="col-sm-2 col-form-label text-right">Qtde*</label>
             <div class="col-sm-1">
-                <input type="text" id="qtde" name="qtde" class="form-control col-md-13" value="">
+                <input type="text" id="qtde" name="qtde" class="form-control col-md-13 sonumeros" value="">
             </div>
-            <label for="medidax" class="col-sm-2 col-form-label text-right">Medida X</label>
+            <label for="medidax" class="col-sm-2 col-form-label text-right ">Medida X</label>
             <div class="col-sm-1">
-                <input type="text" id="medidax" name="medidax" class="form-control col-md-13" value="">
+                <input type="text" id="medidax" name="medidax" class="form-control col-md-13 sonumeros" value="">
             </div>
             <label for="mediday" class="col-sm-2 col-form-label text-right">Medida Y</label>
             <div class="col-sm-1">
-                <input type="text" id="mediday" name="mediday" class="form-control col-md-13" value="">
+                <input type="text" id="mediday" name="mediday" class="form-control col-md-13 sonumeros" value="">
             </div>
 
 
@@ -190,7 +190,7 @@
         <hr class="my-3">
         <label for="codigo" class="col-sm-10 col-form-label">Tabela de composição do EP</label>
         <div class="form-group row">
-            <table class="table table-sm table-striped " id="table_composicao">
+            <table class="table table-sm table-striped text-center" id="table_composicao">
                 <thead class="thead-dark">
                     <tr>
                         <th scope="col">Blank</th>
@@ -221,7 +221,10 @@
                             <td data-name="tempo_montagem" class="tempo_montagem">{{$fichatecnicaitem->tempo_montagem}}</td>
                             <td data-name="tempo_montagem_torre" class="tempo_montagem_torre">{{$fichatecnicaitem->tempo_montagem_torre}}</td>
                             <td data-name="tempo_inspecao" class="tempo_inspecao">{{$fichatecnicaitem->tempo_inspecao}}</td>
-                            <td><button type="button" class="close" aria-label="Close" data-blank="{{$fichatecnicaitem->blank}}{{$fichatecnicaitem->materiais_id}}"><span aria-hidden="true">&times;</span></button></td>
+                            <td>
+                                <button type="button" class="close" aria-label="Close" data-blank="{{$fichatecnicaitem->blank}}{{$fichatecnicaitem->materiais_id}}"><span aria-hidden="true">&times;</span></button>
+                                <button type="button" class="close edita_composicao" style="padding-right: 20px" data-blank="{{$fichatecnicaitem->blank}}{{$fichatecnicaitem->materiais_id}}"><span aria-hidden="true">&#9998;</span></button>
+                            </td>
                         </tr>
                         @endforeach
                     @endif
@@ -237,7 +240,7 @@
         <hr class="my-4">
 
         <div class="form-group row">
-            <table class="table table-sm table-striped">
+            <table class="table table-sm table-striped  text-center">
                 <thead>
                     <tr>
                         <th scope="col">Total usinagem </th>

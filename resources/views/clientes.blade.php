@@ -56,11 +56,14 @@
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
-                <table class="table table-striped">
+                <table class="table table-striped text-center">
                   <thead>
                     <tr>
                       <th>ID</th>
                       <th>Nome</th>
+                      <th>Contato</th>
+                      <th>Telefone</th>
+                      <th>Email</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -69,6 +72,9 @@
                             <tr>
                             <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $pessoa->id )) }}>{{$pessoa->id}}</a></th>
                               <td>{{$pessoa->nome_cliente}}</td>
+                              <td>{{$pessoa->nome_contato}}</td>
+                              <td class='mask_phone'>{{$pessoa->telefone}}</td>
+                              <td>{{$pessoa->email}}</td>
                             </tr>
                         @endforeach
                     @endif
@@ -135,7 +141,7 @@
             <div class="form-group row">
                 <label for="numero" class="col-sm-2 col-form-label">Numero</label>
                 <div class="col-sm-1">
-                <input type="text" class="form-control" id="numero" name="numero" value="@if (isset($pessoas[0]->numero)){{$pessoas[0]->numero}}@else{{''}}@endif">
+                <input type="text" class="form-control sonumeros" id="numero" name="numero" value="@if (isset($pessoas[0]->numero)){{$pessoas[0]->numero}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
@@ -159,7 +165,7 @@
             <div class="form-group row">
                 <label for="cep" class="col-sm-2 col-form-label">Cep</label>
                 <div class="col-sm-2">
-                <input type="text" class="form-control" id="cep" name="cep" value="@if (isset($pessoas[0]->cep)){{$pessoas[0]->cep}}@else{{''}}@endif">
+                <input type="text" class="form-control cep" id="cep" name="cep" value="@if (isset($pessoas[0]->cep)){{$pessoas[0]->cep}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">

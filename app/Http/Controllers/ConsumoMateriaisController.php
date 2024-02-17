@@ -33,6 +33,14 @@ class ConsumoMateriaisController extends Controller
             $pedidos = $pedidos->where('pedidos.id', '=', $id);
         }
 
+        if(!empty($request->input('ep'))) {
+            $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $request->input('ep'));
+        }
+
+        if(!empty($request->input('os'))) {
+            $pedidos = $pedidos->where('pedidos.os', '=', $request->input('os'));
+        }
+
         if ($status_id) {
             $pedidos = $pedidos->where('pedidos.status_id', '=', $status_id);
         }
@@ -134,7 +142,6 @@ class ConsumoMateriaisController extends Controller
                         foreach ($valueD['qtde'] as $qtde) {
                             $quantidade = $quantidade + $qtde;
                         }
-
                         $medida_placax = (float)$valueD['unidadex'];
                         $medida_placay = (float)$valueD['unidadey'];
                         $valor = (float)$valueD['valor'];
@@ -146,20 +153,19 @@ class ConsumoMateriaisController extends Controller
                             $alturaPrincipal = (float)$medida_placay;
                             $larguraPeca = (float)$medidax;
                             $alturaPeca = (float)$mediday;
-                            $totalPecasPequenas = $quantidade;
+                            $totalPecasPequenas = $quantidade*$qtde_pedido;
                             $placas = $this->calculaPecas($larguraPrincipal, $alturaPrincipal, $larguraPeca, $alturaPeca, $totalPecasPequenas);
                             $custo=  $placas * (float)$valor;
-
 
                             $placas_utilizadas = [
                                 'placas' => $placas,
                                 'custo' => number_format($custo, 2, ',','.'),
                                 'valor_unitario' => number_format((float)$valor, 2, ',','.'),
                                 'custo_noformat' => $custo,
-                                'Totalplacas' => $placas * $qtde_pedido,
-                                'Totalcusto' => number_format($custo * $qtde_pedido, 2, ',','.'),
+                                'Totalplacas' => $placas,
+                                'Totalcusto' => number_format($custo, 2, ',','.'),
                                 'Totalvalor_unitario' => number_format((float)$valor, 2, ',','.'),
-                                'Totalcusto_noformat' => $custo * $qtde_pedido,
+                                'Totalcusto_noformat' => $custo
                             ];
 
                         } else {
@@ -216,12 +222,12 @@ class ConsumoMateriaisController extends Controller
 
         $calculo_horizontalx = floor($alturaChapa/$alturaPeca);
         $calculo_horizontaly = floor($larguraChapa/$larguraPeca);
-        $horizontal = ($calculo_horizontalx + $calculo_horizontaly);
+        $horizontal = ($calculo_horizontalx * $calculo_horizontaly);
 
         $calculo_verticalx = floor($larguraChapa/$larguraPeca);
         $calculo_verticaly = floor($alturaChapa/$alturaPeca);
 
-        $vertical = ($calculo_verticalx + $calculo_verticaly);
+        $vertical = ($calculo_verticalx * $calculo_verticaly);
 
         $pecas_po_placa = ($horizontal > $vertical ? $horizontal : $vertical);
 
