@@ -33,8 +33,8 @@ return new class extends Migration
                 [ 'nome' => 'Inspeção', 'alertacliente' => 1, 'status' => 'A'],
                 [ 'nome' => 'Embalar', 'alertacliente' => 1, 'status' => 'A'],
                 [ 'nome' => 'Expedição', 'alertacliente' => 1, 'status' => 'A'],
-                [ 'nome' => 'Entregue', 'alertacliente' => 1, 'status' => 'A'],
                 [ 'nome' => 'Estoque   ', 'alertacliente' => 1, 'status' => 'A'],
+                [ 'nome' => 'Entregue', 'alertacliente' => 1, 'status' => 'A'],
 
             ]
         );

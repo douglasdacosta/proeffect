@@ -749,7 +749,7 @@
                                         <td>{{ $pedido->nome_contato }}</td>
                                         <td>{{ $pedido->os }}</td>
                                         <td>{{ $pedido->nome_status}}</td>
-                                        <td>{{ \Carbon\Carbon::parse($pedido->created_at)->format('d/m/Y')}}</td>
+                                        <td>{{ \Carbon\Carbon::parse($pedido->data_ultimo_historico)->format('d/m/Y')}}</td>
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y')}}</td>
                                         <td class="{{$class_dias_alerta}}" >{{$dias_alerta}}</td>
                                         <td>{{ $pedido->email}}</td>

@@ -126,7 +126,11 @@ class MateriaisController extends Controller
 
     public function salva($request) {
         $materiais = new Materiais();
-
+        $tempo_torre = '00:00:00';
+        if(!empty($request->input('tempo_montagem_torre'))) {
+            $tempo_torre = '00:'.$request->input('tempo_montagem_torre');
+        }
+    
         if($request->input('id')) {
             $materiais = $materiais::find($request->input('id'));
         }
@@ -136,7 +140,7 @@ class MateriaisController extends Controller
         $materiais->unidadex = $request->input('unidadex');
         $materiais->unidadey = $request->input('unidadey');
         $materiais->peca_padrao = $request->input('peca_padrao');
-        $materiais->tempo_montagem_torre = $request->input('tempo_montagem_torre');
+        $materiais->tempo_montagem_torre = $tempo_torre;
         $materiais->valor = DateHelpers::formatFloatValue($request->input('valor'));
         $materiais->status = $request->input('status');
         $materiais->save();

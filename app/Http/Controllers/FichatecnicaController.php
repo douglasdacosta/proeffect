@@ -170,6 +170,7 @@ class FichatecnicaController extends Controller
             $fichatecnicas->save();
 
             $composicoes = json_decode($request->input('composicoes'));
+            \Log::info(print_r($composicoes, true));
             $composicaoeps = json_decode($composicoes->composicaoep);
             foreach ($composicaoeps as $key1 => $composicaoep) {
                 foreach ($composicaoep as $key => $value) {

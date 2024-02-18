@@ -513,13 +513,9 @@ class PedidosController extends Controller
             foreach ($request->input('enviar') as $key => $pedido) {
 
                 $alertasPedido = DB::table('pedidos')
-                    ->select('pedidos.id',  'historicos_pedidos.created_at', 'status.alertacliente', 'alertas.id as id_alerta')
+                    ->select('pedidos.id','status.alertacliente', 'alertas.id as id_alerta')
                     ->join('alertas', 'pedidos.id', '=', 'alertas.pedidos_id')
-                    ->join('status', 'pedidos.status_id', '=', 'status.id')
-                    ->join('historicos_pedidos', function($join){
-                        $join->on("historicos_pedidos.id","=","pedidos.id")
-                            ->on("historicos_pedidos.status_id","=","status.id");
-                    })
+                    ->join('status', 'pedidos.status_id', '=', 'status.id')                    
                     ->where('alertas.enviado', '=', 0)
                     ->where('pedidos.id', '=', $pedido)->get();
 
@@ -551,8 +547,13 @@ class PedidosController extends Controller
         ->join('status', 'pedidos.status_id', '=', 'status.id')
         ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
         ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-        ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente','pessoas.nome_contato', 'pessoas.email', 'status.nome as nome_status')
+        ->join('historicos_pedidos', function($join){
+            $join->on("historicos_pedidos.pedidos_id","=","pedidos.id")
+                ->on("historicos_pedidos.status_id","=","status.id");
+        })
+        ->select('pedidos.*', 'ficha_tecnica.ep', 'historicos_pedidos.created_at as data_ultimo_historico', 'pessoas.nome_cliente','pessoas.nome_contato', 'pessoas.email', 'status.nome as nome_status')
         ->where('enviado', '=', 0)->get();
+
         $data = array(
             'tela' =>'alerta-pedidos',
             'nome_tela' => 'alerta de pedidos',

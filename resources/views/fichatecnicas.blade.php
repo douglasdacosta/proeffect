@@ -221,10 +221,10 @@
                             <td data-name="tempo_montagem" class="tempo_montagem">{{$fichatecnicaitem->tempo_montagem}}</td>
                             <td data-name="tempo_montagem_torre" class="tempo_montagem_torre">{{$fichatecnicaitem->tempo_montagem_torre}}</td>
                             <td data-name="tempo_inspecao" class="tempo_inspecao">{{$fichatecnicaitem->tempo_inspecao}}</td>
-                            <td>
+                            <th>
                                 <button type="button" class="close" aria-label="Close" data-blank="{{$fichatecnicaitem->blank}}{{$fichatecnicaitem->materiais_id}}"><span aria-hidden="true">&times;</span></button>
                                 <button type="button" class="close edita_composicao" style="padding-right: 20px" data-blank="{{$fichatecnicaitem->blank}}{{$fichatecnicaitem->materiais_id}}"><span aria-hidden="true">&#9998;</span></button>
-                            </td>
+                            </th>
                         </tr>
                         @endforeach
                     @endif
