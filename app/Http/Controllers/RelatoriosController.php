@@ -128,9 +128,6 @@ class RelatoriosController extends Controller
                 }
             }
         }
-        // \Log::info(print_r($dados_pedidos, true));
-        // \Log::info(print_r($arr_status, true));
-        // \Log::info(print_r($dados_pedidos, true));
 
         $tela = 'pesquisar';
     	$data = array(
@@ -145,52 +142,6 @@ class RelatoriosController extends Controller
 
         return view('relatorios_producao', $data);
     }
-
-    /**
-     *
-     */
-    public function relatorioProducao(Request $request, $imprimir = 0) {
-
-
-        $id = !empty($request->input('id')) ? ($request->input('id')) : (!empty($id) ? $id : false);
-
-        $pedidos = DB::table('pedidos')
-            ->join('historicos_pedidos', 'historicos_pedidos.pedidos_id', '=', 'pedidos.id')
-            // ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
-            // ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->select(
-                'pedidos.*',
-                'historicos_pedidos.status_id',
-                'historicos_pedidos.created_at'
-            )
-            ->distinct('')
-            ->orderby('pedidos.status_id', 'desc');
-
-        $pedidos = $pedidos->where('pedidos.id', '=', $id);
-
-        $pedidos = $pedidos->get();
-
-
-        foreach ($pedidos as $key => $pedido) {
-            \Log::info(print_r($pedido, true));
-        }
-
-
-
-        $tela = 'relatorio-producao';
-    	$data = array(
-				'tela' => $tela,
-                'nome_tela' => 'produção',
-                'pedidos' => $pedidos,
-                'request' => $request,
-                'AllStatus' => (new PedidosController)->getAllStatus(),
-				'rotaAlterar' => 'relatorio-producao'
-			);
-
-        return view('relatorios_producao', $data);
-
-    }
-
 
 }
 

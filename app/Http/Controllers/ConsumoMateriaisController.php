@@ -154,9 +154,18 @@ class ConsumoMateriaisController extends Controller
                             $larguraPeca = (float)$medidax;
                             $alturaPeca = (float)$mediday;
                             $totalPecasPequenas = $quantidade*$qtde_pedido;
-                            $placas = $this->calculaPecas($larguraPrincipal, $alturaPrincipal, $larguraPeca, $alturaPeca, $totalPecasPequenas);
-                            $custo=  $placas * (float)$valor;
+                            $retorno = $this->calculaPecas($larguraPrincipal, $alturaPrincipal, $larguraPeca, $alturaPeca, $totalPecasPequenas);
+                            $placas = $retorno['quantidadeChapas'];
 
+                            \Log::info(print_r('chapa '.$larguraPrincipal.'x'.$medida_placay, true));
+                            \Log::info(print_r('peça '.$larguraPeca.'x'.$alturaPeca, true));
+                            
+                            \Log::info(print_r($retorno, true));
+
+                            $custo=  $placas * (float)$valor;
+                            // 'quantidadeChapas' => $quantidadeChapas,
+                            // 'sobra_na_horizontal' => $sobra_na_horizontal,
+                            // 'sobra_na_vertical' => $sobra_na_vertical,
                             $placas_utilizadas = [
                                 'placas' => $placas,
                                 'custo' => number_format($custo, 2, ',','.'),
@@ -186,7 +195,7 @@ class ConsumoMateriaisController extends Controller
                         $materiais[] = [
                             'nome_material' => $nome_material,
                             'medida_placax' => $medida_placax,
-                            'medida_placay' => $medida_placay,
+                            'medida_placay' => $medida_placay,                            
                             'medidax' => $medidax,
                             'mediday' => $mediday,
                             'espessura' => $espessura,
@@ -197,6 +206,30 @@ class ConsumoMateriaisController extends Controller
                 }
             }
         }
+        
+        
+        // \Log::info(print_r($materiais, true));
+        // foreach ($materiais as $key => $material) {
+        //    if($material['material'] == $materiais[$key -1]['material'] &&  $material['espessura']) {
+        // $materiais_agrupado[$key] = [            
+        //         'nome_material' => PSAI Cinza Claro
+        //         'medida_placax' => 1200
+        //         'medida_placay' => 960
+        //         'espessura' => 3
+        //         'quantidade' => 2
+        //         'placas_utilizadas' => [                    
+        //                 'placas' => 167
+        //                 'custo' => 2.588,50
+        //                 'valor_unitario' => 15,50
+        //                 'custo_noformat' => 2588.5
+        //                 'Totalplacas' => 167
+        //                 'Totalcusto' => 2.588,50
+        //                 'Totalvalor_unitario' => 15,50
+        //                 'Totalcusto_noformat' => 2588.5                    
+        //         ]
+        // ]         
+        // }
+        
         $totais['total'] = number_format($totais['total'],2,',','.');
         $totais['Totaltotal'] = number_format($totais['Totaltotal'],2,',','.');
 
@@ -219,20 +252,40 @@ class ConsumoMateriaisController extends Controller
     }
 
     function calculaPecas($alturaChapa, $larguraChapa, $alturaPeca, $larguraPeca, $qtdePecas) {
-
+        
         $calculo_horizontalx = floor($alturaChapa/$alturaPeca);
         $calculo_horizontaly = floor($larguraChapa/$larguraPeca);
-        $horizontal = ($calculo_horizontalx * $calculo_horizontaly);
+
+        $qtde_na_horizontal = ($calculo_horizontalx * $calculo_horizontaly);
+
+        $sobra_na_horizontalx = $alturaChapa - ($alturaPeca*$calculo_horizontalx);
+        $sobra_na_horizontaly = $alturaChapa - ($larguraPeca*$calculo_horizontaly);
+
 
         $calculo_verticalx = floor($larguraChapa/$larguraPeca);
         $calculo_verticaly = floor($alturaChapa/$alturaPeca);
 
-        $vertical = ($calculo_verticalx * $calculo_verticaly);
+        $qtde_na_vertical = ($calculo_verticalx * $calculo_verticaly);
 
-        $pecas_po_placa = ($horizontal > $vertical ? $horizontal : $vertical);
+        $sobra_na_verticalx = $alturaChapa - ($alturaPeca*$calculo_verticalx);
+        $sobra_na_verticaly = $alturaChapa - ($larguraPeca*$calculo_verticaly);
+
+        $pecas_po_placa = ($qtde_na_horizontal > $qtde_na_vertical ? $qtde_na_horizontal : $qtde_na_vertical);
 
         $quantidadeChapas = ceil($qtdePecas/$pecas_po_placa);
-        return $quantidadeChapas;
+        return [
+            'quantidadeChapas' => $quantidadeChapas,
+            'sobra_na_horizontal' => [
+                'x' => $sobra_na_horizontalx,
+                'y' => $sobra_na_horizontaly
+            ],
+            'sobra_na_vertical' => [
+                'x' => $sobra_na_verticalx,
+                'y' => $sobra_na_verticaly
+            ],
+
+        ];
+            
 
 
     }

@@ -35,7 +35,7 @@
             <form id="filtro" action="consumo-materiais" method="get" data-parsley-validate="" class="form-horizontal form-label-left"
                 novalidate="">
                 <div class="form-group row">
-                    <label for="codigo_cliente" class="colrelatorio-producao-sm-1 col-form-label text-right">Código cliente</label>
+                    <label for="codigo_cliente" class="col-sm-1 col-form-label text-right">Código cliente</label>
                     <div class="col-sm-1">
                         <input type="text" id="codigo_cliente" name="codigo_cliente" class="form-control col-md-13"
                             value="">
@@ -71,12 +71,12 @@
                     <div class="col-sm-1">
                         <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                     </div>
-                    <label  for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega inicial</label>
+                    <label  for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
                     <div class="col-sm-1">
                         <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
                             placeholder="DD/MM/AAAA">
                     </div>
-                    <label for="data_entrega_fim" class="col-sm-2 col-form-label text-right">Data entrega final</label>
+                    <label for="data_entrega_fim" class=" col-form-label text-right">até</label>
                     <div class="col-sm-1">
                         <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
                             placeholder="DD/MM/AAAA">

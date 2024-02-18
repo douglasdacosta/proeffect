@@ -86,12 +86,12 @@
                         <div class="col-sm-1">
                             <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                         </div>
-                        <label  for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega inicial</label>
+                        <label  for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
                         <div class="col-sm-1">
                             <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
                                 placeholder="DD/MM/AAAA">
                         </div>
-                        <label for="data_entrega_fim" class="col-sm-2 col-form-label text-right">Data entrega final</label>
+                        <label for="data_entrega_fim" class="col-form-label text-right">até</label>
                         <div class="col-sm-1">
                             <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
                                 placeholder="DD/MM/AAAA">
@@ -394,10 +394,9 @@
                         <div class="col-sm-1">
                             <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                         </div>
-
-                        <label for="blank" class="col-sm-2 col-form-label text-right text-sm-end">Status do pedido</label>
-                        <div class="col-sm-4">
-                            <select class="form-control" id="status_id" name="status_id">
+                        <label for="blank" class="col-sm-1 col-form-label text-right text-sm-end">Status do pedido</label>
+                        <div class="col-sm-2">
+                            <select class="custom-select" multiple size="4" id="status_id" name="status_id[]">
                                 <option value=""></option>
                                 @if (isset($status))
                                     @foreach ($status as $status)
@@ -408,26 +407,24 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-2 text-center">
-                            <label for="data_gerado">Data gerado inicial</label>
+                    <div class="form-group row">
+                        <label  for="data_gerado" class="col-sm-1 col-form-label text-right">Data pedido: de</label>
+                        <div class="col-sm-1">
                             <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
                                 placeholder="DD/MM/AAAA">
                         </div>
-                        <div class="form-group col-md-2 text-center">
-                            <label for="data_gerado_fim">Data gerado final</label>
+                        <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-1">
                             <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
                                 placeholder="DD/MM/AAAA">
-                        </div>
-                        <div class="form-group col-md-2 text-center">
-                        </div>
-                        <div class="form-group col-md-2 text-center">
-                            <label for="data_entrega">Data entrega inicial</label>
+                        </div>                       
+                        <label  for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
+                        <div class="col-sm-1">
                             <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
                                 placeholder="DD/MM/AAAA">
                         </div>
-                        <div class="form-group col-md-2 text-center">
-                            <label for="data_entrega_fim">Data entrega final</label>
+                        <label for="data_entrega_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-1">
                             <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
                                 placeholder="DD/MM/AAAA">
                         </div>
@@ -539,15 +536,15 @@
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem'])}}</th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento'])}}</th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem'])}}</th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao'])}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem']). ' horas'}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento']). ' horas'}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem']). ' horas'}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao']). ' horas'}}</th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                 </tr>
                                 <tr>
-                                    <th scope="col">Maquinas/pessoas</th>
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col">{{$dado_pedido_status['maquinas_usinagens']}}</th>
@@ -583,10 +580,10 @@
                             <tr style="">
                                 <th scope="col" colspan="2">Total geral</th>
                                 <th scope="col">&nbsp;</th>
-                                <th scope="col">{{$totalGeral['totalGeralusinagens'] . ' dias de máquinas'}}</th>
-                                <th scope="col">{{$totalGeral['totalGeralacabamento'] . ' dias de trabalho'}}</th>
-                                <th scope="col">{{$totalGeral['totalGeralmontagem'] . ' dias de trabalho'}}</th>
-                                <th scope="col">{{$totalGeral['totalGeralinspecao'] . ' dias de trabalho'}}</th>
+                                <th scope="col">{{ !empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] . ' dias' : '0'}}</th>
+                                <th scope="col">{{ !empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] . ' dias' : '0'}}</th>
+                                <th scope="col">{{ !empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] . ' dias' : '0'}}</th>
+                                <th scope="col">{{ !empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] . ' dias' : '0'}}</th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                             </tr>
@@ -676,13 +673,13 @@
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem'])}}</th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento'])}}</th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem'])}}</th>
-                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao'])}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem']) .' horas'}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento']).' horas'}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem']).' horas'}}</th>
+                                    <th scope="col">{{PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao']).' horas'}}</th>
                                 </tr>
                                 <tr>
-                                    <th scope="col" colspan="2">Maquinas/pessoas</th>
+                                    <th scope="col" colspan="2"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
@@ -726,6 +723,7 @@
                                     <th scope="col" title="Código do cliente">Cliente</th>
                                     <th scope="col">Responsável</th>
                                     <th scope="col">OS</th>
+                                    <th scope="col" title="Data do status">Data status</th>
                                     <th scope="col">Status do pedido</th>
                                     <th scope="col" title="Data da entrega">Data Entrega</th>
                                     <th scope="col" title="Alerta de dias">Alerta</th>
@@ -751,6 +749,7 @@
                                         <td>{{ $pedido->nome_contato }}</td>
                                         <td>{{ $pedido->os }}</td>
                                         <td>{{ $pedido->nome_status}}</td>
+                                        <td>{{ \Carbon\Carbon::parse($pedido->created_at)->format('d/m/Y')}}</td>
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y')}}</td>
                                         <td class="{{$class_dias_alerta}}" >{{$dias_alerta}}</td>
                                         <td>{{ $pedido->email}}</td>

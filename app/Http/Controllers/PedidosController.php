@@ -306,8 +306,6 @@ class PedidosController extends Controller
     */
     public function followup(Request $request)
     {
-
-
         $filtrado = 0;
         $pedidos = DB::table('pedidos')
             ->join('status', 'pedidos.status_id', '=', 'status.id')
@@ -316,7 +314,7 @@ class PedidosController extends Controller
             ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome' , 'status.id as id_status');
 
         if(!empty($request->input('status_id'))) {
-            $pedidos = $pedidos->where('status_id', '=', $request->input('status_id'));
+            $pedidos = $pedidos->whereIn('status_id', $request->input('status_id'));
             $filtrado++;
         }
         if(!empty($request->input('os'))) {
@@ -430,11 +428,12 @@ class PedidosController extends Controller
         $total_horas_pessoas_acabamento_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_acabamento);
         $total_horas_pessoas_pessoas_montagem_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem);
         $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
-
+        $totalGeral = [];
         foreach ($dados_pedido_status as $status => $pedidos) {
 
 
-            foreach ($pedidos['classe'] as $pedido) {
+            foreach ($pedidos['classe'] as $chave =>  $pedido) {
+                
                 $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
 
                 $total_tempo_usinagem = $this->somarHoras($total_tempo_usinagem , $pedido->tabelaFichastecnicas->tempo_usinagem);
@@ -464,18 +463,27 @@ class PedidosController extends Controller
             $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia);
             $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia);
 
+            if($pedidos['id_status'][$chave] <= 4 ){
+                $totalGeral['totalGeralusinagens'] = ((!empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']) );                            
+                $totalGeral['totalGeralacabamento'] = ((!empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_acabamento']) );
+                $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
+            if($pedidos['id_status'][$chave] == 5 ){
+                $totalGeral['totalGeralacabamento'] = ((!empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_acabamento']) );
+                $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
+            if($pedidos['id_status'][$chave] == 6 ){
+                $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
+            if($pedidos['id_status'][$chave] == 7 ){
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
 
-            $totalGeral['totalGeralusinagens'] = ((!empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']) );
-            $totalGeral['totalGeralacabamento'] = ((!empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_acabamento']) );
-            $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
-            $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
 
-            // \Log::info(print_r(preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']), true));
-            // \Log::info(print_r($totalGeral['totalGeralusinagens'], true));
-            // \Log::info(print_r($totalGeral, true));
         }
-
-
 
         $tela = 'followup-detalhes';
         $nome_da_tela ='followup tempos';
@@ -505,9 +513,13 @@ class PedidosController extends Controller
             foreach ($request->input('enviar') as $key => $pedido) {
 
                 $alertasPedido = DB::table('pedidos')
-                    ->select('pedidos.id', 'status.alertacliente', 'alertas.id as id_alerta')
+                    ->select('pedidos.id',  'historicos_pedidos.created_at', 'status.alertacliente', 'alertas.id as id_alerta')
                     ->join('alertas', 'pedidos.id', '=', 'alertas.pedidos_id')
                     ->join('status', 'pedidos.status_id', '=', 'status.id')
+                    ->join('historicos_pedidos', function($join){
+                        $join->on("historicos_pedidos.id","=","pedidos.id")
+                            ->on("historicos_pedidos.status_id","=","status.id");
+                    })
                     ->where('alertas.enviado', '=', 0)
                     ->where('pedidos.id', '=', $pedido)->get();
 
@@ -558,7 +570,7 @@ class PedidosController extends Controller
 
         $pedidos = $pedidos::with('tabelaStatus', 'tabelaFichastecnicas')->where('id', $request->input('id'))->get();
 
-        $fichastecnicasitens = $Fichastecnicasitens->where('fichatecnica_id', $request->input('id'))->get();
+        $fichastecnicasitens = $Fichastecnicasitens->where('fichatecnica_id', '=', $pedidos[0]->tabelaFichastecnicas->id)->get();
 
         $conjuntos['conjuntos'] = [];
         $qdte_blank = 0;
@@ -649,7 +661,7 @@ class PedidosController extends Controller
         $resultDays = $totalSeconds / $smallerseconds ;
 
         // Formatar o resultado
-        $resultTime = sprintf("%.1f dias de trabalho", $resultDays);
+        $resultTime = sprintf("%.1f dias", $resultDays);
 
         return $resultTime;
     }
@@ -679,7 +691,7 @@ class PedidosController extends Controller
         $resultadoDias = $tempoTotalSegundos / $tempoDiarioSegundos;
 
         // Formatando o resultado
-        $mensagem = sprintf("%.1f dias de máquinas", $resultadoDias);
+        $mensagem = sprintf("%.1f dias", $resultadoDias);
 
         return $mensagem;
     }
