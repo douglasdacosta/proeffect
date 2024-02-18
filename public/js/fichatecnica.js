@@ -25,6 +25,12 @@ $(function () {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (data) {
+                if(data[0].peca_padrao == 1){
+                    $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', true);
+                } else {
+                    $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', false);
+
+                }
                 hora = data[0].tempo_montagem_torre.toString().substring(8, 3);
                 hora = (hora == '') ? hora : '00:00'
                 $('#tempo_montagem_torre').val(hora);
