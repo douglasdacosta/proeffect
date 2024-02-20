@@ -157,11 +157,6 @@ class ConsumoMateriaisController extends Controller
                             $retorno = $this->calculaPecas($larguraPrincipal, $alturaPrincipal, $larguraPeca, $alturaPeca, $totalPecasPequenas);
                             $placas = $retorno['quantidadeChapas'];
 
-                            \Log::info(print_r('chapa '.$larguraPrincipal.'x'.$medida_placay, true));
-                            \Log::info(print_r('peça '.$larguraPeca.'x'.$alturaPeca, true));
-                            
-                            \Log::info(print_r($retorno, true));
-
                             $custo=  $placas * (float)$valor;
                             // 'quantidadeChapas' => $quantidadeChapas,
                             // 'sobra_na_horizontal' => $sobra_na_horizontal,

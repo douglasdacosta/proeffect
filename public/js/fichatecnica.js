@@ -26,13 +26,13 @@ $(function () {
             },
             success: function (data) {
                 if(data[0].peca_padrao == 1){
-                    $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', true);
+                    bloqueiaCampos(true);
                 } else {
-                    $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', false);
+                    bloqueiaCampos(false);
 
                 }
                 hora = data[0].tempo_montagem_torre.toString().substring(8, 3);
-                hora = (hora == '') ? hora : '00:00'
+                hora = (hora == '') ? '00:00' : hora
                 $('#tempo_montagem_torre').val(hora);
                 $('.overlay').hide();
                 $('#blank').val('');
@@ -45,24 +45,49 @@ $(function () {
 
     })
 
+    function bloqueiaCampos($bloquear){
+        if($bloquear){
+            $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', true);
+        } else {
+            $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', false);
+    
+        }
+    }
+    
+
     $("#addComposicao").click(function () {
         texto = ' não pode ser vazio!';
-        if ($('#ep').val() === '') {
+        if ($('#blank').val().trim() == '' && $('#blank').prop('readonly') == false) {
+            abreAlert('O campo Blank' + texto);
+            $('#blank').focus();
+            return false;
+        }
+        if ($('#medidax').val().trim() == '' && $('#blank').prop('readonly') == false) {
+            abreAlert('O campo Medida X' + texto);
+            $('#medidax').focus();
+            return false;
+        }
+        if ($('#mediday').val().trim() == '' && $('#blank').prop('readonly') == false) {
+            abreAlert('O campo Medida Y' + texto);
+            $('#medidax').focus();
+            return false;
+        }
+        if ($('#ep').val().trim() == '') {
             abreAlert('O campo EP' + texto);
             $('#ep').focus();
             return false;
         }
-        if ($('#material_id').val() === '') {
+        if ($('#material_id').val() == '') {
             abreAlert('O campo  Material não selecionado');
             $('#material_id').focus();
             return false;
         }
-        if ($('#qtde').val() === '') {
+        if ($('#qtde').val().trim() == '') {
             abreAlert('O campo  Qtde' + texto);
             $('#qtde').focus();
             return false;
         }
-        blank = $('#blank').val().toUpperCase();
+        blank = $('#blank').val().toUpperCase().trim();
         $('#table_composicao tbody').append(
             '<tr class="blank_' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
                 '<td data-name="blank" class="blank" scope="row">' + blank + '</td>' +
@@ -87,16 +112,22 @@ $(function () {
 
     $(document).on('click', '#table_composicao .edita_composicao', function () {
         id = $(this).data('blank');
-        blank = $('.blank_'+id+' td').eq(0).text();
-        qtde = $('.blank_'+id+' td').eq(1).text();
+        blank = $('.blank_'+id+' td').eq(0).text().trim();
+        qtde = $('.blank_'+id+' td').eq(1).text().trim();
         materialid = $('.blank_'+id+' td').eq(2).data('materialid');
-        medidax = $('.blank_'+id+' td').eq(3).text();
-        mediday = $('.blank_'+id+' td').eq(4).text();
-        tmpusinagem = $('.blank_'+id+' td').eq(5).text();
-        tmpacabamento = $('.blank_'+id+' td').eq(6).text();
-        tmpmontagem = $('.blank_'+id+' td').eq(7).text();
-        tmptorre = $('.blank_'+id+' td').eq(8).text();
-        tmpinspecao = $('.blank_'+id+' td').eq(9).text();
+        medidax = $('.blank_'+id+' td').eq(3).text().trim();
+        mediday = $('.blank_'+id+' td').eq(4).text().trim();
+        tmpusinagem = $('.blank_'+id+' td').eq(5).text().trim();
+        tmpacabamento = $('.blank_'+id+' td').eq(6).text().trim();
+        tmpmontagem = $('.blank_'+id+' td').eq(7).text().trim();
+        tmptorre = $('.blank_'+id+' td').eq(8).text().trim();
+        tmpinspecao = $('.blank_'+id+' td').eq(9).text().trim();
+
+        if(blank.trim() == ''){
+            bloqueiaCampos(true);
+        } else {
+            bloqueiaCampos(false);
+        }
 
         $('#blank').val(blank);
         $('#material_id').val(materialid);
@@ -294,16 +325,11 @@ $(function () {
                 if ($(j).data('name') == 'material_id') {
                     json.push('{"' + $(j).data('name') + '":"' + $(j).data('materialid') + '"}');
                 } else {
-                    json.push('{"' + $(j).data('name') + '":"' + $(j).text() + '"}');
+                    json.push('{"' + $(j).data('name') + '":"' + $(j).text().trim() + '"}');
                 }
-
             });
             composicaoep.push(json);
         })
-
-
-
-
 
         composicaoep = JSON.stringify(composicaoep);
         json_valores = {
@@ -316,7 +342,9 @@ $(function () {
         }
 
         $('#composicoes').val(JSON.stringify(json_valores));
-        $('.form_ficha').submit();
+        setTimeout(function () {
+            $('.form_ficha').submit();
+        }, 1000);
     });
 
 

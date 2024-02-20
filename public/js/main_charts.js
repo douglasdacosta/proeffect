@@ -19,7 +19,6 @@ $(function ($) {
             valores.push(data.total_pedidos);
 
             Object.keys(data.totais).forEach(function(key, el) {
-                console.log(data.totais[key].qtde);
                 colunas.push(key);
                 valores.push(data.totais[key].qtde);
               });
