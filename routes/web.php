@@ -60,5 +60,11 @@ Route::match(['get', 'post'],'/consumo-materiais-detalhes', [App\Http\Controller
 Route::match(['get', 'post'],'/maquinas', [App\Http\Controllers\MaquinasController::class, 'index'])->name('maquinas');
 
 Route::match(['get', 'post'],'/relatorio-producao', [App\Http\Controllers\RelatoriosController::class, 'index'])->name('relatorio-producao');
+Route::match(['get', 'post'],'/paineis', [App\Http\Controllers\PaineisController::class, 'index'])->name('paineis');
+Route::match(['get', 'post'],'/paineis-usinagem', [App\Http\Controllers\PaineisController::class, 'paineisUsinagem'])->name('paineis-usinagem');
+Route::match(['get', 'post'],'/paineis-montagem', [App\Http\Controllers\PaineisController::class, 'paineisMontagem'])->name('paineis-montagem');
+Route::match(['get', 'post'],'/paineis-acabamento', [App\Http\Controllers\PaineisController::class, 'paineisAcabamento'])->name('paineis-acabamento');
+Route::match(['get', 'post'],'/paineis-inspecao', [App\Http\Controllers\PaineisController::class, 'paineisInspecao'])->name('paineis-inspecao');
+Route::match(['get', 'post'],'/paineis-expedicao', [App\Http\Controllers\PaineisController::class, 'paineisExpedicao'])->name('paineis-expedicao');
 
 
