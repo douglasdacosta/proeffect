@@ -451,9 +451,15 @@ class PedidosController extends Controller
 
                 $total_tempo_montagem_torre = $this->somarHoras($total_tempo_montagem_torre , $pedido->tabelaFichastecnicas->tempo_montagem_torre);
                 $total_tempo_montagem_torre = $MaquinasController->multiplicarHoras($total_tempo_montagem_torre,$pedido->qtde);
+
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem_torre'] = $total_tempo_montagem_torre;
                 $total_tempo_montagem = $this->somarHoras($total_tempo_montagem , $pedido->tabelaFichastecnicas->tempo_montagem);
                 $total_tempo_montagem = $MaquinasController->multiplicarHoras($total_tempo_montagem,$pedido->qtde);
+                
+                if($nome_tela == 'geral') {
+                    $total_tempo_montagem = $this->somarHoras($total_tempo_montagem, $total_tempo_montagem_torre) ;
+                }
+                
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem'] = $total_tempo_montagem;
 
                 $total_tempo_inspecao = $this->somarHoras($total_tempo_inspecao , $pedido->tabelaFichastecnicas->tempo_inspecao);
@@ -469,7 +475,10 @@ class PedidosController extends Controller
 
             $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia);
             $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia);
+            
+
             $dados_pedido_status[$status]['pessoas_montagem_torre'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'], $total_horas_pessoas_pessoas_montagem_dia);
+            
             $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia);
             $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia);
 
@@ -565,7 +574,8 @@ class PedidosController extends Controller
                 ->on("historicos_pedidos.status_id","=","status.id");
         })
         ->select('pedidos.*', 'ficha_tecnica.ep', 'historicos_pedidos.created_at as data_ultimo_historico', 'pessoas.nome_cliente','pessoas.nome_contato', 'pessoas.email', 'status.nome as nome_status')
-        ->where('enviado', '=', 0)->get();
+        ->where('enviado', '=', 0)
+        ->orderBy('data_ultimo_historico', 'asc')->get();
 
         $data = array(
             'tela' =>'alerta-pedidos',

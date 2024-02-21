@@ -157,6 +157,18 @@
                     <option value="I" @if (isset($materiais[0]->status) && $materiais[0]->status =='I'){{ ' selected '}}@else @endif>Inativo</option>
                 </select>
             </div>
+            @if (!empty($historicos))
+                <div class="form-group row">
+                    <label for="observacao" class="col-sm-2 col-form-label">Histórico</label>
+                    <div class="col-sm-8">
+                        <div class="d-flex p-2 bd-highlight overflow-auto">
+                            @foreach ($historicos as $historico)
+                                {{ '[' . \Carbon\Carbon::parse($historico->created_at)->format('d/m/Y h:i:s') . '] ' . $historico->historico }}</br>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
             <div class="form-group row">
                 <div class="col-sm-5">
                     <button class="btn btn-danger" onclick="window.history.back();" type="button">Cancelar</button>
