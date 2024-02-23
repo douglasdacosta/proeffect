@@ -20,159 +20,81 @@ setTimeout(function () {
 @section('content')
 
 
-    <div class="container_default" style="background-color: #afafaf;">   
+    <div class="container_default" style="background-color: #ffffff;">   
         <div class="w-auto text-center">
             <h1>Painel de Montagem</h1>
         </div>
-            
-            <div class="w-auto"  style="min-height: 48%; background-color: #36a840;">
-                <h1>Concluídos</h1> 
-                <table class="table table-sm table-striped text-center" id="table_composicao">
-                    <thead >
-                        <tr>
-                            <th scope="col">EP</th>
-                            <th scope="col">OS</th>
-                            <th scope="col">Qtde</th>
-                            <th scope="col">Entrega</th>
-                            <th scope="col">Alerta</th>
-                            <th scope="col">Responsáveis</th>
-                        </tr>
-                    </thead>
-                    <tbody>                        
-                        <tr>
-                            <td scope="col">234</td>
-                            <td scope="col">23424</td>
-                            <td scope="col">444</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">55</td>
-                            <td scope="col">João, Fernanda</td>
-                        </tr>
-                        <tr>
-                            <td scope="col">4564</td>
-                            <td scope="col">674</td>
-                            <td scope="col">678</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">7</td>
-                            <td scope="col">Lucas, </td>
-                        </tr>
-                        <tr>
-                            <td scope="col">234</td>
-                            <td scope="col">23424</td>
-                            <td scope="col">444</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">55</td>
-                            <td scope="col">João lucas, Maria </td>
-                        </tr>
-                        <tr>
-                            <td scope="col">234</td>
-                            <td scope="col">23424</td>
-                            <td scope="col">444</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">55</td>
-                            <td scope="col">João ,  Fernanda</td>
-                        </tr>
-                        <tr>
-                            <td scope="col">345345</td>
-                            <td scope="col">456</td>
-                            <td scope="col">456</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">46</td>
-                            <td scope="col"> lucas, Maria </td>
-                        </tr>
-                        <tr>
-                            <td scope="col">56767</td>
-                            <td scope="col">7575</td>
-                            <td scope="col">675</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">789</td>
-                            <td scope="col">João lucas, Fernanda</td>
-                        </tr>
-                        <tr>
-                            <td scope="col">56767</td>
-                            <td scope="col">7575</td>
-                            <td scope="col">675</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">789</td>
-                            <td scope="col">João lucas, Fernanda</td>
-                        </tr>
-                        <tr>
-                            <td scope="col">56767</td>
-                            <td scope="col">7575</td>
-                            <td scope="col">675</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">789</td>
-                            <td scope="col">João lucas, Fernanda</td>
-                        </tr>
-                    </tbody>
-                </table>
+
+        <div class="w-auto"  style="height: 34%; overflow: hidden; background-color: #68c570;">
+            <h1><b>Concluídos</h1> 
+            <table class="table table-sm table-striped text-center" id="table_composicao">
+                <thead >
+                    <tr>
+                        <th scope="col">EP</th>
+                        <th scope="col">OS</th>
+                        <th scope="col">Qtde</th>
+                        <th scope="col">Blanks</th>
+                        <th scope="col">Conj.</th>
+                        <th scope="col">Entrega</th>
+                        <th scope="col">Alerta</th>
+                        <th scope="col">Etapa</th>
+                        <th scope="col">Responsável</th>
+                    </tr>
+                </thead>
+                <tbody> 
+                    
+                    @foreach ($pedidosCompletos as $pedido)                        
+                    <tr>
+                        <td scope="col">{{$pedido->ep}}</td>
+                        <td scope="col">{{$pedido->os}}</td>
+                        <td scope="col">{{$pedido->qtde}}</td>
+                        <td scope="col">{{$pedido->qtde_blank}}</td>
+                        <td scope="col">{{$pedido->conjuntos}}</td>
+                        <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
+                        <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
+                        <td scope="col">{{'iniciado'}}</td>
+                        <td scope="col">{{'Renata'}}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
 
 
-            </div>
-            <div class="w-auto"  style="min-height: 47%; background-color: #ff7220;">
-                <h1>Pendentes</h1> 
-                <table class="table table-sm table-striped text-center" id="table_composicao">
-                    <thead >
-                        <tr>
-                            <th scope="col">EP</th>
-                            <th scope="col">OS</th>
-                            <th scope="col">Qtde</th>
-                            <th scope="col">Entrega</th>
-                            <th scope="col">Alerta</th>
-                            <th scope="col">Responsáveis</th>
-                        </tr>
-                    </thead>
-                    <tbody>                        
-                        <tr>
-                            <td scope="col">234</td>
-                            <td scope="col">23424</td>
-                            <td scope="col">444</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">55</td>
-                            <td scope="col">João, Fernanda</td>
-                        </tr>
-                        <tr>
-                            <td scope="col">4564</td>
-                            <td scope="col">674</td>
-                            <td scope="col">678</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">7</td>
-                            <td scope="col">Lucas, </td>
-                        </tr>
-                        <tr>
-                            <td scope="col">234</td>
-                            <td scope="col">23424</td>
-                            <td scope="col">444</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">55</td>
-                            <td scope="col">João lucas, Maria </td>
-                        </tr>
-                        <tr>
-                            <td scope="col">234</td>
-                            <td scope="col">23424</td>
-                            <td scope="col">444</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">55</td>
-                            <td scope="col">João ,  Fernanda</td>
-                        </tr>
-                        <tr>
-                            <td scope="col">345345</td>
-                            <td scope="col">456</td>
-                            <td scope="col">456</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">46</td>
-                            <td scope="col"> lucas, Maria </td>
-                        </tr>
-                        <tr>
-                            <td scope="col">56767</td>
-                            <td scope="col">7575</td>
-                            <td scope="col">675</td>
-                            <td scope="col">10/10/2024</td>
-                            <td scope="col">789</td>
-                            <td scope="col">João lucas, Fernanda</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-    </div>
+        </div>
+        <div class="w-auto"  style="height: 60%; overflow: hidden; background-color: #e9aa4c;">
+            <h1><b>Pendentes</b></h1> 
+            <table class="table table-sm table-striped text-center" id="table_composicao">
+                <thead >
+                    <tr>
+                        <th scope="col">EP</th>
+                        <th scope="col">OS</th>
+                        <th scope="col">Qtde</th>
+                        <th scope="col">Blanks</th>
+                        <th scope="col">Conj.</th>
+                        <th scope="col">Entrega</th>
+                        <th scope="col">Alerta</th>
+                        <th scope="col">Etapa</th>
+                        <th scope="col">Responsável</th>
+                    </tr>
+                </thead>
+                <tbody>                        
+                    @foreach ($pedidosPendentes as $pedido)                        
+                    <tr>
+                        <td scope="col">{{$pedido->ep}}</td>
+                        <td scope="col">{{$pedido->os}}</td>
+                        <td scope="col">{{$pedido->qtde}}</td>
+                        <td scope="col">{{$pedido->qtde_blank}}</td>
+                        <td scope="col">{{$pedido->conjuntos}}</td>
+                        <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
+                        <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
+                        <td scope="col">{{'iniciado'}}</td>
+                        <td scope="col">{{'Maria'}}</td>
+                    </tr>
+                    @endforeach
+                    
+                </tbody>
+            </table>
+        </div>
+</div>
 
 @stop

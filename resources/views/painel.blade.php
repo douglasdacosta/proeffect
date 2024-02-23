@@ -33,7 +33,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
         </div>
         <div class="col-sm-2">
             <a target="_blank">
-                <button type="button"  data-nometela='Painel de expedição' data-url="{{URL::route('paineis-expedicao')}}" class="btn painel" style="background-color: {{$palheta_cores[8]}}">Tela de Expedição</button>
+                <button type="button"  data-nometela='Painel de Embalagem' data-url="{{URL::route('paineis-embalar')}}" class="btn painel" style="background-color: {{$palheta_cores[8]}}">Tela de Embalagem</button>
             </a>
         </div>
     </div>

@@ -108,7 +108,8 @@ class FichatecnicaController extends Controller
         $fichatecnicasitens = new Fichastecnicasitens();
 
         $fichatecnica= $fichatecnicas->where('id', '=', $request->input('id'))->get();
-        $fichatecnicasitens= $fichatecnicasitens::with('materiais')->where('fichatecnica_id', '=', $request->input('id'))->get();
+        $fichatecnicasitens= $fichatecnicasitens::with('materiais')->where('fichatecnica_id', '=', $request->input('id'))->orderByRaw("CASE WHEN blank='' THEN 1 ELSE 0 END ASC")->orderBy('blank','ASC')->get();
+        
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,
@@ -170,7 +171,6 @@ class FichatecnicaController extends Controller
             $fichatecnicas->save();
 
             $composicoes = json_decode($request->input('composicoes'));
-            \Log::info(print_r($composicoes, true));
             $composicaoeps = json_decode($composicoes->composicaoep);
             foreach ($composicaoeps as $key1 => $composicaoep) {
                 foreach ($composicaoep as $key => $value) {

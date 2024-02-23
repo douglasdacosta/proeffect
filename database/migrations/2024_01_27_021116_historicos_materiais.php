@@ -13,12 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('historicos_pedidos', function (Blueprint $table) {
+        Schema::create('historicos_materiais', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('pedidos_id')->unsigned();
-            $table->bigInteger('status_id')->unsigned();
+            $table->bigInteger('materiais_id')->unsigned();
+            $table->text('historico')->nullable();
+            $table->string('status',1);
             $table->timestamps();
-            $table->foreign('pedidos_id')->references('id')->on('pedidos');
+
+            $table->foreign('materiais_id')->references('id')->on('materiais');
         });
 
 
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('historicos_pedidos');
+        Schema::dropIfExists('historicos_materiais');
     }
 };

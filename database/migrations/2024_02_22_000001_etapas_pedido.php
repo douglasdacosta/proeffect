@@ -1,0 +1,44 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('etapas_pedidos', function (Blueprint $table) {
+            $table->id();
+            $table->string('nome');
+            $table->string('status',1); 
+            $table->timestamps();
+        });
+
+        DB::table('etapas_pedidos')->insert(
+            [
+                [ 'nome' => 'Início', 'status' => 'A'],
+                [ 'nome'=> 'Pausa', 'status'=> 'A'],
+                [ 'nome'=> 'Continuar', 'status'=> 'A'],
+                [ 'nome'=> 'Término', 'status'=> 'A'],
+            ]
+        );
+    }
+
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('etapas_pedidos');
+    }
+};

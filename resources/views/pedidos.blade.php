@@ -348,7 +348,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             </div>
             @if (!empty($historicos))
                 <div class="form-group row">
-                    <label for="observacao" class="col-sm-2 col-form-label">Historico</label>
+                    <label for="observacao" class="col-sm-2 col-form-label">Histórico</label>
                     <div class="col-sm-8">
                         <div class="d-flex p-2 bd-highlight overflow-auto">
                             @foreach ($historicos as $historico)
@@ -775,8 +775,8 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col" title="Código do cliente">Cliente</th>
                                 <th scope="col">Responsável</th>
                                 <th scope="col">OS</th>
-                                <th scope="col" title="Data do status">Data status</th>
                                 <th scope="col">Status do pedido</th>
+                                <th scope="col" title="Data do status">Data Status</th>
                                 <th scope="col" title="Data da entrega">Data Entrega</th>
                                 <th scope="col" title="Alerta de dias">Alerta</th>
                                 <th scope="col">Email</th>

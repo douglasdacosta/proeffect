@@ -5,27 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Fichastecnicasitens;
 use Illuminate\Support\Facades\DB;
 
-class PaineisController extends Controller
+class PainelController extends Controller
 {
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function index()
-    {
-        return view('painel');
-    }
+    public function __construct() {}
 
     private function busca_dados_pedidos($status){
 
@@ -109,10 +96,5 @@ class PaineisController extends Controller
         $data = $this->carrega_dados(8,9);
         return view('paineis.painel_embalar', $data);
     }
-
-
-
-
-
 
 }

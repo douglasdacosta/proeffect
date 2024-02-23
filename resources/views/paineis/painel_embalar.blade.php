@@ -22,7 +22,7 @@ setTimeout(function () {
 
     <div class="container_default" style="background-color: #ffffff;">   
         <div class="w-auto text-center">
-            <h1>Painel de Usinagem</h1>
+            <h1>Painel de Embalagem</h1>
         </div>
             
             <div class="w-auto"  style="height: 34%; overflow: hidden; background-color: #68c570;">

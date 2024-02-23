@@ -34,6 +34,10 @@ Route::match(['get', 'post'],'/status', [App\Http\Controllers\StatusController::
 Route::match(['get', 'post'],'/alterar-status', [App\Http\Controllers\StatusController::class, 'alterar'])->name('alterar-status');
 Route::match(['get', 'post'],'/incluir-status', [App\Http\Controllers\StatusController::class, 'incluir'])->name('incluir-status');
 
+Route::match(['get', 'post'],'/funcionarios', [App\Http\Controllers\FuncionariosController::class, 'index'])->name('funcionarios');
+Route::match(['get', 'post'],'/alterar-funcionarios', [App\Http\Controllers\FuncionariosController::class, 'alterar'])->name('alterar-funcionarios');
+Route::match(['get', 'post'],'/incluir-funcionarios', [App\Http\Controllers\FuncionariosController::class, 'incluir'])->name('incluir-funcionarios');
+
 Route::match(['get', 'post'],'/fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'index'])->name('fichatecnica');
 Route::match(['get', 'post'],'/alterar-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'alterar'])->name('alterar-fichatecnica');
 Route::match(['get', 'post'],'/incluir-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'incluir'])->name('incluir-fichatecnica');
@@ -61,10 +65,3 @@ Route::match(['get', 'post'],'/maquinas', [App\Http\Controllers\MaquinasControll
 
 Route::match(['get', 'post'],'/relatorio-producao', [App\Http\Controllers\RelatoriosController::class, 'index'])->name('relatorio-producao');
 Route::match(['get', 'post'],'/paineis', [App\Http\Controllers\PaineisController::class, 'index'])->name('paineis');
-Route::match(['get', 'post'],'/paineis-usinagem', [App\Http\Controllers\PaineisController::class, 'paineisUsinagem'])->name('paineis-usinagem');
-Route::match(['get', 'post'],'/paineis-montagem', [App\Http\Controllers\PaineisController::class, 'paineisMontagem'])->name('paineis-montagem');
-Route::match(['get', 'post'],'/paineis-acabamento', [App\Http\Controllers\PaineisController::class, 'paineisAcabamento'])->name('paineis-acabamento');
-Route::match(['get', 'post'],'/paineis-inspecao', [App\Http\Controllers\PaineisController::class, 'paineisInspecao'])->name('paineis-inspecao');
-Route::match(['get', 'post'],'/paineis-expedicao', [App\Http\Controllers\PaineisController::class, 'paineisExpedicao'])->name('paineis-expedicao');
-
-
