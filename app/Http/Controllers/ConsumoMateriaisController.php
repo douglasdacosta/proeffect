@@ -131,8 +131,23 @@ class ConsumoMateriaisController extends Controller
 
         }
 
-        $totais['Totaltotal'] = $totais['total'] = 0;
 
+
+// // Exemplo de uso:
+// $pecas = [
+//     // ['quantidade' => 9, 'width' => 350, 'height' => 250],
+//     ['quantidade' => 2, 'width' => 1200, 'height' => 200],
+//     // ['quantidade' => 1, 'width' => 150, 'height' => 610],
+// ];
+// $chapa = [
+//     'sheetWidth' => 1200,
+//     'sheetHeight' => 960,
+// ];
+
+// $resultado = SheetCuttingCalculator::calculateSheets($pecas, $chapa);
+
+        $totais['Totaltotal'] = $totais['total'] = 0;
+        $percentualPerda = 10;
         foreach ($array_materiais as $nome_material => $valueA) {
             foreach ($valueA as $medidax => $valueB) {
                 foreach ($valueB as $mediday => $valueC) {
@@ -144,6 +159,12 @@ class ConsumoMateriaisController extends Controller
                         }
                         $medida_placax = (float)$valueD['unidadex'];
                         $medida_placay = (float)$valueD['unidadey'];
+                        // \Log::info(print_r($medida_placax.'x'.$medida_placay, true));
+                        // $medida_placax = $medida_placax * (1 - ($percentualPerda / 100));
+                        // $medida_placay = $medida_placay * (1 - ($percentualPerda / 100));
+                        
+                        // \Log::info(print_r($medida_placax.'x'.$medida_placay, true));
+
                         $valor = (float)$valueD['valor'];
                         $qtde_pedido = (float)$valueD['qtde_pedido'];
 
@@ -154,13 +175,12 @@ class ConsumoMateriaisController extends Controller
                             $larguraPeca = (float)$medidax;
                             $alturaPeca = (float)$mediday;
                             $totalPecasPequenas = $quantidade*$qtde_pedido;
+                            
                             $retorno = $this->calculaPecas($larguraPrincipal, $alturaPrincipal, $larguraPeca, $alturaPeca, $totalPecasPequenas);
                             $placas = $retorno['quantidadeChapas'];
 
                             $custo=  $placas * (float)$valor;
-                            // 'quantidadeChapas' => $quantidadeChapas,
-                            // 'sobra_na_horizontal' => $sobra_na_horizontal,
-                            // 'sobra_na_vertical' => $sobra_na_vertical,
+
                             $placas_utilizadas = [
                                 'placas' => $placas,
                                 'custo' => number_format($custo, 2, ',','.'),
@@ -285,6 +305,88 @@ class ConsumoMateriaisController extends Controller
 
     }
 
+    public static function calculateSheets($pieces, $sheet)
+    {
+        $sheet_area = $sheet['sheetWidth'] * $sheet['sheetHeight'];
+
+        // Calcula a área total ocupada pelas peças sem considerar a quantidade
+        $total_pieces_area = 0;
+        foreach ($pieces as $piece) {
+            $total_pieces_area += $piece['width'] * $piece['height'];
+        }
+
+        // Calcula o número de chapas necessárias
+        $total_sheets = 0;
+        $remaining_area = $sheet_area;
+        foreach ($pieces as $piece) {
+            $piece_area = $piece['width'] * $piece['height'];
+            $piece_quantity = $piece['quantidade'];
+
+            while ($piece_quantity > 0 && $remaining_area >= $piece_area) {
+                $remaining_area -= $piece_area;
+                $piece_quantity--;
+            }
+
+            // Se não couber nenhuma peça, passa para a próxima chapa
+            if ($piece_quantity == $piece['quantidade']) {
+                continue;
+            }
+
+            $total_sheets++;
+            $remaining_area = $sheet_area;
+        }
+
+        return $total_sheets;
+    }
+
+
+}
+
+class SheetCuttingCalculator2
+{
+    public static function calculateSheets($pieces, $sheet)
+    {
+        $sheet_area = $sheet['sheetWidth'] * $sheet['sheetHeight'];
+        $total_pieces_area = 0;
+
+        foreach ($pieces as $piece) {
+            $total_pieces_area += $piece['width'] * $piece['height'] * $piece['quantidade'];
+        }
+
+        $total_sheets = ceil($total_pieces_area / $sheet_area);
+        $unused_area = $total_sheets * $sheet_area - $total_pieces_area;
+
+        return ['total_sheets' => $total_sheets, 'unused_area' => $unused_area];
+    }
 }
 
 
+class SheetCuttingCalculator
+{
+    public static function calculateSheets($pieces, $sheet)
+    {
+        $total_sheets = 0;
+        $unused_width = $sheet['sheetWidth'];
+        $unused_height = $sheet['sheetHeight'];
+
+        foreach ($pieces as $piece) {
+            $piece_width = $piece['width'];
+            $piece_height = $piece['height'];
+            $piece_quantity = $piece['quantidade'];
+
+            while ($piece_quantity > 0) {
+                if ($piece_width <= $unused_width && $piece_height <= $unused_height) {
+                    $unused_width -= $piece_width;
+                    $unused_height -= $piece_height;
+                    $piece_quantity--;
+                } else {
+                    $total_sheets++;
+                    $unused_width = $sheet['sheetWidth'];
+                    $unused_height = $sheet['sheetHeight'];
+                }
+            }
+        }
+
+        return ['total_sheets' => $total_sheets, 'unused_width' => $unused_width, 'unused_height' => $unused_height];
+    }
+}
