@@ -15,9 +15,7 @@ class TestesController extends BaseController
 
 
 
-        $pecas_necessarias = [
-            ['quantidade' => 18, 'width' => 350 , 'height' => 250],
-            ['quantidade' => 2, 'width' => 1200 , 'height' => 200],
+        $pecas_necessarias = [           
             ['quantidade' => 2, 'width' => 150 , 'height' => 611],
             ['quantidade' => 8, 'width' => 61 , 'height' => 61],
         ];

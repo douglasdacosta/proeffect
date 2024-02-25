@@ -212,49 +212,7 @@
         @endif
 
 
-            {{-- <div class="form-group row">
-                <h3 class="text-dark ">Cálculos das médias de consumo de materiais por pedido</h1>
-            </div>
-                @if (!empty($calculos))
-                    <table class="table table-sm table-striped  text-center" id="table_composicao">
-                        <thead class="">
-                            <tr>
-                                <th scope="col">Material</th>
-                                <th scope="col">Medida Blank</th>
-                                <th scope="col">Medida placa</th>
-                                <th scope="col">Espessura</th>
-                                <th scope="col">Valor unitário</th>
-                                <th scope="col" title="Placas necessárias">Qtde/Placas</th>
-                                <th scope="col">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach ($calculos as $calculo)
-                            <tr>
-                                <td scope="col">{{$calculo['nome_material']}}</td>
-                                <td scope="col">@if(!empty($calculo['medidax'])) {{$calculo['medidax'].'x'.$calculo['mediday'].'mm'}} @else {{''}} @endif</td>
-                                <td scope="col">@if(!empty($calculo['medidax'])) {{$calculo['medida_placax'].'x'.$calculo['medida_placay'].'mm'}} @else {{''}} @endif</td>
-                                <td scope="col">{{$calculo['espessura']}}</td>
-                                <td scope="col">{{!empty($calculo['placas_utilizadas']['valor_unitario']) ? $calculo['placas_utilizadas']['valor_unitario'] : ''}}</td>
-                                <td scope="col">{{!empty($calculo['placas_utilizadas']['placas']) ? $calculo['placas_utilizadas']['placas'] : ''}}</td>
-                                <td scope="col">{{!empty($calculo['placas_utilizadas']['custo']) ? $calculo['placas_utilizadas']['custo'] : ''}}</td>
-                            </tr>
-                            @endforeach
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                                <th scope="col">{{'R$ ' .$totais['total']}}</th>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="form-group row">
-                        <p>
-                    </div>
-                    @endif --}}
+            
                     <div class="form-group row">
                         <h3 class="text-dark ">Total de materiais</h1>
                     </div>
@@ -263,7 +221,6 @@
                                 <thead class="">
                                     <tr>
                                         <th scope="col">Material</th>
-                                        <th scope="col">Medida Blank</th>
                                         <th scope="col">Medida placa</th>
                                         <th scope="col">Espessura</th>
                                         <th scope="col">Valor unitário</th>
@@ -275,16 +232,14 @@
                                 @foreach ($calculos as $calculo)
                                     <tr>
                                         <td scope="col">{{$calculo['nome_material']}}</td>
-                                        <td scope="col">@if(!empty($calculo['medidax'])) {{$calculo['medidax'].'x'.$calculo['mediday'].'mm'}} @else {{''}} @endif</td>
-                                        <td scope="col">@if(!empty($calculo['medidax'])) {{$calculo['medida_placax'].'x'.$calculo['medida_placay'].'mm'}} @else {{''}} @endif</td>
+                                        <td scope="col">@if(!empty($calculo['medida_placax'])) {{$calculo['medida_placax'].'x'.$calculo['medida_placay'].'mm'}} @else {{''}} @endif</td>
                                         <td scope="col">{{$calculo['espessura']}}</td>
-                                        <td scope="col">{{!empty($calculo['placas_utilizadas']['Totalvalor_unitario']) ? $calculo['placas_utilizadas']['Totalvalor_unitario'] : ''}}</td>
-                                        <td scope="col">{{!empty($calculo['placas_utilizadas']['Totalplacas']) ? $calculo['placas_utilizadas']['Totalplacas'] : ''}}</td>
-                                        <td scope="col">{{!empty($calculo['placas_utilizadas']['Totalcusto']) ? $calculo['placas_utilizadas']['Totalcusto'] : ''}}</td>
+                                        <td scope="col">{{!empty($calculo['placas_utilizadas'][$calculo['nome_material']]['Totalvalor_unitario']) ? $calculo['placas_utilizadas'][$calculo['nome_material']]['Totalvalor_unitario'] : ''}}</td>
+                                        <td scope="col">{{!empty($calculo['placas_utilizadas'][$calculo['nome_material']]['Totalplacas']) ? $calculo['placas_utilizadas'][$calculo['nome_material']]['Totalplacas'] : ''}}</td>
+                                        <td scope="col">{{!empty($calculo['placas_utilizadas'][$calculo['nome_material']]['Totalcusto']) ? $calculo['placas_utilizadas'][$calculo['nome_material']]['Totalcusto'] : ''}}</td>
                                     </tr>
                                     @endforeach
                                     <tr>
-                                        <th scope="col"></th>
                                         <th scope="col"></th>
                                         <th scope="col"></th>
                                         <th scope="col"></th>
