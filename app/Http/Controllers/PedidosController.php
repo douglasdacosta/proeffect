@@ -438,7 +438,7 @@ class PedidosController extends Controller
 
 
             foreach ($pedidos['classe'] as $chave =>  $pedido) {
-                
+
                 $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem_torre=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
 
                 $total_tempo_usinagem = $this->somarHoras($total_tempo_usinagem , $pedido->tabelaFichastecnicas->tempo_usinagem);
@@ -455,11 +455,11 @@ class PedidosController extends Controller
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem_torre'] = $total_tempo_montagem_torre;
                 $total_tempo_montagem = $this->somarHoras($total_tempo_montagem , $pedido->tabelaFichastecnicas->tempo_montagem);
                 $total_tempo_montagem = $MaquinasController->multiplicarHoras($total_tempo_montagem,$pedido->qtde);
-                
+
                 if($nome_tela == 'geral') {
                     $total_tempo_montagem = $this->somarHoras($total_tempo_montagem, $total_tempo_montagem_torre) ;
                 }
-                
+
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem'] = $total_tempo_montagem;
 
                 $total_tempo_inspecao = $this->somarHoras($total_tempo_inspecao , $pedido->tabelaFichastecnicas->tempo_inspecao);
@@ -475,15 +475,15 @@ class PedidosController extends Controller
 
             $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia);
             $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia);
-            
+
 
             $dados_pedido_status[$status]['pessoas_montagem_torre'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'], $total_horas_pessoas_pessoas_montagem_dia);
-            
+
             $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia);
             $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia);
 
             if($pedidos['id_status'][$chave] <= 4 ){
-                $totalGeral['totalGeralusinagens'] = ((!empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']) );                            
+                $totalGeral['totalGeralusinagens'] = ((!empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']) );
                 $totalGeral['totalGeralacabamento'] = ((!empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_acabamento']) );
                 $totalGeral['totalGeralmontagem_torre'] = ((!empty($totalGeral['totalGeralmontagem_torre']) ? $totalGeral['totalGeralmontagem_torre'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem_torre']) );
                 $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
@@ -537,7 +537,7 @@ class PedidosController extends Controller
                 $alertasPedido = DB::table('pedidos')
                     ->select('pedidos.id','status.alertacliente', 'alertas.id as id_alerta')
                     ->join('alertas', 'pedidos.id', '=', 'alertas.pedidos_id')
-                    ->join('status', 'pedidos.status_id', '=', 'status.id')                    
+                    ->join('status', 'pedidos.status_id', '=', 'status.id')
                     ->where('alertas.enviado', '=', 0)
                     ->where('pedidos.id', '=', $pedido)->get();
 
@@ -860,4 +860,32 @@ class PedidosController extends Controller
         // Formatando o resultado para o formato desejado
         return sprintf("%02d:%02d:%02d", $horas, $diferenca->i, $diferenca->s);
     }
+
+    static function formatarMinutoSegundo($hora) {
+        // Separando as partes da hora
+        $partes = explode(":", $hora);
+
+        // Se houver mais de duas partes, mantenha apenas as duas ultimas
+        if (count($partes) > 2) {
+            return $partes[1] . ":" . $partes[2];
+        } else {
+            return $hora; // Já está no formato desejado
+        }
+    }
+
+    static function calcularPorcentagemEntreMinutos($tempoA, $tempoB) {
+        // Convertendo os tempos para minutos
+        list($horasA, $minutosA, $segundosA) = explode(':', $tempoA);
+        $totalMinutosA = ($horasA * 60 * 60 + $minutosA * 60 + $segundosA) / 60;
+
+        list($horasB, $minutosB, $segundosB) = explode(':', $tempoB);
+        $totalMinutosB = ($horasB * 60 * 60 + $minutosB * 60 + $segundosB) / 60;
+
+        // Calculando a porcentagem de tempoA em relação a tempoB
+        $percentual = ($totalMinutosA / $totalMinutosB) * 100;
+
+       return $percentual;
+    }
+
 }
+

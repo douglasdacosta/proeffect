@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Cache;
 class TestesController extends BaseController
 {
     public function index(){
- 
 
 
 
-        $pecas_necessarias = [           
+
+        $pecas_necessarias = [
             ['quantidade' => 2, 'width' => 150 , 'height' => 611],
             ['quantidade' => 8, 'width' => 61 , 'height' => 61],
         ];
@@ -23,8 +23,8 @@ class TestesController extends BaseController
             'sheetWidth' => 1200,
             'sheetHeight' => 960,
         ];
-        
-        
+
+
 
         $quantidade_chapas = 0;
         while(count($pecas_necessarias)>0) {
@@ -42,19 +42,18 @@ class TestesController extends BaseController
                         if($value['quantidade'] == count($dados)) {
                             unset($pecas_necessarias[$key]);
                         }
-                        $value['quantidade'] = $value['quantidade']- count($dados);                    
+                        $value['quantidade'] = $value['quantidade']- count($dados);
                     }
                 }
             }
             \Log::info(print_r(' ----------------------------------------------------------------------', true));
             // \Log::info(print_r($usados, true));
             \Log::info(print_r($pecas_necessarias, true));
-            
+
 
         }
 
         \Log::info(print_r('Chapas totais '. $quantidade_chapas, true));
-        
 
 
 
@@ -62,7 +61,8 @@ class TestesController extends BaseController
 
 
 
-        
+
+
     }
 
 
@@ -81,7 +81,7 @@ class Empacotamento {
             'width' => $chapa['sheetWidth'],
             'height' => $chapa['sheetHeight'],
             'pecasUsadas' => [],
-        ];        
+        ];
     }
 
     public static function ordenaPecas($pecas) {
@@ -99,7 +99,7 @@ class Empacotamento {
         foreach ($this->pecas as $peca) {
             for ($i = 0; $i < $peca['quantidade']; $i++) {
                 $pecaInserida = false;
-                
+
                 // Tenta inserir a peça em diferentes orientações (horizontal e vertical)
                 for ($j = 0; $j < 2; $j++) {
                     $width = $j == 0 ? $peca['width'] : $peca['height'];
@@ -125,7 +125,7 @@ class Empacotamento {
                             // Se a posição estiver livre, adiciona a peça na chapa
                             if (!$posicaoOcupada) {
 
-                               
+
                                 $size = $width.'x'.$height;
                                 $this->chapaOrganizada['pecasUsadas'][$size][] = $size;
 

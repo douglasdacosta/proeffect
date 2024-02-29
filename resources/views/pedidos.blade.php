@@ -308,7 +308,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             <div class="form-group row">
                 <label for="data_gerado" class="col-sm-2 col-form-label">Data gerado</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado" 
+                    <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
                     @if ($tela == 'alterar') readonly='readonly' @else {{''}} @endif
                         value="@if (isset($pedidos[0]->data_gerado)) {{ Carbon\Carbon::parse($pedidos[0]->data_gerado)->format('d/m/Y') }}@else{{ Carbon\Carbon::now()->format('d/m/Y') }} @endif">
                 </div>

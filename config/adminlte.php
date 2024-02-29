@@ -371,9 +371,16 @@ return [
             'label'       => '',
             'label_color' => '',
         ],
+        // [
+        //     'text'        => 'Relatório produção',
+        //     'url'         => 'relatorio-producao',
+        //     'icon'        => 'far fa-fw fa-file',
+        //     'label'       => '',
+        //     'label_color' => '',
+        // ],
         [
-            'text'        => 'Relatório produção',
-            'url'         => 'relatorio-producao',
+            'text'        => 'Orçamentos',
+            'url'         => 'orcamentos',
             'icon'        => 'far fa-fw fa-file',
             'label'       => '',
             'label_color' => '',

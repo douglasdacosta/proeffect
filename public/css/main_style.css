@@ -14,3 +14,11 @@
 .contenedor .table tr td .top_texto_itens {
     margin-top: 200%;
 }
+
+#blocker {
+    z-index: 9999999;
+    width: 100%;
+    height: 100%;
+    background-color: #FFFFFF;
+    position: fixed;
+}
