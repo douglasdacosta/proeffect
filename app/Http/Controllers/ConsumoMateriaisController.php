@@ -120,171 +120,223 @@ class ConsumoMateriaisController extends Controller
         ->orderby('ficha_tecnica_itens.blank', 'ASC');
         $dados_materiais = $dados_materiais->where('pedidos.id', '=', $id);
         $dados_materiais = $dados_materiais->get()->toArray();
-
-        $array_materiais=[];
+        $total_somado=0;
         foreach ($dados_materiais as $array_material) {
-            $array_materiais[$array_material->nome_material][$array_material->medidax][$array_material->mediday][$array_material->espessura]['qtde'][] = $array_material->qtde_blank;
-            $array_materiais[$array_material->nome_material][$array_material->medidax][$array_material->mediday][$array_material->espessura]['unidadey'] = $array_material->unidadey;
-            $array_materiais[$array_material->nome_material][$array_material->medidax][$array_material->mediday][$array_material->espessura]['unidadex'] = $array_material->unidadex;
-            $array_materiais[$array_material->nome_material][$array_material->medidax][$array_material->mediday][$array_material->espessura]['valor'] = $array_material->valor;
-            $array_materiais[$array_material->nome_material][$array_material->medidax][$array_material->mediday][$array_material->espessura]['qtde_pedido'] = $array_material->qtde;
+            $tamanho_chapa = '';
+            if(!empty($array_material->medidax)) {
 
-        }
+                $array_pecas_necessarias[$array_material->nome_material][] = [
+                        'quantidade' => $array_material->qtde_blank * $array_material->qtde,
+                        'width' => $array_material->medidax ,
+                        'height' => $array_material->mediday
+                    ];
 
-        $totais['Totaltotal'] = $totais['total'] = 0;
-
-        foreach ($array_materiais as $nome_material => $valueA) {
-            foreach ($valueA as $medidax => $valueB) {
-                foreach ($valueB as $mediday => $valueC) {
-                    foreach ($valueC as $espessura => $valueD) {
-                        $quantidade =0;
-                        $placas_utilizadas= [];
-                        foreach ($valueD['qtde'] as $qtde) {
-                            $quantidade = $quantidade + $qtde;
-                        }
-                        $medida_placax = (float)$valueD['unidadex'];
-                        $medida_placay = (float)$valueD['unidadey'];
-                        $valor = (float)$valueD['valor'];
-                        $qtde_pedido = (float)$valueD['qtde_pedido'];
-
-                        if(!empty($medidax)) {
-
-                            $larguraPrincipal = (float)$medida_placax;
-                            $alturaPrincipal = (float)$medida_placay;
-                            $larguraPeca = (float)$medidax;
-                            $alturaPeca = (float)$mediday;
-                            $totalPecasPequenas = $quantidade*$qtde_pedido;
-                            $retorno = $this->calculaPecas($larguraPrincipal, $alturaPrincipal, $larguraPeca, $alturaPeca, $totalPecasPequenas);
-                            $placas = $retorno['quantidadeChapas'];
-
-                            $custo=  $placas * (float)$valor;
-                            // 'quantidadeChapas' => $quantidadeChapas,
-                            // 'sobra_na_horizontal' => $sobra_na_horizontal,
-                            // 'sobra_na_vertical' => $sobra_na_vertical,
-                            $placas_utilizadas = [
-                                'placas' => $placas,
-                                'custo' => number_format($custo, 2, ',','.'),
-                                'valor_unitario' => number_format((float)$valor, 2, ',','.'),
-                                'custo_noformat' => $custo,
-                                'Totalplacas' => $placas,
-                                'Totalcusto' => number_format($custo, 2, ',','.'),
-                                'Totalvalor_unitario' => number_format((float)$valor, 2, ',','.'),
-                                'Totalcusto_noformat' => $custo
-                            ];
-
-                        } else {
-                            //alimenta nas posicoes do array caso não for um blank
-                            $placas_utilizadas = [
-                                'placas' => $quantidade,
-                                'custo' => number_format($valor * $quantidade, 2, ',','.'),
-                                'valor_unitario' => number_format((float)$valor, 2, ',','.'),
-                                'custo_noformat' => $valor,
-                                'Totalplacas' => $quantidade * $qtde_pedido,
-                                'Totalcusto' => number_format(($valor * $quantidade) * $qtde_pedido, 2, ',','.'),
-                                'Totalvalor_unitario' => number_format((float)$valor, 2, ',','.'),
-                                'Totalcusto_noformat' => $valor * $qtde_pedido,
-                            ];
-                        }
-                        $totais['total'] = $totais['total'] + DateHelpers::formatFloatValue($placas_utilizadas['custo_noformat']);
-                        $totais['Totaltotal'] = $totais['Totaltotal'] + DateHelpers::formatFloatValue($placas_utilizadas['Totalcusto_noformat']);
-                        $materiais[] = [
-                            'nome_material' => $nome_material,
-                            'medida_placax' => $medida_placax,
-                            'medida_placay' => $medida_placay,                            
-                            'medidax' => $medidax,
-                            'mediday' => $mediday,
-                            'espessura' => $espessura,
-                            'quantidade' => $quantidade,
-                            'placas_utilizadas' => $placas_utilizadas
-                        ];
-                    }
-                }
+                $chapa[$array_material->nome_material] = [
+                    'sheetWidth' => $array_material->unidadex,
+                    'sheetHeight' => $array_material->unidadey,
+                ];
+                $tamanho_chapa = $array_material->unidadex .'x'. $array_material->unidadey;
             }
+            $qtde = $array_material->qtde_blank * $array_material->qtde ;
+
+            $dados_totais[$array_material->nome_material] = [
+                'nome_material' => $array_material->nome_material,
+                'tamanho_chapa' => $tamanho_chapa,
+                'quantidade_chapas' => $qtde,
+                'espessura' => $array_material->espessura,
+                'valor_unitario' => $array_material->valor,
+                'valor_total' => $array_material->valor,
+            ];
+
         }
-        
-        
-        // \Log::info(print_r($materiais, true));
-        // foreach ($materiais as $key => $material) {
-        //    if($material['material'] == $materiais[$key -1]['material'] &&  $material['espessura']) {
-        // $materiais_agrupado[$key] = [            
-        //         'nome_material' => PSAI Cinza Claro
-        //         'medida_placax' => 1200
-        //         'medida_placay' => 960
-        //         'espessura' => 3
-        //         'quantidade' => 2
-        //         'placas_utilizadas' => [                    
-        //                 'placas' => 167
-        //                 'custo' => 2.588,50
-        //                 'valor_unitario' => 15,50
-        //                 'custo_noformat' => 2588.5
-        //                 'Totalplacas' => 167
-        //                 'Totalcusto' => 2.588,50
-        //                 'Totalvalor_unitario' => 15,50
-        //                 'Totalcusto_noformat' => 2588.5                    
-        //         ]
-        // ]         
-        // }
-        
-        $totais['total'] = number_format($totais['total'],2,',','.');
-        $totais['Totaltotal'] = number_format($totais['Totaltotal'],2,',','.');
+
+        foreach ($array_pecas_necessarias as $nome_material => $pecas_necessarias) {
+
+            $quantidade_chapas = 0;
+            $calculadora = new CalculadoraPlacas($pecas_necessarias, $chapa[$nome_material]);
+            $quantidade_chapas =  $calculadora->calcularNumeroPlacas();
+            $dados_totais[$nome_material]['quantidade_chapas'] = $quantidade_chapas;
+        }
+
+        foreach($dados_totais as $nome_material => $value) {
+
+            $unico = $dados_totais[$nome_material]['valor_unitario'];
+            $quantidade_chapas = $dados_totais[$nome_material]['quantidade_chapas'];
+            $dados_totais[$nome_material]['valor_total'] = $quantidade_chapas * $unico;
+            $total_somado = $total_somado + $dados_totais[$nome_material]['valor_total'];
+            $dados_totais[$nome_material]['valor_unitario'] =  DateHelpers::formatRealFormat($dados_totais[$nome_material]['valor_unitario']);
+            $dados_totais[$nome_material]['valor_total'] =  DateHelpers::formatRealFormat($dados_totais[$nome_material]['valor_total']);
+        };
 
         $tela = 'detalhes';
     	$data = array(
 				'tela' => $tela,
-                'nome_tela' => 'consumo de materiais',
-                'pedidos' => $pedidos,
-                'materiais' => $dados_materiais,
-                'calculos' => $materiais,
-                'totais' => $totais,
-                'request' => $request,
-                'imprimir' => $imprimir,
-                'AllStatus' => (new PedidosController)->getAllStatus(),
-				'rotaAlterar' => 'consumo-materiais-detalhes'
+                 'nome_tela' => 'consumo de materiais',
+                 'pedidos' => $pedidos,
+                 'materiais' => $dados_materiais,
+                 'totais_calculados' => $dados_totais,
+                 'total_somado' => DateHelpers::formatRealFormat($total_somado),
+                 'imprimir' => $imprimir,
 			);
 
         return view('consumo_materiais', $data);
 
     }
 
-    function calculaPecas($alturaChapa, $larguraChapa, $alturaPeca, $larguraPeca, $qtdePecas) {
-        
+    function calculaPecas($pecas, $chapa) {
+
+        $larguraPeca = $pecas['width'];
+        $alturaPeca = $pecas['height'];
+        $larguraChapa = $chapa['sheetWidth'];
+        $alturaChapa = $chapa['sheetHeight'];
         $calculo_horizontalx = floor($alturaChapa/$alturaPeca);
         $calculo_horizontaly = floor($larguraChapa/$larguraPeca);
 
         $qtde_na_horizontal = ($calculo_horizontalx * $calculo_horizontaly);
-
-        $sobra_na_horizontalx = $alturaChapa - ($alturaPeca*$calculo_horizontalx);
-        $sobra_na_horizontaly = $alturaChapa - ($larguraPeca*$calculo_horizontaly);
-
 
         $calculo_verticalx = floor($larguraChapa/$larguraPeca);
         $calculo_verticaly = floor($alturaChapa/$alturaPeca);
 
         $qtde_na_vertical = ($calculo_verticalx * $calculo_verticaly);
 
-        $sobra_na_verticalx = $alturaChapa - ($alturaPeca*$calculo_verticalx);
-        $sobra_na_verticaly = $alturaChapa - ($larguraPeca*$calculo_verticaly);
-
         $pecas_po_placa = ($qtde_na_horizontal > $qtde_na_vertical ? $qtde_na_horizontal : $qtde_na_vertical);
 
-        $quantidadeChapas = ceil($qtdePecas/$pecas_po_placa);
-        return [
-            'quantidadeChapas' => $quantidadeChapas,
-            'sobra_na_horizontal' => [
-                'x' => $sobra_na_horizontalx,
-                'y' => $sobra_na_horizontaly
-            ],
-            'sobra_na_vertical' => [
-                'x' => $sobra_na_verticalx,
-                'y' => $sobra_na_verticaly
-            ],
+        return $pecas_po_placa;
 
-        ];
-            
 
 
     }
 
+    function calcularQuantidadePecasNaChapa($pecas, $chapa, ) {
+
+        $percentual_perda = env('PERCENTUAL_PERDA_CHAPA');
+
+        $area_peca = $pecas['width'] * $pecas['height'];
+
+        // Calculando a área útil da chapa (considerando o percentual de perda)
+        $area_chapa_util = ($chapa['sheetWidth'] * $chapa['sheetHeight']) * (1 - $percentual_perda);
+
+        // Calculando quantas peças podem caber na chapa
+        $quantidade_peca_na_chapa = floor($area_chapa_util / $area_peca);
+
+        return $quantidade_peca_na_chapa;
+    }
+
+}
+
+//não estou utilizando, pois o calculo com peças pquenas fica muito lento;
+class Empacotamento {
+    private $chapa;
+    private $pecas;
+    private $chapaOrganizada;
+
+    public function __construct($chapa, $pecas) {
+        $this->chapa = $chapa;
+        $this->pecas = $this->ordenaPecas($pecas);
+        $this->chapaOrganizada = [
+            'pecas' => [],
+            'width' => $chapa['sheetWidth'],
+            'height' => $chapa['sheetHeight'],
+            'pecasUsadas' => [],
+        ];
+    }
+
+    public static function ordenaPecas($pecas) {
+        // Ordena as peças em ordem decrescente de largura (width) e altura (height)
+        // sort($pecas);
+        // usort($pecas, function($a, $b) {
+        //     $areaA = $a['width'] * $a['height'];
+        //     $areaB = $b['width'] * $b['height'];
+        //     return $areaB - $areaA;
+        // });
+
+        return $pecas;
+    }
+    public function organizarPecas() {
+        foreach ($this->pecas as $peca) {
+            for ($i = 0; $i < $peca['quantidade']; $i++) {
+                $pecaInserida = false;
+
+                // Tenta inserir a peça em diferentes orientações (horizontal e vertical)
+                for ($j = 0; $j < 2; $j++) {
+                    $width = $j == 0 ? $peca['width'] : $peca['height'];
+                    $height = $j == 0 ? $peca['height'] : $peca['width'];
+                    // Procura uma posição na chapa onde a peça possa ser inserida
+                    for ($x = 0; $x <= $this->chapaOrganizada['width'] - $width; $x++) {
+                        for ($y = 0; $y <= $this->chapaOrganizada['height'] - $height; $y++) {
+                            $posicaoOcupada = false;
+
+                            // Verifica se a posição está ocupada por outra peça
+                            foreach ($this->chapaOrganizada['pecas'] as $pecaNaChapa) {
+                                if (!(
+                                    $x + $width <= $pecaNaChapa['x'] ||
+                                    $y + $height <= $pecaNaChapa['y'] ||
+                                    $x >= $pecaNaChapa['x'] + $pecaNaChapa['width'] ||
+                                    $y >= $pecaNaChapa['y'] + $pecaNaChapa['height']
+                                )) {
+                                    $posicaoOcupada = true;
+                                    break;
+                                }
+                            }
+
+                            // Se a posição estiver livre, adiciona a peça na chapa
+                            if (!$posicaoOcupada) {
+
+
+                                $size = $width.'x'.$height;
+                                $this->chapaOrganizada['pecasUsadas'][$size][] = $size;
+
+                                $this->chapaOrganizada['pecas'][] = [
+                                    'x' => $x,
+                                    'y' => $y,
+                                    'width' => $width,
+                                    'height' => $height
+                                ];
+                                $pecaInserida = true;
+                                break 3;
+                            }
+                        }
+                    }
+                }
+
+                // Se não for possível inserir a peça em nenhuma orientação, encerra o loop
+                if (!$pecaInserida) {
+                    break;
+                }
+            }
+        }
+    }
+
+    public function getChapaOrganizada() {
+        return $this->chapaOrganizada;
+    }
 }
 
 
+
+
+class CalculadoraPlacas {
+    private $pecas_necessarias;
+    private $chapa;
+    private $perda;
+
+    public function __construct($pecas_necessarias, $chapa) {
+
+        $this->pecas_necessarias = $pecas_necessarias;
+        $this->chapa = $chapa;
+        $this->perda = env('PERCENTUAL_PERDA_CHAPA');
+    }
+
+    public function calcularNumeroPlacas() {
+        $total_area_peca = 0;
+        foreach ($this->pecas_necessarias as $peca) {
+            $total_area_peca += $peca['quantidade'] * $peca['width'] * $peca['height'];
+        }
+
+        $area_chapa_util = ($this->chapa['sheetWidth'] * $this->chapa['sheetHeight']) * (1 - $this->perda);
+
+        $numero_placas = ceil($total_area_peca / $area_chapa_util);
+
+        return $numero_placas;
+    }
+}

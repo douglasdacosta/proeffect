@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Fichastecnicasitens extends Model
-{    
+{
     use HasFactory;
 
     protected $table = 'ficha_tecnica_itens';
@@ -17,9 +17,14 @@ class Fichastecnicasitens extends Model
     {
         return $this->hasOne(Materiais::class, 'id', 'materiais_id');
     }
-    
+
     public function tabelaFichastecnicasitens(): HasMany
     {
         return $this->HasMany(Fichastecnicasitens::class, 'id', 'fichatecnica_id');
+    }
+
+    public function tabelaMateriais(): HasOne
+    {
+        return $this->HasOne(Materiais::class, 'id', 'materiais_id');
     }
 }

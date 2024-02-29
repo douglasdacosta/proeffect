@@ -18,4 +18,8 @@ class DateHelpers
         $value = preg_replace('/\,/', '.', preg_replace('/\./', '', $value));
         return number_format($value, 2, '.', '');
     }
+    
+    public static function formatRealFormat($value) {        
+        return number_format($value, 2, ',', '');
+    }
 }

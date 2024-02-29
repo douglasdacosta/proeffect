@@ -33,8 +33,10 @@
 //         }
 //       });
 //     $('.selectonfocus').mask("00/00/0000", {selectOnFocus: true});
+
 //   });
 $(function ($) {
+    $('#blocker').hide();
     $('.cep').mask('00000-000', {reverse: true});
     $('.sonumeros').mask('999999999999', {reverse: true});
     $('.mask_minutos').mask('00:00', {reverse: true});
@@ -52,6 +54,11 @@ $(function ($) {
     };
     $('.mask_phone').mask(behavior, options);
     $('.toast').hide();
+
+
+    $(document).on('click', '.pesquisar_materiais', function () {
+        $('#blocker').show();
+    });
 
 
     $(".alteracao_status_pedido").change(function () {
@@ -90,6 +97,82 @@ $(function ($) {
         }
     }
 
+    $("#calculo_hora_fresa").change(function () {
+        $('.overlay').show();
+        var composicaoep = new Array();
+        $('#table_composicao_orcamento tbody tr').each(function (i, e) {
+            json = new Array();
+            $(e).find('td').each(function (c, j) {
+
+                if ($(j).data('name') == 'material_id') {
+                    json.push('{"' + $(j).data('name') + '":"' + $(j).data('materialid') + '"}');
+                } else {
+                    json.push('{"' + $(j).data('name') + '":"' + $(j).text().trim() + '"}');
+                }
+            });
+            composicaoep.push(json);
+        })
+        $.ajax({
+            "type": "POST",
+            "url": '/calcular-orcamento-ajax',
+            "data": {
+                "dados": composicaoep,
+                "calculo_hora_fresa": $('#calculo_hora_fresa').val(),
+                "_token": $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                tabela = data[0];
+                Totais = data[1];
+                console.log(Totais.subTotalMO);
+
+                $('.subTotalMO').text(Totais.subTotalMO);
+                $('.subTotalMP').text(Totais.subTotalMP);                
+                $('.subTotalCI').text(Totais.subTotalCI);
+                $('.desc_10_1').text(Totais.desc_10_1);
+                $('.desc_20_1').text(Totais.desc_20_1);
+                $('.desc_30_1').text(Totais.desc_30_1);
+                $('.desc_40_1').text(Totais.desc_40_1);
+                $('.desc_50_1').text(Totais.desc_50_1);
+                $('.desc_10_2').text(Totais.desc_10_2);
+                $('.desc_20_2').text(Totais.desc_20_2);
+                $('.desc_30_2').text(Totais.desc_30_2);
+                $('.desc_40_2').text(Totais.desc_40_2);
+                $('.desc_50_2').text(Totais.desc_50_2);
+                $('.desc_10_total').text(Totais.desc_10_total);
+                $('.desc_20_total').text(Totais.desc_20_total);
+                $('.desc_30_total').text(Totais.desc_30_total);
+                $('.desc_40_total').text(Totais.desc_40_total);
+                $('.desc_50_total').text(Totais.desc_50_total);
+
+                $.each(tabela, function (k, data1) {
+                    $.each(data1, function (k, data2) {
+                        if(k = 1) {
+                            objeto = JSON.parse(data2);                        
+                            classe = Object.keys(objeto)[0];             
+                            if(Object.values(objeto)[0] != '') {
+                                valor = Object.values(objeto)[0]; 
+                                $('.' + classe).text(valor);
+                            } else {
+                                $('.' + classe).text('');
+                            }
+                        }                        
+                    })
+
+
+                })
+
+                abreAlertSuccess('Orçamento calculado', false);
+                $('.overlay').hide();
+            },
+            error: function (data, textStatus, errorThrown) {
+                abreAlertSuccess('Erro ao tentar calcular o orçamento', true);
+                $('.overlay').hide();
+            },
+
+        });
+
+    })
+    $("#calculo_hora_fresa").change();
 });
 
 
