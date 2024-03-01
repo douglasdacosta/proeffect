@@ -43,7 +43,6 @@ class AjaxOrcamentosController extends Controller
                 $valor_chapa = json_decode($dado[8]);
                 $MO = json_decode($dado[9]);
                 $MP = json_decode($dado[10]);
-                
                 $val_chapa = DateHelpers::formatFloatValue($valor_chapa->{"valor_chapa_$key"});
                 $qtde_CH = $qtdeCH->{"qtdeCH_$key"};
                 $qtde_ = $qtde->{"qtde_$key"};
@@ -53,10 +52,10 @@ class AjaxOrcamentosController extends Controller
                     $MP->{"valorMP_$key"} = $val_chapa/$qtde_CH*$qtde_;                
                     $dado[10] = json_encode(["valorMP_$key" => number_format($MP->{"valorMP_$key"}, 2, ',','')]);
                     
-                    $tempo = $pedidos->multiplyTimeByInteger('00:'.$tmp->{"tmp_$key"},  $qtde_);
-
-                    $MO->{"valorMO_$key"} = $this->calcularValor($calculo_hora_fresa, $tempo);
                     
+                    $tempo = $pedidos->multiplyTimeByInteger('00:'.$tmp->{"tmp_$key"},  $qtde_);
+                    \Log::info(print_r($tempo, true));
+                    $MO->{"valorMO_$key"} = $this->calcularValor($calculo_hora_fresa, $tempo);
 
                     $dado[9] = json_encode(["valorMO_$key" => $MO->{"valorMO_$key"}]);
                     $Total_mo = $Total_mo + DateHelpers::formatFloatValue($MO->{"valorMO_$key"});
@@ -112,14 +111,14 @@ class AjaxOrcamentosController extends Controller
 
 
     function calcularValor($valorHora, $tempoTrabalhado) {
+
         // Convertendo o tempo trabalhado para minutos
-        $tempoTrabalhado = '00:'.$tempoTrabalhado;
+        
         list($horas, $minutos, $segundos) = explode(':', $tempoTrabalhado);
         $tempoTotalMinutos = ($horas * 60 * 60) + ($minutos * 60) + $segundos;
 
         // Calculando o custo total
         $custoTotal = ($tempoTotalMinutos / 60) / 60 * $valorHora;
-
         return number_format($custoTotal, 2, ',','');
     }
 
