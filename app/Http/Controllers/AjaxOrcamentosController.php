@@ -119,6 +119,7 @@ class AjaxOrcamentosController extends Controller
 
         // Calculando o custo total
         $custoTotal = ($tempoTotalMinutos / 60) / 60 * $valorHora;
+        round($custoTotal, 2, PHP_ROUND_HALF_DOWN);
         return number_format($custoTotal, 2, ',','');
     }
 

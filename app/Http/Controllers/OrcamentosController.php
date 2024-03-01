@@ -115,8 +115,8 @@ class OrcamentosController extends Controller
             ];
 
             $chapa = [
-                'sheetWidth' => $fichatecnicasitem->tabelaMateriais->unidadex - 40,
-                'sheetHeight'=> $fichatecnicasitem->tabelaMateriais->unidadey - 40 
+                'sheetWidth' => $fichatecnicasitem->tabelaMateriais->unidadex - 20,
+                'sheetHeight'=> $fichatecnicasitem->tabelaMateriais->unidadey - 20 
             ];
 
             if($fichatecnicasitem->tabelaMateriais->peca_padrao == 2){
