@@ -109,13 +109,13 @@ class OrcamentosController extends Controller
 
 
             $pecas = [
-                'width' => $fichatecnicasitem->medidax,
-                'height'=> $fichatecnicasitem->mediday,
+                'width' => $fichatecnicasitem->medidax + 2,
+                'height'=> $fichatecnicasitem->mediday + 10,
             ];
 
             $chapa = [
-                'sheetWidth' => $fichatecnicasitem->tabelaMateriais->unidadex,
-                'sheetHeight'=> $fichatecnicasitem->tabelaMateriais->unidadey
+                'sheetWidth' => $fichatecnicasitem->tabelaMateriais->unidadex - 40,
+                'sheetHeight'=> $fichatecnicasitem->tabelaMateriais->unidadey - 40 
             ];
 
             if($fichatecnicasitem->tabelaMateriais->peca_padrao == 2){
@@ -125,7 +125,7 @@ class OrcamentosController extends Controller
                 
                 $blank_por_chapa = $fichatecnicasitem->qtde_blank;
             }
-            
+
             $percentuais[$key]['blank_por_chapa'] = $blank_por_chapa;
         }
 

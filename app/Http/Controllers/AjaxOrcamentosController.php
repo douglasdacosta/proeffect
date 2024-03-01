@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Materiais;
 use App\Providers\DateHelpers;
+use App\Http\Controllers\PedidosController;
 use PhpParser\Node\Expr\Cast\Array_;
 use PhpParser\Node\Expr\Cast\Object_;
 
@@ -31,6 +32,7 @@ class AjaxOrcamentosController extends Controller
             $dados = $request->input('dados');
             $calculo_hora_fresa = DateHelpers::formatFloatValue($request->input('calculo_hora_fresa'));
 
+            $pedidos = new PedidosController();
             $Total_mo=$Total_mp=$Total_ci=0;
             foreach ($dados as $key => &$dado) {
 
@@ -51,7 +53,11 @@ class AjaxOrcamentosController extends Controller
                     $MP->{"valorMP_$key"} = $val_chapa/$qtde_CH*$qtde_;                
                     $dado[10] = json_encode(["valorMP_$key" => number_format($MP->{"valorMP_$key"}, 2, ',','')]);
                     
-                    $MO->{"valorMO_$key"} = $this->calcularValor($calculo_hora_fresa, $tmp->{"tmp_$key"});
+                    $tempo = $pedidos->multiplyTimeByInteger('00:'.$tmp->{"tmp_$key"},  $qtde_);
+
+                    $MO->{"valorMO_$key"} = $this->calcularValor($calculo_hora_fresa, $tempo);
+                    
+
                     $dado[9] = json_encode(["valorMO_$key" => $MO->{"valorMO_$key"}]);
                     $Total_mo = $Total_mo + DateHelpers::formatFloatValue($MO->{"valorMO_$key"});
                     
