@@ -402,17 +402,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                         <div class="col-sm-1">
                             <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                         </div>
-                        <label for="blank" class="col-sm-1 col-form-label text-right text-sm-end">Status do pedido</label>
-                        <div class="col-sm-2">
-                            <select class="custom-select" multiple size="4" id="status_id" name="status_id[]">
-                                <option value=""></option>
-                                @if (isset($status))
+                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
+                        <div class="col-sm-5" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
+                            <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
-                                        <option value="{{ $status->id }}">{{ $status->nome }}
-                                        </option>
+                                        <div class="col-sm-6 form-check">
+                                            <input class="form-check-input col-sm-4"  name="status_id[]" type="checkbox"
+                                            @if($status->id == 10) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}" id="status_id">
+                                            <label class="fform-check-label col-sm-6" style="white-space:nowrap" for="status_id">{{$status->nome}}</label>
+                                        </div>
                                     @endforeach
-                                @endif
-                            </select>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">

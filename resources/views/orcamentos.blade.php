@@ -242,27 +242,6 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td scope="col" class='desc_10_1'>0</td>
-                            <td scope="col" class='desc_20_1'>0</td>
-                            <td scope="col" class='desc_30_1'>0</td>
-                            <td scope="col" class='desc_40_1'>0</td>
-                            <td scope="col" class='desc_50_1'>0</td>
-                        </tr>
-                        <tr>
-                            <td scope="col" class='desc_10_2'>0</td>
-                            <td scope="col" class='desc_20_2'>0</td>
-                            <td scope="col" class='desc_30_2'>0</td>
-                            <td scope="col" class='desc_40_2'>0</td>
-                            <td scope="col" class='desc_50_2'>0</td>
-                        </tr>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        <tr>
                             <th scope="col" class='desc_10_total'>0</th>
                             <th scope="col" class='desc_20_total'>0</th>
                             <th scope="col" class='desc_30_total'>0</th>
@@ -274,14 +253,27 @@
             </div>
         </div>
 
-
+        <div class="col-sm-5">
+            <table class="table table-sm table-striped text-center" id="tabela_rev">
+                <thead style="background-color: #b6b3b3">
+                    <tr>
+                        <th scope="col">RV</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Carregar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
         <hr class="my-4">
         <div class="form-group row">
             <div class="col-sm-10">
                 <button class="btn btn-danger" onclick="window.history.back();" type="button">Cancelar</button>
             </div>
             <div class="col-sm-2">
-                <button type="button" id="salvar_ficha" class="btn btn-primary">Salvar</button>
+                <button type="button" id="salvar_orcamento" class="btn btn-primary">Salvar</button>
             </div>
         </div>
         </form>

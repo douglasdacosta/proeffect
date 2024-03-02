@@ -97,7 +97,8 @@ $(function ($) {
         }
     }
 
-    $("#calculo_hora_fresa").change(function () {
+    function Calcula(tipo, revisao, rev, data) {
+
         $('.overlay').show();
         var composicaoep = new Array();
         $('#table_composicao_orcamento tbody tr').each(function (i, e) {
@@ -112,32 +113,34 @@ $(function ($) {
             });
             composicaoep.push(json);
         })
+
+        rv = $('#rv').val().trim();
+        if(rev.toString().length > 0) {
+            rv = rev;
+            $('#rv').val(rev);
+        }
+
         $.ajax({
             "type": "POST",
             "url": '/calcular-orcamento-ajax',
             "data": {
+                "tipo": tipo,
                 "dados": composicaoep,
+                "revisao": revisao,
+                "ep":$('#ep').val().trim(),
+                "rv":rv,
+                "data" : data,
                 "calculo_hora_fresa": $('#calculo_hora_fresa').val(),
                 "_token": $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
                 tabela = data[0];
                 Totais = data[1];
-                console.log(Totais.subTotalMO);
+                Orcamentos = data[2];
 
                 $('.subTotalMO').text(Totais.subTotalMO);
-                $('.subTotalMP').text(Totais.subTotalMP);                
+                $('.subTotalMP').text(Totais.subTotalMP);
                 $('.subTotalCI').text(Totais.subTotalCI);
-                $('.desc_10_1').text(Totais.desc_10_1);
-                $('.desc_20_1').text(Totais.desc_20_1);
-                $('.desc_30_1').text(Totais.desc_30_1);
-                $('.desc_40_1').text(Totais.desc_40_1);
-                $('.desc_50_1').text(Totais.desc_50_1);
-                $('.desc_10_2').text(Totais.desc_10_2);
-                $('.desc_20_2').text(Totais.desc_20_2);
-                $('.desc_30_2').text(Totais.desc_30_2);
-                $('.desc_40_2').text(Totais.desc_40_2);
-                $('.desc_50_2').text(Totais.desc_50_2);
                 $('.desc_10_total').text(Totais.desc_10_total);
                 $('.desc_20_total').text(Totais.desc_20_total);
                 $('.desc_30_total').text(Totais.desc_30_total);
@@ -147,32 +150,87 @@ $(function ($) {
                 $.each(tabela, function (k, data1) {
                     $.each(data1, function (k, data2) {
                         if(k = 1) {
-                            objeto = JSON.parse(data2);                        
-                            classe = Object.keys(objeto)[0];             
+                            objeto = JSON.parse(data2);
+                            classe = Object.keys(objeto)[0];
                             if(Object.values(objeto)[0] != '') {
-                                valor = Object.values(objeto)[0]; 
+                                valor = Object.values(objeto)[0];
                                 $('.' + classe).text(valor);
                             } else {
                                 $('.' + classe).text('');
                             }
-                        }                        
+                        }
                     })
-
-
                 })
+                $('#tabela_rev tbody').empty();
+                $.each(Orcamentos, function(i,j) {
+                    $('#tabela_rev tbody').append(
+                       '<tr>'+
+                            '<th scope="col">'+j.rev+'</th>'+
+                            '<th scope="col">'+formatarData(j.created_at)+'</th>'+
+                            '<th scope="col" style="cursor:pointer"><span data-rv="'+j.rev+'" data-horafreza="'+j.hora_fresa+'" data-data="'+formatarData(j.created_at)+'" class="carrega_rev" style="color:blue">&#8599;</span></th>'+
+                        '</tr>'
+                    );
+                });
 
                 abreAlertSuccess('Orçamento calculado', false);
                 $('.overlay').hide();
             },
             error: function (data, textStatus, errorThrown) {
-                abreAlertSuccess('Erro ao tentar calcular o orçamento', true);
+                abreAlertSuccess('Erro ao Ao salvar/calcular', true);
                 $('.overlay').hide();
             },
 
         });
 
+    };
+
+    $("#calculo_hora_fresa").change(function () {
+        rv = $('#rv').val().trim();
+        Calcula('calculo_hora_fresa', false, rv, false);
     })
+
+
+    $("#salvar_orcamento").click(function () {
+        $('.overlay').show();
+        rv = $('#rv').val().trim();
+        if($('#rv').val().trim() == '')
+        {
+            abreAlertSuccess('Campo RV. vazio não pode salvar o orçamento', true);
+            $('.overlay').hide();
+            return false;
+        }
+
+        Calcula('salvar_orcamento', false, rv, false);
+    });
+
     $("#calculo_hora_fresa").change();
+
+    $(document).on('click', '.carrega_rev', function(e){
+        rev = $(this).data('rv');
+        data = $(this).data('data');
+        $('#calculo_hora_fresa').val($(this).data('horafreza'));
+
+        Calcula('carrega_rev', true, rev, data);
+
+    })
+
+    function formatarData(data) {
+        // Cria um objeto de data com a data fornecida
+        const dataObj = new Date(data);
+
+        // Extrai os componentes da data
+        const dia = String(dataObj.getDate()).padStart(2, '0');
+        const mes = String(dataObj.getMonth() + 1).padStart(2, '0'); // Mês começa de zero, por isso adicionamos 1
+        const ano = dataObj.getFullYear();
+        const horas = String(dataObj.getHours()).padStart(2, '0');
+        const minutos = String(dataObj.getMinutes()).padStart(2, '0');
+        const segundos = String(dataObj.getSeconds()).padStart(2, '0');
+
+        // Formata a data e hora conforme necessário
+        const dataFormatada = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+
+        return dataFormatada;
+    }
 });
 
 
