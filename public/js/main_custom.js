@@ -147,19 +147,63 @@ $(function ($) {
                 $('.desc_40_total').text(Totais.desc_40_total);
                 $('.desc_50_total').text(Totais.desc_50_total);
 
+
+
+                $('#table_composicao_orcamento tbody').empty();
+                contador = 0;
+                html = '';
                 $.each(tabela, function (k, data1) {
+                    html = '<tr>';
                     $.each(data1, function (k, data2) {
-                        if(k = 1) {
-                            objeto = JSON.parse(data2);
-                            classe = Object.keys(objeto)[0];
-                            if(Object.values(objeto)[0] != '') {
-                                valor = Object.values(objeto)[0];
-                                $('.' + classe).text(valor);
-                            } else {
-                                $('.' + classe).text('');
-                            }
+                        objeto = JSON.parse(data2);
+                        classe = Object.keys(objeto)[0];
+
+                        switch(k) {
+                            case 0:
+                                html = html + "<td data-name='blank_"+contador+"' class='blank_"+contador+"' scope='row'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 1:
+                                html = html + "<td data-name='tmp_"+contador+"' class='tmp_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 2:
+                                html = html + "<td data-name='uso_"+contador+"' class='uso_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 3:
+                                html = html + "<td data-name='qtde_"+contador+"' class='qtde_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 4:
+                                html = html +    "<td data-name='material_id_"+contador+"' class='material_id_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 5:
+                                html = html + "<td data-name='qtdeCH_"+contador+"' class='qtdeCH_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 6:
+                                html = html + "<td data-name='medidax_"+contador+"' class='medidax_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 7:
+                                html = html + "<td data-name='mediday_"+contador+"' class='mediday_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 8:
+                                html = html + "<td data-name='valor_chapa_"+contador+"' class='valor_chapa_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 9:
+                                html = html + "<td style='border-left: solid; border-right: solid;' data-name='valorMO_"+contador+"' class='valorMO_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
+                            case 10:
+                                html = html + "<td style='border-left: solid; border-right: solid;'data-name='valorMP_"+contador+"' class='valorMP_"+contador+"'>"+Object.values(objeto)[0]+"</td>";
+                                break;
                         }
+                        if(Object.values(objeto)[0] != '') {
+                            valor = Object.values(objeto)[0];
+                            $('.' + classe).text(valor);
+                        } else {
+                            $('.' + classe).text('');
+                        }
+
                     })
+                    contador =contador+1;
+                    html = html + "</tr>";
+                    $('#table_composicao_orcamento tbody').append(html);
                 })
                 $('#tabela_rev tbody').empty();
                 $.each(Orcamentos, function(i,j) {
@@ -256,6 +300,3 @@ function abreAlertSuccess(texto, erro) {
         $('.toast').hide('slow');
     }, 7000);
 };
-
-
-

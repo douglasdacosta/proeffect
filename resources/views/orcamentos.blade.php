@@ -162,6 +162,8 @@
                             <?php $count++ ?>
                         @endforeach
                     @endif
+                </tbody>
+                    <tfoot>
                     <tr>
                         <th></th>
                         <th></th>
@@ -201,8 +203,8 @@
                         <th style="border: solid;" scope="col"></th>
                         <th style="border: solid;" scope="col" class='subTotalCI'>0</th>
                     </tr>
+                </tfoot>
 
-                </tbody>
             </table>
 
         </div>
