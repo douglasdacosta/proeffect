@@ -408,7 +408,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     @foreach ($status as $status)
                                         <div class="col-sm-6 form-check">
                                             <input class="form-check-input col-sm-4"  name="status_id[]" type="checkbox"
-                                            @if($status->id == 10) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}" id="status_id">
+                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}" id="status_id">
                                             <label class="fform-check-label col-sm-6" style="white-space:nowrap" for="status_id">{{$status->nome}}</label>
                                         </div>
                                     @endforeach
