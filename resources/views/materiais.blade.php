@@ -116,8 +116,8 @@
             <div class="form-group row">
                 <label for="peca_padrao" class="col-sm-2 col-form-label">Peça padrão</label>
                 <select class="form-control col-sm-1 custom-select" id="peca_padrao" name="peca_padrao">
-                    <option value="2" @if (($materiais[0]->peca_padrao == 2)){{"selected='selected'"}}@else{{''}}@endif>Não</option>
-                    <option value="1"@if (($materiais[0]->peca_padrao == 1)){{"selected='selected'"}}@else{{''}}@endif>Sim</option>
+                    <option value="2" @if ((isset($materiais[0]->peca_padrao) && $materiais[0]->peca_padrao == 2)){{"selected='selected'"}}@else{{''}}@endif>Não</option>
+                    <option value="1"@if ((isset($materiais[0]->peca_padrao) && $materiais[0]->peca_padrao == 1)){{"selected='selected'"}}@else{{''}}@endif>Sim</option>
                 </select>
             </div>
             <div class="form-group row">
