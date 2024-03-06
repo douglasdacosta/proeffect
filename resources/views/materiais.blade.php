@@ -147,7 +147,7 @@
             <div class="form-group row">
                 <label for="valor" class="col-sm-2 col-form-label">Valor unitário </label>
                 <div class="col-sm-2">
-                <input type="text" class="form-control mask_valor" id="valor" name="valor" data-mask="0,00"  value="@if (isset($materiais[0]->valor)){{ number_format($materiais[0]->valor,2, ',','.')}}@else{{''}}@endif">
+                <input type="text" class="form-control mask_valor" id="valor" name="valor"  value="@if (isset($materiais[0]->valor)){{ number_format($materiais[0]->valor,2, ',','.')}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
