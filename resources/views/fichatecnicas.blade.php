@@ -57,6 +57,10 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>EP</th>
+                                    <th scope="col">Total usinagem </th>
+                                    <th scope="col">Total acabamento</th>
+                                    <th scope="col">Total montagem</th>
+                                    <th scope="col">Total inspeção</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,6 +71,10 @@
                                                     href={{ URL::route($rotaAlterar, ['id' => $fichatecnica->id]) }}>{{ $fichatecnica->id }}</a>
                                             </th>
                                             <td>{{ $fichatecnica->ep }}</td>
+                                            <td class="@if($fichatecnica->tempo_usinagem == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_usinagem }}</td>
+                                            <td class="@if($fichatecnica->tempo_acabamento == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_acabamento }}</td>
+                                            <td class="@if($fichatecnica->tempo_montagem == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_montagem }}</td>
+                                            <td class="@if($fichatecnica->tempo_inspecao == '00:00:00') {{'text-danger'}} @else {{''}} @endif"  >{{ $fichatecnica->tempo_inspecao }}</td>
                                         </tr>
                                     @endforeach
                                 @endif
