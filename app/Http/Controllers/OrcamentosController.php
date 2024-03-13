@@ -46,7 +46,7 @@ class OrcamentosController extends Controller
         }
 
 
-        $fichatecnicas = $fichatecnicas->get();
+        $fichatecnicas = $fichatecnicas->orderby('ep','desc')->get();
         $tela = 'pesquisa';
     	$data = array(
 				'tela' => $tela,
@@ -104,7 +104,7 @@ class OrcamentosController extends Controller
         }
 
         foreach ($fichatecnicasitens as $key => $fichatecnicasitem) {
-           
+
             $tempo_usinagem = $fichatecnicasitem->tempo_usinagem;
             $tempo_usinagem = $pedidos->multiplyTimeByInteger($tempo_usinagem,$fichatecnicasitem->qtde_blank);
 
@@ -118,14 +118,14 @@ class OrcamentosController extends Controller
 
             $chapa = [
                 'sheetWidth' => $fichatecnicasitem->tabelaMateriais->unidadex - 20,
-                'sheetHeight'=> $fichatecnicasitem->tabelaMateriais->unidadey - 20 
+                'sheetHeight'=> $fichatecnicasitem->tabelaMateriais->unidadey - 20
             ];
 
             if($fichatecnicasitem->tabelaMateriais->peca_padrao == 2){
 
                 $blank_por_chapa = $consumoMateriais->calculaPecas($pecas, $chapa);
             } else {
-                
+
                 $blank_por_chapa = $fichatecnicasitem->qtde_blank;
             }
 

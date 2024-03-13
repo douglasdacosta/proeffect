@@ -18,7 +18,7 @@
     @section('content')
         <div class="right_col" role="main">
 
-            <form id="filtro" action="fichatecnica" method="get" data-parsley-validate=""
+            <form id="filtro" action="orcamentos" method="get" data-parsley-validate=""
                 class="form-horizontal form-label-left" novalidate="">
                 <div class="form-group row">
                     <label for="ep" class="col-sm-2 col-form-label">EP</label>

@@ -46,7 +46,7 @@ class FichatecnicaController extends Controller
         }
 
 
-        $fichatecnicas = $fichatecnicas->get();
+        $fichatecnicas = $fichatecnicas->orderby('ep','desc')->get();
         $tela = 'pesquisa';
     	$data = array(
 				'tela' => $tela,
@@ -109,7 +109,7 @@ class FichatecnicaController extends Controller
 
         $fichatecnica= $fichatecnicas->where('id', '=', $request->input('id'))->get();
         $fichatecnicasitens= $fichatecnicasitens::with('materiais')->where('fichatecnica_id', '=', $request->input('id'))->orderByRaw("CASE WHEN blank='' THEN 1 ELSE 0 END ASC")->orderBy('blank','ASC')->get();
-        
+
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,
@@ -166,7 +166,7 @@ class FichatecnicaController extends Controller
             $fichatecnicas->alerta_expedicao2 =  $request->input('alerta_expedicao2');
             $fichatecnicas->alerta_expedicao3 =  $request->input('alerta_expedicao3');
             $fichatecnicas->alerta_expedicao4 =  $request->input('alerta_expedicao4');
-            $fichatecnicas->alerta_expedicao5 =  $request->input('alerta_expedicao5');            
+            $fichatecnicas->alerta_expedicao5 =  $request->input('alerta_expedicao5');
             $fichatecnicas->status = $request->input('status');
             $fichatecnicas->save();
 
