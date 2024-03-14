@@ -56,7 +56,8 @@ class JobImportarPedido implements ShouldQueue
 
                 $venda_completa= $ApiERPController->getVendasByOS($idOs);
 
-                if(!$venda_completa) {
+                if(!$venda_completa || empty($venda_completa['os']['prevEntrega'])) {
+
                     continue;
                 }
 
@@ -115,6 +116,7 @@ class JobImportarPedido implements ShouldQueue
      * Salva dados do pedido
      */
     private function savePedidos($pedido, $dados){
+        info($dados);
         if(empty($pedido->id)) {
             $pedidos = new Pedidos();
             $pedidos->os = $dados['numeroOs'];

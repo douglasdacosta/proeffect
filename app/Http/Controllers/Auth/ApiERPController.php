@@ -109,7 +109,6 @@ class ApiERPController extends Controller
             ];
 
             $url = env('URL_ERP')."api/VendaV2/completa/$os";
-
             $request = new Request('GET', $url, $headers);
             $response = $client->sendAsync($request)->wait();
             $body = $response->getBody();
