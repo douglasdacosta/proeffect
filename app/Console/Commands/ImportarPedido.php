@@ -28,8 +28,8 @@ class ImportarPedido extends Command
      */
     public function handle()
     {
-        sleep(300);
-        // JobImportarPedido::dispatch();
+
+        JobImportarPedido::dispatch();
 
         return true;
     }
