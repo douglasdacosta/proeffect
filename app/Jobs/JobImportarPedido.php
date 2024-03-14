@@ -73,7 +73,7 @@ class JobImportarPedido implements ShouldQueue
                         $dataOS = $venda_completa['os']['dataOS'];
                         $prevEntrega = $venda_completa['os']['prevEntrega'];
                         $ep = $itens['codigo'];
-                        $cliente_id = $venda_completa['cliente']['id'];
+                        $cliente_id = $venda_completa['cliente']['numcli'];
                         $cliente = $venda_completa['cliente'];
                         $transportadora = $venda_completa['transportadora'];
                         $idVendedor = $venda_completa['os']['idVendedor'];
@@ -181,7 +181,7 @@ class JobImportarPedido implements ShouldQueue
         if(!empty($pessoa->id)) {
             $pessoas = $pessoas::find($pessoa->id);
         }
-        $pessoas->codigo_cliente =  $cliente['id'];
+        $pessoas->codigo_cliente =  $cliente['numcli'];
         $pessoas->nome_cliente = $cliente['razao'];
         $pessoas->nome_contato = $cliente['fantasia'];
         $pessoas->nome_assistente = $Vendedor['nome'];
