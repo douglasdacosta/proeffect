@@ -27,7 +27,7 @@ class JobImportarPedido implements ShouldQueue
      */
     public function __construct()
     {
-        set_time_limit(360);
+
     }
 
     /**
@@ -57,12 +57,12 @@ class JobImportarPedido implements ShouldQueue
                 $venda_completa= $ApiERPController->getVendasByOS($idOs);
 
                 if(!$venda_completa || empty($venda_completa['os']['prevEntrega'])) {
-
+                    info(" OS não encontrada ".$venda_completa['os']['numeroOS'] . " ou sem data de prevEntrega");
                     continue;
                 }
 
                 foreach($venda_completa['os']['itens'] as $itens) {
-
+                    info("EP: ". $itens['codigo']. '; OS:'.$venda_completa['os']['numeroOS']. '; IdOs:'.$idOs);
                     $pedidos = new Pedidos();
                     $pessoas = new Pessoas();
                     $fichatecnica = new Fichastecnicas();
@@ -93,7 +93,7 @@ class JobImportarPedido implements ShouldQueue
 
                         $transporte_id = $this->saveTrasportes($transportes, $transportadora);
 
-                        $pedido = $pedidos->where('os', '=', $numeroOs)->first();
+                        $pedido = $pedidos->where('os', '=', $numeroOs)->where('fichatecnica_id', '=', $fichatecnicaId)->first();
                         $dados = [
                             'numeroOs' => $numeroOs,
                             'fichatecnicaId' => $fichatecnicaId,
@@ -116,7 +116,7 @@ class JobImportarPedido implements ShouldQueue
      * Salva dados do pedido
      */
     private function savePedidos($pedido, $dados){
-        info($dados);
+
         if(empty($pedido->id)) {
             $pedidos = new Pedidos();
             $pedidos->os = $dados['numeroOs'];
