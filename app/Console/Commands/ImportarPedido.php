@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\JobImportarPedido;
 use Illuminate\Console\Command;
-
+ini_set('max_execution_time', 5); // Define o tempo limite de execução para 300 segundos (5 minutos)
 class ImportarPedido extends Command
 {
     /**
@@ -28,7 +28,8 @@ class ImportarPedido extends Command
      */
     public function handle()
     {
-        JobImportarPedido::dispatch();
+        sleep(300);
+        // JobImportarPedido::dispatch();
 
         return true;
     }

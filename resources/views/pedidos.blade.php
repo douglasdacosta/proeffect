@@ -689,7 +689,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                         <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
-                                        <td>{{ $pedido->tabelaPrioridades->nome }}</td>
+                                        <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
                                         <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
                                         <td>{{ $pedido->tabelaTransportes->nome }}</td>
                                         <td>{{ $pedido->tabelaStatus->nome }}</td>
