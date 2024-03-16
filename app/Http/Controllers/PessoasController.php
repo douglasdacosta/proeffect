@@ -34,7 +34,10 @@ class PessoasController extends Controller
 
         if (!empty($request->input('status'))){
             $pessoas = $pessoas->where('status', '=', $request->input('status'));
+        } else {
+            $pessoas = $pessoas->where('status', '=', 'A');
         }
+
 
         if ($request->input('codigo_cliente') != '') {
         	$pessoas = $pessoas->where('codigo_cliente', '=', $request->input('codigo_cliente'));

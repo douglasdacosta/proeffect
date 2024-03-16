@@ -60,7 +60,10 @@ class PedidosController extends Controller
             ->orderby('pedidos.data_entrega');
         if (!empty($request->input('status'))){
             $pedidos = $pedidos->where('pedidos.status', '=', $request->input('status'));
+        } else {
+            $pedidos = $pedidos->where('pedidos.status', '=', 'A');
         }
+
 
         if ($ep) {
             $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $ep);

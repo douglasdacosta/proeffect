@@ -130,7 +130,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             <th>OS</th>
                                             <th>EP</th>
                                             <th>Qtde</th>
-                                            <th>Cliente</th>
                                             <th>Status do pedido</th>
                                             <th>Data gerado</th>
                                             <th>Data entrega</th>
@@ -149,7 +148,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     <td>{{ $pedido->os }}</td>
                                                     <td>{{ $pedido->ep }}</td>
                                                     <td>{{ $pedido->qtde }}</td>
-                                                    <td>{{ $pedido->nome_cliente }}</td>
                                                     <td>
                                                         <select class="form-control alteracao_status_pedido"
                                                             data-statusatual='{{ $pedido->id_status }}'
@@ -407,9 +405,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
                                         <div class="col-sm-6 form-check">
-                                            <input class="form-check-input col-sm-4"  name="status_id[]" type="checkbox"
-                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}" id="status_id">
-                                            <label class="fform-check-label col-sm-6" style="white-space:nowrap" for="status_id">{{$status->nome}}</label>
+                                            <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                            <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
                                         </div>
                                     @endforeach
                             </div>
@@ -508,6 +506,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <th scope="col">OS</th>
                                     <th scope="col">EP</th>
                                     <th scope="col">Qtde</th>
+                                    <th scope="col">Obs</th>
                                     <th scope="col">Usinagem</th>
                                     <th scope="col">Acabamento</th>
                                     <th scope="col">Montagem Torre</th>
@@ -533,6 +532,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <td>{{ $pedido->os }}
                                         <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
                                         <td>{{ $pedido->qtde }}</td>
+                                        <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 2, '...') !!}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                         </td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
@@ -630,6 +630,14 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     </table>
                 </div>
             @endif
+            </div>
+            <div class="form-group row">
+                <label for="observacao" class="col-sm-2 col-form-label">Observações</label>
+                <div class="col-sm-6">
+                    <textarea class="form-control" id="observacao" name="observacao">
+                        @if (isset($pedidos[0]->observacao)){{ trim($pedidos[0]->observacao) }}@else{{ '' }} @endif
+                    </textarea>
+                </div>
             </div>
 
         @stop

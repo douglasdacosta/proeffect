@@ -43,6 +43,8 @@ class OrcamentosController extends Controller
 
         if (!empty($request->input('status'))){
             $fichatecnicas = $fichatecnicas->where('status', '=', $request->input('status'));
+        } else {
+            $fichatecnicas = $fichatecnicas->where('status', '=', 'A');
         }
 
 

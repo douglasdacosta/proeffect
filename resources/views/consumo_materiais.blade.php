@@ -22,7 +22,7 @@
                     <div class="spinner-border" role="status">
                     </div>
                   </div>
-        </div>        
+        </div>
         <div id="toastsContainerTopRight" class="toasts-top-right fixed">
             <div class="toast fade show" role="alert" style="width: 350px" aria-live="assertive"
                 aria-atomic="true">
@@ -215,7 +215,7 @@
         @endif
 
 
-            
+
                     <div class="form-group row">
                         <h3 class="text-dark ">Total de materiais</h1>
                     </div>
@@ -254,6 +254,12 @@
                             </table>
                             <div class="form-group row">
                                 <input type="hidden" value="{{$imprimir}}" id="imprimir" >
+                            </div>
+                            <div class="form-group row">
+                                <label for="observacao" class="col-sm-2 col-form-label">Observações</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" id="observacao" name="observacao">@if (isset($pedido->observacao)){{ trim($pedido->observacao) }}@else{{ '' }} @endif</textarea>
+                                </div>
                             </div>
             @endif
         @stop

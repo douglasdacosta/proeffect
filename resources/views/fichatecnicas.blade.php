@@ -128,7 +128,7 @@
         <div class="form-group row">
             <label for="ep" class="col-sm-2 col-form-label text-right">EP*</label>
             <div class="col-sm-1">
-                <input type="text" id="ep" name="ep" class="form-control col-md-13"
+                <input type="text" id="ep" name="ep" class="form-control col-md-13 text-uppercase"
                     value="@if (isset($fichatecnicas[0]->ep)) {{ $fichatecnicas[0]->ep }} @else{{ '' }} @endif">
             </div>
             <label for="blank" class="col-sm-2 col-form-label text-right text-sm-end">Material*</label>

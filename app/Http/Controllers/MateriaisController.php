@@ -47,6 +47,8 @@ class MateriaisController extends Controller
 
         if (!empty($request->input('status'))){
             $materiais = $materiais = $materiais->where('status', '=', $request->input('status'));
+        } else{
+            $materiais = $materiais->where('status', '=', 'A');
         }
 
         $materiais = $materiais->get();
