@@ -354,7 +354,7 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="alerta_expedicao" class="col-sm-2 col-form-label text-right">Alerta expedição</label>
+            <label for="alerta_expedicao" class="col-sm-2 col-form-label text-right">Alerta Embalagem</label>
             <div class="col-sm-10">
                 <input type="text" id="alerta_expedicao1" name="alerta_expedicao1" class="form-control col-md-13"
                     value="@if (isset($fichatecnicas[0]->alerta_expedicao1)) {{ $fichatecnicas[0]->alerta_expedicao1 }} @else{{ '' }} @endif">

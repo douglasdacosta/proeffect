@@ -614,6 +614,7 @@ class PedidosController extends Controller
             'folhas' => [
                 0 => [
                     'status' => 'Usinagem',
+                    'indicador_status' => 'usinagem',
                     'alerta1' => $pedidos[0]->tabelaFichastecnicas->alerta_usinagem1,
                     'alerta2' => $pedidos[0]->tabelaFichastecnicas->alerta_usinagem2,
                     'alerta3' => $pedidos[0]->tabelaFichastecnicas->alerta_usinagem3,
@@ -622,6 +623,7 @@ class PedidosController extends Controller
                 ],
                 1 => [
                     'status' => 'Acabamento',
+                    'indicador_status' => 'acabamento',
                     'alerta1' => $pedidos[0]->tabelaFichastecnicas->alerta_acabamento1,
                     'alerta2' => $pedidos[0]->tabelaFichastecnicas->alerta_acabamento2,
                     'alerta3' => $pedidos[0]->tabelaFichastecnicas->alerta_acabamento3,
@@ -630,6 +632,7 @@ class PedidosController extends Controller
                 ],
                 2 => [
                     'status' => 'Montagem',
+                    'indicador_status' => 'montagem',
                     'alerta1' => $pedidos[0]->tabelaFichastecnicas->alerta_montagem1,
                     'alerta2' => $pedidos[0]->tabelaFichastecnicas->alerta_montagem2,
                     'alerta3' => $pedidos[0]->tabelaFichastecnicas->alerta_montagem3,
@@ -638,6 +641,7 @@ class PedidosController extends Controller
                 ],
                 3 => [
                     'status' => 'Inspeção',
+                    'indicador_status' => 'inspecao',
                     'alerta1' => $pedidos[0]->tabelaFichastecnicas->alerta_inspecao1,
                     'alerta2' => $pedidos[0]->tabelaFichastecnicas->alerta_inspecao2,
                     'alerta3' => $pedidos[0]->tabelaFichastecnicas->alerta_inspecao3,
@@ -645,7 +649,8 @@ class PedidosController extends Controller
                     'alerta5' => $pedidos[0]->tabelaFichastecnicas->alerta_inspecao5,
                 ],
                 4 => [
-                    'status' => 'Expedição',
+                    'status' => 'Embalagem',
+                    'indicador_status' => 'embalagem',
                     'alerta1' => $pedidos[0]->tabelaFichastecnicas->alerta_expedicao1,
                     'alerta2' => $pedidos[0]->tabelaFichastecnicas->alerta_expedicao2,
                     'alerta3' => $pedidos[0]->tabelaFichastecnicas->alerta_expedicao3,
@@ -760,17 +765,17 @@ class PedidosController extends Controller
     /**
     * Show the application dashboard.
     *
-    * @return \Illuminate\Contracts\Support\Renderable
+    * 
     */
     public function getAllfichastecnicas() {
         $Status = new Fichastecnicas();
-        return $Status->where('status', '=', 'A')->get();
+        return $Status->where('status', '=', 'A')->orderBy('ep', 'ASC')->get();
 
     }
     /**
     * Show the application dashboard.
     *
-    * @return \Illuminate\Contracts\Support\Renderable
+    * 
     */
     public function getAllClientes() {
         $pessoa = new Pessoas();
