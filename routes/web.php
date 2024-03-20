@@ -63,6 +63,5 @@ Route::match(['get', 'post'],'/maquinas', [App\Http\Controllers\MaquinasControll
 Route::match(['get', 'post'],'/orcamentos', [App\Http\Controllers\OrcamentosController::class, 'index'])->name('orcamentos');
 Route::match(['get', 'post'],'/alterar-orcamentos', [App\Http\Controllers\OrcamentosController::class, 'alterar'])->name('alterar-orcamentos');
 
-Route::match(['get', 'post'],'/teste', [App\Http\Controllers\TestesController::class, 'index'])->name('teste');
 
 

@@ -17,3 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::match(['post'],'/salva-dados-maquina', [App\Http\Controllers\MaquinasController::class, 'salvaDadosMaquina'])->name('salva-dados-maquina');
+Route::match(['get'],'/get-horas-turno', [App\Http\Controllers\MaquinasController::class, 'getHorasTurno'])->name('get-horas-turno');
