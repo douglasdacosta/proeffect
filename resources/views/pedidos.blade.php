@@ -633,14 +633,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 </div>
             @endif
             </div>
-            <div class="form-group row">
-                <label for="observacao" class="col-sm-2 col-form-label">Observações</label>
-                <div class="col-sm-6">
-                    <textarea class="form-control" id="observacao" name="observacao">
-                        @if (isset($pedidos[0]->observacao)){{ trim($pedidos[0]->observacao) }}@else{{ '' }} @endif
-                    </textarea>
-                </div>
-            </div>
 
         @stop
     @break
