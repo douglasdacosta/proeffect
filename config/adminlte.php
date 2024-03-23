@@ -385,6 +385,14 @@ return [
             'label'       => '',
             'label_color' => '',
         ],
+        ['header' => 'Produção'],
+        [
+            'text'        => 'Produção de Maquinas',
+            'url'         => 'producao-maquinas',
+            'icon'        => 'far fa-fw fa-file',
+            'label'       => '',
+            'label_color' => '',
+        ],
         ['header' => 'Configurações'],
         [
             'text' => 'Conta',

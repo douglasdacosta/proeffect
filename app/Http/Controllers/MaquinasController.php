@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Maquinas;
 use App\Models\ProducaoMaquinas;
+use App\Providers\DateHelpers;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
@@ -44,6 +45,127 @@ class MaquinasController extends Controller
         return view('maquinas', $data);
     }
 
+
+    public function producaoMaquinas(Request $request)
+    {
+        $this->middleware('auth');
+        $ProducaoMaquinas = new ProducaoMaquinas();
+
+        $data = date('Y-m-d');
+        $data_fim = date('Y-m-d');
+        $hora = '00:00:01';
+        $hora_fim = '23:59:59';
+
+        if(!empty($request->input('numero_cnc'))) {
+            $numero_cnc = $request->input('numero_cnc');
+            $ProducaoMaquinas = $ProducaoMaquinas->where('numero_cnc', '=', $numero_cnc);
+        }
+
+
+        if(!empty($request->input('hora')) && !empty($request->input('hora_fim') )) {
+            $hora = $request->input('hora');
+            $hora_fim = $request->input('hora_fim');
+        }
+
+        if(!empty($request->input('hora')) && empty($request->input('hora_fim') )) {
+            $hora = $request->input('hora');
+        }
+
+        if(empty($request->input('hora')) && !empty($request->input('hora_fim') )) {
+            $hora_fim = $request->input('hora_fim');
+        }
+
+        if(!empty($request->input('created_at')) && !empty($request->input('created_at_fim') )) {
+            $data = DateHelpers::formatDate_dmY($request->input('created_at'));
+            $data_fim = DateHelpers::formatDate_dmY($request->input('created_at_fim'));
+        }
+
+        if(!empty($request->input('created_at')) && empty($request->input('created_at_fim') )) {
+            $data = DateHelpers::formatDate_dmY($request->input('created_at'));
+        }
+
+        if(empty($request->input('created_at')) && !empty($request->input('created_at_fim') )) {
+            $data_fim = DateHelpers::formatDate_dmY($request->input('created_at_fim'));
+        }
+
+        $datHora = $data.' '.$hora;
+        $datHora_fim = $data_fim.' '.$hora_fim;
+
+        $created_atA = DateTime::createFromFormat('Y-m-d H:i:s', $datHora);
+        $created_atb = DateTime::createFromFormat('Y-m-d H:i:s', $datHora_fim);
+        $ProducaoMaquinas = $ProducaoMaquinas->whereBetween('created_at', [$created_atA, $created_atb]);
+
+        $ProducaoMaquinas = $ProducaoMaquinas
+                                        ->orderby('numero_cnc','asc')
+                                        ->orderby('created_at','asc')
+                                        ->get();
+        $total_horas_usinadas_manha = $total_horas_usinadas_tarde = '00:00:00';
+        $hora_servico_periodo_manha = '08:00:00';
+        $hora_servico_periodo_tarde = '08:00:00';
+        $qtdeServico_manha = $qtdeServico_tarde = $metrosPercorridos_manha = $metrosPercorridos_tarde =  0;
+
+        $dados=[];
+        $chave_antes = $chave = '';
+        foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
+            $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
+
+            $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'];
+            $data = $created_at->format('d/m/Y');
+
+            if($chave_antes != $chave) {
+                $chave_antes = $chave;
+                $total_horas_usinadas_manha = $total_horas_usinadas_tarde = '00:00:00';
+                $hora_servico_periodo_manha = '08:00:00';
+                $hora_servico_periodo_tarde = '08:00:00';
+                $qtdeServico_manha = $qtdeServico_tarde = $metrosPercorridos_manha = $metrosPercorridos_tarde =  0;
+
+            }
+
+            if($created_at->format('H') < '14') {
+
+                $total_horas_usinadas_manha = PedidosController::somarHoras($total_horas_usinadas_manha, $producaoMaquina['HorasServico']);
+                $qtdeServico_manha = $qtdeServico_manha + $producaoMaquina['qtdeServico'];
+                $metrosPercorridos_manha = $metrosPercorridos_manha + $producaoMaquina['metrosPercorridos'];
+                $dados['manha'][$chave]['turno'] = 'Manhã';
+                $dados['manha'][$chave]['data'] = $data;
+                $dados['manha'][$chave]['maquina_cnc'] = $producaoMaquina['numero_cnc'];
+                $dados['manha'][$chave]['total_horas_usinadas'] = $total_horas_usinadas_manha;
+                $dados['manha'][$chave]['horasTrabalho'] = $hora_servico_periodo_manha;
+                $dados['manha'][$chave]['qtdeServico'] = $qtdeServico_manha;
+                $dados['manha'][$chave]['metrosPercorridos'] = $metrosPercorridos_manha;
+
+            } else {
+
+                $total_horas_usinadas_tarde = PedidosController::somarHoras($total_horas_usinadas_tarde, $producaoMaquina['HorasServico']);
+                $qtdeServico_tarde = $qtdeServico_tarde + $producaoMaquina['qtdeServico'];
+                $metrosPercorridos_tarde = $metrosPercorridos_tarde + $producaoMaquina['metrosPercorridos'];
+                $dados['tarde'][$chave]['turno'] = 'Tarde';
+                $dados['tarde'][$chave]['data'] = $data;
+                $dados['tarde'][$chave]['maquina_cnc'] = $producaoMaquina['numero_cnc'];
+                $dados['tarde'][$chave]['total_horas_usinadas'] = $total_horas_usinadas_tarde;
+                $dados['tarde'][$chave]['horasTrabalho'] = $hora_servico_periodo_tarde;
+                $dados['tarde'][$chave]['qtdeServico'] = $qtdeServico_tarde;
+                $dados['tarde'][$chave]['metrosPercorridos'] = $metrosPercorridos_tarde;
+            }
+
+        }
+
+        foreach ($dados as $turno => $dado) {
+            foreach ($dado as $data => $dados_dia) {
+                $dados[$turno][$data]['percentual'] = $this->calcularPorcentagemUsinada($dados_dia['total_horas_usinadas'],$dados_dia['horasTrabalho']);
+            }
+        }
+
+        $data = array(
+            'tela' => 'pesquisa',
+            'nome_tela' => 'Produção Máquinas',
+            'producao_maquinas' => $dados,
+            'request' => $request
+        );
+
+        return view('producao_maquinas', $data);
+    }
+
     public function getHorasTurno(Request $request){
         try {
             $array = $request->input();
@@ -54,22 +176,21 @@ class MaquinasController extends Controller
 
             $numero_cnc = $array['NUMERO_CNC'];
             $data_atual = Carbon::now()->format('Y-m-d');
-
             $hora_inicio = $data_atual." 14:00:00";
-
             $hora_fim =  $data_atual." 22:00:00";
-
+            $turno = "Turno 14:00 as 22:00";
             if($this->turno_mamnha()) {
-                $hora_inicio = $data_atual." 08:00:00";
+                $hora_inicio = $data_atual." 06:00:00";
                 $hora_fim =  $data_atual." 13:59:59";
+                $turno = "Turno 06:00 as 14:00";
             }
 
             $dados = [
+                'turno' => $turno,
                 'textoHorasTrabalhadas' => "Horas Trabalhadas: 00:00:00",
                 'textoHorasUsinadas' => "Horas Usinadas: 00:00:00",
-                'horasTrabalhadasq'=>"00",
+                'horasTrabalhadasq'=>"0",
                 'horasUsinadas'=>"0",
-
             ];
 
             $producaoMaquinas = new ProducaoMaquinas();
@@ -83,10 +204,10 @@ class MaquinasController extends Controller
             $total_horas_usinadas = $total_horas_trabalhadas = "00:00:00";
             $hora_atual = new DateTime();
             $hora_atual = $hora_atual->format('H:i:s');
-            info('---------------------------------------------------------------------------');
             $hora = new DateTime();
             $hora = $hora->format('H');
-            if($hora > 8 && count($producaoMaquinas)) {
+
+            if($hora > 5 && count($producaoMaquinas)) {
 
                 foreach ($producaoMaquinas as $key => $producaoMaquina) {
                     $total_horas_usinadas = PedidosController::somarHoras($total_horas_usinadas, $producaoMaquina['HorasServico']);
@@ -99,6 +220,7 @@ class MaquinasController extends Controller
                 $horasUsinadas = $this->calcularPorcentagemUsinada($total_horas_usinadas,$total_horas_trabalhadas);
 
                 $dados = [
+                    'turno' => $turno,
                     'textoHorasTrabalhadas' => "Horas Trabalhadas: ". substr($total_horas_trabalhadas, 0, 5),
                     'textoHorasUsinadas' => "Horas Usinadas: ". substr($total_horas_usinadas, 0, 5),
                     'horasTrabalhadasq'=>"$horasTrabalhadasq",
@@ -172,17 +294,14 @@ class MaquinasController extends Controller
     $percentualTrabalhado = ($intervaloTrabalhadoSegundos / $intervaloTotalSegundos) * 100;
         return (float)number_format($percentualTrabalhado, 0);
     }
-
-
     public function turno_mamnha() {
         $hora_atual = new DateTime();
         $hora_atual = $hora_atual->format('H:i:s');
         $hora = DateTime::createFromFormat('H:i', '14:00');
         return $hora_atual < $hora->format('H:i:s');
     }
-
     private function converterParaHoras($valor_em_horas) {
-        // Separar a parte inteira e decimal do valor em horas
+    // Separar a parte inteira e decimal do valor em horas
         $partes = explode('.', $valor_em_horas);
         $horas = (int)$partes[0]; // parte inteira
         $minutos_decimais = isset($partes[1]) ? $partes[1] : 0; // parte decimal
@@ -193,8 +312,6 @@ class MaquinasController extends Controller
         // Formatar a saída no formato HH:MM:SS
         return sprintf('%02d:%02d:00', $horas, $minutos);
     }
-
-
     private function checkAcesso(Request $request){
         $dados = $request->input();
         if($dados['TOKEN'] != env('TOKEN_API')){
@@ -209,7 +326,6 @@ class MaquinasController extends Controller
         return true;
 
     }
-
     public function salva($request) {
         $maquinas = new Maquinas();
 
@@ -226,10 +342,7 @@ class MaquinasController extends Controller
 
         return $maquinas->id;
     }
-
-
-    function horasParaDias($horas)
-    {
+    function horasParaDias($horas) {
         // Divide a string da hora em horas, minutos e segundos
         list($horas, $minutos, $segundos) = explode(':', $horas);
 
@@ -242,8 +355,7 @@ class MaquinasController extends Controller
         return $dias;
     }
 
-    function horasParaDiasTrabalhados($horas)
-    {
+    function horasParaDiasTrabalhados($horas) {
         // Divide a string da hora em horas, minutos e segundos
         list($horas, $minutos, $segundos) = explode(':', $horas);
 
@@ -258,9 +370,7 @@ class MaquinasController extends Controller
 
         return $diasTrabalhados;
     }
-
-    function multiplicarHoras($horas, $multiplicador)
-    {
+    function multiplicarHoras($horas, $multiplicador) {
         // Divide a string da hora em horas, minutos e segundos
         list($horas, $minutos, $segundos) = explode(':', $horas);
 
@@ -280,7 +390,6 @@ class MaquinasController extends Controller
 
         return $resultadoFormatado;
     }
-
     function diff_hours_between_dates($dataInicio, $dataFim) {
         // Converte as datas para timestamps
     $inicioTimestamp = strtotime($dataInicio);

@@ -59,6 +59,7 @@ Route::match(['get', 'post'],'/alertas-pedidos', [App\Http\Controllers\PedidosCo
 Route::match(['get', 'post'],'/consumo-materiais', [App\Http\Controllers\ConsumoMateriaisController::class, 'index'])->name('consumo-materiais');
 Route::match(['get', 'post'],'/consumo-materiais-detalhes', [App\Http\Controllers\ConsumoMateriaisController::class, 'detalhes'])->name('consumo-materiais-detalhes');
 Route::match(['get', 'post'],'/maquinas', [App\Http\Controllers\MaquinasController::class, 'index'])->name('maquinas');
+Route::match(['get', 'post'],'/producao-maquinas', [App\Http\Controllers\MaquinasController::class, 'producaoMaquinas'])->name('producao_maquinas');
 
 Route::match(['get', 'post'],'/orcamentos', [App\Http\Controllers\OrcamentosController::class, 'index'])->name('orcamentos');
 Route::match(['get', 'post'],'/alterar-orcamentos', [App\Http\Controllers\OrcamentosController::class, 'alterar'])->name('alterar-orcamentos');
