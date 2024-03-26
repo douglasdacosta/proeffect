@@ -765,7 +765,7 @@ class PedidosController extends Controller
     /**
     * Show the application dashboard.
     *
-    * 
+    *
     */
     public function getAllfichastecnicas() {
         $Status = new Fichastecnicas();
@@ -775,7 +775,7 @@ class PedidosController extends Controller
     /**
     * Show the application dashboard.
     *
-    * 
+    *
     */
     public function getAllClientes() {
         $pessoa = new Pessoas();
@@ -808,7 +808,7 @@ class PedidosController extends Controller
         return $resultado;
     }
 
-    function subtrairHoras($hora1, $hora2) {
+    public function subtrairHoras($hora1, $hora2) {
         // Convertendo as strings de horas para segundos
         list($hours1, $minutes1, $seconds1) = explode(':', $hora1);
         $totalSeconds1 = $hours1 * 3600 + $minutes1 * 60 + $seconds1;

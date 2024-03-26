@@ -91,7 +91,7 @@ class MaquinasController extends Controller
         $datHora = $data.' '.$hora;
         $datHora_fim = $data_fim.' '.$hora_fim;
 
-       
+
         $created_atA = DateTime::createFromFormat('Y-m-d H:i:s', $datHora);
         $created_atb = DateTime::createFromFormat('Y-m-d H:i:s', $datHora_fim);
         $ProducaoMaquinas = $ProducaoMaquinas->whereBetween('data', [$data, $data_fim])
@@ -109,7 +109,7 @@ class MaquinasController extends Controller
         $chave_antes = $chave = '';
 
         $horas_usinagem_tarde =$horas_usinagem_manha = [];
-        
+
         foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
             $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
             $hora_loop = $created_at->format('H');
@@ -154,11 +154,11 @@ class MaquinasController extends Controller
                                 ->orderby('created_at', 'desc')->get()->toArray();
             if(empty($ProdMaq[0]['HorasServico'])) {
                 $ProdMaq = new ProducaoMaquinas();
-                $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)                                
+                $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
                                 ->where('numero_cnc', '=', $maquina)
                                 ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
             }
-            
+
             $horas_usinagem_manha_anterior[$chave]=number_format($ProdMaq[0]['HorasServico'], 3, '.', '');
 
             $distancia_manha_antes[$chave] = $ProdMaq[0]['metrosPercorridos'];
@@ -177,7 +177,7 @@ class MaquinasController extends Controller
 
             if(empty($ProdMaq[0]['HorasServico'])) {
                 $ProdMaq = new ProducaoMaquinas();
-                $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)                                
+                $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
                                 ->where('numero_cnc', '=', $maquina)
                                 ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
             }
@@ -233,7 +233,7 @@ class MaquinasController extends Controller
                 $dados[$turno][$data]['percentual'] = '0';
                 if($dados_dia['total_horas_usinadas'] != '00:00:00' && $dados_dia['horasTrabalho'] != '00:00:00') {
                     $dados[$turno][$data]['percentual'] = $this->calcularPorcentagemUsinada($dados_dia['total_horas_usinadas'],$dados_dia['horasTrabalho']);
-                } 
+                }
             }
 
         }
@@ -258,8 +258,10 @@ class MaquinasController extends Controller
 
             $numero_cnc = $array['NUMERO_CNC'];
             $data_atual = Carbon::now()->format('Y-m-d');
+
             $hora_inicio = $data_atual." 14:00:00";
             $hora_fim =  $data_atual." 22:00:00";
+            $hora_fim = "22:00:00";
             $turno = "Turno 14:00 as 22:00";
             if($this->turno_mamnha()) {
                 $hora_inicio = $data_atual." 06:00:00";
@@ -283,16 +285,26 @@ class MaquinasController extends Controller
             $producaoMaquinas->orderby('created_at', 'asc');
             $producaoMaquinas = $producaoMaquinas->get();
 
-            $total_horas_usinadas = $total_horas_trabalhadas = "00:00:00";
+            $total_horas_usinadas = "00:00:00";
+            $total_horas_trabalhadas = "00:00:00";
             $hora_atual = new DateTime();
             $hora_atual = $hora_atual->format('H:i:s');
             $hora = new DateTime();
             $hora = $hora->format('H');
 
+            $producaoMaquinas_antes = new ProducaoMaquinas();
+            $producaoMaquinas_antes = $producaoMaquinas_antes->where('data', '<=', $data_atual)
+                                ->where('hora', '<', $hora_inicio)
+                                ->where('numero_cnc', '=', $numero_cnc)
+                                ->orderby('created_at', 'desc')->get()->toArray();
+            $total_horas_usinadas_anterior=$this->converterParaHoras(number_format($producaoMaquinas_antes[0]['HorasServico'], 3, '.', ''));
+
+            $PedidosController = new PedidosController();
             if($hora > 5 && count($producaoMaquinas)) {
 
                 foreach ($producaoMaquinas as $key => $producaoMaquina) {
-                    $total_horas_usinadas = PedidosController::somarHoras($total_horas_usinadas, $producaoMaquina['HorasServico']);
+                    $HorasServico = $this->converterParaHoras($producaoMaquina['HorasServico']);
+                    $total_horas_usinadas = $PedidosController->subtrairHoras( $HorasServico, $total_horas_usinadas_anterior);
                 }
 
 
@@ -301,10 +313,11 @@ class MaquinasController extends Controller
                 $horasTrabalhadasq = $this->calcularPorcentagemTrabalhada($hora_inicio, $hora_fim, $hora_atual);
                 $horasUsinadas = $this->calcularPorcentagemUsinada($total_horas_usinadas,$total_horas_trabalhadas);
 
+                $total_horas_usinadas = explode(':', $total_horas_usinadas);
                 $dados = [
                     'turno' => $turno,
                     'textoHorasTrabalhadas' => "Horas Trabalhadas: ". substr($total_horas_trabalhadas, 0, 5),
-                    'textoHorasUsinadas' => "Horas Usinadas: ". substr($total_horas_usinadas, 0, 5),
+                    'textoHorasUsinadas' => "Horas Usinadas: ". $total_horas_usinadas[0].":".$total_horas_usinadas[1],
                     'horasTrabalhadasq'=>"$horasTrabalhadasq",
                     'horasUsinadas'=>"$horasUsinadas",
                 ];
@@ -334,7 +347,7 @@ class MaquinasController extends Controller
 
             $hora_atual = new DateTime();
             $hora_atual = $hora_atual->format('H:i:s');
-            
+
             $data_atual = new DateTime();
             $data_atual = $data_atual->format('Y-m-d');
 
