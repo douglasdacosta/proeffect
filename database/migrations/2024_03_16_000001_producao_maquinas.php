@@ -16,9 +16,11 @@ return new class extends Migration
         Schema::create('producao_maquinas', function (Blueprint $table) {
             $table->id();
             $table->integer('numero_cnc')->length(11);
-            $table->time('HorasServico');
+            $table->float('HorasServico', 11,3);
             $table->integer('metrosPercorridos')->length(11);;
             $table->text('qtdeServico');
+            $table->date('data');
+            $table->time('hora');
             $table->timestamps();
         });
 
@@ -33,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orcamentos');
+        Schema::dropIfExists('producao_maquinas');
     }
 };

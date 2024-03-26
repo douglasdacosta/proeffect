@@ -67,9 +67,9 @@
                 <table class="table table-striped text-center">
                   <thead>
                     <tr>
+                        <th>Máquina</th>
                         <th>Turno</th>
                         <th>Data</th>
-                        <th>Máquina</th>
                         <th>Horas de Trabalho</th>
                         <th>Horas de Usinagem</th>
                         <th>% de horas</th>
@@ -80,10 +80,10 @@
                         @if(isset($producao_maquinas))
                         @foreach ($producao_maquinas as $turno => $dados)
                             @foreach ($dados as $data => $producao_maquina)
-                                <tr>
+                            <tr>
+                                    <td scope="row">{{$producao_maquina['maquina_cnc']}}</td>
                                     <td>{{$producao_maquina['turno']}}</td>
                                     <td>{{$producao_maquina['data']}}</td>
-                                    <td scope="row">{{$producao_maquina['maquina_cnc']}}</td>
                                     <td>{{$producao_maquina['horasTrabalho']}}</td>
                                     <td>{{$producao_maquina['total_horas_usinadas']}}</td>
                                     <td>{{$producao_maquina['percentual'].'%'}}</td>
