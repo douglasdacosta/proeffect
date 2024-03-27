@@ -200,9 +200,30 @@ class MaquinasController extends Controller
             }
 
             if($created_at->format('H') < '14') {
-                $total_horas_usinadas = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_manha_anterior[$chave]);
+                info('serv '.$producaoMaquina['HorasServico']);
+                info('anterior '.$horas_usinagem_manha_anterior[$chave]);
+                $total_horas_usinadas = $this->converterParaHoras($horas_usinagem_manha_anterior[$chave] - $producaoMaquina['HorasServico']);
 
-                $hora_servico_periodo_manha =  $this->diferencaHoras($periodo_horas_manha[$chave][0], end($periodo_horas_manha[$chave]));
+                // $hora_servico_periodo_manha =  $this->diferencaHoras($periodo_horas_manha[$chave][0], end($periodo_horas_manha[$chave]));
+                if($request->input('hora') && $this->horaMaior($request->input('hora'), '06:00:00')) {
+                    $inicio_periodo = $request->input('hora');
+                } else {
+                    $inicio_periodo = '06:00:00';
+                }
+
+
+                if($request->input('hora_fim') && $this->horaMaior('14:00:00', $request->input('hora_fim'))) {
+                    $final_periodo = $request->input('hora_fim');
+                } else {
+                    $final_periodo = '14:00:00';
+                }
+
+                if($this->horaMaior(end($periodo_horas_manha[$chave]), '14:00:00') ) {
+                    $final_periodo = end($periodo_horas_manha[$chave]);
+                    $final_periodo = '14:00:00';
+                }
+
+                $hora_servico_periodo_manha =  $this->diferencaHoras($inicio_periodo, $final_periodo);
                 $qtdeServico_manha = $qtdeServico_manha + $producaoMaquina['qtdeServico'];
                 $dados[$chave]['manha']['maquina_cnc'] = $producaoMaquina['numero_cnc'];
                 $dados[$chave]['manha']['turno'] = 'Manhã';
@@ -215,7 +236,23 @@ class MaquinasController extends Controller
             } else {
 
                 $total_horas_usinadas = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_tarde_anterior[$chave]);
-                $hora_servico_periodo_tarde =  $this->diferencaHoras($periodo_horas_tarde[$chave][0], end($periodo_horas_tarde[$chave]));
+                info($producaoMaquina['HorasServico']);
+                info($horas_usinagem_tarde_anterior[$chave]);
+                info($total_horas_usinadas );
+                if($request->input('hora_fim') && $this->horaMaior('22:00:00', $request->input('hora_fim'))) {
+                    $final_periodo = $request->input('hora_fim');
+                } else {
+                    $final_periodo = '22:00:00';
+                }
+
+
+                if($this->horaMaior(end($periodo_horas_tarde[$chave]), '22:00:00') ) {
+                    $final_periodo = end($periodo_horas_tarde[$chave]);
+                    $final_periodo = '22:00:00';
+                }
+
+                $hora_servico_periodo_tarde =  $this->diferencaHoras('14:00:00', $final_periodo);
+
                 $qtdeServico_tarde = $qtdeServico_tarde + $producaoMaquina['qtdeServico'];
                 $dados[$chave]['tarde']['maquina_cnc'] = $producaoMaquina['numero_cnc'];
                 $dados[$chave]['tarde']['turno'] = 'Tarde';
