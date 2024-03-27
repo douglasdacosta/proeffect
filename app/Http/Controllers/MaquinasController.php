@@ -333,6 +333,15 @@ class MaquinasController extends Controller
             $total_horas_usinadas_anterior=$this->converterParaHoras(number_format($producaoMaquinas_antes[0]['HorasServico'], 3, '.', ''));
 
             $PedidosController = new PedidosController();
+
+            $dados = [
+                'turno' => 'Não encontrado dados para o período',
+                'textoHorasTrabalhadas' => "Horas Trabalhadas: 0",
+                'textoHorasUsinadas' => "Horas Usinadas: 0",
+                'horasTrabalhadasq'=>"0",
+                'horasUsinadas'=>"0",
+            ];
+
             if($hora > 5 && count($producaoMaquinas)) {
 
                 foreach ($producaoMaquinas as $key => $producaoMaquina) {
