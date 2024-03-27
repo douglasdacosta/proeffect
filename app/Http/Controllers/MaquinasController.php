@@ -326,11 +326,7 @@ class MaquinasController extends Controller
             $hora = $hora->format('H');
 
             $producaoMaquinas_antes = new ProducaoMaquinas();
-            info($data_atual);
-            info($hora_inicio);
-            info($numero_cnc);
-            $producaoMaquinas_antes = $producaoMaquinas_antes->where('data', '<=', $data_atual)
-                                ->where('hora', '<', $hora_inicio)
+            $producaoMaquinas_antes = $producaoMaquinas_antes->where('created_at', '<=', $data_hora_inicio)
                                 ->where('numero_cnc', '=', $numero_cnc)
                                 ->orderby('created_at', 'desc')->get()->toArray();
                                 info($producaoMaquinas_antes);
