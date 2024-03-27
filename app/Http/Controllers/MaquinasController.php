@@ -300,29 +300,21 @@ class MaquinasController extends Controller
             $numero_cnc = $array['NUMERO_CNC'];
             $data_atual = Carbon::now()->format('Y-m-d');
 
-            $hora_inicio = $data_atual." 14:00:00";
-            $hora_fim =  $data_atual." 22:00:00";
+            $data_hora_inicio = $data_atual." 14:00:00";
             $hora_fim = "22:00:00";
             $turno = "Turno 14:00 as 22:00";
             if($this->turno_mamnha()) {
-                $hora_inicio = $data_atual." 06:00:00";
-                $hora_fim =  $data_atual." 13:59:59";
+                $data_hora_inicio = $data_atual." 06:00:00";
+                $hora_inicio = "06:00:00";
+                $hora_fim =  "13:59:59";
                 $turno = "Turno 06:00 as 14:00";
             }
-
-            $dados = [
-                'turno' => $turno,
-                'textoHorasTrabalhadas' => "Horas Trabalhadas: 00:00:00",
-                'textoHorasUsinadas' => "Horas Usinadas: 00:00:00",
-                'horasTrabalhadasq'=>"0",
-                'horasUsinadas'=>"0",
-            ];
 
             $producaoMaquinas = new ProducaoMaquinas();
             $datahora_atual = new DateTime();
             $datahora_atual = $datahora_atual->format('Y-m-d H:i:s');
             $producaoMaquinas = $producaoMaquinas->where('numero_cnc', '=', $numero_cnc);
-            $producaoMaquinas->whereBetween('created_at', [$hora_inicio, $datahora_atual]);
+            $producaoMaquinas->whereBetween('created_at', [$data_hora_inicio, $datahora_atual]);
             $producaoMaquinas->orderby('created_at', 'asc');
             $producaoMaquinas = $producaoMaquinas->get();
 
