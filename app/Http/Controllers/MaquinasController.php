@@ -151,12 +151,12 @@ class MaquinasController extends Controller
             $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
                                 ->where('hora', '<', $hora_inicio)
                                 ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'desc')->get()->toArray();
+                                ->orderby('created_at', 'asc')->get()->toArray();
             if(empty($ProdMaq[0]['HorasServico'])) {
                 $ProdMaq = new ProducaoMaquinas();
                 $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
                                 ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+                                ->orderby('created_at', 'asc')->limit(1)->get()->toArray();
             }
 
             $horas_usinagem_manha_anterior[$chave]=number_format($ProdMaq[0]['HorasServico'], 3, '.', '');
@@ -173,13 +173,13 @@ class MaquinasController extends Controller
             $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
                                 ->where('hora', '<', $hora_inicio)
                                 ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'desc')->get()->toArray();
+                                ->orderby('created_at', 'asc')->get()->toArray();
 
             if(empty($ProdMaq[0]['HorasServico'])) {
                 $ProdMaq = new ProducaoMaquinas();
                 $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
                                 ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+                                ->orderby('created_at', 'asc')->limit(1)->get()->toArray();
             }
 
             $horas_usinagem_tarde_anterior[$chave]= number_format($ProdMaq[0]['HorasServico'], 3, '.', '');
@@ -200,9 +200,8 @@ class MaquinasController extends Controller
             }
 
             if($created_at->format('H') < '14') {
-                info('serv '.$producaoMaquina['HorasServico']);
-                info('anterior '.$horas_usinagem_manha_anterior[$chave]);
-                $total_horas_usinadas = $this->converterParaHoras($horas_usinagem_manha_anterior[$chave] - $producaoMaquina['HorasServico']);
+
+                $total_horas_usinadas = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_manha_anterior[$chave]);
 
                 // $hora_servico_periodo_manha =  $this->diferencaHoras($periodo_horas_manha[$chave][0], end($periodo_horas_manha[$chave]));
                 if($request->input('hora') && $this->horaMaior($request->input('hora'), '06:00:00')) {
@@ -236,9 +235,14 @@ class MaquinasController extends Controller
             } else {
 
                 $total_horas_usinadas = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_tarde_anterior[$chave]);
-                info($producaoMaquina['HorasServico']);
-                info($horas_usinagem_tarde_anterior[$chave]);
-                info($total_horas_usinadas );
+
+                if($request->input('hora') && $this->horaMaior($request->input('hora'), '14:00:00')) {
+                    $inicio_periodo = $request->input('hora');
+                } else {
+                    $inicio_periodo = '14:00:00';
+                }
+
+
                 if($request->input('hora_fim') && $this->horaMaior('22:00:00', $request->input('hora_fim'))) {
                     $final_periodo = $request->input('hora_fim');
                 } else {
