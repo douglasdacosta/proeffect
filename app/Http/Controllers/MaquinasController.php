@@ -333,6 +333,7 @@ class MaquinasController extends Controller
                                 ->where('hora', '<', $hora_inicio)
                                 ->where('numero_cnc', '=', $numero_cnc)
                                 ->orderby('created_at', 'desc')->get()->toArray();
+                                info($producaoMaquinas_antes);
             $total_horas_usinadas_anterior=$this->converterParaHoras(number_format($producaoMaquinas_antes[0]['HorasServico'], 3, '.', ''));
 
             $PedidosController = new PedidosController();
