@@ -17,9 +17,7 @@ class MaquinasController extends Controller
      * @return void
      */
     public function __construct()
-    {
-
-    }
+    {}
 
     /**
      * Show the application dashboard.
@@ -44,7 +42,6 @@ class MaquinasController extends Controller
 
         return view('maquinas', $data);
     }
-
 
     public function producaoMaquinas(Request $request)
     {
@@ -335,7 +332,7 @@ class MaquinasController extends Controller
             $PedidosController = new PedidosController();
 
             $dados = [
-                'turno' => 'Não encontrado dados para o período',
+                'turno' => 'Nenhum dado do turno',
                 'textoHorasTrabalhadas' => "Horas Trabalhadas: 0",
                 'textoHorasUsinadas' => "Horas Usinadas: 0",
                 'horasTrabalhadasq'=>"0",
@@ -415,6 +412,7 @@ class MaquinasController extends Controller
 
 
     }
+
     function calcularPorcentagemUsinada($horasTrabalhadas, $periodoTotal) {
         // Convertendo as horas trabalhadas e o período total para segundos
         $horasTrabalhadasSegundos = strtotime($horasTrabalhadas) - strtotime('TODAY');
@@ -424,6 +422,7 @@ class MaquinasController extends Controller
         $porcentagem = ($horasTrabalhadasSegundos / $periodoTotalSegundos) * 100;
         return (float)number_format($porcentagem, 0);
     }
+
     function calcularPorcentagemTrabalhada($inicioPeriodo, $fimPeriodo, $trabalhadas) {
     $inicioSegundos = strtotime($inicioPeriodo);
     $fimSegundos = strtotime($fimPeriodo);
@@ -439,12 +438,14 @@ class MaquinasController extends Controller
     $percentualTrabalhado = ($intervaloTrabalhadoSegundos / $intervaloTotalSegundos) * 100;
         return (float)number_format($percentualTrabalhado, 0);
     }
+
     public function turno_mamnha() {
         $hora_atual = new DateTime();
         $hora_atual = $hora_atual->format('H:i:s');
         $hora = DateTime::createFromFormat('H:i', '14:00');
         return $hora_atual < $hora->format('H:i:s');
     }
+
     private function converterParaHoras($floatHours) {
     // Extrair as horas e os minutos do valor float
     $hours = floor($floatHours);
@@ -455,6 +456,7 @@ class MaquinasController extends Controller
 
     return $timeFormat;
     }
+
     private function checkAcesso(Request $request){
         $dados = $request->input();
         if($dados['TOKEN'] != env('TOKEN_API')){
@@ -469,6 +471,7 @@ class MaquinasController extends Controller
         return true;
 
     }
+
     public function salva($request) {
         $maquinas = new Maquinas();
 
@@ -485,6 +488,7 @@ class MaquinasController extends Controller
 
         return $maquinas->id;
     }
+
     function horasParaDias($horas) {
         // Divide a string da hora em horas, minutos e segundos
         list($horas, $minutos, $segundos) = explode(':', $horas);
@@ -513,6 +517,7 @@ class MaquinasController extends Controller
 
         return $diasTrabalhados;
     }
+
     function multiplicarHoras($horas, $multiplicador) {
         // Divide a string da hora em horas, minutos e segundos
         list($horas, $minutos, $segundos) = explode(':', $horas);
@@ -533,6 +538,7 @@ class MaquinasController extends Controller
 
         return $resultadoFormatado;
     }
+
     function diff_hours_between_dates($dataInicio, $dataFim) {
         // Converte as datas para timestamps
     $inicioTimestamp = strtotime($dataInicio);
@@ -551,7 +557,6 @@ class MaquinasController extends Controller
 
     return $intervalo;
     }
-
 
     function horaMaior($hora1, $hora2) {
         $dataHora1 = DateTime::createFromFormat('H:i:s', $hora1);

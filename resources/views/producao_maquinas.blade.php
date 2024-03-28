@@ -26,7 +26,7 @@
 
                 <label  for="created_at" class="col-sm-2 col-form-label text-right">Data: de </label>
                 <div class="col-sm-1">
-                    <input type="text" class="form-control " id="created_at" name="created_at"
+                    <input type="text" class="form-control mask_date" id="created_at" name="created_at"
                         placeholder="DD/MM/AAAA" value="@if (isset($request) && $request->input('created_at') != ''){{$request->input('created_at')}} @else{{''}}@endif">
                 </div>
                 <label for="created_at_fim" class=" col-form-label text-right">até</label>
