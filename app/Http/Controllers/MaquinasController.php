@@ -298,6 +298,7 @@ class MaquinasController extends Controller
             $data_atual = Carbon::now()->format('Y-m-d');
 
             $data_hora_inicio = $data_atual." 14:00:00";
+            $hora_inicio = "14:00:00";
             $hora_fim = "22:00:00";
             $turno = "Turno 14:00 as 22:00";
             if($this->turno_mamnha()) {
@@ -312,7 +313,7 @@ class MaquinasController extends Controller
             $datahora_atual = $datahora_atual->format('Y-m-d H:i:s');
             $producaoMaquinas = $producaoMaquinas->where('numero_cnc', '=', $numero_cnc);
             $producaoMaquinas->whereBetween('created_at', [$data_hora_inicio, $datahora_atual]);
-            $producaoMaquinas->orderby('created_at', 'asc');
+            $producaoMaquinas->orderby('created_at', 'desc')->limit('1');
             $producaoMaquinas = $producaoMaquinas->get();
 
             $total_horas_usinadas = "00:00:00";
@@ -325,12 +326,9 @@ class MaquinasController extends Controller
             $producaoMaquinas_antes = new ProducaoMaquinas();
             $producaoMaquinas_antes = $producaoMaquinas_antes->where('created_at', '<=', $data_hora_inicio)
                                 ->where('numero_cnc', '=', $numero_cnc)
-                                ->orderby('created_at', 'desc')->get()->toArray();
-                                info($producaoMaquinas_antes);
-            $total_horas_usinadas_anterior=$this->converterParaHoras(number_format($producaoMaquinas_antes[0]['HorasServico'], 3, '.', ''));
+                                ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
 
-            $PedidosController = new PedidosController();
-
+            $usinadas_anterior_turno=$producaoMaquinas_antes[0]['HorasServico'];
             $dados = [
                 'turno' => 'Nenhum dado do turno',
                 'textoHorasTrabalhadas' => "Horas Trabalhadas: 0",
@@ -338,21 +336,18 @@ class MaquinasController extends Controller
                 'horasTrabalhadasq'=>"0",
                 'horasUsinadas'=>"0",
             ];
-
             if($hora > 5 && count($producaoMaquinas)) {
 
                 foreach ($producaoMaquinas as $key => $producaoMaquina) {
-                    $HorasServico = $this->converterParaHoras($producaoMaquina['HorasServico']);
-                    $total_horas_usinadas = $PedidosController->subtrairHoras( $HorasServico, $total_horas_usinadas_anterior);
+                    $HorasServico = $producaoMaquina['HorasServico'] -$usinadas_anterior_turno;
                 }
 
-
                 $total_horas_trabalhadas = $this->diff_hours_between_dates($hora_inicio, $hora_atual);
-
+                $total_horas_usinadas = $this->converterParaHoras($HorasServico);
                 $horasTrabalhadasq = $this->calcularPorcentagemTrabalhada($hora_inicio, $hora_fim, $hora_atual);
                 $horasUsinadas = $this->calcularPorcentagemUsinada($total_horas_usinadas,$total_horas_trabalhadas);
-
                 $total_horas_usinadas = explode(':', $total_horas_usinadas);
+
                 $dados = [
                     'turno' => $turno,
                     'textoHorasTrabalhadas' => "Horas Trabalhadas: ". substr($total_horas_trabalhadas, 0, 5),
@@ -413,14 +408,13 @@ class MaquinasController extends Controller
 
     }
 
-    function calcularPorcentagemUsinada($horasTrabalhadas, $periodoTotal) {
-        // Convertendo as horas trabalhadas e o período total para segundos
-        $horasTrabalhadasSegundos = strtotime($horasTrabalhadas) - strtotime('TODAY');
-        $periodoTotalSegundos = strtotime($periodoTotal) - strtotime('TODAY');
+    function calcularPorcentagemUsinada($periodoTotal,$horasTrabalhadas ) {
+        $segundos_a = strtotime($periodoTotal) - strtotime('00:00:00');
+        $segundos_b = strtotime($horasTrabalhadas) - strtotime('00:00:00');
 
-        // Calculando a porcentagem
-        $porcentagem = ($horasTrabalhadasSegundos / $periodoTotalSegundos) * 100;
-        return (float)number_format($porcentagem, 0);
+        // Calculando o percentual da horaA em relação à horaB
+        $percentual = ($segundos_a / $segundos_b) * 100;
+        return (float)number_format($percentual, 0);
     }
 
     function calcularPorcentagemTrabalhada($inicioPeriodo, $fimPeriodo, $trabalhadas) {
