@@ -91,6 +91,7 @@ class MaquinasController extends Controller
                                                 ->orderby('created_at','asc')
                                                 ->get();
 
+
         $horas_filtradas = $this->diferencaHoras($hora, $hora_fim);
         $hora_servico_periodo_manha = $horas_filtradas;
         $hora_servico_periodo_tarde = $horas_filtradas;
@@ -100,182 +101,240 @@ class MaquinasController extends Controller
         $chave_antes = $chave = '';
 
         $horas_usinagem_tarde =$horas_usinagem_manha = [];
-
-        foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
-            $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
-            $hora_loop = $created_at->format('H');
-
-            $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'];
-            $data = $created_at->format('d/m/Y');
-
-            if($chave_antes != $chave) {
-                $chave_antes = $chave;
-                $hora_servico_periodo_manha = $horas_filtradas;
-                $hora_servico_periodo_tarde = $horas_filtradas;
-                $qtdeServico_manha = $qtdeServico_tarde =  0;
-
-            }
-
-
-            if($hora_loop < '14') {
-                if ($hora_loop < 6) {
-                    continue;
-                }
-                $periodo_horas_manha[$chave][]= $created_at->format('H:i:s');
-                $horas_usinagem_manha[$chave][]= $producaoMaquina['HorasServico'];
-            } else {
-                if ($hora_loop > 22) {
-                    continue;
-                }
-                $periodo_horas_tarde[$chave][]= $created_at->format('H:i:s');
-                $horas_usinagem_tarde[$chave][]= $producaoMaquina['HorasServico'];
-            }
-        }
-
-
-
-        foreach($horas_usinagem_manha as $chave => $valor){
-            $horas_usinagem_manha_anterior[$chave] = '00:00:01';
-            $horas_usinagem_manha_anterior[$chave] = '0';
+        if ($request->input('listarpor') == 1) { #0  por hora
             $ProdMaq = new ProducaoMaquinas();
+            foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
+                $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
+                $numero_maquina = $producaoMaquina['numero_cnc'];
+                $hora_loop = $created_at->format('H');
+                $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'].$hora_loop;
+                $turno = ($hora_loop < 14 ) ? 'Manhã' : 'Tarde';
+                $turno_chave = ($hora_loop < 14 ) ? 'manha' : 'tarde';
 
-            $data_inicio =   DateHelpers::formatDate_dmY(substr($chave, 0,10));
-            $hora_inicio =  $periodo_horas_manha[$chave][0];
-            $maquina =   substr($chave, 10, 1);
-            $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
-                                ->where('hora', '<', $hora_inicio)
-                                ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'asc')->get()->toArray();
-            if(empty($ProdMaq[0]['HorasServico'])) {
+                $data_hora_pesquisa = $created_at->format('Y-m-d H');
+
+                $ProdMaqAntes = $ProdMaq->where('created_at', '<', $data_hora_pesquisa.':00:00')
+                                    ->where('numero_cnc', '=', $numero_maquina)
+                                    ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+
+                if(empty($ProdMaqAntes[0]['HorasServico'])) {
+                    $ProdMaq = new ProducaoMaquinas();
+                    $ProdMaqAntes = $ProdMaq->where('created_at', '=', $created_at)
+                                    ->where('numero_cnc', '=', $numero_maquina)
+                                    ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+                }
+                $usinados[$chave][$turno_chave]['horas_usinadas'] = $producaoMaquina['HorasServico'] - $ProdMaqAntes[0]['HorasServico'];
+                $usinados[$chave][$turno_chave]['metrosPercorridos'] = $producaoMaquina['qtdeServico'] - $ProdMaqAntes[0]['qtdeServico'];
+                $usinados[$chave][$turno_chave]['qtdeServico'] = $producaoMaquina['qtdeServico'] - $ProdMaqAntes[0]['qtdeServico'];
+            }
+
+
+            foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
+                $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
+
+                $hora = $created_at ->format('H');
+                $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'].$hora;
+                $hora_loop = $created_at->format('H');
+                $turno = ($hora_loop < 14 ) ? 'Manhã' : 'Tarde';
+                $turno_chave = ($hora_loop < 14 ) ? 'manha' : 'tarde';
+                $horas_usinadas =$usinados[$chave][$turno_chave]['horas_usinadas'];
+
+                $horas_usinadas = $this->converterParaHoras($horas_usinadas);
+
+                $horas_tabalhadas = '01:00:00';
+                $dados[$chave][$turno_chave] = [
+                    'maquina_cnc' =>  $producaoMaquina['numero_cnc'],
+                    'turno' => $turno,
+                    'data' =>  $created_at->format('d/m/Y'). ' ' . $hora_loop .':00:00',
+                    'horasTrabalho' => $horas_tabalhadas,
+                    'total_horas_usinadas' => $horas_usinadas,
+                    'metrosPercorridos' => $usinados[$chave][$turno_chave]['metrosPercorridos'],
+                    'qtdeServico' => $usinados[$chave][$turno_chave]['qtdeServico'],
+                    'percentual' => $this->calcularPorcentagemUsinada($horas_usinadas,$horas_tabalhadas)
+                ];
+
+                $data = $created_at->format('d/m/Y');
+
+            }
+
+        } else { #0 = por data
+
+
+            foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
+                $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
+                $hora_loop = $created_at->format('H');
+
+                $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'];
+                $data = $created_at->format('d/m/Y');
+
+                if($chave_antes != $chave) {
+                    $chave_antes = $chave;
+                    $hora_servico_periodo_manha = $horas_filtradas;
+                    $hora_servico_periodo_tarde = $horas_filtradas;
+                    $qtdeServico_manha = $qtdeServico_tarde =  0;
+
+                }
+
+
+                if($hora_loop < '14') {
+                    if ($hora_loop < 6) {
+                        continue;
+                    }
+                    $periodo_horas_manha[$chave][]= $created_at->format('H:i:s');
+                    $horas_usinagem_manha[$chave][]= $producaoMaquina['HorasServico'];
+                } else {
+                    if ($hora_loop > 22) {
+                        continue;
+                    }
+                    $periodo_horas_tarde[$chave][]= $created_at->format('H:i:s');
+                    $horas_usinagem_tarde[$chave][]= $producaoMaquina['HorasServico'];
+                }
+            }
+
+
+
+            foreach($horas_usinagem_manha as $chave => $valor){
+                $horas_usinagem_manha_anterior[$chave] = '00:00:01';
+                $horas_usinagem_manha_anterior[$chave] = '0';
                 $ProdMaq = new ProducaoMaquinas();
-                $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
-                                ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'asc')->limit(1)->get()->toArray();
+
+                $data_inicio =   DateHelpers::formatDate_dmY(substr($chave, 0,10));
+                $hora_inicio =  $periodo_horas_manha[$chave][0];
+                $maquina =   substr($chave, 10, 1);
+                $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
+                                    ->where('hora', '<', $hora_inicio)
+                                    ->where('numero_cnc', '=', $maquina)
+                                    ->orderby('created_at', 'asc')->limit(1)->get()->toArray();
+                if(empty($ProdMaq[0]['HorasServico'])) {
+                    $ProdMaq = new ProducaoMaquinas();
+                    $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
+                                    ->where('numero_cnc', '=', $maquina)
+                                    ->orderby('created_at', 'asc')->limit(1)->get()->toArray();
+                }
+
+                $horas_usinagem_manha_anterior[$chave]=number_format($ProdMaq[0]['HorasServico'], 3, '.', '');
+
+                $distancia_manha_antes[$chave] = $ProdMaq[0]['metrosPercorridos'];
+                $numero_trabalho_manha_antes[$chave] = $ProdMaq[0]['qtdeServico'];
             }
 
-            $horas_usinagem_manha_anterior[$chave]=number_format($ProdMaq[0]['HorasServico'], 3, '.', '');
-
-            $distancia_manha_antes[$chave] = $ProdMaq[0]['metrosPercorridos'];
-            $numero_trabalho_manha_antes[$chave] = $ProdMaq[0]['qtdeServico'];
-        }
 
 
-
-        foreach($horas_usinagem_tarde as $chave => $valor){
-            $ProdMaq = new ProducaoMaquinas();
-            $data_inicio =   DateHelpers::formatDate_dmY(substr($chave, 0,10));
-            $hora_inicio =  $periodo_horas_tarde[$chave][0];
-            $maquina =   substr($chave, 10, 1);
-            $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
-                                ->where('hora', '<=', $hora_inicio)
-                                ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
-
-            if(empty($ProdMaq[0]['HorasServico'])) {
+            foreach($horas_usinagem_tarde as $chave => $valor){
                 $ProdMaq = new ProducaoMaquinas();
-                $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
-                                ->where('numero_cnc', '=', $maquina)
-                                ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+                $data_inicio =   DateHelpers::formatDate_dmY(substr($chave, 0,10));
+                $hora_inicio =  $periodo_horas_tarde[$chave][0];
+                $maquina =   substr($chave, 10, 1);
+                $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
+                                    ->where('hora', '<=', $hora_inicio)
+                                    ->where('numero_cnc', '=', $maquina)
+                                    ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+
+                if(empty($ProdMaq[0]['HorasServico'])) {
+                    $ProdMaq = new ProducaoMaquinas();
+                    $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
+                                    ->where('numero_cnc', '=', $maquina)
+                                    ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+                }
+                $horas_usinagem_tarde_anterior[$chave]= number_format($ProdMaq[0]['HorasServico'], 3, '.', '');
+                $distancia_tarde_antes[$chave] = $ProdMaq[0]['metrosPercorridos'];
+                $numero_trabalho_tarde_antes[$chave] = $ProdMaq[0]['qtdeServico'];
             }
-            $horas_usinagem_tarde_anterior[$chave]= number_format($ProdMaq[0]['HorasServico'], 3, '.', '');
-            $distancia_tarde_antes[$chave] = $ProdMaq[0]['metrosPercorridos'];
-            $numero_trabalho_tarde_antes[$chave] = $ProdMaq[0]['qtdeServico'];
+
+
+
+            foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
+
+                $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
+                $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'];
+                $data = $created_at->format('d/m/Y');
+
+                if($chave_antes != $chave) {
+                    $chave_antes = $chave;
+                    $hora_servico_periodo_tarde = $horas_filtradas;
+                    $qtdeServico_manha = $qtdeServico_tarde = 0;
+
+                }
+
+                if($created_at->format('H') < '14') {
+
+                    $total_horas_usinadas_manha = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_manha_anterior[$chave]);
+
+                    if($request->input('hora') && $this->horaMaior($request->input('hora'), '06:00:00')) {
+                        $inicio_periodo = $request->input('hora');
+                    } else {
+                        $inicio_periodo = '06:00:00';
+                    }
+
+
+                    if($request->input('hora_fim') && $this->horaMaior('14:00:00', $request->input('hora_fim'))) {
+                        $final_periodo = $request->input('hora_fim');
+                    } else {
+                        $final_periodo = '14:00:00';
+                    }
+
+                    if($this->horaMaior(end($periodo_horas_manha[$chave]), '14:00:00') ) {
+                        $final_periodo = end($periodo_horas_manha[$chave]);
+                        $final_periodo = '14:00:00';
+                    }
+
+                    $hora_servico_periodo_manha =  $this->diferencaHoras($inicio_periodo, $final_periodo);
+                    $qtdeServico_manha = $qtdeServico_manha + $producaoMaquina['qtdeServico'];
+                    $dados[$chave]['manha']['maquina_cnc'] = $producaoMaquina['numero_cnc'];
+                    $dados[$chave]['manha']['turno'] = 'Manhã';
+                    $dados[$chave]['manha']['data'] = $data;
+                    $dados[$chave]['manha']['horasTrabalho'] = $hora_servico_periodo_manha;
+                    $dados[$chave]['manha']['total_horas_usinadas'] = $total_horas_usinadas_manha;
+                    $dados[$chave]['manha']['metrosPercorridos'] = $producaoMaquina['metrosPercorridos'] - $distancia_manha_antes[$chave] ;
+                    $dados[$chave]['manha']['qtdeServico'] = $producaoMaquina['qtdeServico'] - $numero_trabalho_manha_antes[$chave];
+
+                } else {
+
+                    $total_horas_usinadas_tarde = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_tarde_anterior[$chave]);
+
+                    if($request->input('hora') && $this->horaMaior($request->input('hora'), '14:00:00')) {
+                        $inicio_periodo = $request->input('hora');
+                    } else {
+                        $inicio_periodo = '14:00:00';
+                    }
+
+
+                    if($request->input('hora_fim') && $this->horaMaior('22:00:00', $request->input('hora_fim'))) {
+                        $final_periodo = $request->input('hora_fim');
+                    } else {
+                        $final_periodo = '22:00:00';
+                    }
+
+
+                    if($this->horaMaior(end($periodo_horas_tarde[$chave]), '22:00:00') ) {
+                        $final_periodo = end($periodo_horas_tarde[$chave]);
+                        $final_periodo = '22:00:00';
+                    }
+
+                    $hora_servico_periodo_tarde =  $this->diferencaHoras('14:00:00', $final_periodo);
+
+                    $qtdeServico_tarde = $qtdeServico_tarde + $producaoMaquina['qtdeServico'];
+                    $dados[$chave]['tarde']['maquina_cnc'] = $producaoMaquina['numero_cnc'];
+                    $dados[$chave]['tarde']['turno'] = 'Tarde';
+                    $dados[$chave]['tarde']['data'] = $data;
+                    $dados[$chave]['tarde']['horasTrabalho'] = $hora_servico_periodo_tarde;
+                    $dados[$chave]['tarde']['total_horas_usinadas'] = $total_horas_usinadas_tarde;
+                    $dados[$chave]['tarde']['metrosPercorridos'] = $producaoMaquina['metrosPercorridos'] - $distancia_tarde_antes[$chave] ;
+                    $dados[$chave]['tarde']['qtdeServico'] = $producaoMaquina['qtdeServico'] - $numero_trabalho_tarde_antes[$chave];
+                }
+
+            }
+            foreach ($dados as $turno => $dado) {
+                foreach ($dado as $data => $dados_dia) {
+
+                    $dados[$turno][$data]['percentual'] = '0';
+                    if($dados_dia['total_horas_usinadas'] != '00:00:00' && $dados_dia['horasTrabalho'] != '00:00:00') {
+                        $dados[$turno][$data]['percentual'] = $this->calcularPorcentagemUsinada($dados_dia['total_horas_usinadas'],$dados_dia['horasTrabalho']);
+                    }
+                }
+
+            }
         }
-
-
-
-        foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
-
-            $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
-            $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'];
-            $data = $created_at->format('d/m/Y');
-
-            if($chave_antes != $chave) {
-                $chave_antes = $chave;
-                $hora_servico_periodo_tarde = $horas_filtradas;
-                $qtdeServico_manha = $qtdeServico_tarde = 0;
-
-            }
-
-            if($created_at->format('H') < '14') {
-
-                $total_horas_usinadas_manha = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_manha_anterior[$chave]);
-
-                if($request->input('hora') && $this->horaMaior($request->input('hora'), '06:00:00')) {
-                    $inicio_periodo = $request->input('hora');
-                } else {
-                    $inicio_periodo = '06:00:00';
-                }
-
-
-                if($request->input('hora_fim') && $this->horaMaior('14:00:00', $request->input('hora_fim'))) {
-                    $final_periodo = $request->input('hora_fim');
-                } else {
-                    $final_periodo = '14:00:00';
-                }
-
-                if($this->horaMaior(end($periodo_horas_manha[$chave]), '14:00:00') ) {
-                    $final_periodo = end($periodo_horas_manha[$chave]);
-                    $final_periodo = '14:00:00';
-                }
-
-                $hora_servico_periodo_manha =  $this->diferencaHoras($inicio_periodo, $final_periodo);
-                $qtdeServico_manha = $qtdeServico_manha + $producaoMaquina['qtdeServico'];
-                $dados[$chave]['manha']['maquina_cnc'] = $producaoMaquina['numero_cnc'];
-                $dados[$chave]['manha']['turno'] = 'Manhã';
-                $dados[$chave]['manha']['data'] = $data;
-                $dados[$chave]['manha']['horasTrabalho'] = $hora_servico_periodo_manha;
-                $dados[$chave]['manha']['total_horas_usinadas'] = $total_horas_usinadas_manha;
-                $dados[$chave]['manha']['metrosPercorridos'] = $producaoMaquina['metrosPercorridos'] - $distancia_manha_antes[$chave] ;
-                $dados[$chave]['manha']['qtdeServico'] = $producaoMaquina['qtdeServico'] - $numero_trabalho_manha_antes[$chave];
-
-            } else {
-
-                $total_horas_usinadas_tarde = $this->converterParaHoras($producaoMaquina['HorasServico'] - $horas_usinagem_tarde_anterior[$chave]);
-
-                if($request->input('hora') && $this->horaMaior($request->input('hora'), '14:00:00')) {
-                    $inicio_periodo = $request->input('hora');
-                } else {
-                    $inicio_periodo = '14:00:00';
-                }
-
-
-                if($request->input('hora_fim') && $this->horaMaior('22:00:00', $request->input('hora_fim'))) {
-                    $final_periodo = $request->input('hora_fim');
-                } else {
-                    $final_periodo = '22:00:00';
-                }
-
-
-                if($this->horaMaior(end($periodo_horas_tarde[$chave]), '22:00:00') ) {
-                    $final_periodo = end($periodo_horas_tarde[$chave]);
-                    $final_periodo = '22:00:00';
-                }
-
-                $hora_servico_periodo_tarde =  $this->diferencaHoras('14:00:00', $final_periodo);
-
-                $qtdeServico_tarde = $qtdeServico_tarde + $producaoMaquina['qtdeServico'];
-                $dados[$chave]['tarde']['maquina_cnc'] = $producaoMaquina['numero_cnc'];
-                $dados[$chave]['tarde']['turno'] = 'Tarde';
-                $dados[$chave]['tarde']['data'] = $data;
-                $dados[$chave]['tarde']['horasTrabalho'] = $hora_servico_periodo_tarde;
-                $dados[$chave]['tarde']['total_horas_usinadas'] = $total_horas_usinadas_tarde;
-                $dados[$chave]['tarde']['metrosPercorridos'] = $producaoMaquina['metrosPercorridos'] - $distancia_tarde_antes[$chave] ;
-                $dados[$chave]['tarde']['qtdeServico'] = $producaoMaquina['qtdeServico'] - $numero_trabalho_tarde_antes[$chave];
-            }
-
-        }
-        foreach ($dados as $turno => $dado) {
-            foreach ($dado as $data => $dados_dia) {
-
-                $dados[$turno][$data]['percentual'] = '0';
-                if($dados_dia['total_horas_usinadas'] != '00:00:00' && $dados_dia['horasTrabalho'] != '00:00:00') {
-                    $dados[$turno][$data]['percentual'] = $this->calcularPorcentagemUsinada($dados_dia['total_horas_usinadas'],$dados_dia['horasTrabalho']);
-                }
-            }
-
-        }
-
         $data = array(
             'tela' => 'pesquisa',
             'nome_tela' => 'Produção Máquinas',
@@ -411,7 +470,6 @@ class MaquinasController extends Controller
     function calcularPorcentagemUsinada($periodoTotal,$horasTrabalhadas ) {
         $segundos_a = strtotime($periodoTotal) - strtotime('00:00:00');
         $segundos_b = strtotime($horasTrabalhadas) - strtotime('00:00:00');
-
         // Calculando o percentual da horaA em relação à horaB
         $percentual = ($segundos_a / $segundos_b) * 100;
         return (float)number_format($percentual, 0);

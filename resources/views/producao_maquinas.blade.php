@@ -24,7 +24,7 @@
                     <input type="text" id="numero_cnc" name="numero_cnc" class="form-control col-md-13" value="@if (isset($request) && $request->input('numero_cnc') != ''){{$request->input('numero_cnc')}}@else{{''}}@endif">
                 </div>
 
-                <label  for="created_at" class="col-sm-2 col-form-label text-right">Data: de </label>
+                <label  for="created_at" class="col-sm-1 col-form-label text-right">Data: de </label>
                 <div class="col-sm-1">
                     <input type="text" class="form-control mask_date" id="created_at" name="created_at"
                         placeholder="DD/MM/AAAA" value="@if (isset($request) && $request->input('created_at') != ''){{$request->input('created_at')}} @else{{''}}@endif">
@@ -35,17 +35,21 @@
                         placeholder="DD/MM/AAAA" value="@if (isset($request) && $request->input('created_at_fim') != ''){{$request->input('created_at_fim')}}@else{{''}}@endif">
                 </div>
 
-                <label  for="hora" class="col-sm-2 col-form-label text-right">Hora: de</label>
+                <label  for="hora" class="col-sm-1 col-form-label text-right">Hora: de</label>
                 <div class="col-sm-1">
                     <input type="text" class="form-control mask_horas" id="hora" name="hora"
                         placeholder="00:00:00" value="@if (isset($request) && $request->input('hora') != ''){{$request->input('hora')}}@else{{''}}@endif">
                 </div>
-                <label for="hora_fim" class=" col-form-label text-right">até</label>
+                <label for="hora_fim" class="col-form-label text-right">até</label>
                 <div class="col-sm-1">
                     <input type="text" class="form-control mask_horas" id="hora_fim" name="hora_fim"
                         placeholder="00:00:00" value="@if (isset($request) && $request->input('hora_fim') != ''){{$request->input('hora_fim')}}@else{{''}}@endif">
                 </div>
-
+                <label for="listarpor" class="col-sm-1 col-form-label">Listar por</label>
+                <select class="form-control col-md-1" id="listarpor" name="listarpor">
+                    <option value="0" @if (isset($request) && $request->input('listarpor') == '0'){{ ' selected '}}@else @endif>Data</option>
+                    <option value="1" @if (isset($request) && $request->input('listarpor')  == '1'){{ ' selected '}}@else @endif>Hora</option>
+                </select>
             </div>
             <div class="form-group row">
                 <div class="col-sm-5">
@@ -69,7 +73,7 @@
                     <tr>
                         <th>Máquina</th>
                         <th>Turno</th>
-                        <th>Data</th>
+                        <th>Data Hora</th>
                         <th>Horas de Trabalho</th>
                         <th>Horas de Usinagem</th>
                         <th>% de horas</th>
