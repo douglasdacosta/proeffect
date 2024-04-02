@@ -57,6 +57,10 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>EP</th>
+                                    <th scope="col">Total usinagem </th>
+                                    <th scope="col">Total acabamento</th>
+                                    <th scope="col">Total montagem</th>
+                                    <th scope="col">Total inspeção</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,6 +71,10 @@
                                                     href={{ URL::route($rotaAlterar, ['id' => $fichatecnica->id]) }}>{{ $fichatecnica->id }}</a>
                                             </th>
                                             <td>{{ $fichatecnica->ep }}</td>
+                                            <td class="@if($fichatecnica->tempo_usinagem == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_usinagem }}</td>
+                                            <td class="@if($fichatecnica->tempo_acabamento == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_acabamento }}</td>
+                                            <td class="@if($fichatecnica->tempo_montagem == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_montagem }}</td>
+                                            <td class="@if($fichatecnica->tempo_inspecao == '00:00:00') {{'text-danger'}} @else {{''}} @endif"  >{{ $fichatecnica->tempo_inspecao }}</td>
                                         </tr>
                                     @endforeach
                                 @endif
@@ -120,7 +128,7 @@
         <div class="form-group row">
             <label for="ep" class="col-sm-2 col-form-label text-right">EP*</label>
             <div class="col-sm-1">
-                <input type="text" id="ep" name="ep" class="form-control col-md-13"
+                <input type="text" id="ep" name="ep" class="form-control col-md-13 text-uppercase"
                     value="@if (isset($fichatecnicas[0]->ep)) {{ $fichatecnicas[0]->ep }} @else{{ '' }} @endif">
             </div>
             <label for="blank" class="col-sm-2 col-form-label text-right text-sm-end">Material*</label>
@@ -346,7 +354,7 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="alerta_expedicao" class="col-sm-2 col-form-label text-right">Alerta expedição</label>
+            <label for="alerta_expedicao" class="col-sm-2 col-form-label text-right">Alerta Embalagem</label>
             <div class="col-sm-10">
                 <input type="text" id="alerta_expedicao1" name="alerta_expedicao1" class="form-control col-md-13"
                     value="@if (isset($fichatecnicas[0]->alerta_expedicao1)) {{ $fichatecnicas[0]->alerta_expedicao1 }} @else{{ '' }} @endif">

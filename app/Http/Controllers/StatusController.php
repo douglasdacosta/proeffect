@@ -33,7 +33,10 @@ class StatusController extends Controller
 
         if (!empty($request->input('status'))){
             $status = $status->where('status', '=', $request->input('status'));
+        } else {
+            $status = $status->where('status', '=', 'A');
         }
+
         if ($request->input('nome') != '') {
         	$status = $status->where('nome', 'like', '%'.$request->input('nome').'%');
         }

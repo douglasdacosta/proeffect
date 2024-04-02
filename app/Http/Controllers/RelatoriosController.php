@@ -35,7 +35,10 @@ class RelatoriosController extends Controller
         if (!empty($request->input('status'))){
             $pedidos = $pedidos->where('pedidos.status', '=', $request->input('status'));
             $filtrado++;
+        } else {
+            $pedidos = $pedidos->where('pedidos.status', '=', 'A');
         }
+
 
         if ($id) {
             $pedidos = $pedidos->where('pedidos.id', '=', $id);

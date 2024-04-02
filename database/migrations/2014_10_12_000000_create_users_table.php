@@ -26,9 +26,9 @@ return new class extends Migration
         DB::table('users')->insert(
                 array(
                         'id' => 1,
-                        'name'=>'Eplax',
-                        'email'=> 'eplax@eplax.com',
-                        'password' => '$2y$10$ONQmi2mWqaaXpE6UYUnhtOqExW2yOQVWYqwo/XMNVotHR5eFCWSSW'
+                        'name'=>'Admin',
+                        'email'=> 'admin@admin.com',
+                        'password' => '$2y$10$W8aQ3AC1YCe4lg0bvio1AOQkBK4xRjLyeH0SvxkyqZcFFhjVq9Gxi'
                     )
 
         );

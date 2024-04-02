@@ -116,8 +116,8 @@
             <div class="form-group row">
                 <label for="peca_padrao" class="col-sm-2 col-form-label">Peça padrão</label>
                 <select class="form-control col-sm-1 custom-select" id="peca_padrao" name="peca_padrao">
-                    <option value="2" @if (($materiais[0]->peca_padrao == 2)){{"selected='selected'"}}@else{{''}}@endif>Não</option>
-                    <option value="1"@if (($materiais[0]->peca_padrao == 1)){{"selected='selected'"}}@else{{''}}@endif>Sim</option>
+                    <option value="2" @if ((isset($materiais[0]->peca_padrao) && $materiais[0]->peca_padrao == 2)){{"selected='selected'"}}@else{{''}}@endif>Não</option>
+                    <option value="1"@if ((isset($materiais[0]->peca_padrao) && $materiais[0]->peca_padrao == 1)){{"selected='selected'"}}@else{{''}}@endif>Sim</option>
                 </select>
             </div>
             <div class="form-group row">
@@ -147,7 +147,7 @@
             <div class="form-group row">
                 <label for="valor" class="col-sm-2 col-form-label">Valor unitário </label>
                 <div class="col-sm-2">
-                <input type="text" class="form-control mask_valor" id="valor" name="valor" data-mask="0,00"  value="@if (isset($materiais[0]->valor)){{ number_format($materiais[0]->valor,2, ',','.')}}@else{{''}}@endif">
+                <input type="text" class="form-control mask_valor" id="valor" name="valor"  value="@if (isset($materiais[0]->valor)){{ number_format($materiais[0]->valor,2, ',','.')}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">

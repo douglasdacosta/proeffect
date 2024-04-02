@@ -47,6 +47,8 @@ class MateriaisController extends Controller
 
         if (!empty($request->input('status'))){
             $materiais = $materiais = $materiais->where('status', '=', $request->input('status'));
+        } else{
+            $materiais = $materiais->where('status', '=', 'A');
         }
 
         $materiais = $materiais->get();
@@ -134,7 +136,7 @@ class MateriaisController extends Controller
         return view('materiais', $data);
     }
 
-    public function salva($request, $historico) {
+    public function salva($request, $historico = null) {
 
         $id = DB::transaction(function () use ($request, $historico) {
 
@@ -143,7 +145,7 @@ class MateriaisController extends Controller
             if(!empty($request->input('tempo_montagem_torre'))) {
                 $tempo_torre = '00:'.$request->input('tempo_montagem_torre');
             }
-        
+
             if($request->input('id')) {
                 $materiais = $materiais::find($request->input('id'));
             }

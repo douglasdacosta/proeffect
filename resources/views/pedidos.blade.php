@@ -130,7 +130,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             <th>OS</th>
                                             <th>EP</th>
                                             <th>Qtde</th>
-                                            <th>Cliente</th>
                                             <th>Status do pedido</th>
                                             <th>Data gerado</th>
                                             <th>Data entrega</th>
@@ -149,7 +148,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     <td>{{ $pedido->os }}</td>
                                                     <td>{{ $pedido->ep }}</td>
                                                     <td>{{ $pedido->qtde }}</td>
-                                                    <td>{{ $pedido->nome_cliente }}</td>
                                                     <td>
                                                         <select class="form-control alteracao_status_pedido"
                                                             data-statusatual='{{ $pedido->id_status }}'
@@ -308,7 +306,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             <div class="form-group row">
                 <label for="data_gerado" class="col-sm-2 col-form-label">Data gerado</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado" 
+                    <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
                     @if ($tela == 'alterar') readonly='readonly' @else {{''}} @endif
                         value="@if (isset($pedidos[0]->data_gerado)) {{ Carbon\Carbon::parse($pedidos[0]->data_gerado)->format('d/m/Y') }}@else{{ Carbon\Carbon::now()->format('d/m/Y') }} @endif">
                 </div>
@@ -402,17 +400,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                         <div class="col-sm-1">
                             <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                         </div>
-                        <label for="blank" class="col-sm-1 col-form-label text-right text-sm-end">Status do pedido</label>
-                        <div class="col-sm-2">
-                            <select class="custom-select" multiple size="4" id="status_id" name="status_id[]">
-                                <option value=""></option>
-                                @if (isset($status))
+                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
+                        <div class="col-sm-5" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
+                            <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
-                                        <option value="{{ $status->id }}">{{ $status->nome }}
-                                        </option>
+                                        <div class="col-sm-6 form-check">
+                                            <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                            <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                        </div>
                                     @endforeach
-                                @endif
-                            </select>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -508,6 +506,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <th scope="col">OS</th>
                                     <th scope="col">EP</th>
                                     <th scope="col">Qtde</th>
+                                    <th scope="col">Obs</th>
                                     <th scope="col">Usinagem</th>
                                     <th scope="col">Acabamento</th>
                                     <th scope="col">Montagem Torre</th>
@@ -533,6 +532,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <td>{{ $pedido->os }}
                                         <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
                                         <td>{{ $pedido->qtde }}</td>
+                                        <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 2, '...') !!}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                         </td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
@@ -548,6 +548,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     </tr>
                                 @endforeach
                                 <tr>
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
@@ -570,6 +571,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <th scope="col"></th>
                                 </tr>
                                 <tr>
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
@@ -689,9 +691,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                         <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
-                                        <td>{{ $pedido->tabelaPrioridades->nome }}</td>
+                                        <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
                                         <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
-                                        <td>{{ $pedido->tabelaTransportes->nome }}</td>
+                                        <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                         <td>{{ $pedido->tabelaStatus->nome }}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                         </td>
