@@ -32,9 +32,9 @@ return [
     |
     */
 
-    'title' => 'Pro Effect',
-    'title_prefix' => 'Pro Effect',
-    'title_postfix' => 'Pro Effect',
+    'title' => 'CRM Eplax',
+    'title_prefix' => '',
+    'title_postfix' => '',
 
     /*
     |--------------------------------------------------------------------------
