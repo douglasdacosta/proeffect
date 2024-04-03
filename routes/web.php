@@ -34,6 +34,10 @@ Route::match(['get', 'post'],'/status', [App\Http\Controllers\StatusController::
 Route::match(['get', 'post'],'/alterar-status', [App\Http\Controllers\StatusController::class, 'alterar'])->name('alterar-status');
 Route::match(['get', 'post'],'/incluir-status', [App\Http\Controllers\StatusController::class, 'incluir'])->name('incluir-status');
 
+Route::match(['get', 'post'],'/funcionarios', [App\Http\Controllers\FuncionariosController::class, 'index'])->name('funcionarios');
+Route::match(['get', 'post'],'/alterar-funcionarios', [App\Http\Controllers\FuncionariosController::class, 'alterar'])->name('alterar-funcionarios');
+Route::match(['get', 'post'],'/incluir-funcionarios', [App\Http\Controllers\FuncionariosController::class, 'incluir'])->name('incluir-funcionarios');
+
 Route::match(['get', 'post'],'/fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'index'])->name('fichatecnica');
 Route::match(['get', 'post'],'/alterar-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'alterar'])->name('alterar-fichatecnica');
 Route::match(['get', 'post'],'/incluir-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'incluir'])->name('incluir-fichatecnica');
@@ -64,5 +68,9 @@ Route::match(['get', 'post'],'/producao-maquinas', [App\Http\Controllers\Maquina
 Route::match(['get', 'post'],'/orcamentos', [App\Http\Controllers\OrcamentosController::class, 'index'])->name('orcamentos');
 Route::match(['get', 'post'],'/alterar-orcamentos', [App\Http\Controllers\OrcamentosController::class, 'alterar'])->name('alterar-orcamentos');
 
+Route::match(['get', 'post'],'/relatorio-producao', [App\Http\Controllers\RelatoriosController::class, 'index'])->name('relatorio-producao');
+Route::match(['get', 'post'],'/paineis', [App\Http\Controllers\PaineisController::class, 'index'])->name('paineis');
+Route::match(['get', 'post'],'/manutencao-status', [App\Http\Controllers\ManutencaoProducaoController::class, 'pesquisar'])->name('manutencao-status');
+Route::match(['post'],'/manutencao-producao-alterar-pedido', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedido'])->name('manutencao-producao-alterar-pedido');
 
 

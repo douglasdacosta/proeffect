@@ -7,7 +7,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\PainelController;
 class RouteServiceProvider extends ServiceProvider
 {
     /**
@@ -29,13 +29,22 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
+            
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+                ->group(base_path('routes/web.php'));           
+                
         });
+
+        Route::match(['get', 'post'],'/paineis-usinagem', [PainelController::class, 'paineisUsinagem'])->name('paineis-usinagem');
+        Route::match(['get', 'post'],'/paineis-montagem', [PainelController::class, 'paineisMontagem'])->name('paineis-montagem');
+        Route::match(['get', 'post'],'/paineis-acabamento', [PainelController::class, 'paineisAcabamento'])->name('paineis-acabamento');
+        Route::match(['get', 'post'],'/paineis-inspecao', [PainelController::class, 'paineisInspecao'])->name('paineis-inspecao');
+        Route::match(['get', 'post'],'/paineis-embalar', [PainelController::class, 'paineisEmbalar'])->name('paineis-embalar');
+
     }
 
     /**

@@ -277,9 +277,15 @@ $(function ($) {
     }
 });
 
+$(document).on('click', '.painel', function(){
+    pageURL = $(this).data('url');
+    pageTitle = $(this).data('nometela');
+    popupWinWidth = 1200; 
+    popupWinHeight = 980;
+    createPopupWin(pageURL, pageTitle,popupWinWidth, popupWinHeight);
+});
 
-function createPopupWin(pageURL, pageTitle,
-    popupWinWidth, popupWinHeight) {
+function createPopupWin(pageURL, pageTitle,popupWinWidth, popupWinHeight) {
     let left = (screen.width);
     let top = (screen.height);
     let myWindow = window.open(pageURL, pageTitle,

@@ -204,12 +204,12 @@ class MaquinasController extends Controller
                 $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
                                     ->where('hora', '<', $hora_inicio)
                                     ->where('numero_cnc', '=', $maquina)
-                                    ->orderby('created_at', 'asc')->limit(1)->get()->toArray();
+                                    ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
                 if(empty($ProdMaq[0]['HorasServico'])) {
                     $ProdMaq = new ProducaoMaquinas();
                     $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
                                     ->where('numero_cnc', '=', $maquina)
-                                    ->orderby('created_at', 'asc')->limit(1)->get()->toArray();
+                                    ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
                 }
 
                 $horas_usinagem_manha_anterior[$chave]=number_format($ProdMaq[0]['HorasServico'], 3, '.', '');

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -13,14 +14,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('historicos_pedidos', function (Blueprint $table) {
+        Schema::create('caixas_pedidos', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('pedidos_id')->unsigned();
-            $table->bigInteger('status_id')->unsigned();
+            $table->integer('a')->unsigned();
+            $table->integer('l')->unsigned();
+            $table->integer('c')->unsigned();
+            $table->integer('peso')->unsigned();
             $table->timestamps();
             $table->foreign('pedidos_id')->references('id')->on('pedidos');
         });
 
+        
 
     }
 
@@ -32,6 +37,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('historicos_pedidos');
+        Schema::dropIfExists('caixas_pedidos');
     }
 };

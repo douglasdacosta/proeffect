@@ -1,5 +1,23 @@
 <?php
 
+    use App\Http\Controllers\TelasController;
+
+    $telas = new TelasController();
+    // $categoriaTelas = $telas->getCategoriaTelas();
+
+    // $arra_menu[] = [
+    //                     'type'         => 'fullscreen-widget',
+    //                     'topnav_right' => true,
+    // ];
+
+    // foreach ($categoriaTelas as $key => $categoria) {
+    //     $arra_menu[] = ['header' => $categoria->nome];
+
+    //     $arra_menu[] ='';
+    // };
+
+
+
 return [
 
     /*
@@ -292,24 +310,13 @@ return [
     |
     */
 
+
     'menu' => [
-        // Navbar items:
-        // [
-        //     'type'         => 'navbar-search',
-        //     'text'         => 'search',
-        //     'topnav_right' => true,
-        // ],
         [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],
-
-        // Sidebar items:
-        // [
-        //     'type' => 'sidebar-menu-search',
-        //     'text' => 'search',
-        // ],
-        ['header' => 'Produção'],
+        ['header' => 'Cadastros'],
         [
             'text' => 'blog',
             'url'  => 'admin/blog',
@@ -332,51 +339,64 @@ return [
         [
             'text'        => 'Materiais',
             'url'         => 'materiais',
-            'icon'        => 'far fa-fw fa-file',
+            'icon'        => 'fas fa-plus',
             'label'       => '',
             'label_color' => '',
         ],
         [
             'text'        => 'Consumo Materiais',
             'url'         => 'consumo-materiais',
-            'icon'        => 'far fa-fw fa-file',
+            'icon'        => 'fas fa-chart-pie',
             'label'       => '',
             'label_color' => '',
         ],
         [
             'text'        => 'Ficha técnica',
             'url'         => 'fichatecnica',
-            'icon'        => 'far fa-fw fa-file',
+            'icon'        => 'fas fa-plus',
             'label'       => '',
             'label_color' => '',
         ],
         [
             'text'        => 'Status',
             'url'         => 'status',
-            'icon'        => 'far fa-fw fa-file',
+            'icon'        => 'fas fa-plus',
             'label'       => '',
             'label_color' => '',
         ],
         [
             'text'        => 'Clientes',
             'url'         => 'clientes',
-            'icon'        => 'far fa-fw fa-file',
+            'icon'        => 'fas fa-plus',
             'label'       => '',
             'label_color' => '',
         ],
         [
             'text'        => 'Maquinas',
             'url'         => 'maquinas',
-            'icon'        => 'far fa-fw fa-file',
+            'icon'        => 'fas fa-plus',
             'label'       => '',
             'label_color' => '',
         ],
         // [
-        //     'text'        => 'Relatório produção',
-        //     'url'         => 'relatorio-producao',
-        //     'icon'        => 'far fa-fw fa-file',
+        //     'text'        => 'Funcionários',
+        //     'url'         => 'funcionarios',
+        //     'icon'        => 'fas fa-plus',
         //     'label'       => '',
         //     'label_color' => '',
+        // ],
+        // [
+        //     'text'        => 'Relatório produção',
+        //     'url'         => 'relatorio-producao',
+        //     'icon'        => 'fas fa-chart-pie',
+        //     'label'       => '',
+        //     'label_color' => '',
+        // ],
+        ['header' => 'Operação'],
+        // [
+        //     'text'        => 'Painéis',
+        //     'url'         => 'paineis',
+        //     'icon'        => 'fas fa-solar-panel',
         // ],
         [
             'text'        => 'Orçamentos',
@@ -389,7 +409,7 @@ return [
         [
             'text'        => 'Produção de Maquinas',
             'url'         => 'producao-maquinas',
-            'icon'        => 'far fa-fw fa-file',
+            'icon'        => 'fas fa-chart-pie',
             'label'       => '',
             'label_color' => '',
         ],
@@ -404,6 +424,7 @@ return [
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-lock',
         ],
+
         // [
         //     'text'    => 'multilevel',
         //     'icon'    => 'fas fa-fw fa-share',
@@ -458,7 +479,7 @@ return [
         //     'icon_color' => 'cyan',
         //     'url'        => '#',
         // ],
-    ],
+        ],
 
     /*
     |--------------------------------------------------------------------------
