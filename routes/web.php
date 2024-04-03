@@ -70,6 +70,7 @@ Route::match(['get', 'post'],'/alterar-orcamentos', [App\Http\Controllers\Orcame
 
 Route::match(['get', 'post'],'/relatorio-producao', [App\Http\Controllers\RelatoriosController::class, 'index'])->name('relatorio-producao');
 Route::match(['get', 'post'],'/paineis', [App\Http\Controllers\PaineisController::class, 'index'])->name('paineis');
-Route::match(['get', 'post'],'/manutencao-producao', [App\Http\Controllers\ManutencaoProducaoController::class, 'index'])->name('manutencao-producao');
+Route::match(['get', 'post'],'/manutencao-status', [App\Http\Controllers\ManutencaoProducaoController::class, 'pesquisar'])->name('manutencao-status');
+Route::match(['post'],'/manutencao-producao-alterar-pedido', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedido'])->name('manutencao-producao-alterar-pedido');
 
 

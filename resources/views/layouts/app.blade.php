@@ -47,8 +47,47 @@
 }
         </style>
 
-    {{-- <script src="{{asset('js/bootstrap.4.6.2.js')}}"></script> --}}
-    <script src="{{asset('jquery_v3.5.1.js')}}"></script>
+<script src="{{asset('js/jquery_v3.5.1.js')}}"></script>
+    <script src="{{asset('js/bootstrap.4.6.2.js')}}"></script>
+    <script type="text/javascript" >
+        $(function ($) {
+
+            $(".alteracao_status_pedido").click(function () {
+                var descricaoproximostatus = $(this).data('descricaoproximostatus');
+                if (!confirm("Você realmente deseja alterar este pedido para "+descricaoproximostatus+" ?")) {
+                    return false;
+                }
+                var pedido = $(this).data('pedidoid');
+                var status = $(this).data('proximostatus');
+                var senha = $('#senha').val();
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", '/manutencao-producao-alterar-pedido', true);
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            alert('Status do pedido aletrado com sucesso para '+descricaoproximostatus +'!')
+                            history.replaceState(null, null, window.location.pathname);
+                            location.reload();
+                        } else {
+                            var data = JSON.parse(xhr.responseText);
+                            alert('Ocorreu um erro al alterar o status!')
+                        }
+                    }
+                };
+
+                var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                var requestData = {
+                    'id': pedido,
+                    'status': status,
+                    'senha': senha,
+                    '_token': csrfToken
+                };
+                xhr.send(JSON.stringify(requestData));
+            })
+        })
+
+        </script>
 </head>
 <body>
     <div id="app">
