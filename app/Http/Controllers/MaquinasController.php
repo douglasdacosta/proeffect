@@ -194,17 +194,18 @@ class MaquinasController extends Controller
 
 
             foreach($horas_usinagem_manha as $chave => $valor){
-                $horas_usinagem_manha_anterior[$chave] = '00:00:01';
                 $horas_usinagem_manha_anterior[$chave] = '0';
                 $ProdMaq = new ProducaoMaquinas();
 
-                $data_inicio =   DateHelpers::formatDate_dmY(substr($chave, 0,10));
-                $hora_inicio =  $periodo_horas_manha[$chave][0];
-                $maquina =   substr($chave, 10, 1);
+                $data_inicio = DateHelpers::formatDate_dmY(substr($chave, 0,10));
+                $hora_inicio = $periodo_horas_manha[$chave][0];
+                $maquina = substr($chave, 10, 1);                
+
                 $ProdMaq = $ProdMaq->where('data', '<=', $data_inicio)
-                                    ->where('hora', '<', $hora_inicio)
+                                    ->where('hora', '<=', $hora_inicio)
                                     ->where('numero_cnc', '=', $maquina)
                                     ->orderby('created_at', 'desc')->limit(1)->get()->toArray();
+                
                 if(empty($ProdMaq[0]['HorasServico'])) {
                     $ProdMaq = new ProducaoMaquinas();
                     $ProdMaq = $ProdMaq->where('data', '=', $data_inicio)
@@ -216,9 +217,8 @@ class MaquinasController extends Controller
 
                 $distancia_manha_antes[$chave] = $ProdMaq[0]['metrosPercorridos'];
                 $numero_trabalho_manha_antes[$chave] = $ProdMaq[0]['qtdeServico'];
+                
             }
-
-
 
             foreach($horas_usinagem_tarde as $chave => $valor){
                 $ProdMaq = new ProducaoMaquinas();
