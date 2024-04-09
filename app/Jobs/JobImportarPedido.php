@@ -181,9 +181,9 @@ class JobImportarPedido implements ShouldQueue
         if(!empty($pessoa->id)) {
             $pessoas = $pessoas::find($pessoa->id);
         }
-        $pessoas->codigo_cliente =  $cliente['numcli'];
-        $pessoas->nome_cliente = $cliente['razao'];
-        $pessoas->nome_contato = $cliente['fantasia'];
+        $pessoas->codigo_cliente = $cliente['numcli'];
+        $pessoas->nome_cliente = $cliente['fantasia'];
+        $pessoas->nome_contato = $cliente['contato1'];
         $pessoas->nome_assistente = $Vendedor['nome'];
         $pessoas->telefone = preg_replace('/\D/', '', $cliente['telefone']);
         $pessoas->email = $cliente['email'];

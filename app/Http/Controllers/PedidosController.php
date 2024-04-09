@@ -360,9 +360,8 @@ class PedidosController extends Controller
             $filtrado++;
         }
 
-        if (!empty($request->input('status'))){
-            $pedidos = $pedidos->where('status', '=', $request->input('status'));
-        }
+        $pedidos = $pedidos->where('pedidos.status', '=', 'A');
+
 
         $pedidos_encontrados = [];
         if ($filtrado > 0) {

@@ -82,21 +82,50 @@
                     </tr>
                   </thead>
                         @if(isset($producao_maquinas))
-                        @foreach ($producao_maquinas as $turno => $dados)
-                            @foreach ($dados as $data => $producao_maquina)
-                            <tr>
-                                    <td scope="row">{{$producao_maquina['maquina_cnc']}}</td>
-                                    <td>{{$producao_maquina['turno']}}</td>
-                                    <td>{{$producao_maquina['data']}}</td>
-                                    <td>{{$producao_maquina['horasTrabalho']}}</td>
-                                    <td>{{$producao_maquina['total_horas_usinadas']}}</td>
-                                    <td>{{$producao_maquina['percentual'].'%'}}</td>
-                                    <td>{{$producao_maquina['metrosPercorridos']}}</td>
-                                    <td>{{$producao_maquina['qtdeServico']}}</td>
+                            <?php
+                                        $turno_antes = '';
+                                        $cor = $colors[array_rand($colors)];
+                            ?>
+                            @foreach ($producao_maquinas as $producao_maquina)
+                                @if ($turno_antes != '' && $producao_maquina['turno'] != $turno_antes)
+                                    <?php $cor = $colors[array_rand($colors)] ?>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                 </tr>
-                                @endforeach
-                        @endforeach
-                    @endif
+                                @endif
+                                    <tr style="background-color: {{$cor}}" >
+                                        <td scope="row">{{$producao_maquina['maquina_cnc']}}</td>
+                                        <td>{{$producao_maquina['turno']}}</td>
+                                        <td>{{$producao_maquina['data']}}</td>
+                                        <td>{{$producao_maquina['horasTrabalho']}}</td>
+                                        <td>{{$producao_maquina['total_horas_usinadas']}}</td>
+                                        <td>{{$producao_maquina['percentual'].'%'}}</td>
+                                        <td>{{$producao_maquina['metrosPercorridos']}}</td>
+                                        <td>{{$producao_maquina['qtdeServico']}}</td>
+                                    </tr>
+
+                                    <?php
+                                        $turno_antes = $producao_maquina['turno']
+                                    ?>
+                            @endforeach
+                        @endif
+                        <tfoot>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>{{$totais['total_horas_tabalhadas']}}</th>
+                            <th>{{$totais['total_horas_usinadas']}}</th>
+                            <th>{{$totais['total_pecentual'].'%'}}</th>
+                            <th></th>
+                            <th></th>
+                        </tfoot>
                   </tbody>
                 </table>
               </div>

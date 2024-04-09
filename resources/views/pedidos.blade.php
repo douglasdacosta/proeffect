@@ -507,6 +507,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <th scope="col">EP</th>
                                     <th scope="col">Qtde</th>
                                     <th scope="col">Obs</th>
+                                    <th scope="col">Prioridade</th>
                                     <th scope="col">Usinagem</th>
                                     <th scope="col">Acabamento</th>
                                     <th scope="col">Montagem Torre</th>
@@ -533,6 +534,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
                                         <td>{{ $pedido->qtde }}</td>
                                         <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 2, '...') !!}</td>
+                                        <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                         </td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
