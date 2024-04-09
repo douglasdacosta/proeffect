@@ -345,15 +345,17 @@ class MaquinasController extends Controller
             }
         }
 
-
+        $dados_array = [];
         $total_pecentual = $this->calcularPorcentagemUsinada($total_horas_usinadas,$total_horas_tabalhadas);
         foreach($dados as $dados2) {
             foreach($dados2 as $dado) {
                 $dados_array[] = $dado;
             }
         }
+        if(!empty($dados_array)) {
 
-        $this->ordenarPorTurno($dados_array);
+            $this->ordenarPorTurno($dados_array);
+        }
 
         $data = array(
             'tela' => 'pesquisa',
@@ -513,6 +515,10 @@ class MaquinasController extends Controller
 
         list($h, $m, $s) = explode(':', $horasTrabalhadas);
         $segundos_trabalhados = $h * 3600 + $m * 60 + $s;
+
+        if($segundos_trabalhados == 0 || $segundos_total == 0) {
+            return 0;
+        }
 
         $percentual = ($segundos_trabalhados / $segundos_total) * 100;
         return (float) number_format($percentual, 0); // Arredondando para 2 casas decimais
