@@ -81,7 +81,7 @@ class JobImportarPedido implements ShouldQueue
                         $Vendedor= $ApiERPController->getVendedorById($idVendedor);
                         $pessoa = $pessoas->where('codigo_cliente', '=', $cliente_id)->first();
 
-                        $fichatecnica = $fichatecnica->where('ep', '=', $ep)->get();
+                        $fichatecnica = $fichatecnica->where('ep', '=', $ep)->where('status', '=', 'A')->get();
                         if(empty($fichatecnica[0]->id)){
                             info("EP ".$ep." não existente no CRM");
                             continue;
