@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Fichastecnicas;
 use App\Models\Fichastecnicasitens;
 use App\Models\Materiais;
+use App\Providers\DateHelpers;
 use Illuminate\Support\Facades\DB;
 
 class FichatecnicaController extends Controller
@@ -38,7 +39,7 @@ class FichatecnicaController extends Controller
         }
 
         if ($ep) {
-        	$fichatecnicas = $fichatecnicas->where('ep', '=', $ep);
+        	$fichatecnicas = $fichatecnicas->where('ep', 'like', '%'.trim($ep).'%');
         }
 
         if (!empty($request->input('status'))){
@@ -90,6 +91,35 @@ class FichatecnicaController extends Controller
         return view('fichatecnicas', $data);
     }
 
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function clonarFichatecnica(Request $request)
+    {
+
+        $fichatecnicas = new Fichastecnicas();
+        $fichatecnicasitens = new Fichastecnicasitens();
+
+        $fichatecnica= $fichatecnicas->where('id', '=', $request->input('id'))->get();
+        $fichatecnicasitens= $fichatecnicasitens::with('materiais')->where('fichatecnica_id', '=', $request->input('id'))->orderByRaw("CASE WHEN blank='' THEN 1 ELSE 0 END ASC")->orderBy('blank','ASC')->get();
+
+        $tela = 'incluir';
+    	$data = array(
+				'tela' => $tela,
+                'nome_tela' => 'clone de ficha técnica',
+				'fichatecnicas'=> $fichatecnica,
+                'fichatecnicasitens' => $fichatecnicasitens,
+				'request' => $request,
+                'materiais' => $this->getAllMateriais(),
+				'rotaIncluir' => 'incluir-fichatecnica',
+				'rotaAlterar' => 'alterar-fichatecnica',
+                'clonando' => true
+			);
+        return view('fichatecnicas', $data);
+    }
+
      /**
      * Show the application dashboard.
      *
@@ -127,6 +157,16 @@ class FichatecnicaController extends Controller
         return view('fichatecnicas', $data);
     }
 
+    public function trataEP($request) {
+        if (str_contains($request->input('ep'), 'EP')) {
+            $ep = $request->input('ep');
+        }else {
+            $ep = 'EP'.$request->input('ep');
+        }
+        return $ep;
+    }
+
+
     public function salva(Request  $request) {
 
         DB::transaction(function () use ($request) {
@@ -138,7 +178,15 @@ class FichatecnicaController extends Controller
                 $Fichastecnicasitens::where('fichatecnica_id', '=', $request->input('id'))->delete();
             }
 
-            $fichatecnicas->ep = $request->input('ep');
+            $ep = $this->trataEP($request);
+
+            if (str_contains($request->input('ep'), 'EP')) {
+                $ep = $request->input('ep');
+            }else {
+                $ep = 'EP'.$request->input('ep');
+            }
+
+            $fichatecnicas->ep = $ep;
             $fichatecnicas->tempo_usinagem =  $request->input('soma_tempo_usinagem');
             $fichatecnicas->tempo_acabamento =  $request->input('soma_tempo_acabamento');
             $fichatecnicas->tempo_montagem =  $request->input('soma_tempo_montagem');
@@ -169,6 +217,8 @@ class FichatecnicaController extends Controller
             $fichatecnicas->alerta_expedicao3 =  $request->input('alerta_expedicao3');
             $fichatecnicas->alerta_expedicao4 =  $request->input('alerta_expedicao4');
             $fichatecnicas->alerta_expedicao5 =  $request->input('alerta_expedicao5');
+            $fichatecnicas->rev = $request->input('rev');
+            $fichatecnicas->data_rev = !empty($request->input('data_rev')) ? DateHelpers::formatDate_dmY($request->input('data_rev')) : null;
             $fichatecnicas->status = $request->input('status');
             $fichatecnicas->save();
 

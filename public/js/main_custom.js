@@ -38,11 +38,19 @@
 $(function ($) {
     $('#blocker').hide();
     $('.cep').mask('00000-000', {reverse: true});
-    $('.sonumeros').mask('999999999999', {reverse: true});
+    $('.sonumeros').mask('000000000000', {reverse: true});
     $('.mask_minutos').mask('00:00', {reverse: true});
     $('.mask_horas').mask('00:00:00', {reverse: true});
     $('.mask_valor').mask("###0,00", {reverse: true});
     $('.mask_date').mask('00/00/0000');
+
+    $(document).on('change', '#calc-type', function(){
+        if($(this).val().trim() == '+') {
+            $('#calc-val2').mask('00:00', {reverse: true});
+        } else {
+            $('#calc-val2').mask('000000000000', {reverse: true});
+        }
+    });
 
     var behavior = function (val) {
         return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
@@ -280,7 +288,7 @@ $(function ($) {
 $(document).on('click', '.painel', function(){
     pageURL = $(this).data('url');
     pageTitle = $(this).data('nometela');
-    popupWinWidth = 1200; 
+    popupWinWidth = 1200;
     popupWinHeight = 980;
     createPopupWin(pageURL, pageTitle,popupWinWidth, popupWinHeight);
 });

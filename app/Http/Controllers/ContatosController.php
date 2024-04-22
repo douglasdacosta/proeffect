@@ -17,8 +17,8 @@ class ContatosController extends Controller
     {
         try {
             $email = $dados['email_cliente'];
-
-            Mail::to(users: $email)->send(mailable: new Contatos(
+            $email_cc = env('MAIL_CC');
+            Mail::to(users: $email)->cc($email_cc)->send(mailable: new Contatos(
                 data: [
                     'fromName' => $dados['fromName'],
                     'fromEmail' => $dados['fromEmail'],
@@ -31,6 +31,7 @@ class ContatosController extends Controller
                 return response('Sucesso', 200);
 
             } catch (\Throwable $th) {
+                info($th);
                 return response($th, 501);
             }
     }

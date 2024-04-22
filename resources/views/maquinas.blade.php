@@ -46,6 +46,12 @@
                     <input type="text" class="form-control" id="pessoas_montagem"  name="pessoas_montagem" value="@if (isset($maquinas[0]->pessoas_montagem)){{$maquinas[0]->pessoas_montagem}}@else{{''}}@endif">
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label for="pessoas_montagem_torres" class="col-sm-3 col-form-label">Pessoas Montagem torres</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control" id="pessoas_montagem_torres"  name="pessoas_montagem_torres" value="@if (isset($maquinas[0]->pessoas_montagem_torres)){{$maquinas[0]->pessoas_montagem_torres}}@else{{''}}@endif">
+                    </div>
+                </div>
 
                 <div class="form-group row">
                     <label for="pessoas_inspecao" class="col-sm-3 col-form-label">Pessoas inspeção</label>

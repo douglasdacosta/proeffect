@@ -62,7 +62,9 @@
                                 <td scope="col">{{$pedido->os}}</td>
                                 <td scope="col">{{$pedido->nomeStatus}}</td>
                                 <td scope="col">
-                                    <button data-pedidoid={{$pedido->id}} data-descricaoproximostatus='{{$status[$pedido->id_status + 1]['nome']}}' data-proximostatus='{{$status[$pedido->id_status + 1]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
+                                    <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>
+
+                                    <button data-pedidoid={{$pedido->id}} data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
                                         <span  style="font-size: 25px">&#9998;</button>
                                     </span>
                                 </td>

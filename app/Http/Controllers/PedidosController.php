@@ -66,7 +66,7 @@ class PedidosController extends Controller
 
 
         if ($ep) {
-            $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $ep);
+            $pedidos = $pedidos->where('ficha_tecnica.ep', 'like', '%'.$ep.'%');
         }
 
         if ($id) {
@@ -74,7 +74,7 @@ class PedidosController extends Controller
         }
 
         if ($os) {
-            $pedidos = $pedidos->where('pedidos.os', '=', $os);
+            $pedidos = $pedidos->where('pedidos.os',  'like', '%'.$os.'%'); 
         }
         if ($status_id) {
             $pedidos = $pedidos->where('pedidos.status_id', '=', $status_id);
@@ -251,20 +251,57 @@ class PedidosController extends Controller
         ->join('status', 'pedidos.status_id', '=', 'status.id')
         ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
         ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-        ->select('pedidos.os', 'pedidos.id', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'pessoas.email','status.nome' );
+        ->select('pedidos.os', 'pedidos.id', 'pedidos.data_entrega', 'ficha_tecnica.ep', 'pessoas.nome_contato', 'pessoas.email','status.nome', 'status.id as status_id' );
 
         $pedidos->where('pedidos.id', '=', $pedido);
         $pedidos = $pedidos->get();
 
+
+        $dados_texto = [
+            'pedidos' => $pedidos,
+            'statusEnvio' => [
+                1 => [
+                    'status_contenedor'=> [1,2,3],
+                    'descricao' => 'Pedido'
+                ],
+                2 => [
+                    'status_contenedor'=> [4],
+                    'descricao' => 'Usinagem'
+                ],
+                3 => [
+                    'status_contenedor'=> [5],
+                    'descricao' => 'Acabamento'
+                ],
+                4 => [
+                    'status_contenedor'=> [6],
+                    'descricao' => 'Montagem'
+                ],
+                5 => [
+                    'status_contenedor'=> [7],
+                    'descricao' => 'Inspeção'
+                ],
+                6 => [
+                    'status_contenedor'=> [8,9,10],
+                    'descricao' => 'Expedição'
+                ],
+                7 => [
+                    'status_contenedor'=> [11],
+                    'descricao' => 'Entregue'
+                    ]
+                ]
+        ];
+
         $dados = [
             'fromName' => 'Eplax',
             'fromEmail' => 'Eplax@eplax.com.br',
-            'assunto' => 'Atualização de status do seu pedido - Eplax',
-            'texto' => 'Seu pedido '. $pedidos[0]->os.' mudou de status para '. $pedidos[0]->nome,
-            'nome_cliente' => $pedidos[0]->nome_cliente,
+            'assunto' => 'Status ded produção '.$pedidos[0]->ep.' Eplax',
+            'texto' => view('layouts.emailAlerta', $dados_texto),
+            'nome_cliente' => $pedidos[0]->nome_contato,
             'email_cliente' => $pedidos[0]->email,
         ];
-        $contatos->store($dados);
+        info('aqui');
+        $retorno = $contatos->store($dados);
+        info('retorno do store' . $retorno);
     }
 
     public function salva($request, $historico='')
@@ -429,11 +466,13 @@ class PedidosController extends Controller
         $horas_maquinas =$maquinas[0]->horas_maquinas;
         $pessoas_acabamento =$maquinas[0]->pessoas_acabamento;
         $pessoas_montagem =$maquinas[0]->pessoas_montagem;
+        $pessoas_montagem_torres =$maquinas[0]->pessoas_montagem_torres;
         $pessoas_inspecao =$maquinas[0]->pessoas_inspecao;
         $horas_dia =$maquinas[0]->horas_dia;
         $total_horas_usinagem_maquinas_dia = $this->multiplyTimeByInteger($horas_maquinas, $qtde_maquinas);
         $total_horas_pessoas_acabamento_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_acabamento);
         $total_horas_pessoas_pessoas_montagem_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem);
+        $total_horas_pessoas_pessoas_montagem_torres_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem_torres);
         $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
         $totalGeral = [];
         foreach ($dados_pedido_status as $status => $pedidos) {
@@ -479,7 +518,7 @@ class PedidosController extends Controller
             $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia);
 
 
-            $dados_pedido_status[$status]['pessoas_montagem_torre'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'], $total_horas_pessoas_pessoas_montagem_dia);
+            $dados_pedido_status[$status]['pessoas_montagem_torre'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'], $total_horas_pessoas_pessoas_montagem_torres_dia);
 
             $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia);
             $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia);
@@ -537,7 +576,7 @@ class PedidosController extends Controller
             foreach ($request->input('enviar') as $key => $pedido) {
 
                 $alertasPedido = DB::table('pedidos')
-                    ->select('pedidos.id','status.alertacliente', 'alertas.id as id_alerta')
+                    ->select('pedidos.id','status.alertacliente', 'status.nome as nome_status', 'alertas.id as id_alerta')
                     ->join('alertas', 'pedidos.id', '=', 'alertas.pedidos_id')
                     ->join('status', 'pedidos.status_id', '=', 'status.id')
                     ->where('alertas.enviado', '=', 0)
@@ -571,13 +610,9 @@ class PedidosController extends Controller
         ->join('status', 'pedidos.status_id', '=', 'status.id')
         ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
         ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-        ->join('historicos_pedidos', function($join){
-            $join->on("historicos_pedidos.pedidos_id","=","pedidos.id")
-                ->on("historicos_pedidos.status_id","=","status.id");
-        })
-        ->select('pedidos.*', 'ficha_tecnica.ep', 'historicos_pedidos.created_at as data_ultimo_historico', 'pessoas.nome_cliente','pessoas.nome_contato', 'pessoas.email', 'status.nome as nome_status')
+        ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente','pessoas.nome_contato', 'pessoas.email', 'status.nome as nome_status')
         ->where('enviado', '=', 0)
-        ->orderBy('data_ultimo_historico', 'asc')->get();
+        ->distinct()->get();
 
         $data = array(
             'tela' =>'alerta-pedidos',
@@ -726,6 +761,35 @@ class PedidosController extends Controller
 
         return $mensagem;
     }
+
+    /**
+     * Exemplo de uso
+     * $tempo = "90:00";
+     * $valor = 3;
+     * $resultado = dividirTempoPorValor($tempo, $valor);
+     */
+    function dividirTempoPorValor($tempo, $valor) {
+        // Separar as partes do tempo
+        list($horas, $minutos) = explode(':', $tempo);
+
+        // Converter o tempo para minutos totais
+        $total_minutos = $horas * 60 + $minutos;
+
+        // Dividir o total de minutos pelo valor
+        $resultado_minutos = $total_minutos / $valor;
+
+        // Calcular as novas horas e minutos do resultado
+        $horas_resultado = floor($resultado_minutos / 60);
+        $minutos_resultado = $resultado_minutos % 60;
+
+        // Formatando a saída com zeros à esquerda, se necessário
+        $hora_formatada = str_pad($horas_resultado, 2, '0', STR_PAD_LEFT);
+        $minuto_formatado = str_pad($minutos_resultado, 2, '0', STR_PAD_LEFT);
+
+        // Retornar o tempo formatado
+        return $hora_formatada . ':' . $minuto_formatado;
+    }
+
 
     /**
     * Show the application dashboard.

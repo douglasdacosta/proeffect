@@ -35,7 +35,7 @@ class ManutencaoProducaoController extends Controller
     public function ajaxAlterarPedido(Request $request) {
         $pedidos = new Pedidos();
         $pedidosController = new PedidosController();
-        
+
         if($request->input('id')) {
             $pedidos= $pedidos::find($request->input('id'));
             $status_anterior = $pedidos->status_id;
@@ -79,9 +79,11 @@ class ManutencaoProducaoController extends Controller
             ->orderby('data_entrega');
 
             $pedidos = $pedidos->where('os', '=', $os)->get();
+            info($pedidos);
             if(!empty($pedidos)) {
                 $status = new Status();
                 $status = $status->orderby('id')->get();
+
                 foreach($status as  $stat) {
                     $id = $stat->id;
                     $dados_status[$id]['id'] = $stat->id;
@@ -90,7 +92,7 @@ class ManutencaoProducaoController extends Controller
             }
 
         }
-
+        info($dados_status);
         $dados = [
             'pedidos' => $pedidos,
             'status' => $dados_status,

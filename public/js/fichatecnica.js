@@ -5,17 +5,75 @@ $(function () {
     $('.toast').hide();
 
     function bloqueiaEP() {
-        if ($('#table_composicao tbody tr').length > 0) {
+        if ($('#table_composicao tbody tr').length > 0 && $('#clone').val() == 0) {
             $('#ep').attr('readonly', true);
         } else {
             $('#ep').attr('readonly', false);
         }
     }
 
+    if($('#clone').val() == 1) {
+        $('#ep').val('');
+    }
+
+    $("#usar_total").click(function () {
+        $("#tempo_usinagem").val($("#calc-total").val());
+    })
+
+
+
+    $("#tempo_usinagem").dblclick(function(){
+        $('#calcmodal').modal('show');
+    });
+
+    $("#calcular").click(function () {
+        $.ajax({
+            type: "POST",
+            url: '/ajax-fichatecnica-calculo-usinagem',
+            data: {
+                'calc-val1': $('#calc-val1').val(),
+                'calc-type': $('#calc-type').val(),
+                'calc-val2': $('#calc-val2').val(),
+                '_token': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (data) {
+                if(data != ''){
+                    $("#calc-total").val(data);
+                }
+            },
+            error: function (data, textStatus, errorThrown) {
+                $('.overlay').hide();
+            },
+
+        });
+
+    })
+    $("#ep").change(function () {
+        $.ajax({
+            type: "POST",
+            url: '/ajax-fichatecnica-check-ep',
+            data: {
+                ep: this.value,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (data) {
+                if(data != ''){
+                    abreAlert(data);
+                    $("#ep").val('');
+                    $("#ep").focus();
+                }
+            },
+            error: function (data, textStatus, errorThrown) {
+                $('.overlay').hide();
+            },
+
+        });
+
+    })
     $("#material_id").change(function () {
         $('.overlay').show();
-        $('#blank, #medidax, #mediday, #qtde').val('');
-        $('#tempo_usinagem, #tempo_acabamento, #tempo_montagem, #tempo_montagem_torre, #tempo_inspecao').val('00:00');
+        //$('#blank, #medidax, #mediday, #qtde').val('');
+        //$('#tempo_usinagem, #tempo_acabamento, #tempo_montagem, #tempo_montagem_torre, #tempo_inspecao').val('00:00');
 
         $.ajax({
             type: "POST",
@@ -35,7 +93,6 @@ $(function () {
                 hora = (hora == '') ? '00:00' : hora
                 $('#tempo_montagem_torre').val(hora);
                 $('.overlay').hide();
-                $('#blank').val('');
             },
             error: function (data, textStatus, errorThrown) {
                 $('.overlay').hide();
@@ -50,18 +107,35 @@ $(function () {
             $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', true);
         } else {
             $('#tempo_usinagem, #blank, #medidax, #mediday, #tempo_acabamento, #tempo_montagem, #tempo_inspecao').prop('readonly', false);
-    
+
         }
     }
-    
 
-    $("#addComposicao").click(function () {
+    function analiza_campos_composicao(){
         texto = ' não pode ser vazio!';
-        if ($('#blank').val().trim() == '' && $('#blank').prop('readonly') == false) {
+        blank = $('#blank').val().toUpperCase().trim();
+        if (blank == '' && $('#blank').prop('readonly') == false) {
             abreAlert('O campo Blank' + texto);
             $('#blank').focus();
             return false;
         }
+        let bloqueia_lancamento = false;
+        if(blank != '') {
+
+            $('.blank').each(function(i,e){
+                
+                if(e.textContent.trim() == blank) {
+                    abreAlert('O Blank ' + blank + ' já existe');
+                    $('#blank').focus();
+                    bloqueia_lancamento = true;
+                }
+            })
+        }
+
+        if(bloqueia_lancamento) {
+            return false;
+        }
+
         if ($('#medidax').val().trim() == '' && $('#blank').prop('readonly') == false) {
             abreAlert('O campo Medida X' + texto);
             $('#medidax').focus();
@@ -87,11 +161,28 @@ $(function () {
             $('#qtde').focus();
             return false;
         }
-        blank = $('#blank').val().toUpperCase().trim();
+
+        return true;
+    }
+
+    $("#addComposicao").click(function () {
+        retorno = analiza_campos_composicao();
+
+        if(retorno) {
+
+            inclui_composicao();
+        }
+
+    })
+
+
+
+    function inclui_composicao() {
+
         $('#table_composicao tbody').append(
             '<tr class="blank_' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
                 '<td data-name="blank" class="blank" scope="row">' + blank + '</td>' +
-                '<td data-name="qtde" class="qtde">' + $('#qtde').val() + '</td>' +
+                '<td contenteditable="true" data-name="qtde" class="qtde">' + $('#qtde').val() + '</td>' +
                 '<td data-name="material_id" class="material_id" data-materialid="' + $('#material_id option:selected').val() + '" >' + $('#material_id option:selected').text() + '</td>' +
                 '<td data-name="medidax" class="medidax">' + $('#medidax').val() + '</td>' +
                 '<td data-name="mediday" class="mediday">' + $('#mediday').val() + '</td>' +
@@ -108,7 +199,7 @@ $(function () {
             '</tr>');
 
         calculaTempos();
-    });
+    };
 
     $(document).on('click', '#table_composicao .edita_composicao', function () {
         id = $(this).data('blank');
@@ -316,6 +407,11 @@ $(function () {
 
     $("#salvar_ficha").click(function () {
 
+        if ($('#ep').val().trim() == '') {
+            abreAlert('O campo EP não pode ser vazio');
+            $('#ep').focus();
+            return false;
+        }
         var composicaoep = new Array();
 
         $('#table_composicao tbody tr').each(function (i, e) {

@@ -57,10 +57,13 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>EP</th>
+                                    <th>REV</th>
+                                    <th>Data REV</th>
                                     <th scope="col">Total usinagem </th>
                                     <th scope="col">Total acabamento</th>
                                     <th scope="col">Total montagem</th>
                                     <th scope="col">Total inspeção</th>
+                                    <th scope="col">Clonar</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,10 +74,15 @@
                                                     href={{ URL::route($rotaAlterar, ['id' => $fichatecnica->id]) }}>{{ $fichatecnica->id }}</a>
                                             </th>
                                             <td>{{ $fichatecnica->ep }}</td>
+                                            <td>{{ $fichatecnica->rev }}</td>
+                                            <td>{{ !empty($fichatecnica->data_rev) ? \Carbon\Carbon::createFromDate($fichatecnica->data_rev)->format('d/m/Y') : '' }}</td>
                                             <td class="@if($fichatecnica->tempo_usinagem == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_usinagem }}</td>
                                             <td class="@if($fichatecnica->tempo_acabamento == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_acabamento }}</td>
                                             <td class="@if($fichatecnica->tempo_montagem == '00:00:00') {{'text-danger'}} @else {{''}} @endif">{{ $fichatecnica->tempo_montagem }}</td>
                                             <td class="@if($fichatecnica->tempo_inspecao == '00:00:00') {{'text-danger'}} @else {{''}} @endif"  >{{ $fichatecnica->tempo_inspecao }}</td>
+                                            <th scope="row"><a
+                                                    href={{ URL::route('clona-fichatecnica', ['id' => $fichatecnica->id]) }}><i class="far fa-copy"></i></a>
+                                            </th>
                                         </tr>
                                     @endforeach
                                 @endif
@@ -125,6 +133,8 @@
                     class="form-horizontal form-label-left" novalidate="" method="post">
         @endif
         @csrf <!--{{ csrf_field() }}-->
+        <input type="hidden" id="clone" name="clone" class="form-control col-md-13 text-uppercase"
+            value="@if (isset($clonando)) {{'1'}} @else{{'0'}} @endif">
         <div class="form-group row">
             <label for="ep" class="col-sm-2 col-form-label text-right">EP*</label>
             <div class="col-sm-1">
@@ -171,6 +181,49 @@
 
 
         </div>
+
+
+        <div id='calcmodal' class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title">Calculo de Usinagem</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <label for="" class="col-sm-2 col-form-label text-right">Valor A</label>
+                            <input type="text" id="calc-val1" name="calc-val1" placeholder='00:00' class="form-control col-md-5 mask_minutos" value="">
+                        </div>
+                        <div class="form-group row">
+                            <label for="" class="col-sm-2 col-form-label text-right">Tipo</label>
+                            <input type="text" id="calc-type" name="calc-type" placeholder="+ ou /" class="form-control col-md-2" value="">
+                        </div>
+                        <div class="form-group row">
+                            <label for="" class="col-sm-2 col-form-label text-right">Valor B</label>
+                            <input type="text" id="calc-val2" name="calc-val2" placeholder='00:00' class="form-control col-md-5" value="">
+                        </div>
+                        <div class="form-group row">
+                            <label for="" class="col-sm-2 col-form-label text-right"></label>
+                            <button type="button" id='calcular' class="btn btn-success" >Calcular</button>
+                        </div>
+                        <div class="form-group row">
+                            <label for="" class="col-sm-2 col-form-label text-right">Total</label>
+                            <input type="text" id="calc-total" name="calc-total" class="form-control col-md-5 mask_minutos" value="">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id='usar_total'>Usar Total</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="form-group row">
             <label for="tempo_usinagem" class="col-sm-2 col-form-label text-right">Tmp usinagem</label>
             <div class="col-sm-1">
@@ -196,7 +249,17 @@
             </div>
         </div>
         <div class="form-group row">
-            <div class="col-sm-10">
+            <label for="rev" class="col-sm-2 col-form-label text-right">REV</label>
+            <div class="col-sm-1">
+                <input type="text" id="rev" name="rev"
+                    class="form-control " value="@if (isset($fichatecnicas[0]->rev)) {{$fichatecnicas[0]->rev}} @else{{ '' }} @endif">
+            </div>
+            <label for="data_rev" class="col-sm-2 col-form-label text-right">Data REV</label>
+            <div class="col-sm-2">
+                <input type="text" id="data_rev" name="data_rev"
+                    class="form-control  mask_date" value="@if (isset($fichatecnicas[0]->data_rev)) {{ \Carbon\Carbon::createFromDate($fichatecnicas[0]->data_rev)->format('d/m/Y') }} @else{{ '' }} @endif">
+            </div>
+            <div class="col-sm-3">
             </div>
             <div class="col-sm-2">
                 <button type="button" id="addComposicao" class="btn btn-success">Adicionar</button>
@@ -228,7 +291,7 @@
                             <tr class="{{ 'blank_' . $fichatecnicaitem->blank }}{{ $fichatecnicaitem->materiais_id }}">
                                 <td data-name="blank" class="blank" scope="row">{{ trim($fichatecnicaitem->blank) }}
                                 </td>
-                                <td data-name="qtde" class="qtde">{{ trim($fichatecnicaitem->qtde_blank) }}</td>
+                                <td contenteditable="true" data-name="qtde" class="qtde">{{ trim($fichatecnicaitem->qtde_blank) }}</td>
                                 <td data-name="material_id" class="material_id"
                                     data-materialid="{{ trim($fichatecnicaitem->materiais_id) }}">
                                     {{ trim($fichatecnicaitem->materiais->material) }}</td>

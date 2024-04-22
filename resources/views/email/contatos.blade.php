@@ -7,7 +7,6 @@
     <title></title>
 </head>
 <body>
-    Olá, <h3> {{$data['nome_cliente']}}</h3>
     <p>{{$data['message']}}</p>
 </body>
 </html>

@@ -42,6 +42,9 @@ Route::match(['get', 'post'],'/fichatecnica', [App\Http\Controllers\Fichatecnica
 Route::match(['get', 'post'],'/alterar-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'alterar'])->name('alterar-fichatecnica');
 Route::match(['get', 'post'],'/incluir-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'incluir'])->name('incluir-fichatecnica');
 Route::match(['get', 'post'],'/ajax-fichatecnica', [App\Http\Controllers\AjaxfichatecnicaController::class, 'buscarMateriais'])->name('ajax-fichatecnica');
+Route::match(['post'],'/ajax-fichatecnica-check-ep', [App\Http\Controllers\AjaxfichatecnicaController::class, 'checkEpExistente'])->name('ajax-fichatecnica-check-ep');
+Route::match(['get'],'/clona-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'clonarFichatecnica'])->name('clona-fichatecnica');
+Route::match(['post'],'/ajax-fichatecnica-calculo-usinagem', [App\Http\Controllers\AjaxfichatecnicaController::class, 'calculaUsinagem'])->name('ajax-fichatecnica-calculo-usinagem');
 
 Route::match(['get', 'post'],'/ajax-getProducao', [App\Http\Controllers\HomeController::class, 'getProducao'])->name('ajax-getProducao');
 Route::match(['get', 'post'],'/followup', [App\Http\Controllers\PedidosController::class, 'followup'])->name('followup');

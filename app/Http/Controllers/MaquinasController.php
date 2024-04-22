@@ -583,6 +583,7 @@ class MaquinasController extends Controller
         $maquinas->horas_maquinas = $request->input('horas_maquinas');
         $maquinas->pessoas_acabamento = $request->input('pessoas_acabamento');
         $maquinas->pessoas_montagem = $request->input('pessoas_montagem');
+        $maquinas->pessoas_montagem_torres = $request->input('pessoas_montagem_torres');
         $maquinas->pessoas_inspecao = $request->input('pessoas_inspecao');
         $maquinas->horas_dia = $request->input('horas_dia');
         $maquinas->save();
