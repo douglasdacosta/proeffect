@@ -17,13 +17,13 @@
                 <td >{{ Carbon\Carbon::createFromDate($pedidos[0]->data_gerado)->format('d/m/Y') }}</td>
             </tr>
             <tr>
-                <td colspan="2" class="font-weight-bold">Quantidade</td>
+                <td colspan="1" class="font-weight-bold">Quantidade</td>
                 <td >{{$pedidos[0]->qtde}}</td>
-                <td  colspan="2" class="font-weight-bold">Quantidade blanks</td>
+                <td  colspan="1" class="font-weight-bold">Quantidade blanks</td>
                 <td >{{$qtde_blank}}</td>
-                <td colspan="2" class="font-weight-bold">Quantidade de conjuntos</td>
+                <td colspan="3" class="font-weight-bold">Quantidade de conjuntos</td>
                 <td >{{$qtde_conjuntos}}</td>
-                <td class="font-weight-bold">Data entrega</td>
+                <td colspan="2" class="font-weight-bold">Data entrega</td>
                 <td >{{Carbon\Carbon::createFromDate($pedidos[0]->data_entrega)->format('d/m/Y')}}</td>
             </tr>
         <tr>

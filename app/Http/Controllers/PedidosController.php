@@ -74,7 +74,7 @@ class PedidosController extends Controller
         }
 
         if ($os) {
-            $pedidos = $pedidos->where('pedidos.os',  'like', '%'.$os.'%'); 
+            $pedidos = $pedidos->where('pedidos.os',  'like', '%'.$os.'%');
         }
         if ($status_id) {
             $pedidos = $pedidos->where('pedidos.status_id', '=', $status_id);

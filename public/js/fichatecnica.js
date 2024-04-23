@@ -123,7 +123,7 @@ $(function () {
         if(blank != '') {
 
             $('.blank').each(function(i,e){
-                
+
                 if(e.textContent.trim() == blank) {
                     abreAlert('O Blank ' + blank + ' já existe');
                     $('#blank').focus();
@@ -178,6 +178,11 @@ $(function () {
 
 
     function inclui_composicao() {
+        tempo_usinagem = $('#tempo_usinagem').val().trim() == ''  ? '00:00:00' : $('#tempo_usinagem').val();
+        tempo_acabamento = $('#tempo_acabamento').val().trim() == ''  ? '00:00:00' : $('#tempo_acabamento').val();
+        tempo_montagem = $('#tempo_montagem').val().trim() == ''  ? '00:00:00' : $('#tempo_montagem').val();
+        tempo_montagem_torre = $('#tempo_montagem_torre').val().trim() == ''  ? '00:00:00' : $('#tempo_montagem_torre').val();
+        tempo_inspecao = $('#tempo_inspecao').val().trim() == ''  ? '00:00:00' : $('#tempo_inspecao').val();
 
         $('#table_composicao tbody').append(
             '<tr class="blank_' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
@@ -186,18 +191,22 @@ $(function () {
                 '<td data-name="material_id" class="material_id" data-materialid="' + $('#material_id option:selected').val() + '" >' + $('#material_id option:selected').text() + '</td>' +
                 '<td data-name="medidax" class="medidax">' + $('#medidax').val() + '</td>' +
                 '<td data-name="mediday" class="mediday">' + $('#mediday').val() + '</td>' +
-                '<td data-name="tempo_usinagem" class="tempo_usinagem">' + $('#tempo_usinagem').val() + '</td>' +
-                '<td data-name="tempo_acabamento" class="tempo_acabamento">' + $('#tempo_acabamento').val() + '</td>' +
-                '<td data-name="tempo_montagem" class="tempo_montagem">' + $('#tempo_montagem').val() + '</td>' +
-                '<td data-name="tempo_montagem_torre" class="tempo_montagem_torre">' + $('#tempo_montagem_torre').val() + '</td>' +
-                '<td data-name="tempo_inspecao" class="tempo_inspecao">' + $('#tempo_inspecao').val() + '</td>' +
+                '<td data-name="tempo_usinagem" class="tempo_usinagem">' + tempo_usinagem + '</td>' +
+                '<td data-name="tempo_acabamento" class="tempo_acabamento">' + tempo_acabamento + '</td>' +
+                '<td data-name="tempo_montagem" class="tempo_montagem">' + tempo_montagem + '</td>' +
+                '<td data-name="tempo_montagem_torre" class="tempo_montagem_torre">' + tempo_montagem_torre + '</td>' +
+                '<td data-name="tempo_inspecao" class="tempo_inspecao">' + tempo_inspecao + '</td>' +
                 '<td><button type="button" class="close" aria-label="Close" data-blank="' + $('#blank').val()+$('#material_id option:selected').val() + '">' +
                     '<span aria-hidden="true">&times;</span>' +
                     '</button>' +
                     '<button type="button" class="close edita_composicao" style="padding-right: 20px" data-blank="' + $('#blank').val()+$('#material_id option:selected').val() + '"><span aria-hidden="true">&#9998;</span></button>' +
                 '</td>' +
-            '</tr>');
+            '</tr>'
+        );
 
+
+        $('#blank, #medidax, #mediday, #qtde').val('');
+        $('#tempo_usinagem, #tempo_acabamento, #tempo_montagem, #tempo_montagem_torre, #tempo_inspecao').val('00:00');
         calculaTempos();
     };
 
