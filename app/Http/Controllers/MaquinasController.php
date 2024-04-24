@@ -50,7 +50,7 @@ class MaquinasController extends Controller
         $colors = ['#FE6F5E','#FDBCB4','#F88379','#FFC0CB','#FFD700','#FF6347','#FF8200','#DAA06D','#CC7F3B','#DDD06A','#E48400','#E5AA70','#E4D96F','#7BA05B','#ACE1AF','#03C03C','#00CCCC','#93C572','#BCB88A','#76FF7A','#2E8B57','#40826D','#00BFFF','#008B8B','#007BA7','#99FFFF','#81D8D0','#5D8AA8','#0095B6','#6F00FF','#BF00FF','#FF00FF','#DDA0DD','#E0B0FF','#AA98A9','#EE82EE','#FBAED2','#FFCBA4','#F0EAD6','#EFDFBB','#F1E9D2'];
         $data = date('Y-m-d');
         $data_fim = date('Y-m-d');
-        $hora = '00:00:01';
+        $hora = '01:00:01';
         $hora_fim = '23:59:59';
 
         if(!empty($request->input('numero_cnc'))) {
@@ -85,8 +85,7 @@ class MaquinasController extends Controller
             $data_fim = DateHelpers::formatDate_dmY($request->input('created_at_fim'));
         }
 
-        $ProducaoMaquinas = $ProducaoMaquinas->whereBetween('data', [$data, $data_fim])
-                                                ->whereBetween('hora', [$hora, $hora_fim])
+        $ProducaoMaquinas = $ProducaoMaquinas->whereBetween('created_at', [$data. ' ' . $hora, $data_fim. ' ' . $hora_fim])
                                                 ->orderby('numero_cnc','asc')
                                                 ->orderby('created_at','asc')
                                                 ->get();
@@ -106,6 +105,7 @@ class MaquinasController extends Controller
             $ProdMaq = new ProducaoMaquinas();
             foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
                 $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
+
                 $numero_maquina = $producaoMaquina['numero_cnc'];
                 $hora_loop = $created_at->format('H');
                 $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'].$hora_loop;
@@ -130,6 +130,8 @@ class MaquinasController extends Controller
             }
 
             $total_horas_tabalhadas=$total_horas_usinadas='00:00:00';
+            $tempo_temporario = $sobra_tempo = '00:00:00';
+            $chave_anterior = '';
             foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
                 $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
 
@@ -142,18 +144,48 @@ class MaquinasController extends Controller
 
                 $horas_usinadas = $this->converterParaHoras($horas_usinadas);
 
-                $horas_tabalhadas = '01:00:00';
-                $dados[$chave][$turno_chave] = [
-                    'maquina_cnc' =>  $producaoMaquina['numero_cnc'],
-                    'turno' => $turno,
-                    'data' =>  $created_at->format('d/m/Y'). ' ' . $hora_loop .':00:00',
-                    'horasTrabalho' => $horas_tabalhadas,
-                    'total_horas_usinadas' => $horas_usinadas,
-                    'metrosPercorridos' => $usinados[$chave][$turno_chave]['metrosPercorridos'],
-                    'qtdeServico' => $usinados[$chave][$turno_chave]['qtdeServico'],
-                    'percentual' => $this->calcularPorcentagemUsinada($horas_usinadas,$horas_tabalhadas)
-                ];
 
+
+                if($chave_anterior != $chave) {
+
+                    if($this->horaMaior($sobra_tempo, '00:00:00')) {
+                        $tempo_temporario = $pedidosController->somarHoras($tempo_temporario, $sobra_tempo);
+                        $sobra_tempo = '00:00:00';
+                    }
+
+                    if($horas_usinadas == '00:00:00') {
+
+                        $tempo_temporario = $pedidosController->somarHoras($tempo_temporario, '01:00:00');
+
+                        $horas_usinadas = '01:00:00';
+
+                    } else {
+                        if($this->horaMaior($horas_usinadas, '01:00:00')) {
+                            $sobra_tempo = $pedidosController->subtrairHoras($horas_usinadas, '01:00:00');
+                            $horas_usinadas  = '01:00:00';
+                        }else {
+                            if($this->horaMaior($horas_usinadas, '01:00:00')) {
+                                $horas_usinadas = $pedidosController->subtrairHoras($horas_usinadas, $tempo_temporario);
+                            }
+                        }
+                        $tempo_temporario = '00:00:00';
+
+                    }
+
+                    $chave_anterior = $chave;
+
+                    $horas_tabalhadas = '01:00:00';
+                    $dados[$chave][$turno_chave] = [
+                        'maquina_cnc' =>  $producaoMaquina['numero_cnc'],
+                        'turno' => $turno,
+                        'data' =>  $created_at->format('d/m/Y'). ' ' . $hora_loop .':00:00',
+                        'horasTrabalho' => $horas_tabalhadas,
+                        'total_horas_usinadas' => $horas_usinadas,
+                        'metrosPercorridos' => $usinados[$chave][$turno_chave]['metrosPercorridos'],
+                        'qtdeServico' => $usinados[$chave][$turno_chave]['qtdeServico'],
+                        'percentual' => $this->calcularPorcentagemUsinada($horas_usinadas,$horas_tabalhadas)
+                    ];
+            }
                 $data = $created_at->format('d/m/Y');
 
             }
@@ -172,7 +204,6 @@ class MaquinasController extends Controller
             foreach ($ProducaoMaquinas as $key => $producaoMaquina) {
                 $created_at = DateTime::createFromFormat('Y-m-d H:i:s', $producaoMaquina['created_at']);
                 $hora_loop = $created_at->format('H');
-
                 $chave = $created_at->format('d/m/Y').$producaoMaquina['numero_cnc'];
                 $data = $created_at->format('d/m/Y');
 
