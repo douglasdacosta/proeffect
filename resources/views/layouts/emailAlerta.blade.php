@@ -5,129 +5,387 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Progresso do Pedido</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-    }
-    .containerA {
-        display: block;
-        justify-content: space-between;
-        align-items: center;
-        margin: 50px auto;
-        width: 90%;
-        position: relative;
-        padding-left: 9%;
+
+    @media only screen and (min-width: 1024px) {
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .containerA {
+            display: block;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px auto;
+            width: 90%;
+            position: relative;
+            padding-left: 9%;
+        }
+
+        .pendente {
+            font-size: 13px;
+            color: #ccc;
+            background-color: #ccc;
+        }
+        .concluido {
+            font-size: 13px;
+            color: #007bff;
+            background-color: #007bff;
+            margin-right: 15px;
+        }
+        .emandamento {
+            font-size: 13px;
+            color: #f5e400;
+            background-color: #f5e400;
+            margin-right: 15px;
+        }
+        .entenda{
+            margin-right: 120px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px auto;
+            width: 70%;
+            position: relative;
+            border: 1px solid #949393;
+            padding: 15px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* Adiciona sombra */
+        }
+        .container p{
+            font-size: 14px;
+        }
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            width: 300px;
+            height: 70px;
+        }
+        .circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-left: 34%;
+            margin-bottom: 10px;
+        }
+
+
+        .line {
+
+            width: calc(100% - 10px);
+            height: 2px;
+            background-color: #ccc;
+            position: absolute;
+            top: 24px;
+            left: 88%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+        .line:first-child {
+            display: none;
+        }
+        .circle.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .line.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .circle.activeProcessando {
+            background-color: #f5e400;
+            color: #272424;
+        }
+        .line.activeProcessando {
+            background-color: #f5e400;
+            color: #272424;
+        }
+
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .footer .address {
+            font-weight: bold;
+        }
+        .footer .contact-info {
+            margin-top: 10px;
+        }
     }
 
-    .pendente {
-        font-size: 13px;
-        color: #ccc;
-        background-color: #ccc;
-    }
-    .concluido {
-        font-size: 13px;
-        color: #007bff;
-        background-color: #007bff;
-        margin-right: 15px;
-    }
-    .emandamento {
-        font-size: 13px;
-        color: #f5e400;
-        background-color: #f5e400;
-        margin-right: 15px;
-    }
-    .entenda{
-        margin-right: 120px;
-    }
+    @media only screen and (min-width: 768px) and (max-width: 1023px) {
 
-    .container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 50px auto;
-        width: 70%;
-        position: relative;
-        border: 1px solid #949393;
-        padding: 15px;
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* Adiciona sombra */
-    }
-    .container p{
-        font-size: 14px;
-    }
-    .step {
-        text-align: center;
-        flex: 1;
-        position: relative;
-        width: 300px;
-        height: 70px;
-    }
-    .circle {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: #ccc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        margin-left: 34%;
-        margin-bottom: 10px;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .containerA {
+            display: block;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px auto;
+            width: 90%;
+            position: relative;
+            padding-left: 9%;
+        }
+
+        .pendente {
+            font-size: 13px;
+            color: #ccc;
+            background-color: #ccc;
+        }
+        .concluido {
+            font-size: 13px;
+            color: #007bff;
+            background-color: #007bff;
+            margin-right: 15px;
+        }
+        .emandamento {
+            font-size: 13px;
+            color: #f5e400;
+            background-color: #f5e400;
+            margin-right: 15px;
+        }
+        .entenda{
+            margin-right: 120px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px auto;
+            width: 70%;
+            position: relative;
+            border: 1px solid #949393;
+            padding: 15px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* Adiciona sombra */
+        }
+        .container p{
+            font-size: 14px;
+        }
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            width: 300px;
+            height: 70px;
+        }
+        .circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-left: 34%;
+            margin-bottom: 10px;
+        }
 
 
-    .line {
+        .line {
 
-        width: calc(100% - 10px);
-        height: 2px;
-        background-color: #ccc;
-        position: absolute;
-        top: 24px;
-        left: 88%;
-        transform: translateX(-50%);
-        z-index: -1;
-    }
-    .line:first-child {
-        display: none;
-    }
-    .circle.active {
-        background-color: #007bff;
-        color: #fff;
-    }
-    .line.active {
-        background-color: #007bff;
-        color: #fff;
-    }
+            width: calc(100% - 10px);
+            height: 2px;
+            background-color: #ccc;
+            position: absolute;
+            top: 24px;
+            left: 88%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+        .line:first-child {
+            display: none;
+        }
+        .circle.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .line.active {
+            background-color: #007bff;
+            color: #fff;
+        }
 
-    .circle.activeProcessando {
-        background-color: #f5e400;
-        color: #272424;
-    }
-    .line.activeProcessando {
-        background-color: #f5e400;
-        color: #272424;
-    }
+        .circle.activeProcessando {
+            background-color: #f5e400;
+            color: #272424;
+        }
+        .line.activeProcessando {
+            background-color: #f5e400;
+            color: #272424;
+        }
 
-    .footer {
-        background-color: #f9f9f9;
-        padding: 20px;
-        text-align: center;
-    }
-    .footer p {
-        margin: 5px 0;
-    }
-    .footer a {
-        color: #007bff;
-        text-decoration: none;
-    }
-    .footer a:hover {
-        text-decoration: underline;
-    }
-    .footer .address {
-        font-weight: bold;
-    }
-    .footer .contact-info {
-        margin-top: 10px;
-    }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .footer .address {
+            font-weight: bold;
+        }
+        .footer .contact-info {
+            margin-top: 10px;
+        }
+}
+
+    @media only screen and (max-width: 767px) {
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        .containerA {
+            display: block;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px auto;
+            width: 90%;
+            position: relative;
+            padding-left: 9%;
+        }
+
+        .pendente {
+            font-size: 13px;
+            color: #ccc;
+            background-color: #ccc;
+        }
+        .concluido {
+            font-size: 13px;
+            color: #007bff;
+            background-color: #007bff;
+            margin-right: 15px;
+        }
+        .emandamento {
+            font-size: 13px;
+            color: #f5e400;
+            background-color: #f5e400;
+            margin-right: 15px;
+        }
+        .entenda{
+            margin-right: 120px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px auto;
+            width: 89%;
+            position: relative;
+            border: 1px solid #949393;
+            padding: 15px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* Adiciona sombra */
+        }
+        .container p{
+            font-size: 7px;
+        }
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            width: 25px;
+            height: 70px;
+        }
+        .circle {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-left: 22%;
+            margin-bottom: 10px;
+        }
+
+
+        .line {
+            width: calc(100% - 2px);
+            height: 2px;
+            background-color: #ccc;
+            position: absolute;
+            top: 12px;
+            left: 88%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+        .line:first-child {
+            display: none;
+        }
+        .circle.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .line.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .circle.activeProcessando {
+            background-color: #f5e400;
+            color: #272424;
+        }
+        .line.activeProcessando {
+            background-color: #f5e400;
+            color: #272424;
+        }
+
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .footer .address {
+            font-weight: bold;
+        }
+        .footer .contact-info {
+            margin-top: 10px;
+        }
+}
+
+
 </style>
 </head>
 <body>
