@@ -293,15 +293,14 @@ class PedidosController extends Controller
 
         $dados = [
             'fromName' => 'Eplax',
-            'fromEmail' => 'Eplax@eplax.com.br',
-            'assunto' => 'Status ded produção '.$pedidos[0]->ep.' Eplax',
+            'fromEmail' => env('MAIL_CC'),
+            'assunto' => 'Status de produção '.$pedidos[0]->ep.' Eplax',
             'texto' => view('layouts.emailAlerta', $dados_texto),
             'nome_cliente' => $pedidos[0]->nome_contato,
             'email_cliente' => $pedidos[0]->email,
         ];
-        info('aqui');
+
         $retorno = $contatos->store($dados);
-        info('retorno do store' . $retorno);
     }
 
     public function salva($request, $historico='')
