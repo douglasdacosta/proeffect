@@ -97,7 +97,7 @@
             <div class="form-group row">
                 <label for="codigo" class="col-sm-2 col-form-label">Id</label>
                 <div class="col-sm-2">
-                <input type="text" id="id" name="id" class="form-control col-md-7 col-xs-12" readonly="true" value="1">
+                <input type="text" id="id" name="id" class="form-control col-md-7 col-xs-12" readonly="true" value="@if (isset($pessoas[0]->id)){{$pessoas[0]->id}}@else{{''}}@endif">
                 </div>
             </div>
         @else
