@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Progresso do Pedido</title>
 <style>
-
-    @media only screen and (min-width: 1024px) {
+%
+    @media only screen and (min-width: 2024px) {
         body {
             font-family: Arial, sans-serif;
             font-size: 14px;
@@ -26,43 +26,39 @@
             color: #ccc;
             background-color: #ccc;
         }
+
         .concluido {
             font-size: 13px;
             color: #007bff;
             background-color: #007bff;
             margin-right: 15px;
         }
+
         .emandamento {
             font-size: 13px;
             color: #f5e400;
             background-color: #f5e400;
             margin-right: 15px;
         }
+
         .entenda{
             margin-right: 120px;
         }
 
         .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin: 50px auto;
             width: 70%;
             position: relative;
-            border: 1px solid #949393;
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* Adiciona sombra */
         }
+
         .container p{
             font-size: 14px;
         }
-        .step {
-            text-align: center;
-            flex: 1;
-            position: relative;
-            width: 300px;
-            height: 70px;
+
+        .container img{
+            width: 99%;
         }
+
         .circle {
             width: 50px;
             height: 50px;
@@ -76,7 +72,6 @@
             margin-bottom: 10px;
         }
 
-
         .line {
 
             width: calc(100% - 10px);
@@ -88,13 +83,16 @@
             transform: translateX(-50%);
             z-index: -1;
         }
+
         .line:first-child {
             display: none;
         }
+
         .circle.active {
             background-color: #007bff;
             color: #fff;
         }
+
         .line.active {
             background-color: #007bff;
             color: #fff;
@@ -132,7 +130,7 @@
         }
     }
 
-    @media only screen and (min-width: 768px) and (max-width: 1023px) {
+    @media only screen and (min-width: 768px) and (max-width: 2023px) {
 
         body {
             font-family: Arial, sans-serif;
@@ -170,26 +168,18 @@
         }
 
         .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin: 50px auto;
             width: 70%;
             position: relative;
-            border: 1px solid #949393;
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* Adiciona sombra */
         }
         .container p{
             font-size: 14px;
         }
-        .step {
-            text-align: center;
-            flex: 1;
-            position: relative;
-            width: 300px;
-            height: 70px;
+
+        .container img{
+            width: 99%;
         }
+
         .circle {
             width: 50px;
             height: 50px;
@@ -295,28 +285,20 @@
         .entenda{
             margin-right: 120px;
         }
-
         .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin: 50px auto;
-            width: 89%;
+            width: 70%;
             position: relative;
-            border: 1px solid #949393;
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* Adiciona sombra */
         }
+
         .container p{
             font-size: 7px;
         }
-        .step {
-            text-align: center;
-            flex: 1;
-            position: relative;
-            width: 25px;
-            height: 70px;
+
+        .container img {
+            width: 99%;
         }
+
         .circle {
             width: 25px;
             height: 25px;
@@ -330,7 +312,6 @@
             margin-bottom: 10px;
         }
 
-
         .line {
             width: calc(100% - 2px);
             height: 2px;
@@ -341,6 +322,7 @@
             transform: translateX(-50%);
             z-index: -1;
         }
+
         .line:first-child {
             display: none;
         }
@@ -403,36 +385,7 @@
     @foreach ($statusEnvio as $key => $status)
 
         @if(in_array($pedidos[0]->status_id, $status['status_contenedor']))
-            <div class="step">
-                @if($key == 7)
-                    <div class="circle active">{{$key}}</div>
-                @else
-                    <div class="circle activeProcessando">{{$key}}</div>
-                @endif
-                <p>{{$status['descricao']}}</p>
-                @if($key != 7)
-                    <div class="line activeProcessando"></div>
-                @endif
-            </div>
-            <?php $setado_andamento = true ?>
-        @else
-            @if($setado_andamento)
-                <div class="step">
-                    <div class="circle">{{$key}}</div>
-                    <p>{{$status['descricao']}}</p>
-                    @if($key != 7)
-                        <div class="line"></div>
-                    @endif
-                </div>
-            @else
-                <div class="step">
-                    <div class="circle active">{{$key}}</div>
-                    <p>{{$status['descricao']}}</p>
-                    @if($key != 7)
-                        <div class="line active"></div>
-                    @endif
-                </div>
-            @endif
+            <img src="{{"data:image/png;base64,".$status['imagem']}}">
         @endif
     @endforeach
 </div>

@@ -262,31 +262,38 @@ class PedidosController extends Controller
             'statusEnvio' => [
                 1 => [
                     'status_contenedor'=> [1,2,3],
-                    'descricao' => 'Pedido'
+                    'descricao' => 'Pedido',
+                    'imagem' => base64_encode(file_get_contents(public_path().'/images/status1.png'))
                 ],
                 2 => [
                     'status_contenedor'=> [4],
-                    'descricao' => 'Usinagem'
+                    'descricao' => 'Usinagem',
+                    'imagem' => base64_encode(file_get_contents(public_path().'/images/status2.png'))
                 ],
                 3 => [
                     'status_contenedor'=> [5],
-                    'descricao' => 'Acabamento'
+                    'descricao' => 'Acabamento',
+                    'imagem' => base64_encode(file_get_contents(public_path().'/images/status3.png'))
                 ],
                 4 => [
                     'status_contenedor'=> [6],
-                    'descricao' => 'Montagem'
+                    'descricao' => 'Montagem',
+                    'imagem' => base64_encode(file_get_contents(public_path().'/images/status4.png'))
                 ],
                 5 => [
                     'status_contenedor'=> [7],
-                    'descricao' => 'Inspeção'
+                    'descricao' => 'Inspeção',
+                    'imagem' => base64_encode(file_get_contents(public_path().'/images/status5.png'))
                 ],
                 6 => [
                     'status_contenedor'=> [8,9,10],
-                    'descricao' => 'Expedição'
+                    'descricao' => 'Expedição',
+                    'imagem' => base64_encode(file_get_contents(public_path().'/images/status6.png'))
                 ],
                 7 => [
                     'status_contenedor'=> [11],
-                    'descricao' => 'Entregue'
+                    'descricao' => 'Entregue',
+                    'imagem' => base64_encode(file_get_contents(public_path().'/images/status7.png'))
                     ]
                 ]
         ];
