@@ -74,6 +74,41 @@
                 </tbody>
             </table>
 
+            <div id='modal_acao_manutencao' class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title">Alteração de status</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <label for="" class="col-sm-2 col-form-label text-right">Tipo</label>
+
+                                <select class="form-control col-md-5" id="status" name="status">
+                                    <option value="A" @if (isset($request) && $request->input('status') == 'A') {{ ' selected ' }}@else @endif>Ativo
+                                    </option>
+                                    <option value="I" @if (isset($request) && $request->input('status') == 'I') {{ ' selected ' }}@else @endif>Inativo
+                                    </option>
+                                </select>
+
+                            </div>
+                            <div class="form-group row">
+                                <label for="" class="col-sm-2 col-form-label text-right">Tipo</label>
+                                <input type="text" id="calc-val1" name="calc-val1" placeholder='00:00' class="form-control col-md-5 mask_minutos" value="">
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="salvar_alteracao_status_pedido" data-dismiss="modal" >Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
     </div>
 
 @stop

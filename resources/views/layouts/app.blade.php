@@ -53,6 +53,11 @@
         $(function ($) {
 
             $(".alteracao_status_pedido").click(function () {
+                    $('#modal_acao_manutencao').modal('show');
+                });
+            });
+
+            $("#salvar_alteracao_status_pedido").click(function () {
                 var descricaoproximostatus = $(this).data('descricaoproximostatus');
                 if (!confirm("Você realmente deseja alterar este pedido para "+descricaoproximostatus+" ?")) {
                     return false;
