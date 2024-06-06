@@ -28,7 +28,7 @@
                     <option value="A" @if (isset($request) && $request->input('status') == 'A'){{ ' selected '}}@else @endif>Ativo</option>
                     <option value="I" @if (isset($request) && $request->input('status')  == 'I'){{ ' selected '}}@else @endif>Inativo</option>
                 </select>
-            </div>            
+            </div>
             <div class="form-group row">
                 <div class="col-sm-5">
                     <button type="submit" class="btn btn-primary">Pesquisar</button>
@@ -58,7 +58,7 @@
                         @foreach ($funcionarios as $funcionario)
                             <tr>
                             <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $funcionario->id )) }}>{{$funcionario->id}}</a></th>
-                              <td>{{$funcionario->nome}}</td>                              
+                              <td>{{$funcionario->nome}}</td>
                             </tr>
                         @endforeach
                     @endif
@@ -79,9 +79,9 @@
             @stop
             <form id="alterar" action="{{$rotaAlterar}}" data-parsley-validate="" class="form-horizontal form-label-left"  method="post">
             <div class="form-group row">
-                <label for="codigo" class="col-sm-2 col-form-label">Id</label>
+                <label for="id" class="col-sm-2 col-form-label">Id</label>
                 <div class="col-sm-2">
-                <input type="text" id="id" name="id" class="form-control col-md-7 col-xs-12" readonly="true" value="1">
+                <input type="text" id="id" name="id" class="form-control col-md-7 col-xs-12" readonly="true" value="@if (isset($funcionarios[0]->id)){{$funcionarios[0]->id}}@else{{''}}@endif">
                 </div>
             </div>
         @else
@@ -102,7 +102,13 @@
                 <div class="col-sm-4">
                 <input type="text" class="form-control" id="funcao"  name="funcao" value="@if (isset($funcionarios[0]->funcao)){{$funcionarios[0]->funcao}}@else{{''}}@endif">
                 </div>
-            </div>            
+            </div>
+            <div class="form-group row">
+                <label for="senha" class="col-sm-2 col-form-label">Senha</label>
+                <div class="col-sm-4">
+                <input type="text" class="form-control" id="senha"  name="senha" value="@if (isset($funcionarios[0]->senha)){{$funcionarios[0]->senha}}@else{{''}}@endif">
+                </div>
+            </div>
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label"></label>
                 <select class="form-control col-md-1" id="status" name="status">

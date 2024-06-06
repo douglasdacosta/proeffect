@@ -42,7 +42,7 @@
                     </div>
                 </div>
             </form>
-
+            <input type="hidden" id="senha_funcionario" name="senha_funcionario" value="{{isset($senha) ? $senha : ''}}">
             <hr class="my-5">
             <h3><b>Encontrados</b></h3>
             <table class="table table-striped text-center" id="table_composicao">
@@ -51,6 +51,7 @@
                         <th scope="col">EP</th>
                         <th scope="col">OS</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Etapa</th>
                         <th scope="col">Ação</th>
                     </tr>
                 </thead>
@@ -61,10 +62,12 @@
                                 <td style="margin-top: 10px" scope="col">{{$pedido->ep}}</td>
                                 <td scope="col">{{$pedido->os}}</td>
                                 <td scope="col">{{$pedido->nomeStatus}}</td>
+                                <td scope="col">{{isset($dados_historicos_etapas[$pedido->id]) && ($dados_historicos_etapas[$pedido->id][$pedido->id_status][0]['nome_etapa'] != 'Término') ? $dados_historicos_etapas[$pedido->id][$pedido->id_status][0]['nome_etapa'] : ''}}</td>
+
                                 <td scope="col">
                                     <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>
 
-                                    <button data-pedidoid={{$pedido->id}} data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
+                                    <button data-pedidoid={{$pedido->id}} data-statusatual='{{$pedido->id_status}}' data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
                                         <span  style="font-size: 25px">&#9998;</button>
                                     </span>
                                 </td>
@@ -74,36 +77,93 @@
                 </tbody>
             </table>
 
-            <div id='modal_acao_manutencao' class="modal" tabindex="-1" role="dialog">
+            <div id='modal_acao_manutencao'  class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
-                    <div class="modal-content">
+                    <div class="modal-content" style="width: 700px">
                         <div class="modal-header">
-                        <h5 class="modal-title">Alteração de status</h5>
+                        <h5 class="modal-title" id='texto_status'></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                         </div>
-                        <div class="modal-body">
-                            <div class="form-group row">
-                                <label for="" class="col-sm-2 col-form-label text-right">Tipo</label>
-
-                                <select class="form-control col-md-5" id="status" name="status">
-                                    <option value="A" @if (isset($request) && $request->input('status') == 'A') {{ ' selected ' }}@else @endif>Ativo
-                                    </option>
-                                    <option value="I" @if (isset($request) && $request->input('status') == 'I') {{ ' selected ' }}@else @endif>Inativo
-                                    </option>
+                        <div class="modal-body" >
+                            <div class="form-group row" id='tipo_manutencao'>
+                                <label for="" class="col-sm-3 col-form-label text-right">Tipo</label>
+                                <select class="form-control col-md-5" name="select_tipo_manutencao" id="select_tipo_manutencao" name="select_tipo_manutencao">
+                                    <option value=""></option>
+                                    <option value="T">Montagem Torre</option>
+                                    <option value="A">Montagem Agulha</option>
                                 </select>
-
                             </div>
-                            <div class="form-group row">
-                                <label for="" class="col-sm-2 col-form-label text-right">Tipo</label>
-                                <input type="text" id="calc-val1" name="calc-val1" placeholder='00:00' class="form-control col-md-5 mask_minutos" value="">
+                            <div class="form-group row" id='etapa_manutencao'>
+                                <label for="" class="col-sm-3 col-form-label text-right">Etapa</label>
+                                <select class="form-control col-md-5" name="select_etapa_manutencao" id="select_etapa_manutencao" name="select_etapa_manutencao">
+                                    <option value=""></option>
+                                    <option value="1">Início</option>
+                                    <option value="2">Pausa</option>
+                                    <option value="3">Continuar</option>
+                                    <option value="4">Término</option>
+                                </select>
+                            </div>
+                            <div class="form-group row" id='motivo_pausas'>
+                                <label for="" class="col-sm-3 col-form-label text-right">Motivos pausa</label>
+                                <select class="form-control col-md-5" name="select_motivo_pausas" id="select_motivo_pausas" name="select_motivo_pausas">
+                                    <option value=""></option>
+                                    <option value="1">F.P – Faltando Peças</option>
+                                    <option value="2">P.P – Problema na produção</option>
+                                    <option value="3">P – Pausado</option>
+                                    <option value="4">P.R – Protótipo</option>
+                                    <option value="5">A.P – Assunto Pessoal</option>
+                                    <option value="6">P.M – Problema na maquina</option>
+                                </select>
+                            </div>
+                            <div class="form-group row" id='quantidade'>
+                                <label for="" class="col-sm-3 col-form-label text-right">Quantidade</label>
+                                <input class="form-control col-md-5" name="texto_quantidade" id="texto_quantidade"/>
                             </div>
                         </div>
+                        <input type="hidden" name="novoStatus" id="novoStatus" value=""/>
+                        <input type="hidden" name="novoPedido" id="novoPedido" value=""/>
 
                         <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-primary" id="salvar_alteracao_status_pedido" data-dismiss="modal" >Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id='modal_caixas'  class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 700px">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id='texto_status_caixas'></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body" >
+                            @if (isset($materiais))
+                                <label for="" class="col-sm-3 col-form-label text-right">Caixas</label>
+                                <span id='nova_caixa' title="Adicionar nova caixa" style="font-size: 20px;  cursor: pointer;  color:darkgreen; font-weight: bolder">+</i></span>
+                                <div class="form-group row div_caixas" id='div_caixas'>
+                                    <label for="" class="col-sm-1 col-form-label text-right">&nbsp;</label>
+                                    <select class="form-control col-md-2 material" name="cx_material[]" id="material" >
+                                            <option value=""></option>
+                                            @foreach ($materiais as $material)
+                                                <option value="{{$material->id}}">{{ $material->material }}</option>
+                                            @endforeach
+                                        </select>&nbsp;
+                                        <input class="form-control col-md-2 cx_quantidade" name="cx_quantidade[]" id="cx_quantidade"  placeholder="Qtde"/>&nbsp;
+                                        <input class="form-control col-md-1 cx_a" name="cx_a[]" id="cx_a"  placeholder="A"/>&nbsp;
+                                        <input class="form-control col-md-1 cx_b" name="cx_b[]" id="cx_b"  placeholder="B"/>&nbsp;
+                                        <input class="form-control col-md-1 cx_c" name="cx_c[]" id="cx_c"  placeholder="C"/>&nbsp;
+                                        <input class="form-control col-md-2 cx_peso" name="cx_peso[]" id="cx_peso"  placeholder="Peso"/>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="salvar_caixas" data-dismiss="modal" >Salvar</button>
                         </div>
                     </div>
                 </div>

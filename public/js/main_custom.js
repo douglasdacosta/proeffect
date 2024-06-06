@@ -68,16 +68,71 @@ $(function ($) {
         $('#blocker').show();
     });
 
+    $(document).on('click', '#adicionar_montador', function (e) {
+        salva_montadores = [];
+        $('.montadores').each(function (c, j) {
+            if($(this).prop('checked') == true ) {
+                salva_montadores.push($(this).val());
+            }
+        })
 
-    $(".alteracao_status_pedido").change(function () {
+        pedido_id = $('#pedido_montagem').val();
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", '/incluir-pedidos-funcionario-montagem', true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function () {
+            console.log(xhr.readyState);
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    alert('Alterado com sucesso!')
+                    history.replaceState(null, null, window.location.pathname);
+                    location.reload();
+                } else {
+                    var data = JSON.parse(xhr.responseText);
+                    alert('Ocorreu um erro al alterar o status!')
+                }
+            }
+        };
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        var requestData = {
+            'pedido_id': pedido_id,
+            'montadores': JSON.stringify(salva_montadores),
+            '_token': csrfToken
+        };
+        xhr.send(JSON.stringify(requestData));
+
+    })
+
+    $(document).on('click', '.add_funcionarios_montagens', function (e) {
+        $('#funcionarios_selecionados').val($(this).data('funcionariomontagem'));
+
+        montadores = $(this).data('funcionariomontagem').split(',');
+        $('#pedido_montagem').val($(this).data('pedido_id'));
+
+        $('.montadores').each(function (c, j) {
+            if(montadores.includes($(this).val())) {
+                $(this).prop('checked', true);
+            } else {
+                $(this).prop('checked', false);
+            }
+        });
+
+        $('#modal_funcionarios').modal('show');
+    });
+
+
+
+    $(document).on('change', '.alteracao_status_pedido', function (e) {
         if (!confirm("Você deseja realmente alterar este pedido?")) {
-            $(this).val($(this).data('statusatual'));
+            $(this).val($(this).attr('data-statusatual'));
             return false;
         }
-
         $('.overlay').show();
-        var pedido = $(this).data('pedido');
+        var pedido = $(this).data("pedido");
         var status = $(this).val();
+        console.log(pedido);
+
         $.ajax({
             type: "POST",
             url: '/alterar-pedidos-ajax',

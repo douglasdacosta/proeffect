@@ -14,14 +14,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('funcionarios', function (Blueprint $table) {
-            $table->id();
-            $table->string('nome');
-            $table->string('funcao')->nullable();
-            $table->string('status',1);
-            $table->timestamps();
+        Schema::table('funcionarios', function($table) {
+            $table->string('senha')->after('funcao')->nullable();;
         });
 
+        DB::table('funcionarios')->insert(
+            [
+                [ 'nome' => 'Fabio', 'status' => 'A', 'senha' => 'fqwer'],
+            ]
+        );
 
     }
 
@@ -33,6 +34,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('funcionarios');
+        Schema::table('funcionarios', function($table) {
+            $table->dropColumn('senha');
+        });
     }
 };

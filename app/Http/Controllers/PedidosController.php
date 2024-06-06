@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alertas;
+use App\Models\Funcionarios;
 use App\Models\HistoricosPedidos;
+use App\Models\PedidosFuncionariosMontagens;
 use Illuminate\Support\Facades\DB;
 use App\Models\Fichastecnicas;
 use App\Models\Fichastecnicasitens;
@@ -42,6 +44,9 @@ class PedidosController extends Controller
     */
     public function index(Request $request)
     {
+
+        $funcionarios = new Funcionarios();
+        $funcionarios = $funcionarios->where('status','=','A')->orderby('nome')->get();
 
         $id = !empty($request->input('id')) ? ($request->input('id')) : (!empty($id) ? $id : false);
         $status_id = !empty($request->input('status_id')) ? ($request->input('status_id')) : (!empty($status_id) ? $status_id : false);
@@ -100,6 +105,18 @@ class PedidosController extends Controller
 
 
         $pedidos = $pedidos->get();
+        $funcionarios_vinculdaos = [];
+        foreach ($pedidos as $key => $pedido) {
+            $funcionarios_montagens = DB::table('pedidos_funcionarios_montagens')
+                ->join('funcionarios', 'funcionarios.id', '=', 'pedidos_funcionarios_montagens.funcionario_id')
+                ->select('funcionarios.nome', 'funcionarios.id')
+                ->where('pedidos_funcionarios_montagens.pedido_id', '=', $pedido->id)
+                ->orderby('funcionarios.nome')->get();
+
+            $funcionarios_vinculdaos[$pedido->id] = [
+                'funcionarios_montagens' => $funcionarios_montagens
+            ];
+        }
 
         $alertasPendentes = DB::table('alertas')->where('enviado', '=', 0)->count();
 
@@ -108,6 +125,8 @@ class PedidosController extends Controller
             'nome_tela' => 'pedidos',
             'pedidos' => $pedidos,
             'request' => $request,
+            'funcionarios' => $funcionarios,
+            'funcionarios_vinculados' => $funcionarios_vinculdaos,
             'alertasPendentes' => $alertasPendentes,
             'AllStatus' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
@@ -204,6 +223,26 @@ class PedidosController extends Controller
         );
 
         return view('pedidos', $data);
+    }
+
+    public function ajaxIncluirFuncionariosMontagens(Request $request) {
+
+        $montadores = json_decode($request->input('montadores'));
+
+        $funcionarioMontagens = new PedidosFuncionariosMontagens();
+        $funcionarioMontagens->where('pedido_id', '=', $request->input('pedido_id'))->delete();
+
+        foreach($montadores as $montador) {
+            $funcionarioMontagens = new PedidosFuncionariosMontagens();
+
+            $funcionarioMontagens->pedido_id = $request->input('pedido_id');
+            $funcionarioMontagens->funcionario_id = $montador;
+            $funcionarioMontagens->save();
+        }
+
+        return response('Alterado com sucesso!', 200);
+
+
     }
 
     public function ajaxAlterar(Request $request) {

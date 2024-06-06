@@ -14,14 +14,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('funcionarios', function (Blueprint $table) {
-            $table->id();
-            $table->string('nome');
-            $table->string('funcao')->nullable();
-            $table->string('status',1);
-            $table->timestamps();
+        Schema::table('caixas_pedidos', function($table) {
+            $table->integer('material_id')->length(11)->after('pedidos_id')->nullable();
+            $table->integer('quantidade')->length(11)->after('material_id')->nullable();
         });
-
 
     }
 
@@ -33,6 +29,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('funcionarios');
+        Schema::table('caixas_pedidos', function($table) {
+            $table->dropColumn('material_id');
+            $table->dropColumn('quantidade');
+        });
     }
 };

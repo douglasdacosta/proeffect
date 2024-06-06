@@ -52,28 +52,71 @@
     <script type="text/javascript" >
         $(function ($) {
 
-            $(".alteracao_status_pedido").click(function () {
-                    $('#modal_acao_manutencao').modal('show');
-                });
+            $(document).on('click', '.alteracao_status_pedido', function () {
+
+                $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material').val('');
+
+                $('#tipo_manutencao, #motivo_pausas, #quantidade').hide();
+                var statusAtual = $(this).data('statusatual');
+                var descricaoproximostatus = $(this).data('descricaoproximostatus');
+                texto_status = "Você realmente deseja alterar este pedido para "+descricaoproximostatus+" ?";
+
+                $('#texto_status').text(texto_status);
+                var pedido = $(this).data('pedidoid');
+                var proximoStatus = $(this).data('proximostatus');
+                $("#novoStatus").val(proximoStatus);
+                $("#novoPedido").val(pedido);
+                if(statusAtual == 6){
+                    $('#tipo_manutencao, #etapa_manutencao').show();
+                }
+                $('#modal_acao_manutencao').modal('show');
+            });
+
+
+            $("#select_etapa_manutencao").change(function () {
+                if($("#select_etapa_manutencao").val() == 2) {
+                    $('#motivo_pausas').show();
+                } else {
+                    $('#motivo_pausas, #quantidade').hide();
+                }
+            });
+
+            $("#select_motivo_pausas").change(function () {
+                if($("#select_motivo_pausas").val() == 1 || $("#select_motivo_pausas").val() == 2) {
+                    $('#quantidade').show();
+                } else {''
+                    $('#quantidade').hide();
+                }
             });
 
             $("#salvar_alteracao_status_pedido").click(function () {
-                var descricaoproximostatus = $(this).data('descricaoproximostatus');
-                if (!confirm("Você realmente deseja alterar este pedido para "+descricaoproximostatus+" ?")) {
-                    return false;
-                }
-                var pedido = $(this).data('pedidoid');
-                var status = $(this).data('proximostatus');
-                var senha = $('#senha').val();
+                var select_tipo_manutencao = $('#select_tipo_manutencao').val();
+                var select_etapa_manutencao = $('#select_etapa_manutencao').val();
+                var select_motivo_pausas = $('#select_motivo_pausas').val();
+                var texto_quantidade = $('#texto_quantidade').val();
+                var pedido = $('#novoPedido').val();
+                var status = $('#novoStatus').val();
+                var senha = $('#senha_funcionario').val();
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", '/manutencao-producao-alterar-pedido', true);
                 xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xhr.onreadystatechange = function () {
+                    console.log(xhr.readyState);
                     if (xhr.readyState === 4) {
                         if (xhr.status >= 200 && xhr.status < 300) {
-                            alert('Status do pedido aletrado com sucesso para '+descricaoproximostatus +'!')
-                            history.replaceState(null, null, window.location.pathname);
-                            location.reload();
+                            alert('Alterado com sucesso!')
+                            var data = JSON.parse(xhr.responseText);
+                            console.log(data.mostrar_caixa);
+                            if(data.mostrar_caixa == 1) {
+                                $('#modal_caixas').modal('show');
+                                var statusAtual = $(this).data('statusatual');
+                                var descricaoproximostatus = $(this).data('descricaoproximostatus');
+                                texto_status = "Adicionar caixas para expedição";
+                                $('#texto_status_caixas').text(texto_status);
+                            } else {
+                                history.replaceState(null, null, window.location.pathname);
+                                location.reload();
+                            }
                         } else {
                             var data = JSON.parse(xhr.responseText);
                             alert('Ocorreu um erro al alterar o status!')
@@ -86,12 +129,75 @@
                     'id': pedido,
                     'status': status,
                     'senha': senha,
+                    'select_tipo_manutencao' : select_tipo_manutencao,
+                    'select_etapa_manutencao' : select_etapa_manutencao,
+                    'select_motivo_pausas' : select_motivo_pausas,
+                    'texto_quantidade' : texto_quantidade,
                     '_token': csrfToken
                 };
                 xhr.send(JSON.stringify(requestData));
             })
-        })
 
+            $("#salvar_caixas").click(function () {
+                var pedido = $('#novoPedido').val();
+                var senha = $('#senha_funcionario').val();
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", '/manutencao-producao-salvar_caixas', true);
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhr.onreadystatechange = function () {
+                    console.log(xhr.readyState);
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            alert('Alterado com sucesso!')
+                            var data = JSON.parse(xhr.responseText);
+                            console.log(data.mostrar_caixa);
+                            if(data.mostrar_caixa == 1) {
+                                $('#modal_caixas').modal('show');
+                                var statusAtual = $(this).data('statusatual');
+                                var descricaoproximostatus = $(this).data('descricaoproximostatus');
+                                texto_status = "Adicionar caixas para expedição";
+                                $('#texto_status_caixas').text(texto_status);
+                            } else {
+                                history.replaceState(null, null, window.location.pathname);
+                                location.reload();
+                            }
+                        } else {
+                            var data = JSON.parse(xhr.responseText);
+                            alert('Ocorreu um erro al alterar o status!')
+                        }
+                    }
+                };
+
+                var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const dados_caixa = [];
+                $(".div_caixas").each(function(e,v){
+                    dados_caixa.push({
+                        "material": $(this).children('.material').val(),
+                        "cx_quantidade": $(this).children('.cx_quantidade').val(),
+                        "cx_a": $(this).children('.cx_a').val(),
+                        "cx_b": $(this).children('.cx_b').val(),
+                        "cx_c": $(this).children('.cx_c').val(),
+                        "cx_peso": $(this).children('.cx_peso').val(),
+                    })
+                })
+
+                var requestData = {
+                    'id': pedido,
+                    'dados_caixa': JSON.stringify(dados_caixa),
+                    '_token': csrfToken
+                };
+                xhr.send(JSON.stringify(requestData));
+            })
+
+            $("#nova_caixa").click(function () {
+
+                clone = $('#div_caixas').clone();
+                $(clone).insertBefore('#div_caixas');
+            });
+
+
+
+        })
         </script>
 </head>
 <body>

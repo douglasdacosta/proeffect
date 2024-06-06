@@ -378,13 +378,13 @@ return [
             'label'       => '',
             'label_color' => '',
         ],
-        // [
-        //     'text'        => 'Funcionários',
-        //     'url'         => 'funcionarios',
-        //     'icon'        => 'fas fa-plus',
-        //     'label'       => '',
-        //     'label_color' => '',
-        // ],
+        [
+            'text'        => 'Funcionários',
+            'url'         => 'funcionarios',
+            'icon'        => 'fas fa-plus',
+            'label'       => '',
+            'label_color' => '',
+        ],
         // [
         //     'text'        => 'Relatório produção',
         //     'url'         => 'relatorio-producao',
@@ -393,11 +393,11 @@ return [
         //     'label_color' => '',
         // ],
         ['header' => 'Operação'],
-        // [
-        //     'text'        => 'Painéis',
-        //     'url'         => 'paineis',
-        //     'icon'        => 'fas fa-solar-panel',
-        // ],
+        [
+            'text'        => 'Painéis',
+            'url'         => 'paineis',
+            'icon'        => 'fas fa-solar-panel',
+        ],
         [
             'text'        => 'Orçamentos',
             'url'         => 'orcamentos',

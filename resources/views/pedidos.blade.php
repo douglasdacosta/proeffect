@@ -6,8 +6,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
 @section('title', 'Pro Effect')
 <script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/jquery.mask.js"></script>
+<script src="js/bootstrap.4.6.2.js"></script>
 <script src="js/main_custom.js"></script>
+<script src="js/jquery.mask.js"></script>
 <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 @switch($tela)
     @case('pesquisar')
@@ -29,6 +30,34 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             </div>
         @stop
         @section('content')
+            <div id='modal_funcionarios'  class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 700px">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id='texto_status_caixas'>Funcionários Montagens</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+
+                        <div class="modal-body" >
+                            @if (isset($funcionarios))
+                            @foreach ($funcionarios as $funcionario)
+                                <div class="form-check">
+                                    <input class="form-check-input montadores" type="checkbox" value="{{$funcionario->id}}" id="montador{{$funcionario->id}}">
+                                    <label class="form-check-label" for="montador{{$funcionario->id}}">{{$funcionario->nome}}</label>
+                              </div>
+                            @endforeach
+                        @endif
+                        <input type="hidden" name="funcionarios_selecionados" id="funcionarios_selecionados" value=""/>
+                        <input type="hidden" name="pedido_montagem" id="pedido_montagem" value=""/>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="adicionar_montador" data-dismiss="modal" >Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="toastsContainerTopRight" class="toasts-top-right fixed">
                 <div class="toast fade show" role="alert" style="width: 350px" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
@@ -132,6 +161,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             <th>Qtde</th>
                                             <th>Status do pedido</th>
                                             <th>Data gerado</th>
+                                            <th>Montadores</th>
                                             <th>Data entrega</th>
                                             <th>Alerta dias</th>
                                             <th>OS</th>
@@ -174,6 +204,14 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     }
                                                     ?>
                                                     <td>{{ Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
+                                                    <td>
+                                                        <i data-funcionariomontagem="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->id.','}}@endforeach"
+                                                            title="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->nome.', '}}@endforeach"
+                                                            data-pedido_id="{{$pedido->id}}"
+                                                            style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:green'}}@else {{'color:red'}}@endif"  class="fas fa-users add_funcionarios_montagens">
+                                                        </i>
+                                                        {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
+                                                    </td>
                                                     <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                                     <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                                     <th scope="row" title="Imprimir ordem de serviço">

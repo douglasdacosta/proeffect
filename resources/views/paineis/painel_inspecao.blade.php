@@ -11,7 +11,7 @@
         font-size: 2em;
     }
 </style>
-<script type="text/javascript" > 
+<script type="text/javascript" >
 
 setTimeout(function () {
     location.reload();
@@ -20,13 +20,13 @@ setTimeout(function () {
 @section('content')
 
 
-    <div class="container_default" style="background-color: #ffffff;">   
+    <div class="container_default" style="background-color: #ffffff;">
         <div class="w-auto text-center">
             <h1>Painel de Inspeção</h1>
         </div>
-            
+
             <div class="w-auto"  style="height: 34%; overflow: hidden; background-color: #68c570;">
-                <h1><b>Concluídos</h1> 
+                <h1><b>Concluídos</h1>
                 <table class="table table-sm table-striped text-center" id="table_composicao">
                     <thead >
                         <tr>
@@ -40,9 +40,9 @@ setTimeout(function () {
                             <th scope="col">Etapa</th>
                         </tr>
                     </thead>
-                    <tbody> 
-                        
-                        @foreach ($pedidosCompletos as $pedido)                        
+                    <tbody>
+
+                        @foreach ($pedidosCompletos as $pedido)
                         <tr>
                             <td scope="col">{{$pedido->ep}}</td>
                             <td scope="col">{{$pedido->os}}</td>
@@ -51,7 +51,7 @@ setTimeout(function () {
                             <td scope="col">{{$pedido->conjuntos}}</td>
                             <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
                             <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
-                            <td scope="col">{{'iniciado'}}</td>
+                            <td scope="col">{{$pedido->nome_etapa}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -60,7 +60,7 @@ setTimeout(function () {
 
             </div>
             <div class="w-auto"  style="height: 60%; overflow: hidden; background-color: #e9aa4c;">
-                <h1><b>Pendentes</b></h1> 
+                <h1><b>Pendentes</b></h1>
                 <table class="table table-sm table-striped text-center" id="table_composicao">
                     <thead >
                         <tr>
@@ -74,8 +74,8 @@ setTimeout(function () {
                             <th scope="col">Etapa</th>
                         </tr>
                     </thead>
-                    <tbody>                        
-                        @foreach ($pedidosPendentes as $pedido)                        
+                    <tbody>
+                        @foreach ($pedidosPendentes as $pedido)
                         <tr>
                             <td scope="col">{{$pedido->ep}}</td>
                             <td scope="col">{{$pedido->os}}</td>
@@ -84,10 +84,10 @@ setTimeout(function () {
                             <td scope="col">{{$pedido->conjuntos}}</td>
                             <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
                             <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
-                            <td scope="col">{{'iniciado'}}</td>
+                            <td scope="col">{{$pedido->nome_etapa}}</td>
                         </tr>
                         @endforeach
-                        
+
                     </tbody>
                 </table>
             </div>

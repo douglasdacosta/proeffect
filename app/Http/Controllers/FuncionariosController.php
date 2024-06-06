@@ -94,7 +94,7 @@ class FuncionariosController extends Controller
      */
     public function alterar(Request $request)
     {
-
+        info($request->input());
         $funcionarios = new Funcionarios();
 
 
@@ -123,13 +123,13 @@ class FuncionariosController extends Controller
 
     public function salva($request) {
         $funcionarios = new Funcionarios();
-
         if($request->input('id')) {
             $funcionarios = $funcionarios::find($request->input('id'));
         }
         $funcionarios->nome = $request->input('nome');
         $funcionarios->funcao = $request->input('funcao');
         $funcionarios->status = $request->input('status');
+        $funcionarios->senha = $request->input('senha');
         $funcionarios->save();
 
         return $funcionarios->id;
