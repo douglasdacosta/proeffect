@@ -36,6 +36,9 @@
 
 //   });
 $(function ($) {
+    //const baseurl = window.location.origin+window.location.pathname + '/public';
+    //const baseurl = window.location.origin+window.location.pathname + '';
+    const baseurl = '';
     $('#blocker').hide();
     $('.cep').mask('00000-000', {reverse: true});
     $('.sonumeros').mask('000000000000', {reverse: true});
@@ -78,7 +81,7 @@ $(function ($) {
 
         pedido_id = $('#pedido_montagem').val();
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", '/incluir-pedidos-funcionario-montagem', true);
+        xhr.open("POST",  baseurl + '/incluir-pedidos-funcionario-montagem', true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.onreadystatechange = function () {
             console.log(xhr.readyState);
@@ -135,7 +138,7 @@ $(function ($) {
 
         $.ajax({
             type: "POST",
-            url: '/alterar-pedidos-ajax',
+            url: baseurl + '/alterar-pedidos-ajax',
             data: {
                 'id': pedido,
                 'status': status,
@@ -185,7 +188,7 @@ $(function ($) {
 
         $.ajax({
             "type": "POST",
-            "url": '/calcular-orcamento-ajax',
+            "url": baseurl + '/calcular-orcamento-ajax',
             "data": {
                 "tipo": tipo,
                 "dados": composicaoep,
