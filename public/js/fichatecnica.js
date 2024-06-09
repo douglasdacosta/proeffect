@@ -1,8 +1,7 @@
 
 $(function () {
 
-    var getUrl = window.location;
-    var baseUrl = getUrl .protocol + "//" + getUrl.host ;
+    var baseUrl = '/proeffect/public'
 
     calculaTempos()
     $('.toast').hide();

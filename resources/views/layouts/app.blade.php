@@ -51,8 +51,7 @@
     <script src="{{asset('js/bootstrap.4.6.2.js')}}"></script>
     <script type="text/javascript" >
         $(function ($) {
-            var getUrl = window.location;
-            var baseUrl = getUrl .protocol + "//" + getUrl.host ;
+            var baseUrl = '/proeffect/public'
             $(document).on('click', '.alteracao_status_pedido', function () {
 
                 $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material').val('');
