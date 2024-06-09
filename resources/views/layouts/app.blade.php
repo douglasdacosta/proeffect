@@ -51,7 +51,8 @@
     <script src="{{asset('js/bootstrap.4.6.2.js')}}"></script>
     <script type="text/javascript" >
         $(function ($) {
-
+            var getUrl = window.location;
+            var baseUrl = getUrl .protocol + "//" + getUrl.host ;
             $(document).on('click', '.alteracao_status_pedido', function () {
 
                 $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material').val('');
@@ -98,15 +99,13 @@
                 var status = $('#novoStatus').val();
                 var senha = $('#senha_funcionario').val();
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", '/manutencao-producao-alterar-pedido', true);
+                xhr.open("POST", baseUrl + '/manutencao-producao-alterar-pedido', true);
                 xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xhr.onreadystatechange = function () {
-                    console.log(xhr.readyState);
                     if (xhr.readyState === 4) {
                         if (xhr.status >= 200 && xhr.status < 300) {
                             alert('Alterado com sucesso!')
                             var data = JSON.parse(xhr.responseText);
-                            console.log(data.mostrar_caixa);
                             if(data.mostrar_caixa == 1) {
                                 $('#modal_caixas').modal('show');
                                 var statusAtual = $(this).data('statusatual');
@@ -142,15 +141,13 @@
                 var pedido = $('#novoPedido').val();
                 var senha = $('#senha_funcionario').val();
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", '/manutencao-producao-salvar_caixas', true);
+                xhr.open("POST", baseUrl + '/manutencao-producao-salvar_caixas', true);
                 xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xhr.onreadystatechange = function () {
-                    console.log(xhr.readyState);
                     if (xhr.readyState === 4) {
                         if (xhr.status >= 200 && xhr.status < 300) {
                             alert('Alterado com sucesso!')
                             var data = JSON.parse(xhr.responseText);
-                            console.log(data.mostrar_caixa);
                             if(data.mostrar_caixa == 1) {
                                 $('#modal_caixas').modal('show');
                                 var statusAtual = $(this).data('statusatual');

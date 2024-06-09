@@ -5,10 +5,12 @@ $(function ($) {
     const colunas = new Array();
     var dados_valores ='';
     var dados_colunas = '';
+    var getUrl = window.location;
+    var baseUrl = getUrl .protocol + "//" + getUrl.host ;
 
     $.ajax({
         type: "POST",
-        url: '/ajax-getProducao',
+        url: baseUrl + '/ajax-getProducao',
         data: {
             _token: $('meta[name="csrf-token"]').attr('content')
         },

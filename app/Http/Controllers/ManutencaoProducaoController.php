@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PainelController;
 use App\Models\CaixasPedidos;
 use App\Models\Funcionarios;
 use App\Models\HistoricosEtapas;
@@ -162,7 +163,7 @@ class ManutencaoProducaoController extends Controller
         $dados_historicos_etapas = [];
         $pedidos=$dados_status=[];
 
-
+        $painelController = new PainelController();
         $materiais = new Materiais();
         $funcionarios = new Funcionarios();
         $funcionarios = $funcionarios->where('status', '=', 'A');
@@ -207,18 +208,20 @@ class ManutencaoProducaoController extends Controller
                 $status = new Status();
                 $status = $status->orderby('id')->get();
 
-                $dados_historicos_etapas = $this->buscaEtapas($pedidos);
+                // $dados_historicos_etapas = $this->buscaEtapas($pedidos);
+                $pedidos =$painelController->buscaDadosEtapa($pedidos);
             }
 
         }
+
         $materiais = $materiais->where('material','LIKE','%CX%')->get();
         $dados = [
             'pedidos' => $pedidos,
             'status' => $dados_status,
             'senha' => $senha,
-            'dados_historicos_etapas' => $dados_historicos_etapas,
             'mensagem'=>'',
             'materiais' => $materiais,
+            'motivosPausa' => $painelController->getMotivosPausa(),
         ];
 
         return view('manutencao_producao', $dados);

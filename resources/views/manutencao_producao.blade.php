@@ -52,6 +52,10 @@
                         <th scope="col">OS</th>
                         <th scope="col">Status</th>
                         <th scope="col">Etapa</th>
+                        <th scope="col">Motivo pausa</th>
+                        <th scope="col">Qtde</th>
+                        <th scope="col">Responsável</th>
+                        <th scope="col">Colaborador</th>
                         <th scope="col">Ação</th>
                     </tr>
                 </thead>
@@ -62,8 +66,11 @@
                                 <td style="margin-top: 10px" scope="col">{{$pedido->ep}}</td>
                                 <td scope="col">{{$pedido->os}}</td>
                                 <td scope="col">{{$pedido->nomeStatus}}</td>
-                                <td scope="col">{{isset($dados_historicos_etapas[$pedido->id]) && ($dados_historicos_etapas[$pedido->id][$pedido->id_status][0]['nome_etapa'] != 'Término') ? $dados_historicos_etapas[$pedido->id][$pedido->id_status][0]['nome_etapa'] : ''}}</td>
-
+                                <td scope="col">{{($pedido->nome_etapa != 'Finalizado') ? $pedido->nome_etapa : $pedido->nome_etapa}}</td>
+                                <td scope="col">{{$pedido->motivo_pausa}}</td>
+                                <td scope="col">{{$pedido->texto_quantidade}}</td>
+                                <td scope="col">{{$pedido->funcionario}}</td>
+                                <td scope="col">{{$pedido->colaborador}}</td>
                                 <td scope="col">
                                     <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>
 
@@ -102,19 +109,16 @@
                                     <option value="1">Início</option>
                                     <option value="2">Pausa</option>
                                     <option value="3">Continuar</option>
-                                    <option value="4">Término</option>
+                                    <option value="4">Finalizado</option>
                                 </select>
                             </div>
                             <div class="form-group row" id='motivo_pausas'>
                                 <label for="" class="col-sm-3 col-form-label text-right">Motivos pausa</label>
                                 <select class="form-control col-md-5" name="select_motivo_pausas" id="select_motivo_pausas" name="select_motivo_pausas">
                                     <option value=""></option>
-                                    <option value="1">F.P – Faltando Peças</option>
-                                    <option value="2">P.P – Problema na produção</option>
-                                    <option value="3">P – Pausado</option>
-                                    <option value="4">P.R – Protótipo</option>
-                                    <option value="5">A.P – Assunto Pessoal</option>
-                                    <option value="6">P.M – Problema na maquina</option>
+                                    @foreach ($motivosPausa as $key => $motivoPausa)
+                                        <option value="{{$key}}">{{$motivoPausa}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="form-group row" id='quantidade'>

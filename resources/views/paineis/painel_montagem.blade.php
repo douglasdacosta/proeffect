@@ -41,6 +41,7 @@ setTimeout(function () {
                         <th scope="col">Motivo pausa</th>
                         <th scope="col">Qtde</th>
                         <th scope="col">Responsável</th>
+                        <th scope="col">Colaborador</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,6 +59,7 @@ setTimeout(function () {
                         <td scope="col">{{$pedido->motivo_pausa}}</td>
                         <td scope="col">{{$pedido->texto_quantidade}}</td>
                         <td scope="col">{{$pedido->funcionario}}</td>
+                        <td scope="col">{{$pedido->colaborador}}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -81,6 +83,7 @@ setTimeout(function () {
                         <th scope="col">Motivo pausa</th>
                         <th scope="col">Qtde</th>
                         <th scope="col">Responsável</th>
+                        <th scope="col">Colaborador</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,6 +100,7 @@ setTimeout(function () {
                         <td scope="col">{{$pedido->motivo_pausa}}</td>
                         <td scope="col">{{$pedido->texto_quantidade}}</td>
                         <td scope="col">{{$pedido->funcionario}}</td>
+                        <td scope="col">{{$pedido->colaborador}}</td>
                     </tr>
                     @endforeach
 

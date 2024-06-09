@@ -58,6 +58,37 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     </div>
                 </div>
             </div>
+
+            <div id='modal_caixas'  class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 700px">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id='texto_status_caixas'>Caixas</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+
+                        <div class="modal-body" >
+                            <table class="table table-striped  text-center" id='tabela_caixas'>
+                                <thead>
+                                    <th>Caixa</th>
+                                    <th>A</th>
+                                    <th>L</th>
+                                    <th>C</th>
+                                    <th>Qtde</th>
+                                    <th>Peso</th>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="toastsContainerTopRight" class="toasts-top-right fixed">
                 <div class="toast fade show" role="alert" style="width: 350px" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
@@ -166,6 +197,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             <th>Alerta dias</th>
                                             <th>OS</th>
                                             <th>MP</th>
+                                            <th>CX</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -222,6 +254,11 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     <th scope="row">
                                                         <a href="{{ URL::route('imprimirMP', ['id' => $pedido->id]) }}" <span
                                                             class="fa fa-print"></span></a>
+                                                    </th>
+                                                    <th scope="row">
+                                                        <a class="show_caixas" data-pedido_id="{{$pedido->id}}">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
                                                     </th>
                                                 </tr>
                                             @endforeach

@@ -21,14 +21,11 @@ class PainelController extends Controller
             '3' => 'P – Pausado',
             '4' => 'P.R – Protótipo',
             '5' => 'A.P – Assunto Pessoal',
-            '6' => 'P.M – Problema na maquina',
+            '6' => 'P.M – Problema na máquina',
+            '7' => 'E.P - Esperando próxima produção'
         ];
     }
-    private function busca_dados_pedidos($status){
-
-        $Fichastecnicasitens = new Fichastecnicasitens();
-
-        $controllerPedidos = new PedidosController();
+    private function busca_dados_pedidos($status, $limit = 11, $tipo ){
 
         $pedidos = DB::table('pedidos')
             ->join('status', 'pedidos.status_id', '=', 'status.id')
@@ -37,8 +34,17 @@ class PainelController extends Controller
             ->select('pedidos.*', 'ficha_tecnica.ep')
             ->orderby('pedidos.data_entrega')
             ->where('pedidos.status_id', '=', $status );
-        $pedidos->paginate(5);
+        $pedidos->paginate($limit);
         $pedidos = $pedidos->get();
+
+        $pedidos = $this->buscaDadosEtapa($pedidos, $tipo);
+
+        return $pedidos;
+    }
+
+    public function buscaDadosEtapa($pedidos, $tipo = false) {
+
+        $Fichastecnicasitens = new Fichastecnicasitens();
 
         foreach ($pedidos as $key => $pedido) {
 
@@ -78,12 +84,20 @@ class PainelController extends Controller
             ->get();
 
 
-            $etapa = 'Pendente';
-            $texto_quantidade = $motivo_pausa =  '';
+            $etapa = $tipo == true ? 'Finalizado': 'Pendente';
+            $texto_quantidade = $motivo_pausa = $colaborador = '';
             $motivos_pausas = $this->getMotivosPausa();
+
             if(!empty($historicos_etapas[0])) {
-                $etapa = $historicos_etapas[0]->nome_etapa;
+
+                $etapa = $tipo == true ? 'Finalizado': $historicos_etapas[0]->nome_etapa;
+                if($historicos_etapas[0]->status_id == 6 ){
+
+                    $etapa = ($historicos_etapas[0]->select_tipo_manutencao =='T' ) ? $etapa . " - Torre" : $etapa . " - Agulha" ;
+                }
+
                 $texto_quantidade = $historicos_etapas[0]->texto_quantidade;
+                $colaborador = $historicos_etapas[0]->nome;
                 if(!empty($historicos_etapas[0]->select_motivo_pausas)) {
 
                     $motivo_pausa = $motivos_pausas[$historicos_etapas[0]->select_motivo_pausas];
@@ -92,6 +106,7 @@ class PainelController extends Controller
             $pedidos[$key]->nome_etapa = $etapa;
             $pedidos[$key]->texto_quantidade = $texto_quantidade;
             $pedidos[$key]->motivo_pausa = $motivo_pausa;
+            $pedidos[$key]->colaborador = $colaborador;
 
 
             $funcionarios_montagens = DB::table('pedidos_funcionarios_montagens')
@@ -107,15 +122,14 @@ class PainelController extends Controller
 
             $pedidos[$key]->funcionario = implode(',',$nome_funcionarios);
         }
-
-
         return $pedidos;
     }
 
+
     private function carrega_dados($status_pendente, $status_concluido){
 
-        $pedidosCompletos = $this->busca_dados_pedidos($status_concluido);
-        $pedidosPendentes = $this->busca_dados_pedidos($status_pendente);
+        $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 3, true);
+        $pedidosPendentes = $this->busca_dados_pedidos($status_pendente, 12, false);
 
         return  [
             'pedidosCompletos'=> $pedidosCompletos,

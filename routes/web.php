@@ -45,6 +45,7 @@ Route::match(['get', 'post'],'/ajax-fichatecnica', [App\Http\Controllers\Ajaxfic
 Route::match(['post'],'/ajax-fichatecnica-check-ep', [App\Http\Controllers\AjaxfichatecnicaController::class, 'checkEpExistente'])->name('ajax-fichatecnica-check-ep');
 Route::match(['get'],'/clona-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'clonarFichatecnica'])->name('clona-fichatecnica');
 Route::match(['post'],'/ajax-fichatecnica-calculo-usinagem', [App\Http\Controllers\AjaxfichatecnicaController::class, 'calculaUsinagem'])->name('ajax-fichatecnica-calculo-usinagem');
+Route::match(['post'],'/buscar-caixas', [App\Http\Controllers\CaixasController::class, 'buscarCaixas'])->name('ajax-buscar-caixas');
 
 Route::match(['get', 'post'],'/ajax-getProducao', [App\Http\Controllers\HomeController::class, 'getProducao'])->name('ajax-getProducao');
 Route::match(['get', 'post'],'/followup', [App\Http\Controllers\PedidosController::class, 'followup'])->name('followup');

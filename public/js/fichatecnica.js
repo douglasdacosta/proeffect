@@ -1,6 +1,9 @@
 
 $(function () {
 
+    var getUrl = window.location;
+    var baseUrl = getUrl .protocol + "//" + getUrl.host ;
+
     calculaTempos()
     $('.toast').hide();
 
@@ -29,7 +32,7 @@ $(function () {
     $("#calcular").click(function () {
         $.ajax({
             type: "POST",
-            url: '/ajax-fichatecnica-calculo-usinagem',
+            url: baseUrl + '/ajax-fichatecnica-calculo-usinagem',
             data: {
                 'calc-val1': $('#calc-val1').val(),
                 'calc-type': $('#calc-type').val(),
@@ -51,7 +54,7 @@ $(function () {
     $("#ep").change(function () {
         $.ajax({
             type: "POST",
-            url: '/ajax-fichatecnica-check-ep',
+            url: baseUrl + '/ajax-fichatecnica-check-ep',
             data: {
                 ep: this.value,
                 _token: $('meta[name="csrf-token"]').attr('content')
@@ -72,12 +75,10 @@ $(function () {
     })
     $("#material_id").change(function () {
         $('.overlay').show();
-        //$('#blank, #medidax, #mediday, #qtde').val('');
-        //$('#tempo_usinagem, #tempo_acabamento, #tempo_montagem, #tempo_montagem_torre, #tempo_inspecao').val('00:00');
 
         $.ajax({
             type: "POST",
-            url: '/ajax-fichatecnica',
+            url: baseUrl + '/ajax-fichatecnica',
             data: {
                 id: this.value,
                 _token: $('meta[name="csrf-token"]').attr('content')

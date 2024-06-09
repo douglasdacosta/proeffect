@@ -38,6 +38,9 @@ setTimeout(function () {
                             <th scope="col">Entrega</th>
                             <th scope="col">Alerta</th>
                             <th scope="col">Etapa</th>
+                            <th scope="col">Motivo Pausa</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Colaborador</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,6 +55,9 @@ setTimeout(function () {
                             <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
                             <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
                             <td scope="col">{{$pedido->nome_etapa}}</td>
+                            <td scope="col">{{$pedido->motivo_pausa}}</td>
+                            <td scope="col">{{$pedido->texto_quantidade}}</td>
+                            <td scope="col">{{$pedido->colaborador}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -72,6 +78,9 @@ setTimeout(function () {
                             <th scope="col">Entrega</th>
                             <th scope="col">Alerta</th>
                             <th scope="col">Etapa</th>
+                            <th scope="col">Motivo Pausa</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Colaborador</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,6 +94,9 @@ setTimeout(function () {
                             <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
                             <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
                             <td scope="col">{{$pedido->nome_etapa}}</td>
+                            <td scope="col">{{$pedido->motivo_pausa}}</td>
+                            <td scope="col">{{$pedido->texto_quantidade}}</td>
+                            <td scope="col">{{$pedido->colaborador}}</td>
                         </tr>
                         @endforeach
 
