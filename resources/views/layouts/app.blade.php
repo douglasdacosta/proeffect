@@ -52,6 +52,7 @@
     <script type="text/javascript" >
         $(function ($) {
             var baseUrl = '/proeffect/public'
+            // var baseUrl = ''
             $(document).on('click', '.alteracao_status_pedido', function () {
 
                 $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material').val('');
@@ -65,6 +66,7 @@
                 var pedido = $(this).data('pedidoid');
                 var proximoStatus = $(this).data('proximostatus');
                 $("#novoStatus").val(proximoStatus);
+                $("#atualStatus").val(statusAtual);
                 $("#novoPedido").val(pedido);
                 if(statusAtual == 6){
                     $('#tipo_manutencao, #etapa_manutencao').show();
@@ -96,6 +98,7 @@
                 var texto_quantidade = $('#texto_quantidade').val();
                 var pedido = $('#novoPedido').val();
                 var status = $('#novoStatus').val();
+                var atualStatus = $('#atualStatus').val();
                 var senha = $('#senha_funcionario').val();
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", baseUrl + '/manutencao-producao-alterar-pedido', true);
@@ -126,6 +129,7 @@
                 var requestData = {
                     'id': pedido,
                     'status': status,
+                    'atualStatus': atualStatus,
                     'senha': senha,
                     'select_tipo_manutencao' : select_tipo_manutencao,
                     'select_etapa_manutencao' : select_etapa_manutencao,

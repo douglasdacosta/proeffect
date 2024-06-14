@@ -37,6 +37,7 @@
 //   });
 $(function ($) {
     var baseUrl = '/proeffect/public'
+    // var baseUrl = ''
 
     $('#blocker').hide();
     $('.cep').mask('00000-000', {reverse: true});

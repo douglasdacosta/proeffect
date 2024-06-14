@@ -25,7 +25,7 @@ class PainelController extends Controller
             '7' => 'E.P - Esperando próxima produção'
         ];
     }
-    private function busca_dados_pedidos($status, $limit = 11, $tipo ){
+    private function busca_dados_pedidos($status, $limit = 11, $concluidos ){
 
         $pedidos = DB::table('pedidos')
             ->join('status', 'pedidos.status_id', '=', 'status.id')
@@ -37,14 +37,15 @@ class PainelController extends Controller
         $pedidos->paginate($limit);
         $pedidos = $pedidos->get();
 
-        $pedidos = $this->buscaDadosEtapa($pedidos, $tipo);
+        $pedidos = $this->buscaDadosEtapa($pedidos, $concluidos);
 
         return $pedidos;
     }
 
-    public function buscaDadosEtapa($pedidos, $tipo = false) {
+    public function buscaDadosEtapa($pedidos, $concluidos = false) {
 
         $Fichastecnicasitens = new Fichastecnicasitens();
+        $dados_colaboradores = [];
 
         foreach ($pedidos as $key => $pedido) {
 
@@ -74,39 +75,74 @@ class PainelController extends Controller
 
 
             $historicos_etapas = DB::table('historicos_etapas')
-            ->select('historicos_etapas.*', 'funcionarios.nome', 'pedidos.status_id', 'etapas_pedidos.nome as nome_etapa')
-            ->join('pedidos', 'pedidos.id', '=', 'historicos_etapas.pedidos_id')
+            ->select('historicos_etapas.*', 'funcionarios.nome', 'etapas_pedidos.nome as nome_etapa')
             ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
             ->join('etapas_pedidos', 'etapas_pedidos.id', '=', 'historicos_etapas.etapas_pedidos_id')
             ->where('pedidos_id','=',$pedido->id)
             ->orderBy('historicos_etapas.created_at', 'desc')
-            ->limit(1)
-            ->get();
+            ->get(1);
 
 
-            $etapa = $tipo == true ? 'Finalizado': 'Pendente';
+
+
+            $etapa = $concluidos == true ? 'Finalizado': 'Pendente';
             $texto_quantidade = $motivo_pausa = $colaborador = '';
             $motivos_pausas = $this->getMotivosPausa();
-
+            $dados_colaboradores = [];
             if(!empty($historicos_etapas[0])) {
 
-                $etapa = $tipo == true ? 'Finalizado': $historicos_etapas[0]->nome_etapa;
-                if($historicos_etapas[0]->status_id == 6 ){
+                $historicos_etapas_status = DB::table('historicos_etapas')
+                    ->select('historicos_etapas.*', 'funcionarios.nome', 'etapas_pedidos.nome as nome_etapa')
+                    ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
+                    ->join('etapas_pedidos', 'etapas_pedidos.id', '=', 'historicos_etapas.etapas_pedidos_id')
+                    ->where('historicos_etapas.pedidos_id','=',$pedido->id);
 
-                    $etapa = ($historicos_etapas[0]->select_tipo_manutencao =='T' ) ? $etapa . " - Torre" : $etapa . " - Agulha" ;
+
+                if($concluidos == true) {
+                    $historicos_etapas_status = $historicos_etapas_status
+                    ->where('historicos_etapas.status_id','=',$historicos_etapas[0]->status_id - 1)
+                    ->where('historicos_etapas.etapas_pedidos_id','=',4);
+                } else {
+                    $historicos_etapas_status = $historicos_etapas_status
+                    ->where('historicos_etapas.status_id','=',$historicos_etapas[0]->status_id);
                 }
 
-                $texto_quantidade = $historicos_etapas[0]->texto_quantidade;
-                $colaborador = $historicos_etapas[0]->nome;
-                if(!empty($historicos_etapas[0]->select_motivo_pausas)) {
 
-                    $motivo_pausa = $motivos_pausas[$historicos_etapas[0]->select_motivo_pausas];
+                $historicos_etapas_status = $historicos_etapas_status
+                    ->orderBy('historicos_etapas.created_at', 'asc')
+                    ->get()->toArray();
+
+
+                $dados_colaboradores = [];
+                foreach ($historicos_etapas_status as $hestatus) {
+
+                    $etapa = $hestatus->nome_etapa;
+
+                    if($hestatus->status_id == 6 ){
+                        $etapa = ($hestatus->select_tipo_manutencao =='T' ) ? $etapa . " - Torre" : $etapa . " - Agulha" ;
+                    }
+                    $dados_colaboradores[$hestatus->pedidos_id][$hestatus->funcionarios_id]= [
+                        'pedidos_id' => $hestatus->pedidos_id   ,
+                        'status_id' => $hestatus->status_id     ,
+                        'etapas_pedidos_id' => $hestatus->etapas_pedidos_id     ,
+                        'funcionarios_id' => $hestatus->funcionarios_id     ,
+                        'select_tipo_manutencao' => $hestatus->select_tipo_manutencao   ,
+                        'select_motivo_pausas' => $hestatus->select_motivo_pausas   ,
+                        'texto_quantidade' => $hestatus->texto_quantidade   ,
+                        'created_at' => $hestatus->created_at   ,
+                        'updated_at' => $hestatus->updated_at   ,
+                        'nome' => $hestatus->nome   ,
+                        'nome_etapa' => $etapa  ,
+                    ];
+
                 }
             }
-            $pedidos[$key]->nome_etapa = $etapa;
-            $pedidos[$key]->texto_quantidade = $texto_quantidade;
-            $pedidos[$key]->motivo_pausa = $motivo_pausa;
-            $pedidos[$key]->colaborador = $colaborador;
+
+
+
+
+
+            $pedidos[$key]->colaboradores =$dados_colaboradores;
 
 
             $funcionarios_montagens = DB::table('pedidos_funcionarios_montagens')
@@ -116,9 +152,9 @@ class PainelController extends Controller
                 ->orderby('funcionarios.nome')->get();
                 $nome_funcionarios = [];
 
-                foreach($funcionarios_montagens as $funcionario_montagem){
-                   $nome_funcionarios[] = $funcionario_montagem->nome;
-                }
+            foreach($funcionarios_montagens as $funcionario_montagem){
+                $nome_funcionarios[] = $funcionario_montagem->nome;
+            }
 
             $pedidos[$key]->funcionario = implode(',',$nome_funcionarios);
         }
@@ -129,6 +165,7 @@ class PainelController extends Controller
     private function carrega_dados($status_pendente, $status_concluido){
 
         $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 3, true);
+
         $pedidosPendentes = $this->busca_dados_pedidos($status_pendente, 12, false);
 
         return  [

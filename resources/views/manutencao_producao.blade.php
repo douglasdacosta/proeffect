@@ -62,23 +62,46 @@
                 <tbody>
                     @if(!empty($pedidos))
                         @foreach ($pedidos as $pedido)
-                            <tr style="padding-top: 10px">
-                                <td style="margin-top: 10px" scope="col">{{$pedido->ep}}</td>
-                                <td scope="col">{{$pedido->os}}</td>
-                                <td scope="col">{{$pedido->nomeStatus}}</td>
-                                <td scope="col">{{($pedido->nome_etapa != 'Finalizado') ? $pedido->nome_etapa : $pedido->nome_etapa}}</td>
-                                <td scope="col">{{$pedido->motivo_pausa}}</td>
-                                <td scope="col">{{$pedido->texto_quantidade}}</td>
-                                <td scope="col">{{$pedido->funcionario}}</td>
-                                <td scope="col">{{$pedido->colaborador}}</td>
-                                <td scope="col">
-                                    <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>
+                            @if(isset($pedido->colaboradores[$pedido->id]))
+                                <?php $contador =0 ?>
+                                @foreach ($pedido->colaboradores[$pedido->id] as $colaborador)
+                                    <tr style="padding-top: 10px">
+                                        <td style="margin-top: 10px" scope="col">{{$pedido->ep}}</td>
+                                        <td scope="col">{{$pedido->os}}</td>
+                                        <td scope="col">{{$pedido->nomeStatus}}</td>
+                                        <td scope="col">{{$colaborador['nome_etapa'] }}</td>
+                                        <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
+                                        <td scope="col">{{$colaborador['texto_quantidade']}}</td>
+                                        <td scope="col">{{$pedido->funcionario}}</td>
+                                        <td scope="col">{{$colaborador['nome']}}</td>
+                                        <td scope="col">
+                                            <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>
 
-                                    <button data-pedidoid={{$pedido->id}} data-statusatual='{{$pedido->id_status}}' data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
-                                        <span  style="font-size: 25px">&#9998;</button>
-                                    </span>
-                                </td>
-                            </tr>
+                                            <button data-pedidoid={{$pedido->id}} data-statusatual='{{$pedido->id_status}}' data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
+                                                <span  style="font-size: 25px">&#9998;</button>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <?php $contador++ ?>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td scope="col">{{$pedido->ep}}</td>
+                                    <td scope="col">{{$pedido->os}}</td>
+                                    <td scope="col">{{$pedido->nomeStatus}}</td>
+                                    <td scope="col"></td>
+                                    <td scope="col"></td>
+                                    <td scope="col"></td>
+                                    <td scope="col"></td>
+                                    <td scope="col"></td>
+                                    <td scope="col">
+                                        <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>
+                                        <button data-pedidoid={{$pedido->id}} data-statusatual='{{$pedido->id_status}}' data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
+                                            <span  style="font-size: 25px">&#9998;</button>
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
                     @endif
                 </tbody>
@@ -126,6 +149,7 @@
                                 <input class="form-control col-md-5" name="texto_quantidade" id="texto_quantidade"/>
                             </div>
                         </div>
+                        <input type="hidden" name="atualStatus" id="atualStatus" value=""/>
                         <input type="hidden" name="novoStatus" id="novoStatus" value=""/>
                         <input type="hidden" name="novoPedido" id="novoPedido" value=""/>
 

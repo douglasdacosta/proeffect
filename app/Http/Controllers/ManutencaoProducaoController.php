@@ -120,6 +120,7 @@ class ManutencaoProducaoController extends Controller
                 $funcionarios = $funcionarios->where('senha', '=', $senha)->get();
 
                 $HistoricosEtapas->pedidos_id = $request->input('id');
+                $HistoricosEtapas->status_id = $request->input('atualStatus');
                 $HistoricosEtapas->etapas_pedidos_id =$select_etapa_manutencao;
                 $HistoricosEtapas->funcionarios_id = $funcionarios[0]->id;
                 $HistoricosEtapas->select_tipo_manutencao = $select_tipo_manutencao;
@@ -208,7 +209,6 @@ class ManutencaoProducaoController extends Controller
                 $status = new Status();
                 $status = $status->orderby('id')->get();
 
-                // $dados_historicos_etapas = $this->buscaEtapas($pedidos);
                 $pedidos =$painelController->buscaDadosEtapa($pedidos);
             }
 

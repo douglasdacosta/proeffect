@@ -61,7 +61,13 @@ class PedidosController extends Controller
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome' , 'status.id as id_status')
+            ->select('pedidos.*',
+            'ficha_tecnica.ep',
+            'pessoas.nome_cliente',
+            'status.nome' ,
+            'status.id as id_status'
+            )
+            ->addSelect(DB::raw('(SELECT COUNT(1) FROM caixas_pedidos where caixas_pedidos.pedidos_id = pedidos.id) as caixas'))
             ->orderby('pedidos.data_entrega');
         if (!empty($request->input('status'))){
             $pedidos = $pedidos->where('pedidos.status', '=', $request->input('status'));
@@ -103,9 +109,9 @@ class PedidosController extends Controller
             $pedidos = $pedidos->where('pessoas.nome_cliente', 'like', '%'.$nome_cliente.'%' );
         }
 
-
         $pedidos = $pedidos->get();
         $funcionarios_vinculdaos = [];
+
         foreach ($pedidos as $key => $pedido) {
             $funcionarios_montagens = DB::table('pedidos_funcionarios_montagens')
                 ->join('funcionarios', 'funcionarios.id', '=', 'pedidos_funcionarios_montagens.funcionario_id')
@@ -119,7 +125,6 @@ class PedidosController extends Controller
         }
 
         $alertasPendentes = DB::table('alertas')->where('enviado', '=', 0)->count();
-
         $data = array(
             'tela' => 'pesquisar',
             'nome_tela' => 'pedidos',
