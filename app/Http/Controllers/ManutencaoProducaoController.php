@@ -173,12 +173,14 @@ class ManutencaoProducaoController extends Controller
         foreach($funcionarios as $funcionario) {
             $array_senha_producao[] = $funcionario->senha;
         }
-
+        $materiais = $materiais->where('material','LIKE','%CX%')->get();
         if(!empty($request->input()) && !in_array($senha, $array_senha_producao)) {
             $dados = [
                 'pedidos' => '',
                 'status' => '',
-                'mensagem' => 'OS não encontrada/senha incorreta'
+                'mensagem' => 'OS não encontrada/senha incorreta',
+                'materiais' => $materiais,
+                'motivosPausa' => $painelController->getMotivosPausa(),
             ];
 
             return view('manutencao_producao', $dados);
@@ -214,7 +216,7 @@ class ManutencaoProducaoController extends Controller
 
         }
 
-        $materiais = $materiais->where('material','LIKE','%CX%')->get();
+
         $dados = [
             'pedidos' => $pedidos,
             'status' => $dados_status,

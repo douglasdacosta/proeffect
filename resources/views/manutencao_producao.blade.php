@@ -72,7 +72,7 @@
                                         <td scope="col">{{$colaborador['nome_etapa'] }}</td>
                                         <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
                                         <td scope="col">{{$colaborador['texto_quantidade']}}</td>
-                                        <td scope="col">{{$pedido->funcionario}}</td>
+                                        <td scope="col">@if($pedido->id_status == 6){{$pedido->funcionario}}@else @endif</td>
                                         <td scope="col">{{$colaborador['nome']}}</td>
                                         <td scope="col">
                                             <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>

@@ -2,7 +2,7 @@
 $(function () {
 
     var baseUrl = '/proeffect/public'
-    // var baseUrl = ''
+    var baseUrl = ''
 
     calculaTempos()
     $('.toast').hide();

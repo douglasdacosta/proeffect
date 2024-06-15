@@ -27,18 +27,29 @@ class PainelController extends Controller
     }
     private function busca_dados_pedidos($status, $limit = 11, $concluidos ){
 
-        $pedidos = DB::table('pedidos')
+        $pedidos = DB::table('pedidos')->distinct()
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
-            ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->select('pedidos.*', 'ficha_tecnica.ep')
-            ->orderby('pedidos.data_entrega')
-            ->where('pedidos.status_id', '=', $status );
+            ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id');
+
+
+        if($concluidos){
+            $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
+            ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+            ->orderBy('historicos_etapas.created_at', 'desc')
+            ->orderby('pedidos.data_entrega');
+        } else {
+            $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep')->orderby('pedidos.data_entrega');
+        }
+
+        $pedidos=$pedidos->where('pedidos.status_id', '=', $status );
+
         $pedidos->paginate($limit);
-        $pedidos = $pedidos->get();
+        $pedidos = $pedidos->get()->toArray();
 
         $pedidos = $this->buscaDadosEtapa($pedidos, $concluidos);
 
+        $pedidos = array_map("unserialize", array_unique(array_map("serialize", $pedidos)));
         return $pedidos;
     }
 
@@ -48,7 +59,8 @@ class PainelController extends Controller
         $dados_colaboradores = [];
 
         foreach ($pedidos as $key => $pedido) {
-
+            unset($pedidos[$key]->created_at);
+            unset($pedidos[$key]->updated_at);
             $fichastecnicasitens = $Fichastecnicasitens->where('fichatecnica_id', '=', $pedido->fichatecnica_id)->get();
             $conjuntos['conjuntos'] = [];
             $qdte_blank = 0;
@@ -82,17 +94,21 @@ class PainelController extends Controller
             ->orderBy('historicos_etapas.created_at', 'desc')
             ->get(1);
 
-
-
-
-            $etapa = $concluidos == true ? 'Finalizado': 'Pendente';
-            $texto_quantidade = $motivo_pausa = $colaborador = '';
-            $motivos_pausas = $this->getMotivosPausa();
             $dados_colaboradores = [];
             if(!empty($historicos_etapas[0])) {
 
-                $historicos_etapas_status = DB::table('historicos_etapas')
-                    ->select('historicos_etapas.*', 'funcionarios.nome', 'etapas_pedidos.nome as nome_etapa')
+                $historicos_etapas_status = DB::table('historicos_etapas')->distinct()
+                    ->select(
+                    'historicos_etapas.pedidos_id',
+                    'historicos_etapas.status_id',
+                    'historicos_etapas.etapas_pedidos_id',
+                    'historicos_etapas.funcionarios_id',
+                    'historicos_etapas.select_tipo_manutencao',
+                    'historicos_etapas.select_motivo_pausas',
+                    'historicos_etapas.texto_quantidade',
+                    'historicos_etapas.created_at',
+                    'funcionarios.nome',
+                    'etapas_pedidos.nome as nome_etapa')
                     ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
                     ->join('etapas_pedidos', 'etapas_pedidos.id', '=', 'historicos_etapas.etapas_pedidos_id')
                     ->where('historicos_etapas.pedidos_id','=',$pedido->id);
@@ -100,11 +116,11 @@ class PainelController extends Controller
 
                 if($concluidos == true) {
                     $historicos_etapas_status = $historicos_etapas_status
-                    ->where('historicos_etapas.status_id','=',$historicos_etapas[0]->status_id - 1)
+                    ->where('historicos_etapas.status_id','=',$pedido->status_id - 1)
                     ->where('historicos_etapas.etapas_pedidos_id','=',4);
                 } else {
                     $historicos_etapas_status = $historicos_etapas_status
-                    ->where('historicos_etapas.status_id','=',$historicos_etapas[0]->status_id);
+                    ->where('historicos_etapas.status_id','=',$pedido->status_id);
                 }
 
 
@@ -114,6 +130,7 @@ class PainelController extends Controller
 
 
                 $dados_colaboradores = [];
+
                 foreach ($historicos_etapas_status as $hestatus) {
 
                     $etapa = $hestatus->nome_etapa;
@@ -130,7 +147,6 @@ class PainelController extends Controller
                         'select_motivo_pausas' => $hestatus->select_motivo_pausas   ,
                         'texto_quantidade' => $hestatus->texto_quantidade   ,
                         'created_at' => $hestatus->created_at   ,
-                        'updated_at' => $hestatus->updated_at   ,
                         'nome' => $hestatus->nome   ,
                         'nome_etapa' => $etapa  ,
                     ];
