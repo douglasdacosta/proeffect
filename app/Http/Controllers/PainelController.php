@@ -35,11 +35,14 @@ class PainelController extends Controller
 
         if($concluidos){
             $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
-            ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+            ->leftJoin('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
             ->orderBy('historicos_etapas.created_at', 'desc')
             ->orderby('pedidos.data_entrega');
         } else {
-            $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep')->orderby('pedidos.data_entrega');
+            $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
+            ->leftJoin('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+            ->orderBy('historicos_etapas.created_at', 'desc')
+            ->orderby('pedidos.data_entrega');
         }
 
         $pedidos=$pedidos->where('pedidos.status_id', '=', $status );
@@ -48,8 +51,10 @@ class PainelController extends Controller
         $pedidos = $pedidos->get()->toArray();
 
         $pedidos = $this->buscaDadosEtapa($pedidos, $concluidos);
-
         $pedidos = array_map("unserialize", array_unique(array_map("serialize", $pedidos)));
+        if($concluidos){
+            $pedidos = array_slice($pedidos, 0,3);
+        }
         return $pedidos;
     }
 
@@ -180,9 +185,9 @@ class PainelController extends Controller
 
     private function carrega_dados($status_pendente, $status_concluido){
 
-        $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 3, true);
+        $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 12, true);
 
-        $pedidosPendentes = $this->busca_dados_pedidos($status_pendente, 12, false);
+        $pedidosPendentes = $this->busca_dados_pedidos($status_pendente, 50, false);
 
         return  [
             'pedidosCompletos'=> $pedidosCompletos,

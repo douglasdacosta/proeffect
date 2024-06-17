@@ -240,7 +240,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                         <i data-funcionariomontagem="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->id.','}}@endforeach"
                                                             title="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->nome.', '}}@endforeach"
                                                             data-pedido_id="{{$pedido->id}}"
-                                                            style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:green'}}@else {{'color:grey'}}@endif"  class="fas fa-users add_funcionarios_montagens">
+                                                            style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:#044f04'}}@else {{'color:#cacaca'}}@endif"  class="fas fa-users add_funcionarios_montagens">
                                                         </i>
                                                         {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
                                                     </td>
@@ -257,7 +257,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     </th>
                                                     <th scope="row">
                                                         <a class="show_caixas" data-pedido_id="{{$pedido->id}}">
-                                                            <i style="cursor:pointer;@if($pedido->caixas==0){{'color:grey'}}@else{{'color:green'}}@endif" class="fas fa-eye"></i>
+                                                            <i style="cursor:pointer;@if($pedido->caixas==0){{'color:#cacaca'}}@else{{'color:#044f04'}}@endif" class="fas fa-eye"></i>
                                                         </a>
                                                     </th>
                                                 </tr>

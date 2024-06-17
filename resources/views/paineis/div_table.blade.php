@@ -22,7 +22,7 @@
         <tbody>
             @foreach ($pedidosCompletos as $pedido)
                 @if(isset($pedido->colaboradores[$pedido->id]))
-                    <?php $contador =0 ?>
+                    <?php  $contador =0 ?>
                     @foreach ($pedido->colaboradores[$pedido->id] as $colaborador)
                         <tr>
                             @if($contador==0)
