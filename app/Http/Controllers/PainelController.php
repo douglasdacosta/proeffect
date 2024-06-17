@@ -35,7 +35,7 @@ class PainelController extends Controller
 
         if($concluidos){
             $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
-            ->leftJoin('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+            ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
             ->orderBy('historicos_etapas.created_at', 'desc')
             ->orderby('pedidos.data_entrega');
         } else {
