@@ -1,6 +1,6 @@
-<div class="w-auto"  style="height: 34%; overflow: hidden; background-color: #68c570;">
+<div class="w-auto"  style="display: contents; overflow: hidden;">
     <h1><b>Concluídos</h1>
-    <table class="table table-sm table-striped text-center" id="table_composicao">
+    <table style="background-color: #68c570;" class="table table-sm table-striped text-center concluidos" id="table_composicao">
         <thead >
             <tr>
                 <th scope="col">EP</th>
@@ -74,7 +74,7 @@
         </tbody>
     </table>
 </div>
-<div class="w-auto"  style="height: 60%; overflow: hidden; background-color: #e9aa4c;">
+<div class="w-auto"  style=" height: 85%; overflow: hidden; background-color: #e9aa4c;">
     <h1><b>Pendentes</b></h1>
     <table class="table table-sm table-striped text-center" id="table_composicao">
         <thead >

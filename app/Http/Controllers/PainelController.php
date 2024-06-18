@@ -136,6 +136,7 @@ class PainelController extends Controller
 
                 $dados_colaboradores = [];
 
+                $motivosPausa = $this->getMotivosPausa();
                 foreach ($historicos_etapas_status as $hestatus) {
 
                     $etapa = $hestatus->nome_etapa;
@@ -149,7 +150,7 @@ class PainelController extends Controller
                         'etapas_pedidos_id' => $hestatus->etapas_pedidos_id     ,
                         'funcionarios_id' => $hestatus->funcionarios_id     ,
                         'select_tipo_manutencao' => $hestatus->select_tipo_manutencao   ,
-                        'select_motivo_pausas' => $hestatus->select_motivo_pausas   ,
+                        'select_motivo_pausas' => !empty($hestatus->select_motivo_pausas) ? $motivosPausa[$hestatus->select_motivo_pausas] : '' ,
                         'texto_quantidade' => $hestatus->texto_quantidade   ,
                         'created_at' => $hestatus->created_at   ,
                         'nome' => $hestatus->nome   ,

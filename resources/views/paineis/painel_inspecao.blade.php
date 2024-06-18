@@ -8,7 +8,7 @@
     }
 
     .container_default .table {
-        font-size: 2em;
+        font-size: 1.5em;
     }
 </style>
 <script type="text/javascript" >
