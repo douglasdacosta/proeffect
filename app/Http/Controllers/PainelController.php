@@ -22,12 +22,13 @@ class PainelController extends Controller
             '4' => 'P.R – Protótipo',
             '5' => 'A.P – Assunto Pessoal',
             '6' => 'P.M – Problema na máquina',
-            '7' => 'E.P - Esperando próxima produção'
+            '7' => 'E.P - Esperando próxima produção',
+            '8' => 'F.M - Faltando Material'
         ];
     }
     private function busca_dados_pedidos($status, $limit = 11, $concluidos ){
 
-        $pedidos = DB::table('pedidos')->distinct()
+        $pedidos = DB::table('pedidos')
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id');
@@ -41,7 +42,7 @@ class PainelController extends Controller
         } else {
             $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
             ->leftJoin('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
-            ->orderBy('historicos_etapas.created_at', 'desc')
+            ->orderBy('historicos_etapas.created_at', 'DESC')
             ->orderby('pedidos.data_entrega');
         }
 
@@ -50,12 +51,48 @@ class PainelController extends Controller
         $pedidos->paginate($limit);
         $pedidos = $pedidos->get()->toArray();
 
+
+
+
+
         $pedidos = $this->buscaDadosEtapa($pedidos, $concluidos);
+        $pedidos = $this->ordenarPedidos($pedidos);
+        $pedidos = $this->higienizaDatas($pedidos);
         $pedidos = array_map("unserialize", array_unique(array_map("serialize", $pedidos)));
+
+
         if($concluidos){
             $pedidos = array_slice($pedidos, 0,3);
         }
         return $pedidos;
+    }
+
+    public function higienizaDatas($pedidos) {
+        foreach ($pedidos as $key => $pedido) {
+            unset($pedidos[$key]->created_at);
+            unset($pedidos[$key]->updated_at);
+        }
+        return $pedidos;
+    }
+    public function ordenarPedidos($array) {
+        usort($array, array($this, 'compararPedidos'));
+        return $array;
+    }
+
+    public function compararPedidos($a, $b) {
+        // Verifica se ambos têm colaboradores
+        $colab_a = !empty($a->colaboradores);
+        $colab_b = !empty($b->colaboradores);
+
+        // Compara baseado na presença de colaboradores e na data de criação
+        if ($colab_a && !$colab_b) {
+            return -1; // $a vem antes de $b
+        } elseif (!$colab_a && $colab_b) {
+            return 1; // $b vem antes de $a
+        } else {
+            // Se ambos têm ou ambos não têm colaboradores, compara pela data de criação
+            return strcmp($a->created_at, $b->created_at);
+        }
     }
 
     public function buscaDadosEtapa($pedidos, $concluidos = false) {
@@ -64,8 +101,6 @@ class PainelController extends Controller
         $dados_colaboradores = [];
 
         foreach ($pedidos as $key => $pedido) {
-            unset($pedidos[$key]->created_at);
-            unset($pedidos[$key]->updated_at);
             $fichastecnicasitens = $Fichastecnicasitens->where('fichatecnica_id', '=', $pedido->fichatecnica_id)->get();
             $conjuntos['conjuntos'] = [];
             $qdte_blank = 0;

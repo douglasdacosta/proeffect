@@ -84,7 +84,7 @@
             });
 
             $("#select_motivo_pausas").change(function () {
-                if($("#select_motivo_pausas").val() == 1 || $("#select_motivo_pausas").val() == 2) {
+                if($("#select_motivo_pausas").val() == 8 || $("#select_motivo_pausas").val() == 1 || $("#select_motivo_pausas").val() == 2) {
                     $('#quantidade').show();
                 } else {''
                     $('#quantidade').hide();
