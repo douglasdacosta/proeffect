@@ -52,7 +52,7 @@
     <script type="text/javascript" >
         $(function ($) {
             var baseUrl = '/proeffect/public'
-            var baseUrl = ''
+            // var baseUrl = ''
             $(document).on('click', '.alteracao_status_pedido', function () {
 
                 $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material').val('');
