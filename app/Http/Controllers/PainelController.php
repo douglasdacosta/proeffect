@@ -37,8 +37,9 @@ class PainelController extends Controller
         if($concluidos){
             $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
             ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
-            ->orderBy('historicos_etapas.created_at', 'desc')
-            ->orderby('pedidos.data_entrega');
+            ->where('historicos_etapas.etapas_pedidos_id','=',4)
+            ->orderBy('historicos_etapas.created_at', 'DESC')
+            ->orderby('pedidos.data_entrega', 'DESC');
         } else {
             $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
             ->leftJoin('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
@@ -56,7 +57,14 @@ class PainelController extends Controller
 
 
         $pedidos = $this->buscaDadosEtapa($pedidos, $concluidos);
-        $pedidos = $this->ordenarPedidos($pedidos);
+
+        if($concluidos) {
+            $pedidos = $this->ordenarPedidosDesc($pedidos);
+        } else{
+
+            $pedidos = $this->ordenarPedidos($pedidos);
+        }
+
         $pedidos = $this->higienizaDatas($pedidos);
         $pedidos = array_map("unserialize", array_unique(array_map("serialize", $pedidos)));
 
@@ -74,11 +82,29 @@ class PainelController extends Controller
         }
         return $pedidos;
     }
-    public function ordenarPedidos($array) {
+    public function ordenarPedidosDesc($array) {
+        usort($array, array($this, 'compararPedidosDesc'));
+        return $array;
+    }
+    public function ordenarPedidos($array, ) {
         usort($array, array($this, 'compararPedidos'));
         return $array;
     }
 
+    public function compararPedidosDesc($a, $b) {
+        // Verifica se ambos têm colaboradores
+        $colab_a = !empty($a->colaboradores);
+        $colab_b = !empty($b->colaboradores);
+
+        // Compara baseado na presença de colaboradores e na data de criação
+        if ($colab_a && !$colab_b) {
+            return -1; // $a vem antes de $b
+        } elseif (!$colab_a && $colab_b) {
+            return 1; // $b vem antes de $a
+        } else {
+            return strcmp($a->created_at, $b->created_at);
+        }
+    }
     public function compararPedidos($a, $b) {
         // Verifica se ambos têm colaboradores
         $colab_a = !empty($a->colaboradores);
@@ -90,8 +116,7 @@ class PainelController extends Controller
         } elseif (!$colab_a && $colab_b) {
             return 1; // $b vem antes de $a
         } else {
-            // Se ambos têm ou ambos não têm colaboradores, compara pela data de criação
-            return strcmp($a->created_at, $b->created_at);
+            return strcmp($a->data_entrega, $b->data_entrega);
         }
     }
 
@@ -221,7 +246,7 @@ class PainelController extends Controller
 
     private function carrega_dados($status_pendente, $status_concluido){
 
-        $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 12, true);
+        $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 3, true);
 
         $pedidosPendentes = $this->busca_dados_pedidos($status_pendente, 50, false);
 
