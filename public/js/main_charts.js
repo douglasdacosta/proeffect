@@ -5,7 +5,8 @@ $(function ($) {
     const colunas = new Array();
     var dados_valores ='';
     var dados_colunas = '';
-    var baseUrl = '/proeffect/public'
+    // var baseUrl = '/proeffect/public'
+    var baseUrl = ''
 
     $.ajax({
         type: "POST",

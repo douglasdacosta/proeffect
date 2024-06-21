@@ -36,7 +36,7 @@
 
 //   });
 $(function ($) {
-    var baseUrl = '/proeffect/public'
+    //var baseUrl = '/proeffect/public'
     var baseUrl = ''
 
     $('#blocker').hide();

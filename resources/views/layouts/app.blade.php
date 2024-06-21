@@ -51,7 +51,7 @@
     <script src="{{asset('js/bootstrap.4.6.2.js')}}"></script>
     <script type="text/javascript" >
         $(function ($) {
-            var baseUrl = '/proeffect/public'
+            // var baseUrl = '/proeffect/public'
             var baseUrl = ''
             $(document).on('click', '.alteracao_status_pedido', function () {
 
