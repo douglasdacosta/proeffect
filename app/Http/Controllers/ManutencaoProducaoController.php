@@ -196,7 +196,7 @@ class ManutencaoProducaoController extends Controller
             ->orderby('status_id', 'desc')
             ->orderby('data_entrega');
 
-            $pedidos = $pedidos->where('os', '=', $os)->get();
+            $pedidos = $pedidos->where('os', '=', $os)->where('pedidos.status', '=', 'A')->get();
 
             if(!empty($pedidos)) {
                 $status = new Status();
