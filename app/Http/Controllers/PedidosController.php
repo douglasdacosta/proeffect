@@ -49,11 +49,11 @@ class PedidosController extends Controller
         $funcionarios = $funcionarios->where('status','=','A')->orderby('nome')->get();
 
         $id = !empty($request->input('id')) ? ($request->input('id')) : (!empty($id) ? $id : false);
-        $status_id = !empty($request->input('status_id')) ? ($request->input('status_id')) : (!empty($status_id) ? $status_id : false);
         $codigo_cliente = !empty($request->input('codigo_cliente')) ? ($request->input('codigo_cliente')) : (!empty($codigo_cliente) ? $codigo_cliente : false);
         $nome_cliente = !empty($request->input('nome_cliente')) ? ($request->input('nome_cliente')) : (!empty($nome_cliente) ? $nome_cliente : false);
         $os = !empty($request->input('os')) ? ($request->input('os')) : (!empty($os) ? $os : false);
         $ep = !empty($request->input('ep')) ? ($request->input('ep')) : (!empty($ep) ? $ep : false);
+
 
 
 
@@ -87,8 +87,14 @@ class PedidosController extends Controller
         if ($os) {
             $pedidos = $pedidos->where('pedidos.os',  'like', '%'.$os.'%');
         }
-        if ($status_id) {
-            $pedidos = $pedidos->where('pedidos.status_id', '=', $status_id);
+        $status_id = $this->getAllStatusExcept([11]);
+
+        if(!empty($request->input('status_id'))) {
+            $status_id = $request->input('status_id');
+        }
+
+        if($status_id) {
+            $pedidos =$pedidos->whereIn('status_id', $status_id);
         }
 
         if(!empty($request->input('data_entrega')) && !empty($request->input('data_entrega_fim') )) {
@@ -850,6 +856,23 @@ class PedidosController extends Controller
     {
         $Status = new Status();
         return $Status->where('status', '=', 'A')->get();
+    }
+
+    /**
+    * Show the application dashboard.
+    *
+    * @return \Illuminate\Contracts\Support\Renderable
+    */
+    public function getAllStatusExcept($status_id)
+    {
+        $Status = new Status();
+        $datas = $Status->select('id')->whereNotIn('id', $status_id)->where('status', '=', 'A')->get();
+        $array_data = [];
+        foreach ($datas as $key => $data) {
+            $array_data[] = $data->id;
+        }
+
+        return $array_data;
     }
 
     /**

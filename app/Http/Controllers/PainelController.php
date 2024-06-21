@@ -47,14 +47,12 @@ class PainelController extends Controller
             ->orderby('pedidos.data_entrega');
         }
 
-        $pedidos=$pedidos->where('pedidos.status_id', '=', $status );
+        $pedidos=$pedidos
+        ->where('pedidos.status_id', '=', $status )
+        ->where('pedidos.status', '=', 'A');
 
         $pedidos->paginate($limit);
         $pedidos = $pedidos->get()->toArray();
-
-
-
-
 
         $pedidos = $this->buscaDadosEtapa($pedidos, $concluidos);
 

@@ -5,10 +5,10 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/bootstrap.4.6.2.js"></script>
-<script src="js/main_custom.js"></script>
-<script src="js/jquery.mask.js"></script>
+<script src="../vendor/jquery/jquery.min.js?cache={{time()}}"></script>
+<script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
+<script src="js/main_custom.js?cache={{time()}}"></script>
+<script src="js/jquery.mask.js?cache={{time()}}"></script>
 <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 @switch($tela)
     @case('pesquisar')
@@ -122,17 +122,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                         <div class="col-sm-1">
                             <input type="text" id="os" name="os" class="form-control" value="">
                         </div>
-                        <label for="blank" class="col-sm-2 col-form-label text-right text-sm-end">Status do pedido</label>
-                        <div class="col-sm-2">
-                            <select class="form-control" id="status_id" name="status_id">
-                                <option value=""></option>
-                                @if (isset($AllStatus))
-                                    @foreach ($AllStatus as $stats)
-                                        <option value="{{ $stats->id }}">{{ $stats->nome }}
-                                        </option>
+                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
+                        <div class="col-sm-2" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
+                            <div class="right_col col-sm-2" role="main">
+                                    @foreach ($AllStatus as $status)
+                                        <div class="col-sm-6 form-check">
+                                            <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                            <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                        </div>
                                     @endforeach
-                                @endif
-                            </select>
+                            </div>
                         </div>
                     </div>
 

@@ -163,7 +163,7 @@
 
             <div id='modal_caixas'  class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="width: 700px">
+                    <div class="modal-content" style="width: 1050px">
                         <div class="modal-header">
                         <h5 class="modal-title" id='texto_status_caixas'></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -176,7 +176,7 @@
                                 <span id='nova_caixa' title="Adicionar nova caixa" style="font-size: 20px;  cursor: pointer;  color:darkgreen; font-weight: bolder">+</i></span>
                                 <div class="form-group row div_caixas" id='div_caixas'>
                                     <label for="" class="col-sm-1 col-form-label text-right">&nbsp;</label>
-                                    <select class="form-control col-md-2 material" name="cx_material[]" id="material" >
+                                    <select class="form-control col-md-3 material" name="cx_material[]" id="material" >
                                             <option value=""></option>
                                             @foreach ($materiais as $material)
                                                 <option value="{{$material->id}}">{{ $material->material }}</option>
