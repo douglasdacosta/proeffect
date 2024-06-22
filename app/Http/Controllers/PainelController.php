@@ -170,9 +170,11 @@ class PainelController extends Controller
                     'historicos_etapas.select_motivo_pausas',
                     'historicos_etapas.texto_quantidade',
                     'historicos_etapas.created_at',
+                    'historicos_etapas.etapas_alteracao_id',
                     'funcionarios.nome',
                     'etapas_pedidos.nome as nome_etapa')
                     ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
+                    ->leftjoin('etapas_alteracao', 'etapas_alteracao.id', '=', 'historicos_etapas.etapas_alteracao_id')
                     ->join('etapas_pedidos', 'etapas_pedidos.id', '=', 'historicos_etapas.etapas_pedidos_id')
                     ->where('historicos_etapas.pedidos_id','=',$pedido->id);
 
@@ -202,9 +204,10 @@ class PainelController extends Controller
                     if($hestatus->status_id == 6 ){
                         $etapa = ($hestatus->select_tipo_manutencao =='T' ) ? $etapa . " - Torre" : $etapa . " - Agulha" ;
                     }
-                    $dados_colaboradores[$hestatus->pedidos_id][$hestatus->funcionarios_id]= [
+                    $dados_colaboradores[$hestatus->pedidos_id][$hestatus->etapas_alteracao_id]= [
                         'pedidos_id' => $hestatus->pedidos_id   ,
                         'status_id' => $hestatus->status_id     ,
+                        'etapas_alteracao_id' => $hestatus->etapas_alteracao_id     ,
                         'etapas_pedidos_id' => $hestatus->etapas_pedidos_id     ,
                         'funcionarios_id' => $hestatus->funcionarios_id     ,
                         'select_tipo_manutencao' => $hestatus->select_tipo_manutencao   ,

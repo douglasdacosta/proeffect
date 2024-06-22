@@ -65,9 +65,11 @@
                 $('#texto_status').text(texto_status);
                 var pedido = $(this).data('pedidoid');
                 var proximoStatus = $(this).data('proximostatus');
+                var etapasalteracao = $(this).data('etapasalteracao');
                 $("#novoStatus").val(proximoStatus);
                 $("#atualStatus").val(statusAtual);
                 $("#novoPedido").val(pedido);
+                $("#etapasalteracao").val(etapasalteracao);
                 if(statusAtual == 6){
                     $('#tipo_manutencao, #etapa_manutencao').show();
                 }
@@ -99,6 +101,7 @@
                 var pedido = $('#novoPedido').val();
                 var status = $('#novoStatus').val();
                 var atualStatus = $('#atualStatus').val();
+                var etapasalteracao = $('#etapasalteracao').val();
                 var senha = $('#senha_funcionario').val();
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", baseUrl + '/manutencao-producao-alterar-pedido', true);
@@ -135,6 +138,7 @@
                     'select_etapa_manutencao' : select_etapa_manutencao,
                     'select_motivo_pausas' : select_motivo_pausas,
                     'texto_quantidade' : texto_quantidade,
+                    'etapasalteracao' : etapasalteracao,
                     '_token': csrfToken
                 };
                 xhr.send(JSON.stringify(requestData));

@@ -77,7 +77,7 @@
                                         <td scope="col">
                                             <?php $st = ($pedido->id_status == 11) ? $pedido->id_status : $pedido->id_status + 1 ?>
 
-                                            <button data-pedidoid={{$pedido->id}} data-statusatual='{{$pedido->id_status}}' data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
+                                            <button data-pedidoid={{$pedido->id}} data-etapasalteracao='{{$colaborador['etapas_alteracao_id']}}' data-statusatual='{{$pedido->id_status}}' data-descricaoproximostatus='{{$status[$st]['nome']}}' data-proximostatus='{{$status[$st]['id']}}' type="button" class="btn btn-primary alteracao_status_pedido">
                                                 <span  style="font-size: 25px">&#9998;</button>
                                             </span>
                                         </td>

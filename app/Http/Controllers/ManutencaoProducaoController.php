@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\PainelController;
 use App\Models\CaixasPedidos;
+use App\Models\EtapasAlteracao;
 use App\Models\Funcionarios;
 use App\Models\HistoricosEtapas;
 use App\Models\Materiais;
@@ -79,11 +80,13 @@ class ManutencaoProducaoController extends Controller
             $HistoricosEtapas = new HistoricosEtapas();
             $funcionarios = new Funcionarios();
             $pedidos = new Pedidos();
+            $ModelEtapasAlteracao = new EtapasAlteracao();
             $pedidosController = new PedidosController();
 
             if($request->input('id')) {
                 $pedidos= $pedidos::find($request->input('id'));
                 $status_anterior = $pedidos->status_id;
+                $etapasalteracao = $request->input('etapasalteracao');
                 $select_tipo_manutencao = $request->input('select_tipo_manutencao');
                 $select_etapa_manutencao= $request->input('select_etapa_manutencao');
                 $select_motivo_pausas= $request->input('select_motivo_pausas');
@@ -115,11 +118,21 @@ class ManutencaoProducaoController extends Controller
 
                 }
                 $pedidos->save();
+                $numero_etapas_alteracao=1;
+                if($select_etapa_manutencao == 1){
+                    $quantidade_iniciada =  $ModelEtapasAlteracao->where('pedido_id','=', $request->input('id'))->get()->count();
+                    info($quantidade_iniciada);
+                    $numero_etapas_alteracao =  $quantidade_iniciada + 1;
+                    $MetapasAlteracao = new EtapasAlteracao();
+                    $MetapasAlteracao->pedido_id = $request->input('id');
+                    $MetapasAlteracao->save();
+                }
 
                 $senha= $request->input('senha');
                 $funcionarios = $funcionarios->where('senha', '=', $senha)->get();
 
                 $HistoricosEtapas->pedidos_id = $request->input('id');
+                $HistoricosEtapas->etapas_alteracao_id = $numero_etapas_alteracao;
                 $HistoricosEtapas->status_id = $request->input('atualStatus');
                 $HistoricosEtapas->etapas_pedidos_id =$select_etapa_manutencao;
                 $HistoricosEtapas->funcionarios_id = $funcionarios[0]->id;
@@ -230,26 +243,4 @@ class ManutencaoProducaoController extends Controller
 
     }
 
-    public function buscaEtapas($pedidos){
-        $dados_historicos_etapas = [];
-        foreach($pedidos as  $pedido) {
-            $historicos_etapas = DB::table('historicos_etapas')
-            ->select('historicos_etapas.*', 'pedidos.status_id', 'etapas_pedidos.nome as nome_etapa')
-            ->join('pedidos', 'pedidos.id', '=', 'historicos_etapas.pedidos_id')
-            ->join('etapas_pedidos', 'etapas_pedidos.id', '=', 'historicos_etapas.etapas_pedidos_id')
-            ->where('pedidos_id','=',$pedido->id)
-            ->orderBy('historicos_etapas.created_at', 'desc')
-            ->limit(1)
-            ->get();
-
-            foreach($historicos_etapas as  $historicos_etapa) {
-                 $dados_historicos_etapas[$pedido->id][$historicos_etapa->status_id][] = [
-                    "nome_etapa" => $historicos_etapa->nome_etapa,
-                    "etapas_pedidos_id" => $historicos_etapa->etapas_pedidos_id,
-                    "funcionarios_id" => $historicos_etapa->funcionarios_id,
-                ];
-            }
-        }
-        return $dados_historicos_etapas;
-    }
 }
