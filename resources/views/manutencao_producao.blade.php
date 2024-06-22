@@ -152,6 +152,7 @@
                         <input type="hidden" name="atualStatus" id="atualStatus" value=""/>
                         <input type="hidden" name="novoStatus" id="novoStatus" value=""/>
                         <input type="hidden" name="novoPedido" id="novoPedido" value=""/>
+                        <input type="hidden" name="etapasalteracao" id="etapasalteracao" value=""/>
 
                         <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>

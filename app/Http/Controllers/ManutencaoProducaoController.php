@@ -118,10 +118,9 @@ class ManutencaoProducaoController extends Controller
 
                 }
                 $pedidos->save();
-                $numero_etapas_alteracao=1;
+                $numero_etapas_alteracao=$etapasalteracao;
                 if($select_etapa_manutencao == 1){
                     $quantidade_iniciada =  $ModelEtapasAlteracao->where('pedido_id','=', $request->input('id'))->get()->count();
-                    info($quantidade_iniciada);
                     $numero_etapas_alteracao =  $quantidade_iniciada + 1;
                     $MetapasAlteracao = new EtapasAlteracao();
                     $MetapasAlteracao->pedido_id = $request->input('id');
