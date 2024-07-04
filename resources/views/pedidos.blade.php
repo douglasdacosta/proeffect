@@ -177,105 +177,101 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 </div>
             </form>
 
-            <div class="row" role="main">
-
-                <div class="form-group">
-                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <h4>Encontrados</h4>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <table class="table table-striped  text-center">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>OS</th>
-                                            <th>EP</th>
-                                            <th>Qtde</th>
-                                            <th>Status do pedido</th>
-                                            <th>Data gerado</th>
-                                            <th>Montadores</th>
-                                            <th>Data entrega</th>
-                                            <th>Alerta dias</th>
-                                            <th>OS</th>
-                                            <th>MP</th>
-                                            <th>CX</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if (isset($pedidos))
-                                            @foreach ($pedidos as $pedido)
-                                                <tr>
-                                                    <th scope="row"><a
-                                                            href={{ URL::route($rotaAlterar, ['id' => $pedido->id]) }}>{{ $pedido->id }}</a>
-                                                    </th>
-                                                    <td>{{ $pedido->os }}</td>
-                                                    <td>{{ $pedido->ep }}</td>
-                                                    <td>{{ $pedido->qtde }}</td>
-                                                    <td>
-                                                        <select class="form-control alteracao_status_pedido"
-                                                            data-statusatual='{{ $pedido->id_status }}'
-                                                            data-pedido="{{ $pedido->id }}" id="status_id" name="status_id">
-                                                            @if (isset($AllStatus))
-                                                                @foreach ($AllStatus as $stats)
-                                                                    <option value="{{ $stats->id }}"
-                                                                        @if ($stats->id < $pedido->id_status) {{ 'disabled' }} @else {{ '' }} @endif
-                                                                        @if (isset($pedido->id_status) && $pedido->id_status == $stats->id) selected="selected" @else{{ '' }} @endif>
-                                                                        {{ $stats->nome }}
-                                                                    </option>
-                                                                @endforeach
-                                                            @endif
-                                                        </select>
-                                                    </td>
-                                                    <?php
-                                                    $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
-                                                    $hoje = date('Y-m-d');
-                                                    $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
-                                                    if ($dias_alerta < 6) {
-                                                        $class_dias_alerta = 'text-danger';
-                                                    } else {
-                                                        $class_dias_alerta = 'text-primary';
-                                                    }
-                                                    ?>
-                                                    <td>{{ Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
-                                                    <td>
-                                                        <i data-funcionariomontagem="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->id.','}}@endforeach"
-                                                            title="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->nome.', '}}@endforeach"
-                                                            data-pedido_id="{{$pedido->id}}"
-                                                            style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:#044f04'}}@else {{'color:#cacaca'}}@endif"  class="fas fa-users add_funcionarios_montagens">
-                                                        </i>
-                                                        {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
-                                                    </td>
-                                                    <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
-                                                    <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
-                                                    <th scope="row" title="Imprimir ordem de serviço">
-                                                        <a target="_blank"
-                                                            href="{{ URL::route('imprimirOS', ['id' => $pedido->id]) }}" <span
-                                                            class="fa fa-print"></span></a>
-                                                    </th>
-                                                    <th scope="row">
-                                                        <a href="{{ URL::route('imprimirMP', ['id' => $pedido->id]) }}" <span
-                                                            class="fa fa-print"></span></a>
-                                                    </th>
-                                                    <th scope="row">
-                                                        <a class="show_caixas" data-pedido_id="{{$pedido->id}}">
-                                                            <i style="cursor:pointer;@if($pedido->caixas==0){{'color:#cacaca'}}@else{{'color:#044f04'}}@endif" class="fas fa-eye"></i>
-                                                        </a>
-                                                    </th>
-                                                </tr>
-                                            @endforeach
-                                        @endif
-                                    </tbody>
-                                </table>
-                            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h4>Encontrados</h4>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <table class="table table-striped  text-center">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>OS</th>
+                                        <th>EP</th>
+                                        <th>Qtde</th>
+                                        <th>Status do pedido</th>
+                                        <th>Data gerado</th>
+                                        <th>Montadores</th>
+                                        <th>Data entrega</th>
+                                        <th>Alerta dias</th>
+                                        <th>OS</th>
+                                        <th>MP</th>
+                                        <th>CX</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (isset($pedidos))
+                                        @foreach ($pedidos as $pedido)
+                                            <tr>
+                                                <th scope="row"><a
+                                                        href={{ URL::route($rotaAlterar, ['id' => $pedido->id]) }}>{{ $pedido->id }}</a>
+                                                </th>
+                                                <td>{{ $pedido->os }}</td>
+                                                <td>{{ $pedido->ep }}</td>
+                                                <td>{{ $pedido->qtde }}</td>
+                                                <td>
+                                                    <select class="form-control alteracao_status_pedido"
+                                                        data-statusatual='{{ $pedido->id_status }}'
+                                                        data-pedido="{{ $pedido->id }}" id="status_id" name="status_id">
+                                                        @if (isset($AllStatus))
+                                                            @foreach ($AllStatus as $stats)
+                                                                <option value="{{ $stats->id }}"
+                                                                    @if ($stats->id < $pedido->id_status) {{ 'disabled' }} @else {{ '' }} @endif
+                                                                    @if (isset($pedido->id_status) && $pedido->id_status == $stats->id) selected="selected" @else{{ '' }} @endif>
+                                                                    {{ $stats->nome }}
+                                                                </option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                </td>
+                                                <?php
+                                                $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
+                                                $hoje = date('Y-m-d');
+                                                $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                                                if ($dias_alerta < 6) {
+                                                    $class_dias_alerta = 'text-danger';
+                                                } else {
+                                                    $class_dias_alerta = 'text-primary';
+                                                }
+                                                ?>
+                                                <td>{{ Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
+                                                <td>
+                                                    <i data-funcionariomontagem="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->id.','}}@endforeach"
+                                                        title="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->nome.', '}}@endforeach"
+                                                        data-pedido_id="{{$pedido->id}}"
+                                                        style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:#044f04'}}@else {{'color:#cacaca'}}@endif"  class="fas fa-users add_funcionarios_montagens">
+                                                    </i>
+                                                    {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
+                                                </td>
+                                                <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
+                                                <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
+                                                <th scope="row" title="Imprimir ordem de serviço">
+                                                    <a target="_blank"
+                                                        href="{{ URL::route('imprimirOS', ['id' => $pedido->id]) }}" <span
+                                                        class="fa fa-print"></span></a>
+                                                </th>
+                                                <th scope="row">
+                                                    <a href="{{ URL::route('imprimirMP', ['id' => $pedido->id]) }}" <span
+                                                        class="fa fa-print"></span></a>
+                                                </th>
+                                                <th scope="row">
+                                                    <a class="show_caixas" data-pedido_id="{{$pedido->id}}">
+                                                        <i style="cursor:pointer;@if($pedido->caixas==0){{'color:#cacaca'}}@else{{'color:#044f04'}}@endif" class="fas fa-eye"></i>
+                                                    </a>
+                                                </th>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-
         @stop
     @break
 
