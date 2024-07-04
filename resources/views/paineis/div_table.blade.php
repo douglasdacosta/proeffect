@@ -44,7 +44,7 @@
                                 <td></td>
                             @endif
                             <td scope="col">{{$colaborador['nome_etapa']}}</td>
-                            <td scope="col">{{$colaborador['Nº máquina']}}</td>
+                            <td scope="col">{{$colaborador['numero_maquina']}}</td>
                             <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
                             <td scope="col">{{$colaborador['texto_quantidade']}}</td>
                             @if(isset($montagem) && $montagem == true)
