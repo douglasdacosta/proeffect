@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,14 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('funcionarios', function (Blueprint $table) {
+        Schema::create('etapas_alteracao', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
-            $table->string('funcao')->nullable();
-            $table->string('status',1);
+            $table->bigInteger('pedido_id')->unsigned()->index();
             $table->timestamps();
-        });
 
+            $table->foreign('pedido_id')->references('id')->on('pedidos');
+        });
 
     }
 
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('funcionarios');
+        Schema::dropIfExists('etapas_alteracao');
     }
 };

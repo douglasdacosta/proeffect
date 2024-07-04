@@ -14,14 +14,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('funcionarios', function (Blueprint $table) {
-            $table->id();
-            $table->string('nome');
-            $table->string('funcao')->nullable();
-            $table->string('status',1);
-            $table->timestamps();
+        Schema::table('historicos_etapas', function($table) {
+            $table->integer('status_id')->length(11)->after('pedidos_id')->nullable();
         });
-
 
     }
 
@@ -33,6 +28,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('funcionarios');
+        Schema::table('historicos_etapas', function($table) {
+            $table->dropColumn('status_id');
+        });
     }
 };

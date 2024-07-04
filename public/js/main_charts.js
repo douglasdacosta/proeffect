@@ -5,10 +5,12 @@ $(function ($) {
     const colunas = new Array();
     var dados_valores ='';
     var dados_colunas = '';
+    // var baseUrl = '/proeffect/public'
+    var baseUrl = ''
 
     $.ajax({
         type: "POST",
-        url: '/ajax-getProducao',
+        url: baseUrl + '/ajax-getProducao',
         data: {
             _token: $('meta[name="csrf-token"]').attr('content')
         },

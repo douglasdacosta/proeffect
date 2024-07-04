@@ -45,6 +45,7 @@ Route::match(['get', 'post'],'/ajax-fichatecnica', [App\Http\Controllers\Ajaxfic
 Route::match(['post'],'/ajax-fichatecnica-check-ep', [App\Http\Controllers\AjaxfichatecnicaController::class, 'checkEpExistente'])->name('ajax-fichatecnica-check-ep');
 Route::match(['get'],'/clona-fichatecnica', [App\Http\Controllers\FichatecnicaController::class, 'clonarFichatecnica'])->name('clona-fichatecnica');
 Route::match(['post'],'/ajax-fichatecnica-calculo-usinagem', [App\Http\Controllers\AjaxfichatecnicaController::class, 'calculaUsinagem'])->name('ajax-fichatecnica-calculo-usinagem');
+Route::match(['post'],'/buscar-caixas', [App\Http\Controllers\CaixasController::class, 'buscarCaixas'])->name('ajax-buscar-caixas');
 
 Route::match(['get', 'post'],'/ajax-getProducao', [App\Http\Controllers\HomeController::class, 'getProducao'])->name('ajax-getProducao');
 Route::match(['get', 'post'],'/followup', [App\Http\Controllers\PedidosController::class, 'followup'])->name('followup');
@@ -56,6 +57,7 @@ Route::match(['get', 'post'],'/pedidos', [App\Http\Controllers\PedidosController
 Route::match(['get', 'post'],'/alterar-pedidos', [App\Http\Controllers\PedidosController::class, 'alterar'])->name('alterar-pedidos');
 Route::match(['get', 'post'],'/incluir-pedidos', [App\Http\Controllers\PedidosController::class, 'incluir'])->name('incluir-pedidos');
 Route::match(['post'],'/alterar-pedidos-ajax', [App\Http\Controllers\PedidosController::class, 'ajaxAlterar'])->name('alterar-pedidos-ajax');
+Route::match(['post'],'/incluir-pedidos-funcionario-montagem', [App\Http\Controllers\PedidosController::class, 'ajaxIncluirFuncionariosMontagens'])->name('incluir-pedidos-funcionario-montagem');
 Route::match(['post'],'/calcular-orcamento-ajax', [App\Http\Controllers\AjaxOrcamentosController::class, 'ajaxCalculaOrcamentos'])->name('calcular-orcamento-ajax');
 
 Route::match(['get',],'/contatos', [App\Http\Controllers\ContatosController::class, 'index'])->name('contatos');
@@ -75,5 +77,6 @@ Route::match(['get', 'post'],'/relatorio-producao', [App\Http\Controllers\Relato
 Route::match(['get', 'post'],'/paineis', [App\Http\Controllers\PaineisController::class, 'index'])->name('paineis');
 Route::match(['get', 'post'],'/manutencao-status', [App\Http\Controllers\ManutencaoProducaoController::class, 'pesquisar'])->name('manutencao-status');
 Route::match(['post'],'/manutencao-producao-alterar-pedido', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedido'])->name('manutencao-producao-alterar-pedido');
+Route::match(['post'],'/manutencao-producao-salvar_caixas', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedidoCaixa'])->name('manutencao-producao-salvar_caixas');
 
 

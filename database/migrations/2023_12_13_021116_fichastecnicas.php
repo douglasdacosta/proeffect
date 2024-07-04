@@ -53,10 +53,7 @@ return new class extends Migration
 
         });
 
-        Schema::table('ficha_tecnica', function($table) {
-            $table->integer('rev');
-            $table->date('data_rev');
-        });
+
     }
 
 

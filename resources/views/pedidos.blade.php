@@ -5,9 +5,10 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/jquery.mask.js"></script>
-<script src="js/main_custom.js"></script>
+<script src="../vendor/jquery/jquery.min.js?cache={{time()}}"></script>
+<script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
+<script src="js/main_custom.js?cache={{time()}}"></script>
+<script src="js/jquery.mask.js?cache={{time()}}"></script>
 <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 @switch($tela)
     @case('pesquisar')
@@ -29,6 +30,65 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             </div>
         @stop
         @section('content')
+            <div id='modal_funcionarios'  class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 700px">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id='texto_status_caixas'>Funcionários Montagens</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+
+                        <div class="modal-body" >
+                            @if (isset($funcionarios))
+                            @foreach ($funcionarios as $funcionario)
+                                <div class="form-check">
+                                    <input class="form-check-input montadores" type="checkbox" value="{{$funcionario->id}}" id="montador{{$funcionario->id}}">
+                                    <label class="form-check-label" for="montador{{$funcionario->id}}">{{$funcionario->nome}}</label>
+                              </div>
+                            @endforeach
+                        @endif
+                        <input type="hidden" name="funcionarios_selecionados" id="funcionarios_selecionados" value=""/>
+                        <input type="hidden" name="pedido_montagem" id="pedido_montagem" value=""/>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="adicionar_montador" data-dismiss="modal" >Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id='modal_caixas'  class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 700px">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id='texto_status_caixas'>Caixas</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+
+                        <div class="modal-body" >
+                            <table class="table table-striped  text-center" id='tabela_caixas'>
+                                <thead>
+                                    <th>Caixa</th>
+                                    <th>A</th>
+                                    <th>L</th>
+                                    <th>C</th>
+                                    <th>Qtde</th>
+                                    <th>Peso</th>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="toastsContainerTopRight" class="toasts-top-right fixed">
                 <div class="toast fade show" role="alert" style="width: 350px" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
@@ -62,17 +122,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                         <div class="col-sm-1">
                             <input type="text" id="os" name="os" class="form-control" value="">
                         </div>
-                        <label for="blank" class="col-sm-2 col-form-label text-right text-sm-end">Status do pedido</label>
-                        <div class="col-sm-2">
-                            <select class="form-control" id="status_id" name="status_id">
-                                <option value=""></option>
-                                @if (isset($AllStatus))
-                                    @foreach ($AllStatus as $stats)
-                                        <option value="{{ $stats->id }}">{{ $stats->nome }}
-                                        </option>
+                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
+                        <div class="col-sm-2" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
+                            <div class="right_col col-sm-2" role="main">
+                                    @foreach ($AllStatus as $status)
+                                        <div class="col-sm-6 form-check">
+                                            <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                            <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                        </div>
                                     @endforeach
-                                @endif
-                            </select>
+                            </div>
                         </div>
                     </div>
 
@@ -132,10 +192,12 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             <th>Qtde</th>
                                             <th>Status do pedido</th>
                                             <th>Data gerado</th>
+                                            <th>Montadores</th>
                                             <th>Data entrega</th>
                                             <th>Alerta dias</th>
                                             <th>OS</th>
                                             <th>MP</th>
+                                            <th>CX</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -174,6 +236,14 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     }
                                                     ?>
                                                     <td>{{ Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
+                                                    <td>
+                                                        <i data-funcionariomontagem="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->id.','}}@endforeach"
+                                                            title="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->nome.', '}}@endforeach"
+                                                            data-pedido_id="{{$pedido->id}}"
+                                                            style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:#044f04'}}@else {{'color:#cacaca'}}@endif"  class="fas fa-users add_funcionarios_montagens">
+                                                        </i>
+                                                        {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
+                                                    </td>
                                                     <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                                     <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                                     <th scope="row" title="Imprimir ordem de serviço">
@@ -184,6 +254,11 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     <th scope="row">
                                                         <a href="{{ URL::route('imprimirMP', ['id' => $pedido->id]) }}" <span
                                                             class="fa fa-print"></span></a>
+                                                    </th>
+                                                    <th scope="row">
+                                                        <a class="show_caixas" data-pedido_id="{{$pedido->id}}">
+                                                            <i style="cursor:pointer;@if($pedido->caixas==0){{'color:#cacaca'}}@else{{'color:#044f04'}}@endif" class="fas fa-eye"></i>
+                                                        </a>
                                                     </th>
                                                 </tr>
                                             @endforeach

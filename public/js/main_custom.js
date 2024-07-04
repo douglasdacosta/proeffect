@@ -36,6 +36,9 @@
 
 //   });
 $(function ($) {
+    //var baseUrl = '/proeffect/public'
+    var baseUrl = ''
+
     $('#blocker').hide();
     $('.cep').mask('00000-000', {reverse: true});
     $('.sonumeros').mask('000000000000', {reverse: true});
@@ -68,19 +71,111 @@ $(function ($) {
         $('#blocker').show();
     });
 
+    $(document).on('click', '.show_caixas', function () {
 
-    $(".alteracao_status_pedido").change(function () {
+        var pedido = $(this).data('pedido_id');
+        var html = '';
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/buscar-caixas',
+            data: {
+                'id': pedido,
+                '_token': $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                $('#tabela_caixas tbody').empty();
+                $.each(data, function (k, value) {
+
+                    html+="<tr>"+
+                        "<td>"+value.material+"</td>"+
+                        "<td>"+value.a+"</td>"+
+                        "<td>"+value.l+"</td>"+
+                        "<td>"+value.c+"</td>"+
+                        "<td>"+value.quantidade+"</td>"+
+                        "<td>"+value.peso+"</td>"+
+                        "</tr>";
+                });
+
+                $('#tabela_caixas tbody').append(html);
+
+                $('#modal_caixas').modal('show');
+
+                $('.overlay').hide();
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                $('.overlay').hide();
+            },
+
+        });
+
+    });
+
+    $(document).on('click', '#adicionar_montador', function (e) {
+        salva_montadores = [];
+        $('.montadores').each(function (c, j) {
+            if($(this).prop('checked') == true ) {
+                salva_montadores.push($(this).val());
+            }
+        })
+
+        pedido_id = $('#pedido_montagem').val();
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST",  baseUrl + '/incluir-pedidos-funcionario-montagem', true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    alert('Alterado com sucesso!')
+                    history.replaceState(null, null, window.location.pathname);
+                    location.reload();
+                } else {
+                    var data = JSON.parse(xhr.responseText);
+                    alert('Ocorreu um erro al alterar o status!')
+                }
+            }
+        };
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        var requestData = {
+            'pedido_id': pedido_id,
+            'montadores': JSON.stringify(salva_montadores),
+            '_token': csrfToken
+        };
+        xhr.send(JSON.stringify(requestData));
+
+    })
+
+    $(document).on('click', '.add_funcionarios_montagens', function (e) {
+        $('#funcionarios_selecionados').val($(this).data('funcionariomontagem'));
+
+        montadores = $(this).data('funcionariomontagem').split(',');
+        $('#pedido_montagem').val($(this).data('pedido_id'));
+
+        $('.montadores').each(function (c, j) {
+            if(montadores.includes($(this).val())) {
+                $(this).prop('checked', true);
+            } else {
+                $(this).prop('checked', false);
+            }
+        });
+
+        $('#modal_funcionarios').modal('show');
+    });
+
+
+
+    $(document).on('change', '.alteracao_status_pedido', function (e) {
         if (!confirm("Você deseja realmente alterar este pedido?")) {
-            $(this).val($(this).data('statusatual'));
+            $(this).val($(this).attr('data-statusatual'));
             return false;
         }
-
         $('.overlay').show();
-        var pedido = $(this).data('pedido');
+        var pedido = $(this).data("pedido");
         var status = $(this).val();
         $.ajax({
             type: "POST",
-            url: '/alterar-pedidos-ajax',
+            url: baseUrl + '/alterar-pedidos-ajax',
             data: {
                 'id': pedido,
                 'status': status,
@@ -130,7 +225,7 @@ $(function ($) {
 
         $.ajax({
             "type": "POST",
-            "url": '/calcular-orcamento-ajax',
+            "url": baseUrl + '/calcular-orcamento-ajax',
             "data": {
                 "tipo": tipo,
                 "dados": composicaoep,
