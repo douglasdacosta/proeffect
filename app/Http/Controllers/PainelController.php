@@ -171,6 +171,7 @@ class PainelController extends Controller
                     'historicos_etapas.texto_quantidade',
                     'historicos_etapas.created_at',
                     'historicos_etapas.etapas_alteracao_id',
+                    'historicos_etapas.numero_maquina',
                     'funcionarios.nome',
                     'etapas_pedidos.nome as nome_etapa')
                     ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
@@ -213,6 +214,7 @@ class PainelController extends Controller
                         'select_tipo_manutencao' => $hestatus->select_tipo_manutencao   ,
                         'select_motivo_pausas' => !empty($hestatus->select_motivo_pausas) ? $motivosPausa[$hestatus->select_motivo_pausas] : '' ,
                         'texto_quantidade' => $hestatus->texto_quantidade   ,
+                        'numero_maquina' => $hestatus->numero_maquina   ,
                         'created_at' => $hestatus->created_at   ,
                         'nome' => $hestatus->nome   ,
                         'nome_etapa' => $etapa  ,

@@ -29,7 +29,7 @@
     margin: 10px;
  }
  .contenedor .table {
-    font-size: 13px;  border-collapse: collapse; border: 1px solid black
+    font-size: 12px;  border-collapse: collapse; border: 1px solid black
  }
  .contenedor .table tr td {
 
@@ -49,15 +49,17 @@
 
 <script src="{{asset('js/jquery_v3.5.1.js')}}"></script>
     <script src="{{asset('js/bootstrap.4.6.2.js')}}"></script>
+    <script src="{{asset('js/main_custom.js')}}"></script>
+    <script src="{{asset('js/jquery.mask.js')}}"></script>
     <script type="text/javascript" >
         $(function ($) {
             // var baseUrl = '/proeffect/public'
             var baseUrl = ''
             $(document).on('click', '.alteracao_status_pedido', function () {
 
-                $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material').val('');
+                $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material, #necessita_montagem, #div_numero_maquina').val('');
 
-                $('#tipo_manutencao, #motivo_pausas, #quantidade').hide();
+                $('#tipo_manutencao, #motivo_pausas, #quantidade, #necessita_montagem, #div_numero_maquina').hide();
                 var statusAtual = $(this).data('statusatual');
                 var descricaoproximostatus = $(this).data('descricaoproximostatus');
                 texto_status = "Você realmente deseja alterar este pedido para "+descricaoproximostatus+" ?";
@@ -77,11 +79,30 @@
             });
 
 
+            $("#necessita_montagem").change(function () {
+                $('#necessitaMontagemExtra').val($(this).val());
+            });
+
+            $("#numero_maquina").change(function () {
+                $('#numero_maquina_iniciando').val($(this).val());
+            });
+
             $("#select_etapa_manutencao").change(function () {
+                if($("#select_etapa_manutencao").val() == 1) {
+                    $('#div_numero_maquina').show();
+                } else {
+                    $('#div_numero_maquina').hide();
+                }
                 if($("#select_etapa_manutencao").val() == 2) {
                     $('#motivo_pausas').show();
                 } else {
                     $('#motivo_pausas, #quantidade').hide();
+                }
+
+                if($("#select_etapa_manutencao").val() == 4) {
+                    $('#necessita_montagem').show();
+                } else {
+                    $('#necessita_montagem').hide();
                 }
             });
 
@@ -98,6 +119,8 @@
                 var select_etapa_manutencao = $('#select_etapa_manutencao').val();
                 var select_motivo_pausas = $('#select_motivo_pausas').val();
                 var texto_quantidade = $('#texto_quantidade').val();
+                var necessitaMontagemExtra = $('#necessitaMontagemExtra').val();
+                var numero_maquina_iniciando = $('#numero_maquina_iniciando').val();
                 var pedido = $('#novoPedido').val();
                 var status = $('#novoStatus').val();
                 var atualStatus = $('#atualStatus').val();
@@ -139,6 +162,8 @@
                     'select_motivo_pausas' : select_motivo_pausas,
                     'texto_quantidade' : texto_quantidade,
                     'etapasalteracao' : etapasalteracao,
+                    'necessitaMontagemExtra' : necessitaMontagemExtra,
+                    'numero_maquina_iniciando' : numero_maquina_iniciando,
                     '_token': csrfToken
                 };
                 xhr.send(JSON.stringify(requestData));

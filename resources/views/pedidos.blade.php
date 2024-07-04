@@ -102,68 +102,69 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     </div>
                 </div>
             </div>
-            <div class="right_col" role="main">
 
-                <form id="filtro" action="pedidos" method="get" data-parsley-validate=""
-                    class="form-horizontal form-label-left" novalidate="">
-                    <div class="form-group row">
-                        <label for="codigo_cliente" class="col-sm-1 col-form-label text-right">Código cliente</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="codigo_cliente" name="codigo_cliente" class="form-control col-md-13"
-                                value="">
-                        </div>
-
-                        <label for="nome_cliente" class="col-sm-2 col-form-label text-right">Nome cliente</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="nome_cliente" name="nome_cliente" class="form-control col-md-13"
-                                value="">
-                        </div>
-                        <label for="os" class="col-sm-2 col-form-label text-right">OS</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="os" name="os" class="form-control" value="">
-                        </div>
-                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
-                        <div class="col-sm-2" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
-                            <div class="right_col col-sm-2" role="main">
-                                    @foreach ($AllStatus as $status)
-                                        <div class="col-sm-6 form-check">
-                                            <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
-                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
-                                            <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
-                                        </div>
-                                    @endforeach
+            <form id="filtro" action="pedidos" method="get" data-parsley-validate=""  novalidate="">
+                <div class="row" role="main">
+                    <div class="col-md-9 themed-grid-col row">
+                        <div class="row">
+                            <label for="codigo_cliente" class="col-sm-2 col-form-label text-right">Código cliente</label>
+                            <div class="col-sm-1">
+                                <input type="text" id="codigo_cliente" name="codigo_cliente" class="form-control col-md-13"
+                                    value="">
+                            </div>
+                            <label for="nome_cliente" class="col-sm-2 col-form-label text-right">Nome cliente</label>
+                            <div class="col-sm-3">
+                                <input type="text" id="nome_cliente" name="nome_cliente" class="form-control col-md-13"
+                                    value="">
+                            </div>
+                            <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
+                            <div class="col-sm-2">
+                                <input type="text" id="os" name="os" class="form-control" value="">
                             </div>
                         </div>
+                        <div class="row">
+                            <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
+                            <div class="col-sm-1">
+                                <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
+                            </div>
+                            <label for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="data_entrega_fim" class="col-form-label text-right">até</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="status" class="col-sm-1 col-form-label">&nbsp;</label>
+                            <div class="col-sm-2">
+                                <select class="form-control " id="status" name="status">
+                                    <option value="A" @if (isset($request) && $request->input('status') == 'A') {{ ' selected ' }}@else @endif>Ativo
+                                    </option>
+                                    <option value="I" @if (isset($request) && $request->input('status') == 'I') {{ ' selected ' }}@else @endif>Inativo
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-3 themed-grid-col row">
+                        <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
+                            <div class="col-sm-7" style="overflow-y: auto; height: 175px; border:1px solid #97928b">
+                                {{-- <div class="" role="main"> --}}
+                                        @foreach ($AllStatus as $status)
+                                            <div class="col-sm-8 form-check">
+                                                <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                                @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                                <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                            </div>
+                                        @endforeach
+                                {{-- </div> --}}
+                            </div>
                     </div>
 
-                    <div class="form-group row">
-
-
-                        <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
-                        </div>
-                        <label for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_entrega_fim" class="col-form-label text-right">até</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="status" class="col-sm-1 col-form-label">&nbsp;</label>
-                        <div class="col-sm-2">
-                            <select class="form-control col-md-5" id="status" name="status">
-                                <option value="A" @if (isset($request) && $request->input('status') == 'A') {{ ' selected ' }}@else @endif>Ativo
-                                </option>
-                                <option value="I" @if (isset($request) && $request->input('status') == 'I') {{ ' selected ' }}@else @endif>Inativo
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
+                    <div class="col-md-8 form-group row">
                         <div class="col-sm-5">
                             <button type="submit" class="btn btn-primary">Pesquisar</button>
                         </div>
@@ -173,7 +174,11 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+            </form>
+
+            <div class="row" role="main">
+
                 <div class="form-group">
                     <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
                     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -461,63 +466,79 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             </div>
         @stop
         @section('content')
-            <div class="right_col" role="main">
 
-                <form id="filtro" action="followup" method="get" data-parsley-validate=""
-                    class="form-horizontal form-label-left" novalidate="">
-                    <div class="form-group row">
+        <form id="filtro" action="followup" method="get" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+            <div class="row" role="main">
+                <div class="col-md-9 themed-grid-col row">
+                    <div class="row">
                         <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
                         <div class="col-sm-1">
                             <input type="text" id="os" name="os" class="form-control col-md-13" value="">
                         </div>
-
                         <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
                         <div class="col-sm-1">
                             <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                         </div>
-                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
-                        <div class="col-sm-5" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
+                        <label for="data_gerado" class="col-sm-3 col-form-label text-right">Data pedido: de</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+                        <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        {{-- <label for="data_entrega" class="col-sm-1 col-form-label text-right">&nbsp;&nbsp;</label>
+                        <div class="col-sm-1"><span class="col-md-13" >&nbsp;</span></div>
+                        <label for="data_entrega" class="col-sm-1 col-form-label text-right">&nbsp;&nbsp;</label>
+                        <div class="col-sm-1"><span class="col-md-13" >&nbsp;</span></div> --}}
+                        <label for="data_entrega" class="col-sm-3 col-form-label text-right">Data entrega: de</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+                        <label for="data_entrega_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-3 themed-grid-col row" >
+                    <div class="row">
+                        <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
+                        <div class="col-sm-8" style="overflow-y: auto; height: 175px; border:1px solid #97928b">
                             <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
                                         <div class="col-sm-6 form-check">
                                             <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
-                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                            @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
                                             <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
                                         </div>
                                     @endforeach
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label for="data_gerado" class="col-sm-1 col-form-label text-right">Data pedido: de</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_entrega_fim" class=" col-form-label text-right">até</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
-                                placeholder="DD/MM/AAAA">
-                        </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-5">
+                        <button type="submit" class="btn btn-primary">Pesquisar</button>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-sm-5">
-                            <button type="submit" class="btn btn-primary">Pesquisar</button>
-                        </div>
-                        <div class="col-sm-5">
-                        </div>
+                    <div class="col-sm-5">
                     </div>
-                </form>
+                </div>
+            </div>
+            </form>
+
+
+
+
+            <div class="right_col" role="main">
                 <div class="form-group">
                     <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
                     <div class="col-md-12 col-sm-12 col-xs-12">

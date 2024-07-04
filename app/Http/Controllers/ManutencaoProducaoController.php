@@ -91,9 +91,11 @@ class ManutencaoProducaoController extends Controller
                 $select_etapa_manutencao= $request->input('select_etapa_manutencao');
                 $select_motivo_pausas= $request->input('select_motivo_pausas');
                 $texto_quantidade= $request->input('texto_quantidade');
+                $necessitaMontagemExtra= $request->input('necessitaMontagemExtra');
+                $numero_maquina_iniciando= $request->input('numero_maquina_iniciando');
 
                 //verifica se é termino
-                if($select_etapa_manutencao == 4){
+                if($select_etapa_manutencao == 4 ){
 
                     #verifica se falta algum início sem término para poder mudar os status
                     $etapasIniciadas = DB::table('historicos_etapas')
@@ -109,7 +111,7 @@ class ManutencaoProducaoController extends Controller
                     ->get()->toArray();
 
                     #verifica se falta apenas 1 finalização para mudar o status
-                    if((count($etapasIniciadas) - count($etapasFinalizadas)) <= 1) {
+                    if((count($etapasIniciadas) - count($etapasFinalizadas)) <= 1 && $necessitaMontagemExtra == 0) {
 
                         $finalizar_etapa = true;
                         $pedidos->status_id = $request->input('status');
@@ -138,6 +140,7 @@ class ManutencaoProducaoController extends Controller
                 $HistoricosEtapas->select_tipo_manutencao = $select_tipo_manutencao;
                 $HistoricosEtapas->select_motivo_pausas = $select_motivo_pausas;
                 $HistoricosEtapas->texto_quantidade = $texto_quantidade;
+                $HistoricosEtapas->numero_maquina = $numero_maquina_iniciando;
 
                 $HistoricosEtapas->save();
 
@@ -205,6 +208,7 @@ class ManutencaoProducaoController extends Controller
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
             ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome as nomeStatus' , 'status.id as id_status')
+            ->where('pedidos.status_id' ,'<','9')
             ->orderby('status_id', 'desc')
             ->orderby('data_entrega');
 

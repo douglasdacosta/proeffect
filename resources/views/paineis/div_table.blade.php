@@ -1,5 +1,5 @@
 <div class="w-auto"  style="display: contents; overflow: hidden;">
-    <h1><b>Concluídos</h1>
+    <h2><b>Concluídos</h2>
     <table style="background-color: #68c570;" class="table table-sm table-striped text-center concluidos" id="table_composicao">
         <thead >
             <tr>
@@ -11,6 +11,7 @@
                 <th scope="col">Entrega</th>
                 <th scope="col">Alerta</th>
                 <th scope="col">Etapa</th>
+                <th scope="col">Nº máquina</th>
                 <th scope="col">Motivo Pausa</th>
                 <th scope="col">Qtde</th>
                 @if(isset($montagem) && $montagem == true)
@@ -43,6 +44,7 @@
                                 <td></td>
                             @endif
                             <td scope="col">{{$colaborador['nome_etapa']}}</td>
+                            <td scope="col">{{$colaborador['Nº máquina']}}</td>
                             <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
                             <td scope="col">{{$colaborador['texto_quantidade']}}</td>
                             @if(isset($montagem) && $montagem == true)
@@ -75,7 +77,7 @@
     </table>
 </div>
 <div class="w-auto"  style=" height: 85%; overflow: hidden; background-color: #e9aa4c;">
-    <h1><b>Pendentes</b></h1>
+    <h2><b>Pendentes</b></h2>
     <table class="table table-sm table-striped text-center" id="table_composicao">
         <thead >
             <tr>
@@ -87,6 +89,8 @@
                 <th scope="col">Entrega</th>
                 <th scope="col">Alerta</th>
                 <th scope="col">Etapa</th>
+                <th scope="col">Nº máquina</th>
+
                 <th scope="col">Motivo Pausa</th>
                 <th scope="col">Qtde</th>
                 @if(isset($montagem) && $montagem == true)
@@ -119,6 +123,7 @@
                                 <td></td>
                             @endif
                             <td scope="col">{{$colaborador['nome_etapa']}}</td>
+                            <td scope="col">{{$colaborador['numero_maquina']}}</td>
                             <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
                             <td scope="col">{{$colaborador['texto_quantidade']}}</td>
                             @if(isset($montagem) && $montagem == true)
