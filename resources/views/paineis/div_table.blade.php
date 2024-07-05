@@ -65,6 +65,7 @@
                         <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
                         <td scope="col"></td>
                         <td scope="col"></td>
+                        <td scope="col"></td>
                         @if(isset($montagem) && $montagem == true)
                             <td scope="col"></td>
                         @endif
@@ -142,6 +143,7 @@
                         <td scope="col">{{$pedido->conjuntos}}</td>
                         <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
                         <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
+                        <td scope="col"></td>
                         <td scope="col"></td>
                         <td scope="col"></td>
                         <td scope="col"></td>
