@@ -52,6 +52,7 @@
                         <th scope="col">OS</th>
                         <th scope="col">Status</th>
                         <th scope="col">Etapa</th>
+                        usinagem
                         <th scope="col">Nº máquina</th>
                         <th scope="col">Motivo pausa</th>
                         <th scope="col">Qtde</th>
