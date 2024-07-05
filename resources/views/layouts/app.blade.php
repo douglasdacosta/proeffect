@@ -88,7 +88,8 @@
             });
 
             $("#select_etapa_manutencao").change(function () {
-                if($("#select_etapa_manutencao").val() == 1) {
+                var statusAtual = $("#atualStatus").val();
+                if($("#select_etapa_manutencao").val() == 1 && statusAtual == 4) {
                     $('#div_numero_maquina').show();
                 } else {
                     $('#div_numero_maquina').hide();
@@ -98,7 +99,7 @@
                 } else {
                     $('#motivo_pausas, #quantidade').hide();
                 }
-
+                console.log(statusAtual);
                 if($("#select_etapa_manutencao").val() == 4) {
                     $('#necessita_montagem').show();
                 } else {
