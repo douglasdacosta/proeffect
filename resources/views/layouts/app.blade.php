@@ -99,7 +99,7 @@
                 } else {
                     $('#motivo_pausas, #quantidade').hide();
                 }
-                if($("#select_etapa_manutencao").val() == 4) {
+                if($("#select_etapa_manutencao").val() == 4 && statusAtual == 6) {
                     $('#necessita_montagem').show();
                 } else {
                     $('#necessita_montagem').hide();
