@@ -39,14 +39,10 @@
                             @else
                                 <td></td>
                                 <td></td>
-                                @if(isset($usinagem) && $usinagem == true)
-                                    <td></td>
-                                @endif
                                 <td></td>
                                 <td></td>
-                                @if(isset($montagem) && $montagem == true)
-                                    <td></td>
-                                @endif
+                                <td></td>
+                                <td></td>
                                 <td></td>
                             @endif
                             <td scope="col">{{$colaborador['nome_etapa']}}</td>
@@ -106,8 +102,8 @@
                 @endif
                 <th scope="col">Motivo Pausa</th>
                 <th scope="col">Qtde</th>
-                    @if(isset($montagem) && $montagem == true)
-                <th scope="col">Responsável</th>
+                @if(isset($montagem) && $montagem == true)
+                    <th scope="col">Responsável</th>
                 @endif
                 <th scope="col">Colaborador</th>
             </tr>
@@ -129,14 +125,10 @@
                             @else
                                 <td></td>
                                 <td></td>
-                                @if(isset($usinagem) && $usinagem == true)
-                                    <td></td>
-                                @endif
                                 <td></td>
                                 <td></td>
-                                @if(isset($montagem) && $montagem == true)
-                                    <td></td>
-                                @endif
+                                <td></td>
+                                <td></td>
                                 <td></td>
                             @endif
                             <td scope="col">{{$colaborador['nome_etapa']}}</td>
