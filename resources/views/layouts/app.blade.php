@@ -58,7 +58,7 @@
             $(document).on('click', '.alteracao_status_pedido', function () {
 
                 $('#tipo_manutencao, #select_etapa_manutencao, #motivo_pausas, #quantidade, #material, #necessita_montagem, #div_numero_maquina').val('');
-
+                $('#necessitaMontagemExtra').val(0);
                 $('#tipo_manutencao, #motivo_pausas, #quantidade, #necessita_montagem, #div_numero_maquina').hide();
                 var statusAtual = $(this).data('statusatual');
                 var descricaoproximostatus = $(this).data('descricaoproximostatus');
@@ -79,7 +79,7 @@
             });
 
 
-            $("#necessita_montagem").change(function () {
+            $("#select_necessita_montagem").change(function () {
                 $('#necessitaMontagemExtra').val($(this).val());
             });
 
@@ -88,7 +88,8 @@
             });
 
             $("#select_etapa_manutencao").change(function () {
-                if($("#select_etapa_manutencao").val() == 1) {
+                var statusAtual = $("#atualStatus").val();
+                if($("#select_etapa_manutencao").val() == 1 && statusAtual == 4) {
                     $('#div_numero_maquina').show();
                 } else {
                     $('#div_numero_maquina').hide();
@@ -98,8 +99,7 @@
                 } else {
                     $('#motivo_pausas, #quantidade').hide();
                 }
-
-                if($("#select_etapa_manutencao").val() == 4) {
+                if($("#select_etapa_manutencao").val() == 4 && statusAtual == 6) {
                     $('#necessita_montagem').show();
                 } else {
                     $('#necessita_montagem').hide();

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Estoque;
 use App\Providers\DateHelpers;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\OrcamentosController;
+use App\Models\Pessoas;
 
 class EstoqueController extends Controller
 {
@@ -78,6 +80,8 @@ class EstoqueController extends Controller
 				'tela' => $tela,
                 'nome_tela' => 'estoque',
 				'request' => $request,
+                'materiais' => (new OrcamentosController())->getAllMateriais(),
+                'fornecedores' => $this->getFornecedores(),
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
 			);
@@ -96,7 +100,7 @@ class EstoqueController extends Controller
         $estoque = new Estoque();
         $historico = '';
 
-        $material= $estoque->where('id', '=', $request->input('id'))->get();
+        $estoque= $estoque->where('id', '=', $request->input('id'))->get();
 
 		$metodo = $request->method();
 		if ($metodo == 'POST') {
@@ -111,7 +115,9 @@ class EstoqueController extends Controller
     	$data = array(
 				'tela' => $tela,
                 'nome_tela' => 'estoque',
-				'estoque'=> $material,
+				'estoque'=> $estoque,
+                'materiais' => (new OrcamentosController())->getAllMateriais(),
+                'fornecedores' => $this->getFornecedores(),
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
@@ -129,7 +135,6 @@ class EstoqueController extends Controller
             if($request->input('id')) {
                 $estoque = $estoque::find($request->input('id'));
             }
-            $estoque->codigo = $request->input('codigo');
             $estoque->material_id = $request->input('material_id');
             $estoque->data = DateHelpers::formatDate_dmY($request->input('data'));
             $estoque->nota_fiscal = $request->input('nota_fiscal');
@@ -146,10 +151,17 @@ class EstoqueController extends Controller
             $estoque->status = $request->input('status');
             $estoque->save();
 
-        return $estoque->id;
-    });
+            return $estoque->id;
+        });
 
-    return $id;
+        return $id;
 
-}
+    }
+
+    public function getFornecedores() : object{
+        $fornecedores = new Pessoas();
+        $fornecedores = $fornecedores->where('fornecedor','=', '1')->get();
+        return $fornecedores;
+    }
+
 }

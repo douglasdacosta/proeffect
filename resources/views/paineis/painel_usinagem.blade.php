@@ -24,7 +24,7 @@ setTimeout(function () {
         <div class="w-auto text-center">
             <h1>Painel de Usinagem</h1>
         </div>
-
+        <?php $usinagem = true ?>
         @include('paineis.div_table')
     </div>
 

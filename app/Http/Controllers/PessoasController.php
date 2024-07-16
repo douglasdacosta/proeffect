@@ -146,6 +146,7 @@ class PessoasController extends Controller
         $pessoas->estado = $request->input('estado');
         $pessoas->telefone = preg_replace("/[^0-9]/", "", $request->input('telefone'));
         $pessoas->email = $request->input('email');
+        $pessoas->fornecedor = $request->input('fornecedor');
         $pessoas->status = $request->input('status');
         $pessoas->save();
 

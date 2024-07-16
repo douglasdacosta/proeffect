@@ -385,6 +385,13 @@ return [
             'label'       => '',
             'label_color' => '',
         ],
+        [
+            'text'        => 'Estoque',
+            'url'         => 'estoque',
+            'icon'        => 'fas fa-plus',
+            'label'       => '',
+            'label_color' => '',
+        ],
         // [
         //     'text'        => 'Relatório produção',
         //     'url'         => 'relatorio-producao',

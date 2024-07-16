@@ -15,7 +15,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('pessoas', function($table) {
-            $table->boolean('fornecedor')->after('email')->nullable();
+            $table->boolean('fornecedor')->after('email')->nullable()->default(0);
         });
 
         Schema::table('materiais', function($table) {

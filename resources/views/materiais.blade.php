@@ -151,6 +151,12 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="estoque_minimo" class="col-sm-2 col-form-label">Estoque mínimo</label>
+                <div class="col-sm-2">
+                <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="estoque_minimo" name="estoque_minimo" value="@if (isset($materiais[0]->estoque_minimo)){{$materiais[0]->estoque_minimo}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label">&nbsp;</label>
                 <select class="form-control custom-select col-md-1 " id="status" name="status">
                     <option value="A" @if (isset($materiais[0]->status) && $materiais[0]->status == 'A'){{ ' selected '}}@else @endif>Ativo</option>

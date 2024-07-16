@@ -11,11 +11,13 @@
                 <th scope="col">Entrega</th>
                 <th scope="col">Alerta</th>
                 <th scope="col">Etapa</th>
-                <th scope="col">Nº máquina</th>
+                @if(isset($usinagem) && $usinagem == true)
+                    <th scope="col">Nº máquina</th>
+                @endif
                 <th scope="col">Motivo Pausa</th>
                 <th scope="col">Qtde</th>
                 @if(isset($montagem) && $montagem == true)
-                <th scope="col">Responsável</th>
+                    <th scope="col">Responsável</th>
                 @endif
                 <th scope="col">Colaborador</th>
             </tr>
@@ -44,7 +46,9 @@
                                 <td></td>
                             @endif
                             <td scope="col">{{$colaborador['nome_etapa']}}</td>
-                            <td scope="col">{{$colaborador['numero_maquina']}}</td>
+                            @if(isset($usinagem) && $usinagem == true)
+                                <td scope="col">{{$colaborador['numero_maquina']}}</td>
+                            @endif
                             <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
                             <td scope="col">{{$colaborador['texto_quantidade']}}</td>
                             @if(isset($montagem) && $montagem == true)
@@ -66,6 +70,9 @@
                         <td scope="col"></td>
                         <td scope="col"></td>
                         <td scope="col"></td>
+                        @if(isset($usinagem) && $usinagem == true)
+                            <td scope="col"></td>
+                        @endif
                         @if(isset($montagem) && $montagem == true)
                             <td scope="col"></td>
                         @endif
@@ -90,12 +97,13 @@
                 <th scope="col">Entrega</th>
                 <th scope="col">Alerta</th>
                 <th scope="col">Etapa</th>
-                <th scope="col">Nº máquina</th>
-
+                @if(isset($usinagem) && $usinagem == true)
+                    <th scope="col">Nº máquina</th>
+                @endif
                 <th scope="col">Motivo Pausa</th>
                 <th scope="col">Qtde</th>
                 @if(isset($montagem) && $montagem == true)
-                <th scope="col">Responsável</th>
+                    <th scope="col">Responsável</th>
                 @endif
                 <th scope="col">Colaborador</th>
             </tr>
@@ -124,7 +132,9 @@
                                 <td></td>
                             @endif
                             <td scope="col">{{$colaborador['nome_etapa']}}</td>
-                            <td scope="col">{{$colaborador['numero_maquina']}}</td>
+                            @if(isset($usinagem) && $usinagem == true)
+                                <td scope="col">{{$colaborador['numero_maquina']}}</td>
+                            @endif
                             <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
                             <td scope="col">{{$colaborador['texto_quantidade']}}</td>
                             @if(isset($montagem) && $montagem == true)
@@ -143,6 +153,9 @@
                         <td scope="col">{{$pedido->conjuntos}}</td>
                         <td scope="col">{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }} </td>
                         <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->dias_alerta }}</td>
+                        @if(isset($usinagem) && $usinagem == true)
+                            <td scope="col"></td>
+                        @endif
                         <td scope="col"></td>
                         <td scope="col"></td>
                         <td scope="col"></td>

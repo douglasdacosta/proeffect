@@ -121,7 +121,7 @@
                         </div>
                         <div class="modal-body" >
                             <div class="form-group row" id='tipo_manutencao'>
-                                <label for="" class="col-sm-3 col-form-label text-right">Tipo</label>
+                                <label for="" class="col-sm-4 col-form-label text-right">Tipo</label>
                                 <select class="form-control col-md-5" name="select_tipo_manutencao" id="select_tipo_manutencao" name="select_tipo_manutencao">
                                     <option value=""></option>
                                     <option value="T">Montagem Torre</option>
@@ -168,7 +168,7 @@
                         <input type="hidden" name="novoStatus" id="novoStatus" value=""/>
                         <input type="hidden" name="novoPedido" id="novoPedido" value=""/>
                         <input type="hidden" name="etapasalteracao" id="etapasalteracao" value=""/>
-                        <input type="hidden" name="necessiaMontagemExtra" id="necessiaMontagemExtra" value="0"/>
+                        <input type="hidden" name="necessitaMontagemExtra" id="necessitaMontagemExtra" value="0"/>
                         <input type="hidden" name="numero_maquina_iniciando" id="numero_maquina_iniciando" value=""/>
 
                         <div class="modal-footer">

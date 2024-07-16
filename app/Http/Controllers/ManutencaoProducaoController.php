@@ -111,8 +111,8 @@ class ManutencaoProducaoController extends Controller
                     ->get()->toArray();
 
                     #verifica se falta apenas 1 finalização para mudar o status
-                    if((count($etapasIniciadas) - count($etapasFinalizadas)) <= 1 && $necessitaMontagemExtra == 0) {
 
+                    if(((count($etapasIniciadas) - count($etapasFinalizadas)) <= 1) && $necessitaMontagemExtra == 0) {
                         $finalizar_etapa = true;
                         $pedidos->status_id = $request->input('status');
 
