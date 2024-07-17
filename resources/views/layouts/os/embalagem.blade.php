@@ -1,3 +1,4 @@
+<div class="row mt-4"></div>
 <div id="imprimir" class="contenedor">
     <table class="table text-center">
         <tbody>

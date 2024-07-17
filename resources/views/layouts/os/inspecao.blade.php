@@ -95,6 +95,10 @@
         </tbody>
     </table>
 </div>
-<div class="row mt-5"></div>
-<div class="row mt-5"></div>
-<div class="row mt-5"></div>
+<div class="row mt-4"></div>
+<div class="row mt-4"></div>
+<div class="row mt-4"></div>
+<div class="row mt-4"></div>
+<div class="row mt-4"></div>
+<div class="row mt-4"></div>
+<div class="row mt-4"></div>
