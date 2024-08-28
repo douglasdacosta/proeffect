@@ -82,4 +82,6 @@ Route::match(['post'],'/manutencao-producao-salvar_caixas', [App\Http\Controller
 Route::match(['get', 'post'],'/estoque', [App\Http\Controllers\EstoqueController::class, 'index'])->name('estoque');
 Route::match(['get', 'post'],'/alterar-estoque', [App\Http\Controllers\EstoqueController::class, 'alterar'])->name('alterar-estoque');
 Route::match(['get', 'post'],'/incluir-estoque', [App\Http\Controllers\EstoqueController::class, 'incluir'])->name('incluir-estoque');
+Route::match(['get', 'post'],'/tela-baixa-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'telaBaixaEstoque'])->name('tela-baixa-estoque');
+Route::match(['get', 'post'],'/executa-baixa-estoque', [App\Http\Controllers\EstoqueController::class, 'executaBaixaEstoque'])->name('executa-baixa-estoque');
 

@@ -60,9 +60,9 @@
                         @foreach ($estoque as $item_estoque)
                             <tr>
                             <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque->id )) }}>{{$item_estoque->id}}</a></th>
-                              <td>{{$item_estoque->material_id}}</td>
-                              <td>{{$item_estoque->data}}</td>
-                              <td>{{number_format($item_estoque->qtde_chapa_peca,2, ',','.')}}</td>
+                              <td>{{$item_estoque->material}}</td>
+                              <td>{{Carbon\Carbon::parse($item_estoque->data)->format('d/m/Y')}}</td>
+                              <td>{{$item_estoque->qtde_chapa_peca}}</td>
 
                             </tr>
                         @endforeach
@@ -174,14 +174,17 @@
             <div class="form-group row">
                 <label for="VD" class="col-sm-2 col-form-label">VD</label>
                 <div class="col-sm-2">
-                    <input type="checkbox" class="form-control form-check-input" id="VD" name="VD" value="@if (isset($estoque[0]->VD)){{$estoque[0]->VD}}@else{{''}}@endif">
+                    <input type="checkbox" class="form-control form-check-input" id="VD" name="VD"
+                    @if (isset($estoque[0]->VD) && $estoque[0]->VD == 1) {{'checked'}} @else{{''}}@endif
+                    value="1">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="MO" class="col-sm-2 col-form-label">MO</label>
                 <div class="col-sm-2">
                     <input type="checkbox" class="form-control form-check-input" id="MO" name="MO"
-                    @if (isset($estoque[0]->MO)){{'checked'}}@else{{''}}@endif>
+                    @if (isset($estoque[0]->MO) && $estoque[0]->MO == 1) {{'checked'}} @else{{''}}@endif
+                    value="1">
                 </div>
             </div>
 

@@ -32,17 +32,19 @@ class EstoqueController extends Controller
         $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
 
 
-        $estoque = new Estoque();
+        $estoque = DB::table('estoque')
+                ->join('materiais', 'materiais.id', '=', 'estoque.material_id')
+                ->select('estoque.data', 'estoque.id', 'estoque.qtde_chapa_peca', 'materiais.material')
+                ->orderby('estoque.data', 'desc');
 
         if ($id) {
-        	$estoque =$estoque->where('id', '=', $id);
+        	$estoque =$estoque->where('estoque.id', '=', $id);
         }
 
-
         if (!empty($request->input('status'))){
-            $estoque = $estoque = $estoque->where('status', '=', $request->input('status'));
+            $estoque = $estoque = $estoque->where('estoque.status', '=', $request->input('status'));
         } else{
-            $estoque = $estoque->where('status', '=', 'A');
+            $estoque = $estoque->where('estoque.status', '=', 'A');
         }
 
         $estoque = $estoque->get();
@@ -51,6 +53,7 @@ class EstoqueController extends Controller
 				'tela' => $tela,
                 'nome_tela' => 'estoque',
 				'estoque'=> $estoque,
+                'materiais' => (new OrcamentosController())->getAllMateriais(),
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
@@ -144,8 +147,8 @@ class EstoqueController extends Controller
             $estoque->valor = DateHelpers::formatFloatValue($request->input('valor'));
             $estoque->imposto = DateHelpers::formatFloatValue($request->input('imposto'));
             $estoque->total = DateHelpers::formatFloatValue($request->input('total'));
-            $estoque->VD = $request->input('VD');
-            $estoque->MO = $request->input('MO');
+            $estoque->VD = (!empty($request->input('VD')) && $request->input('VD') ==1 ) ? 1 : 0;
+            $estoque->MO = (!empty($request->input('MO')) && $request->input('MO') ==1 ) ? 1 : 0;
             $estoque->qtde_chapa_peca = $request->input('qtde_chapa_peca');
             $estoque->qtde_por_pacote = $request->input('qtde_por_pacote');
             $estoque->status = $request->input('status');
@@ -162,6 +165,16 @@ class EstoqueController extends Controller
         $fornecedores = new Pessoas();
         $fornecedores = $fornecedores->where('fornecedor','=', '1')->get();
         return $fornecedores;
+    }
+
+    public function telaBaixaEstoque() {
+        $estoque = new Estoque();
+        return $estoque;
+
+    }
+    public function executaBaixaEstoque() {
+        $estoque = new Estoque();
+        return $estoque;
     }
 
 }

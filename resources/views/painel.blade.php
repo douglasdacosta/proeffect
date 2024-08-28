@@ -36,5 +36,18 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 <button type="button"  data-nometela='Painel de Embalagem' data-url="{{URL::route('paineis-embalar')}}" class="btn painel" style="background-color: {{$palheta_cores[8]}}">Tela de Embalagem</button>
             </a>
         </div>
+
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-2">
+            <a target="_blank">
+                <button type="button"  data-nometela='Apontamentos' data-url="{{URL::route('manutencao-status')}}" class="btn painel" style="background-color: {{$palheta_cores[9]}}">Apontamentos</button>
+            </a>
+        </div>
+        <div class="col-sm-2">
+            <a target="_blank">
+                <button type="button"  data-nometela='Baixa de estoque' data-url="{{URL::route('tela-baixa-estoque')}}" class="btn painel" style="background-color: {{$palheta_cores[9]}}">Baixa de estoque</button>
+            </a>
+        </div>
     </div>
 @stop
