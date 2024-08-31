@@ -70,6 +70,7 @@ class PainelController extends Controller
         if($concluidos){
             $pedidos = array_slice($pedidos, 0,3);
         }
+        
         return $pedidos;
     }
 
@@ -243,6 +244,7 @@ class PainelController extends Controller
 
             $pedidos[$key]->funcionario = implode(',',$nome_funcionarios);
         }
+      //  \Log::info(print_r($pedidos, true));
         return $pedidos;
     }
 
@@ -274,6 +276,7 @@ class PainelController extends Controller
 
     public function paineisMontagem(){
         $data = $this->carrega_dados(6,7);
+       // \Log::info(print_r($data, true));
         return view('paineis.painel_montagem', $data);
     }
 
