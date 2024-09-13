@@ -54,6 +54,7 @@ class EstoqueController extends Controller
                 'nome_tela' => 'estoque',
 				'estoque'=> $estoque,
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
+                'fornecedores' => $this->getFornecedores(),
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
@@ -161,9 +162,12 @@ class EstoqueController extends Controller
 
     }
 
-    public function getFornecedores() : object{
+    public function getFornecedores($array = false){
         $fornecedores = new Pessoas();
         $fornecedores = $fornecedores->where('fornecedor','=', '1')->get();
+        if($array) {
+            $fornecedores = $fornecedores->toArray();
+        }
         return $fornecedores;
     }
 

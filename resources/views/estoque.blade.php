@@ -104,7 +104,7 @@
                         @if (isset($materiais))
                             @foreach ($materiais as $material)
                                 <option
-                                @if($material->id == $estoque[0]->material_id) selected="selected" @else {{''}}@endif
+                                @if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) selected="selected" @else {{''}}@endif
                                 value="{{ $material->id }}">{{ $material->codigo . ' - ' . $material->material }}
                                 </option>
                             @endforeach
@@ -133,7 +133,7 @@
                         @if (isset($fornecedores))
                             @foreach ($fornecedores as $fornecedor)
                                 <option
-                                @if($fornecedor->id == $estoque[0]->fornecedor_id) selected="selected" @else {{''}}@endif
+                                @if(isset($estoque[0]->fornecedor_id) &&  $fornecedor->id == $estoque[0]->fornecedor_id) selected="selected" @else {{''}}@endif
                                 value="{{ $fornecedor->id }}">{{ $fornecedor->id . ' - ' . $fornecedor->nome_cliente }}
                                 </option>
                             @endforeach
