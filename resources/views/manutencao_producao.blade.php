@@ -8,7 +8,7 @@
     }
 
     .container_default .table {
-        font-size: 1.5em;
+        font-size: 1.2em;
     }
 </style>
 
@@ -16,7 +16,7 @@
 
     <div class="container_default" style="background-color:   #f8fafc; padding: 50px">
         <div class="w-auto text-center">
-            <h1>Manutenção de produção</h1>
+            <h2>Manutenção de produção</h2>
         </div>
         <hr class="my-5">
         <div class="right_col" role="main">
@@ -44,7 +44,7 @@
             </form>
             <input type="hidden" id="senha_funcionario" name="senha_funcionario" value="{{isset($senha) ? $senha : ''}}">
             <hr class="my-5">
-            <h3><b>Encontrados</b></h3>
+            <h4><b>Encontrados</b></h4>
             <table class="table table-striped text-center" id="table_composicao">
                 <thead >
                     <tr>
@@ -52,6 +52,7 @@
                         <th scope="col">OS</th>
                         <th scope="col">Status</th>
                         <th scope="col">Etapa</th>
+                        <th scope="col">Nº máquina</th>
                         <th scope="col">Motivo pausa</th>
                         <th scope="col">Qtde</th>
                         <th scope="col">Responsável</th>
@@ -70,6 +71,7 @@
                                         <td scope="col">{{$pedido->os}}</td>
                                         <td scope="col">{{$pedido->nomeStatus}}</td>
                                         <td scope="col">{{$colaborador['nome_etapa'] }}</td>
+                                        <td scope="col">{{$colaborador['numero_maquina'] }}</td>
                                         <td scope="col">{{$colaborador['select_motivo_pausas']}}</td>
                                         <td scope="col">{{$colaborador['texto_quantidade']}}</td>
                                         <td scope="col">@if($pedido->id_status == 6){{$pedido->funcionario}}@else @endif</td>
@@ -89,6 +91,7 @@
                                     <td scope="col">{{$pedido->ep}}</td>
                                     <td scope="col">{{$pedido->os}}</td>
                                     <td scope="col">{{$pedido->nomeStatus}}</td>
+                                    <td scope="col"></td>
                                     <td scope="col"></td>
                                     <td scope="col"></td>
                                     <td scope="col"></td>
@@ -118,7 +121,7 @@
                         </div>
                         <div class="modal-body" >
                             <div class="form-group row" id='tipo_manutencao'>
-                                <label for="" class="col-sm-3 col-form-label text-right">Tipo</label>
+                                <label for="" class="col-sm-4 col-form-label text-right">Tipo</label>
                                 <select class="form-control col-md-5" name="select_tipo_manutencao" id="select_tipo_manutencao" name="select_tipo_manutencao">
                                     <option value=""></option>
                                     <option value="T">Montagem Torre</option>
@@ -126,7 +129,7 @@
                                 </select>
                             </div>
                             <div class="form-group row" id='etapa_manutencao'>
-                                <label for="" class="col-sm-3 col-form-label text-right">Etapa</label>
+                                <label for="" class="col-sm-4 col-form-label text-right">Etapa</label>
                                 <select class="form-control col-md-5" name="select_etapa_manutencao" id="select_etapa_manutencao" name="select_etapa_manutencao">
                                     <option value=""></option>
                                     <option value="1">Início</option>
@@ -136,7 +139,7 @@
                                 </select>
                             </div>
                             <div class="form-group row" id='motivo_pausas'>
-                                <label for="" class="col-sm-3 col-form-label text-right">Motivos pausa</label>
+                                <label for="" class="col-sm-4 col-form-label text-right">Motivos pausa</label>
                                 <select class="form-control col-md-5" name="select_motivo_pausas" id="select_motivo_pausas" name="select_motivo_pausas">
                                     <option value=""></option>
                                     @foreach ($motivosPausa as $key => $motivoPausa)
@@ -144,15 +147,29 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="form-group row" id='necessita_montagem'>
+                                <label for="" class="col-sm-4 col-form-label text-right">Necessita montagem?</label>
+                                <select class="form-control col-md-5" name="select_necessita_montagem" id="select_necessita_montagem" name="select_motivo_pausas">
+                                    <option value="0">Não necessita</option>
+                                    <option value="1">Montagem Agulha</option>
+                                    <option value="2">Montagem Torre</option>
+                                </select>
+                            </div>
                             <div class="form-group row" id='quantidade'>
-                                <label for="" class="col-sm-3 col-form-label text-right">Quantidade</label>
+                                <label for="" class="col-sm-4 col-form-label text-right">Quantidade</label>
                                 <input class="form-control col-md-5" name="texto_quantidade" id="texto_quantidade"/>
+                            </div>
+                            <div class="form-group row" id='div_numero_maquina'>
+                                <label for="" class="col-sm-4 col-form-label text-right">Nº máquina</label>
+                                <input type="text" class="form-control col-md-2 sonumeros" name="numero_maquina" id="numero_maquina"/>
                             </div>
                         </div>
                         <input type="hidden" name="atualStatus" id="atualStatus" value=""/>
                         <input type="hidden" name="novoStatus" id="novoStatus" value=""/>
                         <input type="hidden" name="novoPedido" id="novoPedido" value=""/>
                         <input type="hidden" name="etapasalteracao" id="etapasalteracao" value=""/>
+                        <input type="hidden" name="necessitaMontagemExtra" id="necessitaMontagemExtra" value="0"/>
+                        <input type="hidden" name="numero_maquina_iniciando" id="numero_maquina_iniciando" value=""/>
 
                         <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>

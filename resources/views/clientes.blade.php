@@ -180,7 +180,13 @@
                 <input type="text" class="form-control is-invalid" required id="email" name="email" value="@if (isset($pessoas[0]->email)){{$pessoas[0]->email}}@else{{''}}@endif">
                 </div>
             </div>
-
+            <div class="form-group row">
+                <label for="fornecedor" class="col-sm-2 col-form-label">Fornecedor</label>
+                <select class="form-control col-sm-1 custom-select" id="fornecedor" name="fornecedor">
+                    <option value="0" @if ((isset($pessoas[0]->fornecedor) && $pessoas[0]->fornecedor == 0)){{"selected='selected'"}}@else{{''}}@endif>Não</option>
+                    <option value="1"@if ((isset($pessoas[0]->fornecedor) && $pessoas[0]->fornecedor == 1)){{"selected='selected'"}}@else{{''}}@endif>Sim</option>
+                </select>
+            </div>
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label"></label>
                 <select class="form-control col-md-1" id="status" name="status">

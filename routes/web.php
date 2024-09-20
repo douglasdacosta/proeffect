@@ -78,5 +78,10 @@ Route::match(['get', 'post'],'/paineis', [App\Http\Controllers\PaineisController
 Route::match(['get', 'post'],'/manutencao-status', [App\Http\Controllers\ManutencaoProducaoController::class, 'pesquisar'])->name('manutencao-status');
 Route::match(['post'],'/manutencao-producao-alterar-pedido', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedido'])->name('manutencao-producao-alterar-pedido');
 Route::match(['post'],'/manutencao-producao-salvar_caixas', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedidoCaixa'])->name('manutencao-producao-salvar_caixas');
+Route::match(['get', 'post'],'/atualiza-blank', [App\Http\Controllers\AtualizaFichatecnicaController::class, 'apiAtualizaBlank'])->name('atualiza-blank');
 
-
+Route::match(['get', 'post'],'/estoque', [App\Http\Controllers\EstoqueController::class, 'index'])->name('estoque');
+Route::match(['get', 'post'],'/alterar-estoque', [App\Http\Controllers\EstoqueController::class, 'alterar'])->name('alterar-estoque');
+Route::match(['get', 'post'],'/incluir-estoque', [App\Http\Controllers\EstoqueController::class, 'incluir'])->name('incluir-estoque');
+Route::match(['get', 'post'],'/tela-baixa-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'telaBaixaEstoque'])->name('tela-baixa-estoque');
+Route::match(['get', 'post'],'/baixar-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'baixarEstoque'])->name('baixar-estoque');

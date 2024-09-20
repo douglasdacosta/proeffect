@@ -8,7 +8,7 @@
     }
 
     .container_default .table {
-        font-size: 1.5em;
+        font-size: 1.2em;
     }
 </style>
 <script type="text/javascript" >
@@ -24,7 +24,7 @@ setTimeout(function () {
         <div class="w-auto text-center">
             <h1>Painel de Usinagem</h1>
         </div>
-
+        <?php $usinagem = true ?>
         @include('paineis.div_table')
     </div>
 

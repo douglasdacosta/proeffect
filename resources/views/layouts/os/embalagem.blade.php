@@ -1,31 +1,32 @@
+<div class="row mt-4"></div>
 <div id="imprimir" class="contenedor">
     <table class="table text-center">
         <tbody>
-        <tr>
-            <td colspan="3" class="font-weight-bold">Eplax</td>
-            <td colspan="6" class="font-weight-bold">{{'Ordem de serviço'}}</td>
-            <td colspan="2">RF-11</td>
-        </tr>
-        <tr>
-            <td colspan="2" class="font-weight-bold">Processo</td>
-            <td>{{$folha['status']}}</td>
-            <td class="font-weight-bold">Nº O.S</td>
-            <td>{{$pedidos[0]->os}}</td>
-            <td colspan="3" class="font-weight-bold">Código do produto(EP)</td>
-            <td>{{$pedidos[0]->tabelaFichastecnicas->ep}}</td>
-            <td class="font-weight-bold">Data</td>
-            <td >{{ Carbon\Carbon::createFromDate($pedidos[0]->data_gerado)->format('d/m/Y') }}</td>
-        </tr>
-        <tr>
-            <td colspan="1" class="font-weight-bold">Quantidade</td>
-            <td >{{$pedidos[0]->qtde}}</td>
-            <td  colspan="2" class="font-weight-bold">Quantidade blanks</td>
-            <td >{{$qtde_blank}}</td>
-            <td colspan="2" class="font-weight-bold">Quantidade de conjuntos</td>
-            <td >{{$qtde_conjuntos}}</td>
-            <td colspan="2" class="font-weight-bold">Data entrega</td>
-            <td >{{Carbon\Carbon::createFromDate($pedidos[0]->data_entrega)->format('d/m/Y')}}</td>
-        </tr>
+            <tr>
+                <td colspan="3" class="font-weight-bold">Eplax</td>
+                <td colspan="6" class="font-weight-bold">{{'Ordem de serviço'}}</td>
+                <td colspan="2">RF-11</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="font-weight-bold">Processo</td>
+                <td colspan="1">{{$folha['status']}}</td>
+                <td colspan="1" class="font-weight-bold">Nº O.S</td>
+                <td colspan="1">{{$pedidos[0]->os}}</td>
+                <td colspan="3" class="font-weight-bold">Código do produto(EP)</td>
+                <td colspan="1">{{$pedidos[0]->tabelaFichastecnicas->ep}}</td>
+                <td colspan="1" class="font-weight-bold">Data</td>
+                <td colspan="1">{{ Carbon\Carbon::createFromDate($pedidos[0]->data_gerado)->format('d/m/Y') }}</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="font-weight-bold">Quantidade</td>
+                <td colspan="1">{{$pedidos[0]->qtde}}</td>
+                <td colspan="1" class="font-weight-bold">Quantidade blanks</td>
+                <td colspan="1">{{$qtde_blank}}</td>
+                <td colspan="3" class="font-weight-bold">Quantidade de conjuntos</td>
+                <td colspan="1">{{$qtde_conjuntos}}</td>
+                <td colspan="1" class="font-weight-bold" nowrap='nowrap'>Data entrega</td>
+                <td colspan="1">{{Carbon\Carbon::createFromDate($pedidos[0]->data_entrega)->format('d/m/Y')}}</td>
+            </tr>
         <tr>
             <td colspan="11" class="font-weight-bold ">Materia prima</td>
         </tr>

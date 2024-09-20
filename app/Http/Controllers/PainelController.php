@@ -14,6 +14,7 @@ class PainelController extends Controller
      */
     public function __construct() {}
 
+
     public function getMotivosPausa(){
         return [
             '1' => 'F.P – Faltando Peças',
@@ -27,45 +28,245 @@ class PainelController extends Controller
         ];
     }
     private function busca_dados_pedidos($status, $limit = 11, $concluidos ){
-
-        $pedidos = DB::table('pedidos')
-            ->join('status', 'pedidos.status_id', '=', 'status.id')
-            ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
-            ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id');
-
+        $etapas_pedidos_id = '';
 
         if($concluidos){
-            $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
-            ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
-            ->where('historicos_etapas.etapas_pedidos_id','=',4)
-            ->orderBy('historicos_etapas.created_at', 'DESC')
-            ->orderby('pedidos.data_entrega', 'DESC');
-        } else {
-            $pedidos = $pedidos->select('pedidos.*', 'ficha_tecnica.ep','historicos_etapas.created_at')
-            ->leftJoin('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
-            ->orderBy('historicos_etapas.created_at', 'DESC')
-            ->orderby('pedidos.data_entrega');
+            $etapas_pedidos_id = " AND C.etapas_pedidos_id = 4 ";
+
+
+            $pedidos = DB::select(DB::raw("SELECT distinct
+                                A.id,
+                                H.nome,
+                                B.ep,
+                                A.os,
+                                B.ep as ep_validar,
+                                A.os as os_validar,
+                                A.qtde,
+                                (SELECT COUNT(id)
+                                FROM ficha_tecnica_itens X
+                                WHERE X.fichatecnica_id = A.fichatecnica_id
+                                AND X.blank != '') AS total_itens,
+                                (
+                                    select
+                                        GROUP_CONCAT(X.blank ORDER BY X.blank ASC SEPARATOR ',') AS blanks
+                                    from
+                                        ficha_tecnica_itens X
+                                    WHERE
+                                        X.fichatecnica_id = A.fichatecnica_id
+                                        AND X.blank != ''
+                                    GROUP BY A.fichatecnica_id
+                                ) as  blanks,
+                                A.data_entrega,
+                                DATEDIFF(A.data_entrega, NOW()) AS alerta,
+                                C.numero_maquina,
+                                D.nome as etapa,
+                                case
+                                    when C.select_motivo_pausas ='1' then 'F.P – Faltando Peças'
+                                    when C.select_motivo_pausas ='2' then 'P.P – Problema na produção'
+                                    when C.select_motivo_pausas ='3' then 'P – Pausado'
+                                    when C.select_motivo_pausas ='4' then 'P.R – Protótipo'
+                                    when C.select_motivo_pausas ='5' then 'A.P – Assunto Pessoal'
+                                    when C.select_motivo_pausas ='6' then 'P.M – Problema na máquina'
+                                    when C.select_motivo_pausas ='7' then 'E.P - Esperando próxima produção'
+                                    when C.select_motivo_pausas ='8' then 'F.M - Faltando Material'
+                                END as  motivo_pausa,
+                                C.texto_quantidade as  qtde_pausa,
+                                (
+                                    select
+                                        GROUP_CONCAT(G.nome ORDER BY G.nome ASC SEPARATOR ',') AS nome
+                                    FROM
+                                        pedidos_funcionarios_montagens F
+                                    left join
+                                        funcionarios G
+                                    on
+                                        G.id=F.funcionario_id
+                                    WHERE
+                                        F.pedido_id=A.id
+                                )  AS responsavel,
+                                E.nome as colaborador,
+                                C.created_at,
+                                C.select_tipo_manutencao as select_tipo_manutencao,
+                                A.status_id
+                            FROM
+                                pedidos A
+                            INNER JOIN
+                                ficha_tecnica B
+                            ON
+                                B.id = A.fichatecnica_id
+                            LEFT JOIN
+                                historicos_etapas C
+                            ON
+                                C.pedidos_id=A.id
+                                And C.status_id=$status-1
+                                AND C.etapas_pedidos_id = 4
+                            left join
+                                etapas_pedidos D
+                            on
+                                D.id=4
+                            left join
+                                funcionarios E
+                            on
+                                E.id=C.funcionarios_id
+                            LEFT JOIN
+                                status H
+                            on
+                                H.id=A.status_id
+                            WHERE
+                                A.status_id = $status
+                            ORDER BY
+                                C.created_at desc,
+                                A.os, B.ep ASC
+                            limit $limit"
+                        ));
+                    } else {
+
+                        $pedidos = DB::select(DB::raw("SELECT
+                                                            distinct
+                                                            A.id,
+                                                            H.nome,
+                                                            B.ep,
+                                                            A.os,
+                                                            B.ep as ep_validar,
+                                                            A.os as os_validar,
+                                                            A.qtde,
+                                                            (SELECT COUNT(id)
+                                                            FROM ficha_tecnica_itens X
+                                                            WHERE X.fichatecnica_id = A.fichatecnica_id
+                                                            AND X.blank != '') AS total_itens,
+                                                            (
+                                                                select
+                                                                    GROUP_CONCAT(X.blank ORDER BY X.blank ASC SEPARATOR ',') AS blanks
+                                                                from
+                                                                    ficha_tecnica_itens X
+                                                                WHERE
+                                                                    X.fichatecnica_id = A.fichatecnica_id
+                                                                    AND X.blank != ''
+                                                                GROUP BY A.fichatecnica_id
+                                                            ) as  blanks,
+                                                            A.data_entrega,
+                                                            DATEDIFF(A.data_entrega, NOW()) AS alerta,
+                                                            C.numero_maquina,
+                                                            D.nome as etapa,
+                                                            case
+                                                                when C.select_motivo_pausas ='1' then 'F.P – Faltando Peças'
+                                                                when C.select_motivo_pausas ='2' then 'P.P – Problema na produção'
+                                                                when C.select_motivo_pausas ='3' then 'P – Pausado'
+                                                                when C.select_motivo_pausas ='4' then 'P.R – Protótipo'
+                                                                when C.select_motivo_pausas ='5' then 'A.P – Assunto Pessoal'
+                                                                when C.select_motivo_pausas ='6' then 'P.M – Problema na máquina'
+                                                                when C.select_motivo_pausas ='7' then 'E.P - Esperando próxima produção'
+                                                                when C.select_motivo_pausas ='8' then 'F.M - Faltando Material'
+                                                            END as  motivo_pausa,
+                                                            C.texto_quantidade as  qtde_pausa,
+                                                            (
+                                                                select
+                                                                    GROUP_CONCAT(G.nome ORDER BY G.nome ASC SEPARATOR ',') AS nome
+                                                                FROM
+                                                                    pedidos_funcionarios_montagens F
+                                                                left join
+                                                                    funcionarios G
+                                                                on
+                                                                    G.id=F.funcionario_id
+                                                                WHERE
+                                                                    F.pedido_id=A.id
+                                                            )  AS responsavel,
+                                                            E.nome as colaborador,
+                                                            C.select_tipo_manutencao as select_tipo_manutencao,
+                                                            A.status_id,
+                                                            C.created_at
+                                                        FROM
+                                                            pedidos A
+                                                        INNER JOIN
+                                                            ficha_tecnica B
+                                                        ON
+                                                            B.id = A.fichatecnica_id
+                                                        LEFT JOIN
+                                                            historicos_etapas C
+                                                        ON
+                                                            C.pedidos_id=A.id
+                                                            And C.status_id=A.status_id
+                                                            and C.etapas_pedidos_id = (select max(X.etapas_pedidos_id)
+                                                                                            from historicos_etapas X WHERE
+                                                                                            X.pedidos_id=A.id And
+                                                                                            X.status_id=A.status_id and  X.funcionarios_id =C.funcionarios_id
+                                                                                        )
+                                                        left join
+                                                            etapas_pedidos D
+                                                        on
+                                                            D.id=C.etapas_pedidos_id
+                                                        left join
+                                                            funcionarios E
+                                                        on
+                                                            E.id=C.funcionarios_id
+                                                        LEFT JOIN
+                                                            status H
+                                                        on
+                                                            H.id=A.status_id
+                                                        WHERE
+                                                            A.status_id = $status
+                                                            -- AND A.os =15493
+                                                            -- and B.ep ='EP4177'
+                                                         ORDER BY
+                                                            CASE WHEN D.nome IS NOT NULL THEN 0 ELSE 1 END ASC,
+                                                            A.data_entrega,
+                                                            A.os,
+                                                            B.ep ASC
+                                                        limit $limit"
+                        ));
+                    }
+
+
+        foreach ($pedidos as $key => $pedido) {
+
+            $blanck_exploded = explode(',', $pedido->blanks);
+            $qdte_blank = 0;
+            $conjuntos = array();
+
+
+            if ($pedidos[$key]->alerta < 6) {
+                $pedidos[$key]->class_dias_alerta = 'text-danger';
+            } else {
+                $pedidos[$key]->class_dias_alerta = 'text-primary';
+            }
+
+            foreach($blanck_exploded as $blancks) {
+                $letra_blank = substr($blancks, 0, 1);
+                if($letra_blank != '') {
+                    $qdte_blank++ ;
+                    $conjuntos['conjuntos'][$letra_blank] = $letra_blank;
+                }
+            };
+
+            if($pedido->status_id == 6 ){
+
+                switch (($pedidos[$key]->select_tipo_manutencao)) {
+                    case 'T':
+                        $pedidos[$key]->etapa = $pedido->etapa . " - Torre";
+                        break;
+                    case 'A':
+                        $pedidos[$key]->etapa = $pedido->etapa . " - Agulha";
+                        break;
+
+                    default:
+                        $pedidos[$key]->etapa = '';
+                        break;
+                }
+
+            }
+
+            $pedidos[$key]->blanks = $qdte_blank;
+            $pedidos[$key]->conjuntos = count($conjuntos['conjuntos']);
+
+            if(isset($pedidos[$key-1]) && $pedidos[$key-1]->os_validar == $pedidos[$key]->os_validar && $pedidos[$key-1]->ep_validar == $pedidos[$key]->ep_validar) {
+                $pedidos[$key]->os = '';
+                $pedidos[$key]->ep = '';
+                $pedidos[$key]->qtde = '';
+                $pedidos[$key]->blanks = '';
+                $pedidos[$key]->conjuntos = '';
+                $pedidos[$key]->data_entrega = '';
+                $pedidos[$key]->alerta = '';
+            }
         }
-
-        $pedidos=$pedidos
-        ->where('pedidos.status_id', '=', $status )
-        ->where('pedidos.status', '=', 'A');
-
-        $pedidos->paginate($limit);
-        $pedidos = $pedidos->get()->toArray();
-
-        $pedidos = $this->buscaDadosEtapa($pedidos, $concluidos);
-
-        if($concluidos) {
-            $pedidos = $this->ordenarPedidosDesc($pedidos);
-        } else{
-
-            $pedidos = $this->ordenarPedidos($pedidos);
-        }
-
-        $pedidos = $this->higienizaDatas($pedidos);
-        $pedidos = array_map("unserialize", array_unique(array_map("serialize", $pedidos)));
-
 
         if($concluidos){
             $pedidos = array_slice($pedidos, 0,3);
@@ -103,6 +304,7 @@ class PainelController extends Controller
             return strcmp($a->created_at, $b->created_at);
         }
     }
+
     public function compararPedidos($a, $b) {
         // Verifica se ambos têm colaboradores
         $colab_a = !empty($a->colaboradores);
@@ -171,6 +373,7 @@ class PainelController extends Controller
                     'historicos_etapas.texto_quantidade',
                     'historicos_etapas.created_at',
                     'historicos_etapas.etapas_alteracao_id',
+                    'historicos_etapas.numero_maquina',
                     'funcionarios.nome',
                     'etapas_pedidos.nome as nome_etapa')
                     ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
@@ -213,6 +416,7 @@ class PainelController extends Controller
                         'select_tipo_manutencao' => $hestatus->select_tipo_manutencao   ,
                         'select_motivo_pausas' => !empty($hestatus->select_motivo_pausas) ? $motivosPausa[$hestatus->select_motivo_pausas] : '' ,
                         'texto_quantidade' => $hestatus->texto_quantidade   ,
+                        'numero_maquina' => $hestatus->numero_maquina   ,
                         'created_at' => $hestatus->created_at   ,
                         'nome' => $hestatus->nome   ,
                         'nome_etapa' => $etapa  ,

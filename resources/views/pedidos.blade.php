@@ -102,68 +102,69 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     </div>
                 </div>
             </div>
-            <div class="right_col" role="main">
 
-                <form id="filtro" action="pedidos" method="get" data-parsley-validate=""
-                    class="form-horizontal form-label-left" novalidate="">
-                    <div class="form-group row">
-                        <label for="codigo_cliente" class="col-sm-1 col-form-label text-right">Código cliente</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="codigo_cliente" name="codigo_cliente" class="form-control col-md-13"
-                                value="">
-                        </div>
-
-                        <label for="nome_cliente" class="col-sm-2 col-form-label text-right">Nome cliente</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="nome_cliente" name="nome_cliente" class="form-control col-md-13"
-                                value="">
-                        </div>
-                        <label for="os" class="col-sm-2 col-form-label text-right">OS</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="os" name="os" class="form-control" value="">
-                        </div>
-                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
-                        <div class="col-sm-2" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
-                            <div class="right_col col-sm-2" role="main">
-                                    @foreach ($AllStatus as $status)
-                                        <div class="col-sm-6 form-check">
-                                            <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
-                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
-                                            <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
-                                        </div>
-                                    @endforeach
+            <form id="filtro" action="pedidos" method="get" data-parsley-validate=""  novalidate="">
+                <div class="row" role="main">
+                    <div class="col-md-9 themed-grid-col row">
+                        <div class="row">
+                            <label for="codigo_cliente" class="col-sm-2 col-form-label text-right">Código cliente</label>
+                            <div class="col-sm-1">
+                                <input type="text" id="codigo_cliente" name="codigo_cliente" class="form-control col-md-13"
+                                    value="">
+                            </div>
+                            <label for="nome_cliente" class="col-sm-2 col-form-label text-right">Nome cliente</label>
+                            <div class="col-sm-3">
+                                <input type="text" id="nome_cliente" name="nome_cliente" class="form-control col-md-13"
+                                    value="">
+                            </div>
+                            <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
+                            <div class="col-sm-2">
+                                <input type="text" id="os" name="os" class="form-control" value="">
                             </div>
                         </div>
+                        <div class="row">
+                            <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
+                            <div class="col-sm-1">
+                                <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
+                            </div>
+                            <label for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="data_entrega_fim" class="col-form-label text-right">até</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="status" class="col-sm-1 col-form-label">&nbsp;</label>
+                            <div class="col-sm-2">
+                                <select class="form-control " id="status" name="status">
+                                    <option value="A" @if (isset($request) && $request->input('status') == 'A') {{ ' selected ' }}@else @endif>Ativo
+                                    </option>
+                                    <option value="I" @if (isset($request) && $request->input('status') == 'I') {{ ' selected ' }}@else @endif>Inativo
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-3 themed-grid-col row">
+                        <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
+                            <div class="col-sm-7" style="overflow-y: auto; height: 175px; border:1px solid #97928b">
+                                {{-- <div class="" role="main"> --}}
+                                        @foreach ($AllStatus as $status)
+                                            <div class="col-sm-8 form-check">
+                                                <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                                @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                                <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                            </div>
+                                        @endforeach
+                                {{-- </div> --}}
+                            </div>
                     </div>
 
-                    <div class="form-group row">
-
-
-                        <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
-                        </div>
-                        <label for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_entrega_fim" class="col-form-label text-right">até</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="status" class="col-sm-1 col-form-label">&nbsp;</label>
-                        <div class="col-sm-2">
-                            <select class="form-control col-md-5" id="status" name="status">
-                                <option value="A" @if (isset($request) && $request->input('status') == 'A') {{ ' selected ' }}@else @endif>Ativo
-                                </option>
-                                <option value="I" @if (isset($request) && $request->input('status') == 'I') {{ ' selected ' }}@else @endif>Inativo
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
+                    <div class="col-md-8 form-group row">
                         <div class="col-sm-5">
                             <button type="submit" class="btn btn-primary">Pesquisar</button>
                         </div>
@@ -173,104 +174,104 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             </div>
                         </div>
                     </div>
-                </form>
-                <div class="form-group">
-                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <h4>Encontrados</h4>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <table class="table table-striped  text-center">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>OS</th>
-                                            <th>EP</th>
-                                            <th>Qtde</th>
-                                            <th>Status do pedido</th>
-                                            <th>Data gerado</th>
-                                            <th>Montadores</th>
-                                            <th>Data entrega</th>
-                                            <th>Alerta dias</th>
-                                            <th>OS</th>
-                                            <th>MP</th>
-                                            <th>CX</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if (isset($pedidos))
-                                            @foreach ($pedidos as $pedido)
-                                                <tr>
-                                                    <th scope="row"><a
-                                                            href={{ URL::route($rotaAlterar, ['id' => $pedido->id]) }}>{{ $pedido->id }}</a>
-                                                    </th>
-                                                    <td>{{ $pedido->os }}</td>
-                                                    <td>{{ $pedido->ep }}</td>
-                                                    <td>{{ $pedido->qtde }}</td>
-                                                    <td>
-                                                        <select class="form-control alteracao_status_pedido"
-                                                            data-statusatual='{{ $pedido->id_status }}'
-                                                            data-pedido="{{ $pedido->id }}" id="status_id" name="status_id">
-                                                            @if (isset($AllStatus))
-                                                                @foreach ($AllStatus as $stats)
-                                                                    <option value="{{ $stats->id }}"
-                                                                        @if ($stats->id < $pedido->id_status) {{ 'disabled' }} @else {{ '' }} @endif
-                                                                        @if (isset($pedido->id_status) && $pedido->id_status == $stats->id) selected="selected" @else{{ '' }} @endif>
-                                                                        {{ $stats->nome }}
-                                                                    </option>
-                                                                @endforeach
-                                                            @endif
-                                                        </select>
-                                                    </td>
-                                                    <?php
-                                                    $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
-                                                    $hoje = date('Y-m-d');
-                                                    $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
-                                                    if ($dias_alerta < 6) {
-                                                        $class_dias_alerta = 'text-danger';
-                                                    } else {
-                                                        $class_dias_alerta = 'text-primary';
-                                                    }
-                                                    ?>
-                                                    <td>{{ Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
-                                                    <td>
-                                                        <i data-funcionariomontagem="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->id.','}}@endforeach"
-                                                            title="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->nome.', '}}@endforeach"
-                                                            data-pedido_id="{{$pedido->id}}"
-                                                            style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:#044f04'}}@else {{'color:#cacaca'}}@endif"  class="fas fa-users add_funcionarios_montagens">
-                                                        </i>
-                                                        {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
-                                                    </td>
-                                                    <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
-                                                    <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
-                                                    <th scope="row" title="Imprimir ordem de serviço">
-                                                        <a target="_blank"
-                                                            href="{{ URL::route('imprimirOS', ['id' => $pedido->id]) }}" <span
-                                                            class="fa fa-print"></span></a>
-                                                    </th>
-                                                    <th scope="row">
-                                                        <a href="{{ URL::route('imprimirMP', ['id' => $pedido->id]) }}" <span
-                                                            class="fa fa-print"></span></a>
-                                                    </th>
-                                                    <th scope="row">
-                                                        <a class="show_caixas" data-pedido_id="{{$pedido->id}}">
-                                                            <i style="cursor:pointer;@if($pedido->caixas==0){{'color:#cacaca'}}@else{{'color:#044f04'}}@endif" class="fas fa-eye"></i>
-                                                        </a>
-                                                    </th>
-                                                </tr>
-                                            @endforeach
-                                        @endif
-                                    </tbody>
-                                </table>
-                            </div>
+                </div>
+            </form>
+
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h4>Encontrados</h4>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <table class="table table-striped  text-center">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>OS</th>
+                                        <th>EP</th>
+                                        <th>Qtde</th>
+                                        <th>Status do pedido</th>
+                                        <th>Data gerado</th>
+                                        <th>Montadores</th>
+                                        <th>Data entrega</th>
+                                        <th>Alerta dias</th>
+                                        <th>OS</th>
+                                        <th>MP</th>
+                                        <th>CX</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (isset($pedidos))
+                                        @foreach ($pedidos as $pedido)
+                                            <tr>
+                                                <th scope="row"><a
+                                                        href={{ URL::route($rotaAlterar, ['id' => $pedido->id]) }}>{{ $pedido->id }}</a>
+                                                </th>
+                                                <td>{{ $pedido->os }}</td>
+                                                <td>{{ $pedido->ep }}</td>
+                                                <td>{{ $pedido->qtde }}</td>
+                                                <td>
+                                                    <select class="form-control alteracao_status_pedido"
+                                                        data-statusatual='{{ $pedido->id_status }}'
+                                                        data-pedido="{{ $pedido->id }}" id="status_id" name="status_id">
+                                                        @if (isset($AllStatus))
+                                                            @foreach ($AllStatus as $stats)
+                                                                <option value="{{ $stats->id }}"
+                                                                    @if ($stats->id < $pedido->id_status) {{ 'disabled' }} @else {{ '' }} @endif
+                                                                    @if (isset($pedido->id_status) && $pedido->id_status == $stats->id) selected="selected" @else{{ '' }} @endif>
+                                                                    {{ $stats->nome }}
+                                                                </option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                </td>
+                                                <?php
+                                                $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
+                                                $hoje = date('Y-m-d');
+                                                $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                                                if ($dias_alerta < 6) {
+                                                    $class_dias_alerta = 'text-danger';
+                                                } else {
+                                                    $class_dias_alerta = 'text-primary';
+                                                }
+                                                ?>
+                                                <td>{{ Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
+                                                <td>
+                                                    <i data-funcionariomontagem="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->id.','}}@endforeach"
+                                                        title="@foreach($funcionarios_vinculados[$pedido->id]['funcionarios_montagens'] as $funcionario_montagem){{$funcionario_montagem->nome.', '}}@endforeach"
+                                                        data-pedido_id="{{$pedido->id}}"
+                                                        style="cursor:pointer; @if (count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) > 0) {{'color:#044f04'}}@else {{'color:#cacaca'}}@endif"  class="fas fa-users add_funcionarios_montagens">
+                                                    </i>
+                                                    {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
+                                                </td>
+                                                <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
+                                                <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
+                                                <th scope="row" title="Imprimir ordem de serviço">
+                                                    <a target="_blank"
+                                                        href="{{ URL::route('imprimirOS', ['id' => $pedido->id]) }}" <span
+                                                        class="fa fa-print"></span></a>
+                                                </th>
+                                                <th scope="row">
+                                                    <a href="{{ URL::route('imprimirMP', ['id' => $pedido->id]) }}" <span
+                                                        class="fa fa-print"></span></a>
+                                                </th>
+                                                <th scope="row">
+                                                    <a class="show_caixas" data-pedido_id="{{$pedido->id}}">
+                                                        <i style="cursor:pointer;@if($pedido->caixas==0){{'color:#cacaca'}}@else{{'color:#044f04'}}@endif" class="fas fa-eye"></i>
+                                                    </a>
+                                                </th>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-
         @stop
     @break
 
@@ -461,63 +462,79 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             </div>
         @stop
         @section('content')
-            <div class="right_col" role="main">
 
-                <form id="filtro" action="followup" method="get" data-parsley-validate=""
-                    class="form-horizontal form-label-left" novalidate="">
-                    <div class="form-group row">
+        <form id="filtro" action="followup" method="get" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+            <div class="row" role="main">
+                <div class="col-md-9 themed-grid-col row">
+                    <div class="row">
                         <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
                         <div class="col-sm-1">
                             <input type="text" id="os" name="os" class="form-control col-md-13" value="">
                         </div>
-
                         <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
                         <div class="col-sm-1">
                             <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                         </div>
-                        <label for="ep" class="col-sm-2 col-form-label text-right">Status do pedido</label>
-                        <div class="col-sm-5" style="overflow-y: auto; height: 75px; border:1px solid #97928b">
+                        <label for="data_gerado" class="col-sm-3 col-form-label text-right">Data pedido: de</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+                        <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        {{-- <label for="data_entrega" class="col-sm-1 col-form-label text-right">&nbsp;&nbsp;</label>
+                        <div class="col-sm-1"><span class="col-md-13" >&nbsp;</span></div>
+                        <label for="data_entrega" class="col-sm-1 col-form-label text-right">&nbsp;&nbsp;</label>
+                        <div class="col-sm-1"><span class="col-md-13" >&nbsp;</span></div> --}}
+                        <label for="data_entrega" class="col-sm-3 col-form-label text-right">Data entrega: de</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+                        <label for="data_entrega_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-3 themed-grid-col row" >
+                    <div class="row">
+                        <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
+                        <div class="col-sm-8" style="overflow-y: auto; height: 175px; border:1px solid #97928b">
                             <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
                                         <div class="col-sm-6 form-check">
                                             <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
-                                            @if($status->id == 11) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                            @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
                                             <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
                                         </div>
                                     @endforeach
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label for="data_gerado" class="col-sm-1 col-form-label text-right">Data pedido: de</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-                        <label for="data_entrega_fim" class=" col-form-label text-right">até</label>
-                        <div class="col-sm-1">
-                            <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
-                                placeholder="DD/MM/AAAA">
-                        </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-5">
+                        <button type="submit" class="btn btn-primary">Pesquisar</button>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-sm-5">
-                            <button type="submit" class="btn btn-primary">Pesquisar</button>
-                        </div>
-                        <div class="col-sm-5">
-                        </div>
+                    <div class="col-sm-5">
                     </div>
-                </form>
+                </div>
+            </div>
+            </form>
+
+
+
+
+            <div class="right_col" role="main">
                 <div class="form-group">
                     <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
                     <div class="col-md-12 col-sm-12 col-xs-12">
