@@ -361,6 +361,33 @@ $(function ($) {
 
     })
 
+    $(document).on('click', '.adiciona_fila_impressao', function (e) {
+        if (!confirm("Você deseja imprimir a etiqueda?")) {
+            return false;
+        }
+
+        $('.overlay').show();
+        var id = $(this).data("id");
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/incluir-fila-impressao',
+            data: {
+                'id': id,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                abreAlertSuccess(data, false);
+                $('.overlay').hide();
+            },
+            error: function (data, textStatus, errorThrown) {
+                abreAlertSuccess(data, true);
+                $('.overlay').hide();
+            },
+
+        });
+
+    })
+
     function formatarData(data) {
         // Cria um objeto de data com a data fornecida
         const dataObj = new Date(data);

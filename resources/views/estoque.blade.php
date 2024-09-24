@@ -53,6 +53,7 @@
                       <th>Material</th>
                       <th>Data</th>
                       <th>Valor</th>
+                      <th>Etiqueta</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -63,7 +64,11 @@
                               <td>{{$item_estoque->material}}</td>
                               <td>{{Carbon\Carbon::parse($item_estoque->data)->format('d/m/Y')}}</td>
                               <td>{{$item_estoque->qtde_chapa_peca}}</td>
-
+                              <th scope="row">
+                                <a href="#">
+                                    <span data-id="{{$item_estoque->id}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>
+                                </a>
+                            </th>
                             </tr>
                         @endforeach
                     @endif

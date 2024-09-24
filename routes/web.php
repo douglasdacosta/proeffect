@@ -79,6 +79,8 @@ Route::match(['get', 'post'],'/manutencao-status', [App\Http\Controllers\Manuten
 Route::match(['post'],'/manutencao-producao-alterar-pedido', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedido'])->name('manutencao-producao-alterar-pedido');
 Route::match(['post'],'/manutencao-producao-salvar_caixas', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedidoCaixa'])->name('manutencao-producao-salvar_caixas');
 Route::match(['get', 'post'],'/atualiza-blank', [App\Http\Controllers\AtualizaFichatecnicaController::class, 'apiAtualizaBlank'])->name('atualiza-blank');
+Route::match(['get', 'post'],'/imprimir-tag-estoque', [App\Http\Controllers\FilaImpressaoController::class, 'imprimirTagEstoque'])->name('imprimir-tag-estoque');
+Route::match(['get', 'post'],'/incluir-fila-impressao', [App\Http\Controllers\FilaImpressaoController::class, 'incluirFilaImpressao'])->name('incluir-fila-impressao');
 
 Route::match(['get', 'post'],'/estoque', [App\Http\Controllers\EstoqueController::class, 'index'])->name('estoque');
 Route::match(['get', 'post'],'/alterar-estoque', [App\Http\Controllers\EstoqueController::class, 'alterar'])->name('alterar-estoque');
