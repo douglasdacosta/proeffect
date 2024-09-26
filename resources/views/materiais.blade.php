@@ -157,6 +157,12 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="consumo_medio_mensal" class="col-sm-2 col-form-label">Consumo médio mensal</label>
+                <div class="col-sm-2">
+                <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="consumo_medio_mensal" name="consumo_medio_mensal" value="@if (isset($materiais[0]->consumo_medio_mensal)){{$materiais[0]->consumo_medio_mensal}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label">&nbsp;</label>
                 <select class="form-control custom-select col-md-1 " id="status" name="status">
                     <option value="A" @if (isset($materiais[0]->status) && $materiais[0]->status == 'A'){{ ' selected '}}@else @endif>Ativo</option>

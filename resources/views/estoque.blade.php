@@ -50,9 +50,12 @@
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Material</th>
                       <th>Data</th>
-                      <th>Valor</th>
+                      <th>Material</th>
+                      <th>Estoque comprado</th>
+                      <th>Estoque atual</th>
+                      <th>Estoque mínimo</th>
+                      <th>Alerta</th>
                       <th>Etiqueta</th>
                     </tr>
                   </thead>
@@ -60,14 +63,17 @@
                   @if(isset($estoque))
                         @foreach ($estoque as $item_estoque)
                             <tr>
-                            <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque->id )) }}>{{$item_estoque->id}}</a></th>
-                              <td>{{$item_estoque->material}}</td>
-                              <td>{{Carbon\Carbon::parse($item_estoque->data)->format('d/m/Y')}}</td>
-                              <td>{{$item_estoque->qtde_chapa_peca}}</td>
-                              <th scope="row">
-                                <a href="#">
-                                    <span data-id="{{$item_estoque->id}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>
-                                </a>
+                                <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque->id )) }}>{{$item_estoque->id}}</a></th>
+                                <td>{{Carbon\Carbon::parse($item_estoque->data)->format('d/m/Y')}}</td>
+                                <td>{{$item_estoque->material}}</td>
+                                <td>{{$item_estoque->qtde_chapa_peca * $item_estoque->qtde_por_pacote}}</td>
+                                <td>{{$item_estoque->qtde_chapa_peca}}</td>
+                                <td>{{$item_estoque->estoque_minimo}}</td>
+                                <td>{{$item_estoque->estoque_minimo}}</td>
+                                <th scope="row">
+                                    <a href="#">
+                                        <span data-id="{{$item_estoque->id}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>
+                                    </a>
                             </th>
                             </tr>
                         @endforeach

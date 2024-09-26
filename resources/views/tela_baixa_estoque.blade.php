@@ -53,8 +53,6 @@
                         <th scope="col">ID</th>
                         <th scope="col">Material</th>
                         <th scope="col">Fornecedor</th>
-                        <th scope="col">Qtde chapas</th>
-                        <th scope="col">Qtde por pacote</th>
                         <th scope="col">Ação</th>
                     </tr>
                 </thead>
@@ -64,9 +62,7 @@
                                     <tr style="padding-top: 10px">
                                         <td style="margin-top: 10px" scope="col">{{$estoque->id}}</td>
                                         <td scope="col">{{$materiais[$estoque->material_id]['material']}}</td>
-                                        <td scope="col">{{$fornecedores[$estoque->fornecedor_id]['nome_cliente']}}</td>
-                                        <td scope="col">{{$estoque->qtde_chapa_peca}}</td>
-                                        <td scope="col">{{$estoque->qtde_por_pacote}}</td>
+                                        <td scope="col">{{\Illuminate\Support\Str::words($fornecedores[$estoque->fornecedor_id]['nome_cliente'], 2, '') }}</td>
                                         <td scope="col">
                                             <button class="btn btn-primary baixar_estoque" data-id="{{$estoque->id}}">Baixar</button>
                                         </td>

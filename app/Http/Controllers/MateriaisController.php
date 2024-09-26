@@ -156,6 +156,7 @@ class MateriaisController extends Controller
             $materiais->unidadey = $request->input('unidadey');
             $materiais->peca_padrao = $request->input('peca_padrao');
             $materiais->estoque_minimo = $request->input('estoque_minimo');
+            $materiais->consumo_medio_mensal = $request->input('consumo_medio_mensal');
             $materiais->tempo_montagem_torre = $tempo_torre;
             $materiais->valor = DateHelpers::formatFloatValue($request->input('valor'));
             $materiais->status = $request->input('status');

@@ -34,7 +34,7 @@ class EstoqueController extends Controller
 
         $estoque = DB::table('estoque')
                 ->join('materiais', 'materiais.id', '=', 'estoque.material_id')
-                ->select('estoque.data', 'estoque.id', 'estoque.qtde_chapa_peca', 'materiais.material')
+                ->select('estoque.data', 'estoque.id', 'estoque.qtde_chapa_peca', 'estoque.qtde_por_pacote', 'materiais.estoque_minimo', 'materiais.material')
                 ->orderby('estoque.data', 'desc');
 
         if ($id) {
