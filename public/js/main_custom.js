@@ -111,6 +111,39 @@ $(function ($) {
 
     });
 
+    let table = new DataTable('#table_estoque', {
+        responsive: true,
+        "paging": false,         // Desativa a paginação
+        "info": false,           // Remove o label "Showing X to Y of Z entries"
+        "lengthChange": false,  // Desativa o "entries per page"
+        "pageLength": 15000
+    });
+
+    // Função para atualizar ícones com base no aria-sort
+    function updateSortIcons() {
+        // Remove a classe 'sorted' de todas as colunas
+        $('th').removeClass('sorting_asc');
+        $('th').removeClass('sorting_desc');
+
+        // Para cada cabeçalho de coluna, verifique o valor de aria-sort
+        $('th[aria-sort]').each(function() {
+            var sortOrder = $(this).attr('aria-sort');
+            if (sortOrder === 'ascending' ){
+                $(this).addClass('sorting_asc');  // Adiciona a classe 'sorted' para aplicar o CSS
+            }
+            if (sortOrder === 'descending'){
+                $(this).addClass('sorting_desc');  // Adiciona a classe 'sorted' para aplicar o CSS
+            }
+        });
+    }
+
+    // Atualiza os ícones após a ordenação
+    table.on('order.dt', function() {
+        updateSortIcons();  // Chama a função quando uma ordenação acontece
+    });
+
+    updateSortIcons();
+
     $(document).on('click', '#adicionar_montador', function (e) {
         salva_montadores = [];
         $('.montadores').each(function (c, j) {
@@ -362,17 +395,25 @@ $(function ($) {
     })
 
     $(document).on('click', '.adiciona_fila_impressao', function (e) {
-        if (!confirm("Você deseja imprimir a etiqueda?")) {
+        $('#modal_imprime_etiqueta').modal('show');
+        $('#estoque_id').val($(this).data("id"));
+    });
+    $(document).on('click', '#salva_fila_impressao', function (e) {
+        $('.overlay').show();
+
+        var qtde_etiqueta = $('#qtde_etiqueta').val();
+
+        if(qtde_etiqueta == '' || qtde_etiqueta == 0){
+            $('.overlay').hide();
+            alert('Qtde. etiqueta vazio');
             return false;
         }
-
-        $('.overlay').show();
-        var id = $(this).data("id");
         $.ajax({
             type: "POST",
             url: baseUrl + '/incluir-fila-impressao',
             data: {
-                'id': id,
+                'id': $('#estoque_id').val(),
+                'qtde_etiqueta': qtde_etiqueta,
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
@@ -405,7 +446,48 @@ $(function ($) {
 
         return dataFormatada;
     }
-});
+
+    $(document).on('click', '.altera_estoque', function (e) {
+        if ($('#qtde_alteracao_estoque').val()==0 || $('#qtde_alteracao_estoque').val().trim() =='') {
+            alert('Quantidade Invalida');
+            return false;
+        }
+        acao = $(this).data('acao');
+        $('#acao_estoque').val(acao);
+        $('#modal_estoque').modal('show');
+    });
+
+    $(document).on('click', '#salva_estoque', function (e) {
+        acao_estoque = $('#acao_estoque').val();
+        id = $('#id').val();
+        qtde_alteracao_estoque = $('#qtde_alteracao_estoque').val();
+
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/altera-qtde-estoque',
+            data: {
+                'id': id,
+                'qtde': qtde_alteracao_estoque,
+                'acao_estoque': acao_estoque,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                abreAlertSuccess(data, false);
+                $('.overlay').hide();
+            },
+            error: function (data, textStatus, errorThrown) {
+                abreAlertSuccess(data, true);
+                $('.overlay').hide();
+            },
+
+        });
+        alert('estoque salvo');
+    });
+
+
+
+
+}); //FIM DO BLOCO DE JQUERY READY
 
 $(document).on('click', '.painel', function(){
     pageURL = $(this).data('url');
@@ -436,3 +518,5 @@ function abreAlertSuccess(texto, erro) {
         $('.toast').hide('slow');
     }, 7000);
 };
+
+

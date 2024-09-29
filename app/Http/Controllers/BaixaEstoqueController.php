@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Estoque;
 use App\Models\Funcionarios;
+use App\Models\HistoricosEstoque;
+use App\Models\LoteEstoqueBaixados;
 use App\Models\Pessoas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BaixaEstoqueController extends Controller
 {
@@ -61,13 +64,25 @@ class BaixaEstoqueController extends Controller
                 $array_materiais[$material->id]['material'] = $material->material;
             }
 
-            $estoque = $estoque->where(column: 'status', operator: '=', value: 'A')
-                        ->where(column: 'data_baixa', operator: '=', value: null)
-                        ->where(column: 'id', operator: '=', value: $id)
-                        ->get();
+            $estoque = DB::select(DB::raw("SELECT
+                                            *
+                                            FROM
+                                                estoque A
+                                            WHERE
+                                                A.status = 'A'
+                                                AND A.lote = '$id'
+                                                AND (select
+                                                    count(1)
+                                                    from
+                                                        lote_estoque_baixados
+                                                    where
+                                                        estoque_id = A.id) < A.qtde_por_pacote"
+                        ));
+
             $mensagem = '';
 
-            if(($estoque->isEmpty())) {
+
+            if (empty($estoque)) {
                 $mensagem = 'Estoque não encontrado/senha incorreta';
             }
             $dados = [
@@ -85,17 +100,67 @@ class BaixaEstoqueController extends Controller
 
     public function baixarEstoque(Request $request) {
 
-        $id = $request->input('id');
+        try {
+            $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
+            $LoteEstoqueBaixados->estoque_id=$request->input('id');
+            $LoteEstoqueBaixados->data_baixa = now();
+            $LoteEstoqueBaixados->save();
 
-        $estoque = Estoque::find($id);
+            $historico = "Retirada de 1 de pacote do estoque - tela de baixa de estoque";
+            $historico_estoque = new HistoricosEstoque();
+            $historico_estoque->estoque_id = $request->input('id');
+            $historico_estoque->historico = $historico;
+            $historico_estoque->status = 'A';
+            $historico_estoque->save();
 
-        if ($estoque) {
-            $estoque->data_baixa = now();
-            $estoque->save();
-        } else {
-            return redirect()->back()->with('error', 'Estoque não encontrado');
+            return true;
+        } catch (\Exception $e) {
+            info('erro para Baixar -> '.$e);
+            return false;
         }
 
-        return true;
+    }
+
+    public function alterarEstoque(Request $request) {
+        try{
+
+            $id = DB::transaction(function () use ($request) {
+                $qtde = $request->input('qtde');
+
+                if($request->input('acao_estoque') == 'adicionar') {
+                    $historico = "Devolução de $qtde de pacotes para estoque";
+                } else {
+                    $historico = "Retirada de $qtde de pacotes do estoque";
+                }
+
+                $historico_estoque = new HistoricosEstoque();
+                $historico_estoque->estoque_id = $request->input('id');
+                $historico_estoque->historico = $historico;
+                $historico_estoque->status = 'A';
+                $historico_estoque->save();
+
+                for ($i=0; $i < $qtde; $i++) {
+                    if($request->input('acao_estoque') == 'adicionar') {
+                        $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
+                        $LoteEstoqueBaixados->where('estoque_id', '=', $request->input('id'))->orderBy('id')->first()->delete();
+                    } else {
+                        $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
+                        $LoteEstoqueBaixados->estoque_id=$request->input('id');
+                        $LoteEstoqueBaixados->data_baixa = now();
+                        $LoteEstoqueBaixados->save();
+                    }
+                }
+            });
+
+            return true;
+
+        } catch (\Exception $e) {
+            info('erro para Baixar -> '.$e);
+            return false;
+        }
+
+
+
+
     }
 }

@@ -50,7 +50,7 @@
             <table class="table table-striped text-center" id="table_composicao">
                 <thead >
                     <tr>
-                        <th scope="col">ID</th>
+                        <th scope="col">ID Lote</th>
                         <th scope="col">Material</th>
                         <th scope="col">Fornecedor</th>
                         <th scope="col">Ação</th>
@@ -60,7 +60,7 @@
                     @if(!empty($estoque))
                         @foreach ($estoque as $estoque)
                                     <tr style="padding-top: 10px">
-                                        <td style="margin-top: 10px" scope="col">{{$estoque->id}}</td>
+                                        <td style="margin-top: 10px" scope="col">{{$estoque->lote}}</td>
                                         <td scope="col">{{$materiais[$estoque->material_id]['material']}}</td>
                                         <td scope="col">{{\Illuminate\Support\Str::words($fornecedores[$estoque->fornecedor_id]['nome_cliente'], 2, '') }}</td>
                                         <td scope="col">

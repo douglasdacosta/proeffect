@@ -5,6 +5,9 @@ $(function ($) {
 
     $(document).on('click', '.baixar_estoque', function (e) {
         id_estoque = $(this).data('id')
+        if (!confirm("Confirma baixar estoque?")) {
+            return false;
+        }
         $.ajax({
             type: "POST",
             url: baseUrl + '/baixar-estoque',
@@ -13,7 +16,8 @@ $(function ($) {
                 '_token': $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
-
+                history.replaceState(null, null, window.location.pathname);
+                location.reload();
             },
             error: function (data, textStatus, errorThrown) {
 

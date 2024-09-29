@@ -22,3 +22,13 @@
     background-color: #FFFFFF;
     position: fixed;
 }
+
+.table th.sorting_asc::after {
+    content: " ⬆";  /* Ícone para ordenação ascendente */
+    color: #000;
+}
+
+.table thead th.sorting_desc::after {
+    content: " ⬇";  /* Ícone para ordenação descendente */
+    color: #000;
+}

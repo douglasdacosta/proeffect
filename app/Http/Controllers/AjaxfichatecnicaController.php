@@ -101,7 +101,7 @@ class AjaxfichatecnicaController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return
      */
     public function getAllMateriais() {
         $Materiais = new Materiais();

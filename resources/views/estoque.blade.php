@@ -1,10 +1,13 @@
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../vendor/jquery/jquery.min.js?cache={{time()}}"></script>
+<script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
 <script src="js/jquery.mask.js"></script>
 <script src="js/main_custom.js"></script>
-
+<script src="DataTables/datatables.min.js"></script>
+<link  rel="stylesheet" src="DataTables/datatables.min.css"></link>
+<link rel="stylesheet" href="{{asset('css/main_style.css')}}" />
 @if(isset($tela) and $tela == 'pesquisa')
     @section('content_header')
     <div class="form-group row">
@@ -17,17 +20,67 @@
     @section('content')
     <div class="right_col" role="main">
 
+        <div id='modal_imprime_etiqueta'  class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="width: 99%">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id='texto_status_caixas'>Impressão de etiqueta</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body" >
+                        <label for="id" class="col-sm-9 col-form-label">Confirma impressão de etiqueta?</label>
+                        <div class="form-group row">
+                            <label for="id" class="col-sm-4 col-form-label">Qtde de etiqueta</label>
+                            <input type="text" class='form-control col-sm-2 sonumeros' name="qtde_etiqueta" id="qtde_etiqueta" value=""/>
+                        </div>
+                        <input type="hidden" name="estoque_id" id="estoque_id" value=""/>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="salva_fila_impressao" data-dismiss="modal" >Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <form id="filtro" action="estoque" method="get" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
             <div class="form-group row">
-                <label for="id" class="col-sm-2 col-form-label">Código</label>
+                <label for="id" class="col-sm-2 col-form-label text-right">Código</label>
                 <div class="col-sm-2">
                     <input type="text" id="id" name="id" class="form-control col-md-7 col-xs-12" value="@if (isset($request) && $request->input('id') != ''){{$request->input('codigo')}}@else @endif">
                 </div>
-                <label for="status" class="col-sm-1 col-form-label"></label>
-                <select class="form-control col-md-1" id="status" name="status">
-                    <option value="A" @if (isset($request) && $request->input('status') == 'A'){{ ' selected '}}@else @endif>Ativo</option>
-                    <option value="I" @if (isset($request) && $request->input('status')  == 'I'){{ ' selected '}}@else @endif>Inativo</option>
+                <label for="data" class="col-sm-2 col-form-label text-right">Data: de</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control mask_date" id="data" name="data"
+                        placeholder="DD/MM/AAAA">
+                </div>
+                <label for="data_fim" class="col-form-label text-right">até</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control mask_date" id="data_fim" name="data_fim"
+                        placeholder="DD/MM/AAAA">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="status_estoque" class="col-sm-2 col-form-label text-right">Status do estoque</label>
+                <select class="form-control col-md-2" id="status_estoque" name="status_estoque">
+                    <option value="1" @if (isset($request) && $request->input('status_estoque') == '1'){{ ' selected '}}@else @endif>Em estoque</option>
+                    <option value="0" @if (isset($request) && $request->input('status_estoque')  == '0'){{ ' selected '}}@else @endif>Finalizado</option>
                 </select>
+
+                <label for="Material" class="col-sm-2 col-form-label text-right">Matéria prima</label>
+                <div class="col-sm-5">
+                    <select class="form-control" id="material_id" name="material_id">
+                        <option value=""></option>
+                        @if (isset($materiais))
+                            @foreach ($materiais as $material)
+                                <option
+                                @if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) selected="selected" @else {{''}}@endif
+                                value="{{ $material->id }}">{{ $material->codigo . ' - ' . $material->material }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
             </div>
             <div class="form-group row">
                 <div class="col-sm-5">
@@ -46,7 +99,7 @@
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
-                <table class="table table-striped  text-center ">
+                <table id="table_estoque" class="table table-striped  text-center ">
                   <thead>
                     <tr>
                       <th>ID</th>
@@ -56,23 +109,25 @@
                       <th>Estoque atual</th>
                       <th>Estoque mínimo</th>
                       <th>Alerta</th>
+                      <th>Previsão</th>
                       <th>Etiqueta</th>
                     </tr>
                   </thead>
                   <tbody>
-                  @if(isset($estoque))
-                        @foreach ($estoque as $item_estoque)
+                  @if(isset($array_estoque))
+                        @foreach ($array_estoque as $item_estoque)
                             <tr>
-                                <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque->id )) }}>{{$item_estoque->id}}</a></th>
-                                <td>{{Carbon\Carbon::parse($item_estoque->data)->format('d/m/Y')}}</td>
-                                <td>{{$item_estoque->material}}</td>
-                                <td>{{$item_estoque->qtde_chapa_peca * $item_estoque->qtde_por_pacote}}</td>
-                                <td>{{$item_estoque->qtde_chapa_peca}}</td>
-                                <td>{{$item_estoque->estoque_minimo}}</td>
-                                <td>{{$item_estoque->estoque_minimo}}</td>
-                                <th scope="row">
+                                <th data-sortable='true' data-field="id"  scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque['id'] )) }}>{{$item_estoque['id']}}</a></th>
+                                <td data-sortable='true' data-field="data" >{{Carbon\Carbon::parse($item_estoque['data'])->format('d/m/Y')}}</td>
+                                <td data-sortable='true' data-field="material" >{{$item_estoque['material']}}</td>
+                                <td data-sortable='true' data-field="estoque_comprado" >{{$item_estoque['estoque_comprado']}}</td>
+                                <td data-sortable='true' data-field="estoque_atual" >{{$item_estoque['estoque_atual']}}</td>
+                                <td data-sortable='true' data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
+                                <td data-sortable='true' data-field="alerta" >@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
+                                <td data-sortable='true' data-field="previsao" title="{{$item_estoque['previsao_meses']}} meses">{{$item_estoque['previsao_meses'] }}</td>
+                                <th  scope="row">
                                     <a href="#">
-                                        <span data-id="{{$item_estoque->id}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>
+                                        <span data-id="{{$item_estoque['id']}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>
                                     </a>
                             </th>
                             </tr>
@@ -107,6 +162,46 @@
             <form id="incluir" action="{{$rotaIncluir}}" data-parsley-validate="" class="form-horizontal form-label-left" method="post">
         @endif
             @csrf <!--{{ csrf_field() }}-->
+
+            <div id='modal_estoque'  class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 99%">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id='texto_status_caixas'>Alteração de estoque</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body" >
+                            <label for="id" class="col-sm-9 col-form-label">Confirma alterar a quantidade de estoque?</label>
+                            <input type="hidden" name="acao_estoque" id="acao_estoque" value=""/>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="salva_estoque" data-dismiss="modal" >Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id='modal_imprime_etiqueta'  class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 99%">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id='texto_status_caixas'>Alteração de estoque</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body" >
+                            <label for="id" class="col-sm-9 col-form-label">Confirma alterar a quantidade de estoque?</label>
+                            <input type="hidden" name="acao_estoque" id="acao_estoque" value=""/>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="salva_estoque" data-dismiss="modal" >Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group row">
                 <label for="Material" class="col-sm-2 col-form-label">Matéria prima</label>
                 <div class="col-sm-6">
@@ -155,7 +250,7 @@
             <div class="form-group row">
                 <label for="lote" class="col-sm-2 col-form-label">Lote</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control" id="lote" name="lote" value="@if (isset($estoque[0]->lote)){{$estoque[0]->lote}}@else{{''}}@endif">
+                    <input type="text" readonly class="form-control" id="lote" name="lote" value="@if (isset($estoque[0]->lote)){{$estoque[0]->lote}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
@@ -183,19 +278,14 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label for="VD" class="col-sm-2 col-form-label">VD</label>
-                <div class="col-sm-2">
-                    <input type="checkbox" class="form-control form-check-input" id="VD" name="VD"
-                    @if (isset($estoque[0]->VD) && $estoque[0]->VD == 1) {{'checked'}} @else{{''}}@endif
-                    value="1">
-                </div>
-            </div>
-            <div class="form-group row">
                 <label for="MO" class="col-sm-2 col-form-label">MO</label>
                 <div class="col-sm-2">
                     <input type="checkbox" class="form-control form-check-input" id="MO" name="MO"
                     @if (isset($estoque[0]->MO) && $estoque[0]->MO == 1) {{'checked'}} @else{{''}}@endif
                     value="1">
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control mask_valor" id="valor_mo" placeholder="valor de MO" name="valor_mo"  value="@if (isset($estoque[0]->valor_mo)){{ number_format($estoque[0]->valor_mo,2, ',','.')}}@else{{''}}@endif">
                 </div>
             </div>
 
@@ -206,11 +296,31 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label for="qtde_por_pacote" class="col-sm-2 col-form-label">Qtde por pacote</label>
+                <label for="qtde_por_pacote" class="col-sm-2 col-form-label">Qtde de pacote</label>
                 <div class="col-sm-2">
                 <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="qtde_por_pacote" name="qtde_por_pacote" value="@if (isset($estoque[0]->qtde_por_pacote)){{$estoque[0]->qtde_por_pacote}}@else{{''}}@endif">
                 </div>
             </div>
+            <div class="form-group row">
+                <label for="total_chapa_peca" class="col-sm-2 col-form-label">Total chapa/peças</label>
+                <div class="col-sm-2">
+                <input type="text" readonly pattern="[0-9]+$" class="form-control sonumeros" id="total_chapa_peca" name="total_chapa_peca" value="@if (isset($estoque[0]->qtde_por_pacote) && isset($estoque[0]->qtde_por_pacote)){{$estoque[0]->qtde_chapa_peca * $estoque[0]->qtde_por_pacote}}@else{{''}}@endif">
+                </div>
+            </div>
+            @if($tela == 'alterar')
+                <div class="form-group row">
+                    <label for="status" class="col-sm-2 col-form-label">Baixa/Devolução </label>
+                    <div class="col-sm-2">
+                        <input type="text" pattern="[0-9]+$" class="form-control sonumeros col-sm-6" id="qtde_alteracao_estoque" name="qtde_alteracao_estoque" value="">
+                    </div>
+                    <div class="col-sm-2">
+                        <button id='adicionar_ao_estoque' type="button" data-acao='adicionar' class="btn btn-success altera_estoque">Devolver estoque</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button id='remover_do_estoque' type="button" data-acao='remover' class="btn btn-warning altera_estoque">Baixar estoque</button>
+                    </div>
+                </div>
+            @endif
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label">&nbsp;</label>
                 <select class="form-control custom-select col-md-1 " id="status" name="status">
@@ -218,6 +328,9 @@
                     <option value="I" @if (isset($estoque[0]->status) && $estoque[0]->status =='I'){{ ' selected '}}@else @endif>Inativo</option>
                 </select>
             </div>
+
+
+
             @if (!empty($historicos))
                 <div class="form-group row">
                     <label for="observacao" class="col-sm-2 col-form-label">Histórico</label>
