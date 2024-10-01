@@ -119,7 +119,6 @@ class MateriaisController extends Controller
 	    	return redirect()->route('materiais', [ 'id' => $material_id ] );
 
     	}
-
         $historicos = HistoricosMateriais::where('materiais_id','=', $material[0]->id)->get();
 
         $tela = 'alterar';
@@ -157,6 +156,7 @@ class MateriaisController extends Controller
             $materiais->peca_padrao = $request->input('peca_padrao');
             $materiais->estoque_minimo = $request->input('estoque_minimo');
             $materiais->consumo_medio_mensal = $request->input('consumo_medio_mensal');
+            $materiais->peso = $request->input('peso');
             $materiais->tempo_montagem_torre = $tempo_torre;
             $materiais->valor = DateHelpers::formatFloatValue($request->input('valor'));
             $materiais->status = $request->input('status');

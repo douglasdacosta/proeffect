@@ -46,6 +46,7 @@ $(function ($) {
     $('.mask_horas').mask('00:00:00', {reverse: true});
     $('.mask_valor').mask("###0,00", {reverse: true});
     $('.mask_date').mask('00/00/0000');
+    $('.kg').mask("###.###.###.##0.000", {reverse: true});
 
     $(document).on('change', '#calc-type', function(){
         if($(this).val().trim() == '+') {
@@ -111,38 +112,110 @@ $(function ($) {
 
     });
 
-    let table = new DataTable('#table_estoque', {
-        responsive: true,
-        "paging": false,         // Desativa a paginação
-        "info": false,           // Remove o label "Showing X to Y of Z entries"
-        "lengthChange": false,  // Desativa o "entries per page"
-        "pageLength": 15000
+    $(document).on('blur', '#qtde_chapa_peca, #qtde_por_pacote', function (e) {
+
+        var qtde_chapa_peca = $('#qtde_chapa_peca').val().trim();
+        var qtde_por_pacote = $('#qtde_por_pacote').val().trim();
+        var peso_material = $('#peso_material').val().trim();
+
+        // Remover pontos (.) para tratar os números como inteiros
+        qtde_chapa_peca = parseInt(qtde_chapa_peca.replace('.', ''), 10) || 0;
+        qtde_por_pacote = parseInt(qtde_por_pacote.replace('.', ''), 10) || 0;
+        peso_material = parseInt(peso_material.replace('.', ''), 10) || 0;
+
+        if (qtde_chapa_peca == 0 || qtde_por_pacote == 0) {
+            $('#total_chapa_peca').val(0);
+            return false;
+        }
+
+
+        // Multiplicação das quantidades
+        var total_chapa_peca = qtde_chapa_peca * qtde_por_pacote;
+
+        //campo peso recebe o valor de total_chapa_peca multiplicado pelo peso_material
+        peso = total_chapa_peca * peso_material
+        $('#peso').val(peso.toLocaleString('pt-BR'));
+
+        // Definir o valor total no campo de resultado com separador de milhar
+        $('#total_chapa_peca').val(total_chapa_peca.toLocaleString('pt-BR'));
     });
 
-    // Função para atualizar ícones com base no aria-sort
-    function updateSortIcons() {
-        // Remove a classe 'sorted' de todas as colunas
-        $('th').removeClass('sorting_asc');
-        $('th').removeClass('sorting_desc');
 
-        // Para cada cabeçalho de coluna, verifique o valor de aria-sort
-        $('th[aria-sort]').each(function() {
-            var sortOrder = $(this).attr('aria-sort');
-            if (sortOrder === 'ascending' ){
-                $(this).addClass('sorting_asc');  // Adiciona a classe 'sorted' para aplicar o CSS
+    $(document).on('change', '.material_id_estoque', function (e) {
+        $('#peso_material').val(0);
+        $('#total_chapa_peca').val(0);
+        $('#peso').val(0);
+        material_id = $(this).val();
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST",  baseUrl + '/ajax-fichatecnica', true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    console.log(JSON.parse(xhr.responseText))
+                    dados = JSON.parse(xhr.responseText)
+
+                    if(dados[0].peso != null) {
+                        peso = dados[0].peso.toFixed(3).toLocaleString('pt-BR')
+                        $('#peso_material').val(peso);
+                        $('#qtde_chapa_peca').blur();
+                    }
+
+                } else {
+
+                    alert('Ocorreu um erro ao buscar o material!')
+                }
             }
-            if (sortOrder === 'descending'){
-                $(this).addClass('sorting_desc');  // Adiciona a classe 'sorted' para aplicar o CSS
+        };
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        var requestData = {
+            'id': material_id,
+            '_token': csrfToken
+        };
+        xhr.send(JSON.stringify(requestData));
+
+    });
+
+    if (typeof DataTable !== 'undefined') {
+        let table = new DataTable('#table_estoque', {
+            responsive: true,
+            "paging": false,         // Desativa a paginação
+            "info": false,           // Remove o label "Showing X to Y of Z entries"
+            "lengthChange": false,  // Desativa o "entries per page"
+            "pageLength": 15000,
+            "language": {
+                "search": "Pesquisar:"  // Altera o label de "Search" para "Pesquisar"
             }
         });
+
+        // Função para atualizar ícones com base no aria-sort
+        function updateSortIcons() {
+            // Remove a classe 'sorted' de todas as colunas
+            $('th').removeClass('sorting_asc');
+            $('th').removeClass('sorting_desc');
+
+            // Para cada cabeçalho de coluna, verifique o valor de aria-sort
+            $('th[aria-sort]').each(function() {
+                var sortOrder = $(this).attr('aria-sort');
+                if (sortOrder === 'ascending' ){
+                    $(this).addClass('sorting_asc');  // Adiciona a classe 'sorted' para aplicar o CSS
+                }
+                if (sortOrder === 'descending'){
+                    $(this).addClass('sorting_desc');  // Adiciona a classe 'sorted' para aplicar o CSS
+                }
+            });
+        }
+
+        // Atualiza os ícones após a ordenação
+        table.on('order.dt', function() {
+            updateSortIcons();  // Chama a função quando uma ordenação acontece
+        });
+
+        updateSortIcons();
+
     }
 
-    // Atualiza os ícones após a ordenação
-    table.on('order.dt', function() {
-        updateSortIcons();  // Chama a função quando uma ordenação acontece
-    });
-
-    updateSortIcons();
 
     $(document).on('click', '#adicionar_montador', function (e) {
         salva_montadores = [];

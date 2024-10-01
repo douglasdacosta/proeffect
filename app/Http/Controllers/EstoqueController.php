@@ -31,12 +31,12 @@ class EstoqueController extends Controller
     public function index(Request $request)
     {
 
-        $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
+        $lote = !empty($request->input('lote')) ? ($request->input('lote')) : ( !empty($lote) ? $lote : false );
 
         $where = [];
         $condicao='';
-        if ($id) {
-        	$where[] = " A.id = $id ";
+        if ($lote) {
+        	$where[] = " A.lote = '$lote' ";
         }
 
         if (!empty($request->input('status'))){
@@ -92,6 +92,8 @@ class EstoqueController extends Controller
                                             A.qtde_chapa_peca,
                                             A.qtde_por_pacote,
                                             B.estoque_minimo,
+                                            A.lote,
+                                            C.nome_cliente as fornecedor,
                                             (A.qtde_chapa_peca * A.qtde_por_pacote) - ((select
                                                     count(1)
                                                 from
@@ -115,6 +117,10 @@ class EstoqueController extends Controller
                                         INNER JOIN
                                             materiais B
                                             ON B.id = A.material_id
+                                        INNER JOIN
+                                            pessoas C
+                                        ON
+                                            C.id = A.fornecedor_id
                                         $condicao
                                         ORDER BY
                                             A.data DESC
@@ -162,20 +168,31 @@ class EstoqueController extends Controller
             }
 
             $value->consumo_medio_mensal = $value->consumo_medio_mensal == 0 ? 1 : $value->consumo_medio_mensal;
-            $dados_estoque[$value->material_id]['previsao_meses'] = $dados_estoque[$value->material_id]['estoque'] / $value->consumo_medio_mensal;
+
+            $previsao_meses = ($dados_estoque[$value->material_id]['estoque']  - $value->estoque_minimo) / $value->consumo_medio_mensal;
+            if($previsao_meses <= 0) {
+                $dados_estoque[$value->material_id]['previsao_meses'] = 0;
+            } else {
+
+                #seta truncado em 1122.2
+                $previsao_meses = round($previsao_meses, 1);
+                $dados_estoque[$value->material_id]['previsao_meses'] = $previsao_meses;
+            }
 
         }
         $array_estoque = [];
         foreach($estoque as $key => $value) {
 
             $array_estoque[$value->id]['id'] = $value->id;
+            $array_estoque[$value->id]['fornecedor'] = implode(' ', array_slice(explode(' ', $value->fornecedor), 0, 2));
+            $array_estoque[$value->id]['lote'] = $value->lote;
             $array_estoque[$value->id]['data'] = $value->data;
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->material_id]['previsao_meses'];
-            $array_estoque[$value->id]['estoque_comprado'] = $value->qtde_chapa_peca * $value->qtde_por_pacote;
-            $array_estoque[$value->id]['estoque_minimo'] = $value->estoque_minimo;
-            $array_estoque[$value->id]['estoque_atual'] = $dados_estoque[$value->material_id]['estoque'];
+            $array_estoque[$value->id]['estoque_comprado'] = number_format($value->qtde_chapa_peca * $value->qtde_por_pacote,0, '','.');
+            $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
+            $array_estoque[$value->id]['estoque_atual'] = number_format($dados_estoque[$value->material_id]['estoque'],0, '','.');
 
         }
 
@@ -314,8 +331,8 @@ class EstoqueController extends Controller
             $estoque->total = trim($request->input('total')) != '' ? DateHelpers::formatFloatValue($request->input('total')): null;
             $estoque->VD = (!empty($request->input('VD')) && $request->input('VD') ==1 ) ? 1 : 0;
             $estoque->MO = (!empty($request->input('MO')) && $request->input('MO') ==1 ) ? 1 : 0;
-            $estoque->qtde_chapa_peca = $request->input('qtde_chapa_peca');
-            $estoque->qtde_por_pacote = $request->input('qtde_por_pacote');
+            $estoque->qtde_chapa_peca = str_replace('.', '',$request->input('qtde_chapa_peca'));
+            $estoque->qtde_por_pacote = str_replace('.', '',$request->input('qtde_por_pacote'));
             $estoque->status = $request->input('status');
             $estoque->valor_mo = trim($request->input('valor_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_mo')): null;
             $estoque->save();

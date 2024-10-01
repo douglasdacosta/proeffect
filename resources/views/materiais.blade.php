@@ -163,6 +163,12 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="peso" class="col-sm-2 col-form-label">Peso(Kg)</label>
+                <div class="col-sm-2">
+                <input type="text" class="form-control kg" id="peso" name="peso" value="@if (isset($materiais[0]->peso)){{number_format($materiais[0]->peso, 3, ',', '.');}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label">&nbsp;</label>
                 <select class="form-control custom-select col-md-1 " id="status" name="status">
                     <option value="A" @if (isset($materiais[0]->status) && $materiais[0]->status == 'A'){{ ' selected '}}@else @endif>Ativo</option>
