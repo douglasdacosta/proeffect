@@ -47,7 +47,7 @@ class FilaImpressaoController extends Controller
                 'fornecedor' => $nome_cliente,
                 'estoque_id' => $estoque->lote,
                 'qtde' => $fila->qtde_etiqueta,
-                'data' => $fila->data_impresso ? Carbon::parse($fila->data_impresso)->format('d/m/Y') : $fila->data_impresso,
+                'data' => $fila->data_impresso ? Carbon::parse($fila->data_impresso)->format('d/m/y') : $fila->data_impresso,
             ];
 
             $FilaImpressao = new FilaImpressao();

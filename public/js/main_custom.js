@@ -181,7 +181,7 @@ $(function ($) {
         let table = new DataTable('#table_estoque', {
             responsive: true,
             "paging": false,         // Desativa a paginação
-            "info": false,           // Remove o label "Showing X to Y of Z entries"
+            "info": false,           // Remove o label "Showing X to Y of  Z entries"
             "lengthChange": false,  // Desativa o "entries per page"
             "pageLength": 15000,
             "language": {
