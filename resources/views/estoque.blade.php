@@ -63,8 +63,8 @@
             <div class="form-group row">
                 <label for="status_estoque" class="col-sm-2 col-form-label text-right">Status do estoque</label>
                 <select class="form-control col-md-2" id="status_estoque" name="status_estoque">
-                    <option value="1" @if (isset($request) && $request->input('status_estoque') == '1'){{ ' selected '}}@else @endif>Em estoque</option>
-                    <option value="0" @if (isset($request) && $request->input('status_estoque')  == '0'){{ ' selected '}}@else @endif>Finalizado</option>
+                    <option value="A" @if (isset($request) && $request->input('status_estoque') == 'A'){{ ' selected '}}@else @endif>Em estoque</option>
+                    <option value="F" @if (isset($request) && $request->input('status_estoque')  == 'F'){{ ' selected '}}@else @endif>Finalizado</option>
                 </select>
 
                 <label for="Material" class="col-sm-2 col-form-label text-right">Matéria prima</label>
@@ -333,6 +333,13 @@
                     </div>
                 </div>
             @endif
+            <div class="form-group row">
+                <label for="status_estoque" class="col-sm-2 col-form-label">Status do estoque</label>
+                <select class="form-control custom-select col-md-2 " id="status_estoque" name="status_estoque">
+                    <option value="A" @if (isset($estoque[0]->status_estoque) && $estoque[0]->status_estoque == 'A'){{ ' selected '}}@else @endif>Em andamento</option>
+                    <option value="F" @if (isset($estoque[0]->status_estoque) && $estoque[0]->status_estoque =='F'){{ ' selected '}}@else @endif>Finalizado</option>
+                </select>
+            </div>
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label">&nbsp;</label>
                 <select class="form-control custom-select col-md-1 " id="status" name="status">

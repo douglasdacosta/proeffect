@@ -65,22 +65,13 @@ class EstoqueController extends Controller
             $where[] = "A.material_id = " . $request->input('material_id');
         }
 
-        if ($request->input('status_estoque') == '1'){
-            $where[] = "((A.qtde_chapa_peca * A.qtde_por_pacote) - ((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id) * A.qtde_chapa_peca)) > 0";
+        $status_estoque = "A.status_estoque = 'A'";
+
+        if ($request->input('status_estoque') == 'F'){
+            $status_estoque  = "A.status_estoque = 'F'";
         }
-        if ($request->input('status_estoque') == '0'){
-            $where[] = "((A.qtde_chapa_peca * A.qtde_por_pacote) - ((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id) * A.qtde_chapa_peca)) <= 0";
-        }
+
+        $where[] = $status_estoque;
 
         if(count($where)) {
             $condicao = ' WHERE '.implode(' AND ', $where);
@@ -333,6 +324,7 @@ class EstoqueController extends Controller
             $estoque->MO = (!empty($request->input('MO')) && $request->input('MO') ==1 ) ? 1 : 0;
             $estoque->qtde_chapa_peca = str_replace('.', '',$request->input('qtde_chapa_peca'));
             $estoque->qtde_por_pacote = str_replace('.', '',$request->input('qtde_por_pacote'));
+            $estoque->status_estoque = $request->input('status_estoque');
             $estoque->status = $request->input('status');
             $estoque->valor_mo = trim($request->input('valor_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_mo')): null;
             $estoque->save();
