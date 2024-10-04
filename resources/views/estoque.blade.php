@@ -68,7 +68,7 @@
                 </select>
 
                 <label for="Material" class="col-sm-2 col-form-label text-right">Matéria prima</label>
-                <div class="col-sm-5">
+                <div class="col-sm-2">
                     <select class="form-control" id="material_id" name="material_id">
                         <option value=""></option>
                         @if (isset($materiais))
@@ -79,6 +79,15 @@
                                 </option>
                             @endforeach
                         @endif
+                    </select>
+                </div>
+                <label for="status" class="col-sm-1 col-form-label">&nbsp;</label>
+                <div class="col-sm-2">
+                    <select class="form-control " id="status" name="status">
+                        <option value="A" @if (isset($request) && $request->input('status') == 'A') {{ ' selected ' }}@else @endif>Ativo
+                        </option>
+                        <option value="I" @if (isset($request) && $request->input('status') == 'I') {{ ' selected ' }}@else @endif>Inativo
+                        </option>
                     </select>
                 </div>
             </div>
@@ -109,6 +118,7 @@
                       <th>Material</th>
                       <th>Estoque comprado</th>
                       <th>Estoque atual</th>
+                      <th>Pacote</th>
                       <th>Estoque mínimo</th>
                       <th>Alerta</th>
                       <th>Previsão</th>
@@ -126,6 +136,7 @@
                                 <td data-sortable='true' data-field="material" nowrap>{{$item_estoque['material']}}</td>
                                 <td data-sortable='true' data-field="estoque_comprado" >{{$item_estoque['estoque_comprado']}}</td>
                                 <td data-sortable='true' data-field="estoque_atual" >{{$item_estoque['estoque_atual']}}</td>
+                                <td data-sortable='true' data-field="pacote" >{{$item_estoque['pacote']}}</td>
                                 <td data-sortable='true' data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
                                 <td data-sortable='true' data-field="alerta" >@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
                                 <td data-sortable='true' data-field="previsao" title="{{$item_estoque['previsao_meses']}} meses">{{$item_estoque['previsao_meses'] }}</td>

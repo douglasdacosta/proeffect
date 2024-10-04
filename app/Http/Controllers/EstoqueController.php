@@ -102,6 +102,7 @@ class EstoqueController extends Controller
                                                                 materiais B
                                                                 ON B.id = C.material_id
                                                             WHERE
+                                                                C.status = 'A' AND
                                                                 C.material_id = A.material_id)  as qtde_total_estoque_material
                                         FROM
                                             estoque A
@@ -127,6 +128,7 @@ class EstoqueController extends Controller
                                             estoque C
                                         on
                                             C.id = A.estoque_id
+                                            and C.status = 'A'
                                         INNER JOIN
                                             materiais B
                                             ON B.id = C.material_id
@@ -143,6 +145,7 @@ class EstoqueController extends Controller
                                                                 ON B.id = C.material_id
                                                             WHERE
                                                                 C.material_id = $value->material_id
+                                                                and C.status = 'A'
                                                         "));
 
             if(isset($dados_estoque[$value->material_id]['gasto_total'])) {
@@ -152,6 +155,10 @@ class EstoqueController extends Controller
             }
 
             $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'];
+
+            $dados_estoque[$value->material_id]['estoque_atual'] = ($value->qtde_chapa_peca * $value->qtde_chapa_peca) ;
+
+            $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_chapa_peca) - $qtde_baixa[0]->qtde_baixa;
 
             $dados_estoque[$value->material_id]['alerta']=1; //1 = estoque alto
             if($dados_estoque[$value->material_id]['estoque'] <= $value->estoque_minimo) {
@@ -165,7 +172,6 @@ class EstoqueController extends Controller
                 $dados_estoque[$value->material_id]['previsao_meses'] = 0;
             } else {
 
-                #seta truncado em 1122.2
                 $previsao_meses = round($previsao_meses, 1);
                 $dados_estoque[$value->material_id]['previsao_meses'] = $previsao_meses;
             }
@@ -175,15 +181,17 @@ class EstoqueController extends Controller
         foreach($estoque as $key => $value) {
 
             $array_estoque[$value->id]['id'] = $value->id;
-            $array_estoque[$value->id]['fornecedor'] = implode(' ', array_slice(explode(' ', $value->fornecedor), 0, 2));
+            $array_estoque[$value->id]['fornecedor'] = implode(' ', array_slice(explode(' ', $value->fornecedor), 0, 1));
             $array_estoque[$value->id]['lote'] = $value->lote;
             $array_estoque[$value->id]['data'] = $value->data;
+            $array_estoque[$value->id]['pacote'] = number_format($value->qtde_por_pacote,0, '','.');
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->material_id]['previsao_meses'];
             $array_estoque[$value->id]['estoque_comprado'] = number_format($value->qtde_chapa_peca * $value->qtde_por_pacote,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
-            $array_estoque[$value->id]['estoque_atual'] = number_format($dados_estoque[$value->material_id]['estoque'],0, '','.');
+            // $array_estoque[$value->id]['estoque_atual'] = number_format($dados_estoque[$value->material_id]['estoque_atual'],0, '','.');
+            $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
 
         }
 
