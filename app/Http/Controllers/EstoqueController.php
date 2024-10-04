@@ -190,7 +190,6 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->material_id]['previsao_meses'];
             $array_estoque[$value->id]['estoque_comprado'] = number_format($value->qtde_chapa_peca * $value->qtde_por_pacote,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
-            // $array_estoque[$value->id]['estoque_atual'] = number_format($dados_estoque[$value->material_id]['estoque_atual'],0, '','.');
             $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
 
         }

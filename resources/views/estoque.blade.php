@@ -224,6 +224,14 @@
                         <option value=""></option>
                         @if (isset($materiais))
                             @foreach ($materiais as $material)
+                                <?php
+                                    if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) {
+                                        $peso = $material->peso;
+                                    }
+                                ?>
+
+                                @if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) selected="selected" @else {{''}}@endif
+                                value="{{ $material->id }}">{{ $material->codigo . ' - ' . $material->material }}
                                 <option
                                 @if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) selected="selected" @else {{''}}@endif
                                 value="{{ $material->id }}">{{ $material->codigo . ' - ' . $material->material }}
@@ -326,7 +334,7 @@
             <div class="form-group row">
                 <label for="peso" class="col-sm-2 col-form-label">Peso total(Kg)</label>
                 <div class="col-sm-2">
-                    <input type="hidden" id="peso_material" name="peso_material" value="@if (isset($materiais[0]->peso)){{number_format($materiais[0]->peso, 3, '.', '.');}}@else{{''}}@endif">
+                    <input type="hidden" id="peso_material" name="peso_material" value="@if (isset($peso)){{number_format($peso, 3, '.', '.');}}@else{{''}}@endif">
                 <input type="text" class="form-control kg" readonly id="peso" name="peso" value="@if (isset($materiais[0]->peso)){{number_format($materiais[0]->peso * ($estoque[0]->qtde_chapa_peca * $estoque[0]->qtde_por_pacote), 3, '.', '.');}}@else{{''}}@endif">
                 </div>
             </div>
