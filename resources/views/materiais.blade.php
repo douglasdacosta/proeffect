@@ -162,12 +162,7 @@
                 <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="consumo_medio_mensal" name="consumo_medio_mensal" value="@if (isset($materiais[0]->consumo_medio_mensal)){{$materiais[0]->consumo_medio_mensal}}@else{{''}}@endif">
                 </div>
             </div>
-            <div class="form-group row">
-                <label for="peso" class="col-sm-2 col-form-label">Peso(Kg)</label>
-                <div class="col-sm-2">
-                <input type="text" class="form-control kg" id="peso" name="peso" value="@if (isset($materiais[0]->peso)){{number_format($materiais[0]->peso, 3, ',', '.');}}@else{{''}}@endif">
-                </div>
-            </div>
+
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label">&nbsp;</label>
                 <select class="form-control custom-select col-md-1 " id="status" name="status">

@@ -224,12 +224,6 @@
                         <option value=""></option>
                         @if (isset($materiais))
                             @foreach ($materiais as $material)
-                                <?php
-                                    if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) {
-                                        $peso = $material->peso;
-                                    }
-                                ?>
-
                                 @if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) selected="selected" @else {{''}}@endif
                                 value="{{ $material->id }}">{{ $material->codigo . ' - ' . $material->material }}
                                 <option
@@ -275,66 +269,100 @@
                 <div class="col-sm-2">
                     <input type="text" readonly class="form-control" id="lote" name="lote" value="@if (isset($estoque[0]->lote)){{$estoque[0]->lote}}@else{{''}}@endif">
                 </div>
-            </div>
-            <div class="form-group row">
-                <label for="valor_unitario" class="col-sm-2 col-form-label">Valor unitário </label>
+                <label for="MO" class="col-sm-2 col-form-label  text-center">MO</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control mask_valor" id="valor_unitario" name="valor_unitario"  value="@if (isset($estoque[0]->valor_unitario)){{ number_format($estoque[0]->valor_unitario,2, ',','.')}}@else{{''}}@endif">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="valor" class="col-sm-2 col-form-label">Valor total s/ imposto</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control mask_valor" id="valor" name="valor"  value="@if (isset($estoque[0]->valor)){{ number_format($estoque[0]->valor,2, ',','.')}}@else{{''}}@endif">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="imposto" class="col-sm-2 col-form-label">Imposto</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control mask_valor" id="imposto" name="imposto"  value="@if (isset($estoque[0]->imposto)){{ number_format($estoque[0]->imposto,2, ',','.')}}@else{{''}}@endif">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="total" class="col-sm-2 col-form-label">Total</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control mask_valor" id="total" name="total"  value="@if (isset($estoque[0]->total)){{ number_format($estoque[0]->total,2, ',','.')}}@else{{''}}@endif">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="MO" class="col-sm-2 col-form-label">MO</label>
-                <div class="col-sm-2">
-                    <input type="checkbox" class="form-control form-check-input" id="MO" name="MO"
+                    <input type="checkbox" class="form-control form-check-input ckeckbox_mo" id="MO" name="MO"
                     @if (isset($estoque[0]->MO) && $estoque[0]->MO == 1) {{'checked'}} @else{{''}}@endif
                     value="1">
                 </div>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control mask_valor" id="valor_mo" placeholder="valor de MO" name="valor_mo"  value="@if (isset($estoque[0]->valor_mo)){{ number_format($estoque[0]->valor_mo,2, ',','.')}}@else{{''}}@endif">
-                </div>
             </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col col-lg-6">
+                        <div class="form-group row">
+                            <label for="valor_unitario" class="col-sm-4 col-form-label">Valor unitário </label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor" id="valor_unitario" name="valor_unitario"  value="@if (isset($estoque[0]->valor_unitario)){{ number_format($estoque[0]->valor_unitario,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor identificador_mo" id="valor_mo" placeholder="valor de MO" name="valor_mo"  value="@if (isset($estoque[0]->valor_mo)){{ number_format($estoque[0]->valor_mo,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                        </div>
 
-            <div class="form-group row">
-                <label for="qtde_chapa_peca" class="col-sm-2 col-form-label">Qtde chapa/peça</label>
-                <div class="col-sm-2">
-                <input type="text" class="form-control kg" id="qtde_chapa_peca" name="qtde_chapa_peca" value="@if (isset($estoque[0]->qtde_chapa_peca)){{$estoque[0]->qtde_chapa_peca}}@else{{''}}@endif">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="qtde_por_pacote" class="col-sm-2 col-form-label">Qtde de pacote</label>
-                <div class="col-sm-2">
-                <input type="text" class="form-control kg" id="qtde_por_pacote" name="qtde_por_pacote" value="@if (isset($estoque[0]->qtde_por_pacote)){{$estoque[0]->qtde_por_pacote}}@else{{''}}@endif">
+                        <div class="form-group row">
+                            <label for="valor" class="col-sm-4 col-form-label">Valor kg</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor" id="valor" name="valor"  value="@if (isset($estoque[0]->valor)){{ number_format($estoque[0]->valor,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor identificador_mo" id="valor_kg_mo" name="valor_kg_mo"  value="@if (isset($estoque[0]->valor_kg_mo)){{ number_format($estoque[0]->valor_kg_mo,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="imposto" class="col-sm-4 col-form-label">Imposto</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor" id="imposto" name="imposto"  value="@if (isset($estoque[0]->imposto)){{ number_format($estoque[0]->imposto,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor identificador_mo" id="imposto_mo" name="imposto_mo"  value="@if (isset($estoque[0]->imposto_mo)){{ number_format($estoque[0]->imposto_mo,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="peso" class="col-sm-4 col-form-label">Peso(Kg)</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control kg calcula_peso_chapa" id="peso_material" name="peso_material" value="@if (isset($estoque[0]->peso_material)){{number_format($estoque[0]->peso_material, 3, ',', '.');}}@else{{''}}@endif">
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control kg calcula_peso_chapa identificador_mo" id="peso_material_mo" name="peso_material_mo" value="@if (isset($estoque[0]->peso_material_mo)){{number_format($estoque[0]->peso_material_mo, 3, ',', '.');}}@else{{''}}@endif">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="total" class="col-sm-4 col-form-label">Total</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor" id="total" name="total"  value="@if (isset($estoque[0]->total)){{ number_format($estoque[0]->total,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control mask_valor identificador_mo" id="total_mo" name="total_mo"  value="@if (isset($estoque[0]->total_mo)){{ number_format($estoque[0]->total_mo,2, ',','.')}}@else{{''}}@endif">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="qtde_chapa_peca" class="col-sm-4 col-form-label">Qtde chapa/peça</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control kg calcula_peso_chapa" id="qtde_chapa_peca" name="qtde_chapa_peca" value="@if (isset($estoque[0]->qtde_chapa_peca)){{$estoque[0]->qtde_chapa_peca}}@else{{''}}@endif">
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control kg calcula_peso_chapa identificador_mo" id="qtde_chapa_peca_mo" name="qtde_chapa_peca_mo" value="@if (isset($estoque[0]->qtde_chapa_peca_mo)){{$estoque[0]->qtde_chapa_peca_mo}}@else{{''}}@endif">
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <label for="qtde_por_pacote" class="col-sm-4 col-form-label">Qtde de pacote</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control kg calcula_peso_chapa" id="qtde_por_pacote" name="qtde_por_pacote" value="@if (isset($estoque[0]->qtde_por_pacote)){{$estoque[0]->qtde_por_pacote}}@else{{''}}@endif">
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control kg calcula_peso_chapa identificador_mo" id="qtde_por_pacote_mo" name="qtde_por_pacote_mo" value="@if (isset($estoque[0]->qtde_por_pacote_mo)){{$estoque[0]->qtde_por_pacote_mo}}@else{{''}}@endif">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col col-sm-5">
+                        <label for="qtde_por_pacote" class="col-sm-4 col-form-label">Observacões</label>
+                        <div class="">
+                            <textarea class="form-control" id="observacaoes" name="observacaoes" rows="11">@if (isset($estoque[0]->observacaoes)){{$estoque[0]->observacaoes}}@else{{''}}@endif</textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="total_chapa_peca" class="col-sm-2 col-form-label">Total chapa/peças</label>
-                <div class="col-sm-2">
-                <input type="text" readonly class="form-control kg" id="total_chapa_peca" name="total_chapa_peca" value="@if (isset($estoque[0]->qtde_por_pacote) && isset($estoque[0]->qtde_por_pacote)){{$estoque[0]->qtde_chapa_peca * $estoque[0]->qtde_por_pacote}}@else{{''}}@endif">
+                <div class="col-sm-3">
+                    <input type="text" readonly class="form-control kg" id="total_chapa_peca" name="total_chapa_peca" value="@if (isset($estoque[0]->qtde_por_pacote) && isset($estoque[0]->qtde_por_pacote)){{$estoque[0]->qtde_chapa_peca * $estoque[0]->qtde_por_pacote}}@else{{''}}@endif">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="peso" class="col-sm-2 col-form-label">Peso total(Kg)</label>
                 <div class="col-sm-2">
-                    <input type="hidden" id="peso_material" name="peso_material" value="@if (isset($peso)){{number_format($peso, 3, '.', '.');}}@else{{''}}@endif">
                 <input type="text" class="form-control kg" readonly id="peso" name="peso" value="@if (isset($materiais[0]->peso)){{number_format($materiais[0]->peso * ($estoque[0]->qtde_chapa_peca * $estoque[0]->qtde_por_pacote), 3, '.', '.');}}@else{{''}}@endif">
                 </div>
             </div>
@@ -367,8 +395,14 @@
                 </select>
             </div>
 
-
-
+            <div class="form-group row">
+                <div class="col-sm-5">
+                    <button class="btn btn-danger" onclick="window.history.back();" type="button">Cancelar</button>
+                </div>
+                <div class="col-sm-5">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
             @if (!empty($historicos))
                 <div class="form-group row">
                     <label for="observacao" class="col-sm-2 col-form-label">Histórico</label>
@@ -381,14 +415,6 @@
                     </div>
                 </div>
             @endif
-            <div class="form-group row">
-                <div class="col-sm-5">
-                    <button class="btn btn-danger" onclick="window.history.back();" type="button">Cancelar</button>
-                </div>
-                <div class="col-sm-5">
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                </div>
-            </div>
         </form>
 
     @stop

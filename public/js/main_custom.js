@@ -112,16 +112,25 @@ $(function ($) {
 
     });
 
-    $(document).on('blur', '#qtde_chapa_peca, #qtde_por_pacote', function (e) {
+    $(document).on('blur', '.calcula_peso_chapa', function (e) {
 
         var qtde_chapa_peca = $('#qtde_chapa_peca').val().trim();
         var qtde_por_pacote = $('#qtde_por_pacote').val().trim();
         var peso_material = $('#peso_material').val().trim();
+        var peso_material_mo = $('#peso_material_mo').val().trim();
+
+        var qtde_chapa_peca_mo = $('#qtde_chapa_peca_mo').val().trim();
+        var qtde_por_pacote_mo = $('#qtde_por_pacote_mo').val().trim();
 
         // Remover pontos (.) para tratar os números como inteiros
         qtde_chapa_peca = parseInt(qtde_chapa_peca.replace('.', ''), 10) || 0;
         qtde_por_pacote = parseInt(qtde_por_pacote.replace('.', ''), 10) || 0;
+
+        qtde_chapa_peca_mo = parseInt(qtde_chapa_peca_mo.replace('.', ''), 10) || 0;
+        qtde_por_pacote_mo = parseInt(qtde_por_pacote_mo.replace('.', ''), 10) || 0;
+
         peso_material = parseInt(peso_material.replace('.', ''), 10) || 0;
+        peso_material_mo = parseInt(peso_material_mo.replace('.', ''), 10) || 0;
 
         if (qtde_chapa_peca == 0 || qtde_por_pacote == 0) {
             $('#total_chapa_peca').val(0);
@@ -132,8 +141,22 @@ $(function ($) {
         // Multiplicação das quantidades
         var total_chapa_peca = qtde_chapa_peca * qtde_por_pacote;
 
+        if(qtde_chapa_peca_mo> 0 && qtde_por_pacote_mo > 0) {
+            var total_chapa_peca_mo = qtde_chapa_peca_mo * qtde_por_pacote_mo;
+            peso_mo = total_chapa_peca_mo * peso_material_mo
+        }
+
+        if(total_chapa_peca_mo > 0) {
+            total_chapa_peca = total_chapa_peca + total_chapa_peca_mo
+        }
+
         //campo peso recebe o valor de total_chapa_peca multiplicado pelo peso_material
         peso = total_chapa_peca * peso_material
+
+        if(peso_mo>0) {
+            peso = peso + peso_mo
+        }
+
         $('#peso').val(peso.toLocaleString('pt-BR'));
 
         // Definir o valor total no campo de resultado com separador de milhar
@@ -558,7 +581,21 @@ $(function ($) {
     });
 
 
+    $(document).on('click', '.ckeckbox_mo', function(){
+        show_mo();
+    });
 
+    show_mo = function(){
+
+        if($('.ckeckbox_mo').is(':checked')){
+            $('.identificador_mo').show();
+        }else{
+            $('.identificador_mo').hide();
+        }
+    }
+
+    show_mo();
+    $('.calcula_peso_chapa').blur();
 
 }); //FIM DO BLOCO DE JQUERY READY
 

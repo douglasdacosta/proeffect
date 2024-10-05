@@ -333,6 +333,16 @@ class EstoqueController extends Controller
             $estoque->status_estoque = $request->input('status_estoque');
             $estoque->status = $request->input('status');
             $estoque->valor_mo = trim($request->input('valor_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_mo')): null;
+            $estoque->valor_kg_mo = trim($request->input('valor_kg_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_kg_mo')): null;
+            $estoque->imposto_mo = trim($request->input('imposto_mo')) != '' ? DateHelpers::formatFloatValue($request->input('imposto_mo')): null;
+            $estoque->total_mo = trim($request->input('total_mo')) != '' ? DateHelpers::formatFloatValue($request->input('total_mo')): null;
+            $estoque->peso_material = $request->input('peso_material');
+            $estoque->peso_material_mo = $request->input('peso_material_mo');
+            $estoque->qtde_chapa_peca_mo = str_replace('.', '',$request->input('qtde_chapa_peca_mo'));
+            $estoque->qtde_por_pacote_mo = str_replace('.', '',$request->input('qtde_por_pacote_mo'));
+            $estoque->observacaoes = $request->input('observacaoes');
+
+
             $estoque->save();
 
             return $estoque->id;
