@@ -49,62 +49,61 @@ class JobImportarPedido implements ShouldQueue
             $ApiERPController = new ApiERPController();
             $ApiERPController->getToken();
             $vendas = $ApiERPController->getVendasByStatus();
+            info($vendas);
+            return true;
 
             foreach ($vendas['os'] as $key => $venda) {
 
                 $idOs = $venda['idOs'];
 
-                $venda_completa= $ApiERPController->getVendasByOS($idOs);
-
-                if(!$venda_completa || empty($venda_completa['os']['prevEntrega'])) {
-                    info(" OS não encontrada ".$venda_completa['os']['numeroOS'] . " ou sem data de prevEntrega");
+                if(!$venda || empty($venda['prevEntrega'])) {
+                    info(" OS não encontrada ".$venda['numeroOS'] . " ou sem data de prevEntrega");
                     continue;
                 }
 
-                foreach($venda_completa['os']['itens'] as $itens) {
-                    info("EP: ". $itens['codigo']. '; OS:'.$venda_completa['os']['numeroOS']. '; IdOs:'.$idOs);
+                foreach($venda['itens'] as $itens) {
+                    info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
                     $pedidos = new Pedidos();
                     $pessoas = new Pessoas();
                     $fichatecnica = new Fichastecnicas();
                     $transportes = new transportes();
+                    $ep = $itens['codigo'];
 
-                    if($venda_completa) {
-                        $numeroOs = $venda_completa['os']['numeroOS'];
-                        $dataOS = $venda_completa['os']['dataOS'];
-                        $prevEntrega = $venda_completa['os']['prevEntrega'];
-                        $ep = $itens['codigo'];
-                        $cliente_id = $venda_completa['cliente']['numcli'];
-                        $cliente = $venda_completa['cliente'];
-                        $transportadora = $venda_completa['transportadora'];
-                        $idVendedor = $venda_completa['os']['idVendedor'];
+                    $numeroOs = $venda['numeroOS'];
+                    $dataOS = $venda['dataOS'];
+                    $prevEntrega = $venda['prevEntrega'];
+                    $cliente_id = $venda['numcli'];
+                    $cliente = $venda['idCliente'];
+                    $transportadora = $venda['idTransportadora'];
+                    $idVendedor = $venda['idVendedor'];
 
-                        $Vendedor= $ApiERPController->getVendedorById($idVendedor);
-                        $pessoa = $pessoas->where('codigo_cliente', '=', $cliente_id)->first();
+                    $Vendedor= $ApiERPController->getVendedorById($idVendedor);
+                    $pessoa = $pessoas->where('codigo_cliente', '=', $cliente_id)->first();
 
-                        $fichatecnica = $fichatecnica->where('ep', '=', $ep)->where('status', '=', 'A')->get();
-                        if(empty($fichatecnica[0]->id)){
-                            info("EP ".$ep." não existente no CRM");
-                            continue;
-                        }
-                        $fichatecnicaId = $fichatecnica[0]->id;
-                        $transportes = $transportes->where('nome','=', $transportadora['nome'])->first();
-
-                        $pessoa_id = $this->savePessoas($pessoa, $cliente, $Vendedor);
-
-                        $transporte_id = $this->saveTrasportes($transportes, $transportadora);
-
-                        $pedido = $pedidos->where('os', '=', $numeroOs)->where('fichatecnica_id', '=', $fichatecnicaId)->first();
-                        $dados = [
-                            'numeroOs' => $numeroOs,
-                            'fichatecnicaId' => $fichatecnicaId,
-                            'pessoa_id' => $pessoa_id,
-                            'transporte_id' => $transporte_id,
-                            'dataOS' => $dataOS,
-                            'prevEntrega' => $prevEntrega,
-                            'quantidade' => $itens['quantidade']
-                        ];
-                        $this->savePedidos($pedido, $dados);
+                    $fichatecnica = $fichatecnica->where('ep', '=', $ep)->where('status', '=', 'A')->get();
+                    if(empty($fichatecnica[0]->id)){
+                        info("EP ".$ep." não existente no CRM");
+                        continue;
                     }
+                    $fichatecnicaId = $fichatecnica[0]->id;
+                    $transportes = $transportes->where('nome','=', $transportadora['nome'])->first();
+
+                    $pessoa_id = $this->savePessoas($pessoa, $cliente, $Vendedor);
+
+                    $transporte_id = $this->saveTrasportes($transportes, $transportadora);
+
+                    $pedido = $pedidos->where('os', '=', $numeroOs)->where('fichatecnica_id', '=', $fichatecnicaId)->first();
+                    $dados = [
+                        'numeroOs' => $numeroOs,
+                        'fichatecnicaId' => $fichatecnicaId,
+                        'pessoa_id' => $pessoa_id,
+                        'transporte_id' => $transporte_id,
+                        'dataOS' => $dataOS,
+                        'prevEntrega' => $prevEntrega,
+                        'quantidade' => $itens['quantidade']
+                    ];
+                    $this->savePedidos($pedido, $dados);
+
                 }
             }
         });

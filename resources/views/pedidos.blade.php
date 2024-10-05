@@ -426,7 +426,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     <div class="col-sm-8">
                         <div class="d-flex p-2 bd-highlight overflow-auto">
                             @foreach ($historicos as $historico)
-                                {{ '[' . \Carbon\Carbon::parse($historico->created_at)->format('d/m/Y h:i:s') . '] ' . $historico->historico }}</br>
+                                {{ '[' . \Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:i:s') . '] ' . $historico->historico }}</br>
                             @endforeach
                         </div>
                     </div>

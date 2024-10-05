@@ -176,7 +176,7 @@
                     <div class="col-sm-8">
                         <div class="d-flex p-2 bd-highlight overflow-auto">
                             @foreach ($historicos as $historico)
-                                {{ '[' . \Carbon\Carbon::parse($historico->created_at)->format('d/m/Y h:i:s') . '] ' . $historico->historico }}</br>
+                                {{ '[' . \Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:i:s') . '] ' . $historico->historico }}</br>
                             @endforeach
                         </div>
                     </div>
