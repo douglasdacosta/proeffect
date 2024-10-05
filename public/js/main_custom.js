@@ -146,12 +146,11 @@ $(function ($) {
             peso_mo = total_chapa_peca_mo * peso_material_mo
         }
 
+        //campo peso recebe o valor de total_chapa_peca multiplicado pelo peso_material
+        peso = total_chapa_peca * peso_material
         if(total_chapa_peca_mo > 0) {
             total_chapa_peca = total_chapa_peca + total_chapa_peca_mo
         }
-
-        //campo peso recebe o valor de total_chapa_peca multiplicado pelo peso_material
-        peso = total_chapa_peca * peso_material
 
         if(peso_mo>0) {
             peso = peso + peso_mo
