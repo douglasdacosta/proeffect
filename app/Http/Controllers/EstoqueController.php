@@ -82,20 +82,21 @@ class EstoqueController extends Controller
                                             A.id,
                                             A.qtde_chapa_peca,
                                             A.qtde_por_pacote,
+                                            A.qtde_por_pacote_mo,
                                             B.estoque_minimo,
                                             A.lote,
                                             C.nome_cliente as fornecedor,
-                                            (A.qtde_chapa_peca * A.qtde_por_pacote) - ((select
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                     count(1)
                                                 from
                                                     lote_estoque_baixados X
                                                 where
-                                                    X.estoque_id = A.id) * A.qtde_chapa_peca) as estoque_atual,
+                                                    X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque_atual,
                                             B.material,
                                             A.material_id,
                                             B.consumo_medio_mensal,
                                             (SELECT
-                                                                sum((qtde_chapa_peca * qtde_por_pacote)) as qtde_total
+                                                                sum((C.qtde_chapa_peca * C.qtde_por_pacote) + (C.qtde_chapa_peca_mo * C.qtde_por_pacote_mo)) as qtde_total
                                                             FROM
                                                                 estoque C
                                                             INNER JOIN
@@ -137,7 +138,7 @@ class EstoqueController extends Controller
                                     "));
 
             $qtde_total_estoque_material = DB::select(DB::raw("SELECT
-                                                                sum((qtde_chapa_peca * qtde_por_pacote)) as qtde_total
+                                                                sum((qtde_chapa_peca * qtde_por_pacote)+(qtde_chapa_peca_mo * qtde_por_pacote_mo)) as qtde_total
                                                             FROM
                                                                 estoque C
                                                             INNER JOIN
@@ -178,12 +179,12 @@ class EstoqueController extends Controller
         }
         $array_estoque = [];
         foreach($estoque as $key => $value) {
-
+            $pacote = $value->qtde_por_pacote + $value->qtde_por_pacote_mo;
             $array_estoque[$value->id]['id'] = $value->id;
             $array_estoque[$value->id]['fornecedor'] = implode(' ', array_slice(explode(' ', $value->fornecedor), 0, 1));
             $array_estoque[$value->id]['lote'] = $value->lote;
             $array_estoque[$value->id]['data'] = $value->data;
-            $array_estoque[$value->id]['pacote'] = number_format($value->qtde_por_pacote,0, '','.');
+            $array_estoque[$value->id]['pacote'] = number_format($pacote,0, '','.');
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->material_id]['previsao_meses'];
