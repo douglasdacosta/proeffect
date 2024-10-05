@@ -140,7 +140,7 @@ $(function ($) {
 
         // Multiplicação das quantidades
         var total_chapa_peca = qtde_chapa_peca * qtde_por_pacote;
-
+        var peso_mo = 0
         if(qtde_chapa_peca_mo> 0 && qtde_por_pacote_mo > 0) {
             var total_chapa_peca_mo = qtde_chapa_peca_mo * qtde_por_pacote_mo;
             peso_mo = total_chapa_peca_mo * peso_material_mo
