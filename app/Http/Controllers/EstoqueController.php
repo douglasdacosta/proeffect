@@ -320,6 +320,7 @@ class EstoqueController extends Controller
             if($request->input('id')) {
                 $estoque = $estoque::find($request->input('id'));
             }
+
             $estoque->material_id = $request->input('material_id');
             $estoque->data = DateHelpers::formatDate_dmY($request->input('data'));
             $estoque->nota_fiscal = $request->input('nota_fiscal');
@@ -341,8 +342,8 @@ class EstoqueController extends Controller
             $estoque->total_mo = trim($request->input('total_mo')) != '' ? DateHelpers::formatFloatValue($request->input('total_mo')): 0;
             $estoque->peso_material = $request->input('peso_material', 0);
             $estoque->peso_material_mo = $request->input('peso_material_mo', '0');
-            $estoque->qtde_chapa_peca_mo = str_replace('.', '',$request->input('qtde_chapa_peca_mo', 0));
-            $estoque->qtde_por_pacote_mo = str_replace('.', '',$request->input('qtde_por_pacote_mo', 0));
+            $estoque->qtde_chapa_peca_mo = trim($request->input('qtde_chapa_peca_mo')) != '' ? str_replace('.', '',$request->input('qtde_chapa_peca_mo', '0')) : 0;
+            $estoque->qtde_por_pacote_mo = trim($request->input('qtde_por_pacote_mo')) != '' ? str_replace('.', '',$request->input('qtde_por_pacote_mo', '0')) : 0;
             $estoque->observacaoes = $request->input('observacaoes');
 
 
