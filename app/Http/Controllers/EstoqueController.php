@@ -331,18 +331,18 @@ class EstoqueController extends Controller
             $estoque->total = trim($request->input('total')) != '' ? DateHelpers::formatFloatValue($request->input('total')): null;
             $estoque->VD = (!empty($request->input('VD')) && $request->input('VD') ==1 ) ? 1 : 0;
             $estoque->MO = (!empty($request->input('MO')) && $request->input('MO') ==1 ) ? 1 : 0;
-            $estoque->qtde_chapa_peca = str_replace('.', '',$request->input('qtde_chapa_peca'));
-            $estoque->qtde_por_pacote = str_replace('.', '',$request->input('qtde_por_pacote'));
+            $estoque->qtde_chapa_peca = str_replace('.', '',$request->input('qtde_chapa_peca', 0));
+            $estoque->qtde_por_pacote = str_replace('.', '',$request->input('qtde_por_pacote', 0));
             $estoque->status_estoque = $request->input('status_estoque');
             $estoque->status = $request->input('status');
-            $estoque->valor_mo = trim($request->input('valor_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_mo')): null;
-            $estoque->valor_kg_mo = trim($request->input('valor_kg_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_kg_mo')): null;
-            $estoque->imposto_mo = trim($request->input('imposto_mo')) != '' ? DateHelpers::formatFloatValue($request->input('imposto_mo')): null;
-            $estoque->total_mo = trim($request->input('total_mo')) != '' ? DateHelpers::formatFloatValue($request->input('total_mo')): null;
-            $estoque->peso_material = $request->input('peso_material');
-            $estoque->peso_material_mo = $request->input('peso_material_mo');
-            $estoque->qtde_chapa_peca_mo = str_replace('.', '',$request->input('qtde_chapa_peca_mo'));
-            $estoque->qtde_por_pacote_mo = str_replace('.', '',$request->input('qtde_por_pacote_mo'));
+            $estoque->valor_mo = trim($request->input('valor_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_mo')): 0;
+            $estoque->valor_kg_mo = trim($request->input('valor_kg_mo')) != '' ? DateHelpers::formatFloatValue($request->input('valor_kg_mo')): 0;
+            $estoque->imposto_mo = trim($request->input('imposto_mo')) != '' ? DateHelpers::formatFloatValue($request->input('imposto_mo')): 0;
+            $estoque->total_mo = trim($request->input('total_mo')) != '' ? DateHelpers::formatFloatValue($request->input('total_mo')): 0;
+            $estoque->peso_material = $request->input('peso_material', 0);
+            $estoque->peso_material_mo = $request->input('peso_material_mo', '0');
+            $estoque->qtde_chapa_peca_mo = str_replace('.', '',$request->input('qtde_chapa_peca_mo', 0));
+            $estoque->qtde_por_pacote_mo = str_replace('.', '',$request->input('qtde_por_pacote_mo', 0));
             $estoque->observacaoes = $request->input('observacaoes');
 
 
