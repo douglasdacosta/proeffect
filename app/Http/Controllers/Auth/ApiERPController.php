@@ -122,6 +122,53 @@ class ApiERPController extends Controller
         }
 
     }
+
+    public function getTransportadoraById($id){
+        try {
+            $client = new Client();
+            $headers = [
+                'accept' => 'text/plain',
+                'Authorization' => "Bearer $this->token"
+            ];
+
+            $url = env('URL_ERP')."api/Transportadora/id/$id";
+            $request = new Request('GET', $url, $headers);
+            $response = $client->sendAsync($request)->wait();
+            $body = $response->getBody();
+            $resposta = json_decode($body, true);
+
+            return $resposta;
+
+        } catch (\Throwable $th) {
+            info($th->getMessage());
+            return false;
+        }
+
+    }
+
+    public function getClienteById($id){
+        try {
+            $client = new Client();
+            $headers = [
+                'accept' => 'text/plain',
+                'Authorization' => "Bearer $this->token"
+            ];
+
+            $url = env('URL_ERP')."api/Cliente/id/$id";
+            $request = new Request('GET', $url, $headers);
+            $response = $client->sendAsync($request)->wait();
+            $body = $response->getBody();
+            $resposta = json_decode($body, true);
+
+            return $resposta;
+
+        } catch (\Throwable $th) {
+            info($th->getMessage());
+            return false;
+        }
+
+    }
+
     public function getVendedorById($vendedor_id){
         try {
             $client = new Client();

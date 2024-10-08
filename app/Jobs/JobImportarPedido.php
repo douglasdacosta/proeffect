@@ -49,8 +49,6 @@ class JobImportarPedido implements ShouldQueue
             $ApiERPController = new ApiERPController();
             $ApiERPController->getToken();
             $vendas = $ApiERPController->getVendasByStatus();
-            info($vendas);
-            return true;
 
             foreach ($vendas['os'] as $key => $venda) {
 
@@ -72,20 +70,23 @@ class JobImportarPedido implements ShouldQueue
                     $numeroOs = $venda['numeroOS'];
                     $dataOS = $venda['dataOS'];
                     $prevEntrega = $venda['prevEntrega'];
-                    $cliente_id = $venda['numcli'];
+                    $cliente_id = $venda['numCli'];
                     $cliente = $venda['idCliente'];
-                    $transportadora = $venda['idTransportadora'];
                     $idVendedor = $venda['idVendedor'];
 
+                    $cliente= $ApiERPController->getClienteById($cliente);
                     $Vendedor= $ApiERPController->getVendedorById($idVendedor);
+                    $transportadora= $ApiERPController->getTransportadoraById($venda['idTransportadora']);
                     $pessoa = $pessoas->where('codigo_cliente', '=', $cliente_id)->first();
-
                     $fichatecnica = $fichatecnica->where('ep', '=', $ep)->where('status', '=', 'A')->get();
+
                     if(empty($fichatecnica[0]->id)){
                         info("EP ".$ep." não existente no CRM");
                         continue;
                     }
+
                     $fichatecnicaId = $fichatecnica[0]->id;
+
                     $transportes = $transportes->where('nome','=', $transportadora['nome'])->first();
 
                     $pessoa_id = $this->savePessoas($pessoa, $cliente, $Vendedor);
@@ -93,6 +94,7 @@ class JobImportarPedido implements ShouldQueue
                     $transporte_id = $this->saveTrasportes($transportes, $transportadora);
 
                     $pedido = $pedidos->where('os', '=', $numeroOs)->where('fichatecnica_id', '=', $fichatecnicaId)->first();
+
                     $dados = [
                         'numeroOs' => $numeroOs,
                         'fichatecnicaId' => $fichatecnicaId,
@@ -102,7 +104,10 @@ class JobImportarPedido implements ShouldQueue
                         'prevEntrega' => $prevEntrega,
                         'quantidade' => $itens['quantidade']
                     ];
+
                     $this->savePedidos($pedido, $dados);
+
+                    break;
 
                 }
             }
@@ -127,6 +132,7 @@ class JobImportarPedido implements ShouldQueue
             $pedidos->data_gerado = substr($dados['dataOS'], 0, 10);
             $pedidos->data_entrega = substr($dados['prevEntrega'], 0, 10);
             $pedidos->status ='A';
+            info($pedidos);
             $pedidos->save();
 
             $this->historicosPedidos($pedidos->id, 1);

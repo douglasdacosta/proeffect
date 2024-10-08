@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('command:importarPedido')->everyFiveMinutes()->withoutOverlapping();
+        $schedule->command('command:importarPedido')->everyFifteenMinutes()->withoutOverlapping();
     }
 
     /**
