@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\HistoricosEstoque;
+use App\Models\HistoricosMateriais;
+use App\Models\Materiais;
 use Illuminate\Http\Request;
 use App\Models\Estoque;
 use App\Providers\DateHelpers;
@@ -293,7 +295,8 @@ class EstoqueController extends Controller
 
     	}
 
-        $historicos = HistoricosEstoque::where('estoque_id', '=', $request->input('id'))->get();
+        $historicosMateriais = HistoricosMateriais::where('materiais_id','=', $estoque[0]->material_id)->orderBy('created_at', 'desc')->get();
+        $historicos = HistoricosEstoque::where('estoque_id', '=', $request->input('id'))->orderBy('created_at', 'desc')->get();
 
         $tela = 'alterar';
     	$data = array(
@@ -301,6 +304,7 @@ class EstoqueController extends Controller
                 'nome_tela' => 'estoque',
 				'estoque'=> $estoque,
                 'historicos' => $historicos,
+                'historicosMateriais' =>$historicosMateriais,
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
 				'request' => $request,
@@ -346,8 +350,30 @@ class EstoqueController extends Controller
             $estoque->qtde_por_pacote_mo = trim($request->input('qtde_por_pacote_mo')) != '' ? str_replace('.', '',$request->input('qtde_por_pacote_mo', '0')) : 0;
             $estoque->observacaoes = $request->input('observacaoes');
 
-
             $estoque->save();
+
+            $material = new Materiais();
+            $material = $material->find($request->input('material_id'));
+            if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
+
+                $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
+                $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
+                $material->save();
+
+                if(!empty($historico)) {
+                    $historicos = new HistoricosMateriais();
+                    $historicos->materiais_id = $material->id;
+                    $historicos->historico = $historico;
+                    $historicos->status = 'A';
+                    $historicos->save();
+                }
+
+            }
+
+
+
+
+
 
             return $estoque->id;
         });
