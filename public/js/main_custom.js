@@ -36,6 +36,8 @@
 
 //   });
 $(function ($) {
+    $('body').addClass('sidebar-collapse');
+
     //var baseUrl = '/proeffect/public'
     var baseUrl = ''
 

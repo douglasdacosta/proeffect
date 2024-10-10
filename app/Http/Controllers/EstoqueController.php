@@ -160,7 +160,7 @@ class EstoqueController extends Controller
 
             $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'];
 
-            $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $qtde_baixa[0]->qtde_baixa;
+            $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'];
 
             $dados_estoque[$value->material_id]['alerta']=1; //1 = estoque alto
             if($dados_estoque[$value->material_id]['estoque'] <= $value->estoque_minimo) {
