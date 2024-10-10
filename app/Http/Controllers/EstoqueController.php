@@ -153,9 +153,9 @@ class EstoqueController extends Controller
                                                         "));
 
             if(isset($dados_estoque[$value->material_id]['gasto_total'])) {
-                $dados_estoque[$value->material_id]['gasto_total'] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca_mo + $value->qtde_chapa_peca));
+                $dados_estoque[$value->material_id]['gasto_total'] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             } else {
-                $dados_estoque[$value->material_id]['gasto_total'] = ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca_mo + $value->qtde_chapa_peca));
+                $dados_estoque[$value->material_id]['gasto_total'] = ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             }
 
             $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'];
