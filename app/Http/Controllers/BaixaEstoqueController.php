@@ -109,7 +109,7 @@ class BaixaEstoqueController extends Controller
             $estoqueTodos = $estoqueTodos->where('material_id', '=', $estoque[0]->material_id)
                                 ->where('status_estoque', '=', 'A')
                                 ->where('status', '=', 'A');
-            $estoqueTodos = $estoqueTodos->orderBy('created_at', 'asc')->get();
+            $estoqueTodos = $estoqueTodos->orderBy('data', 'asc')->get();
 
             if($estoque[0]->lote != $estoqueTodos[0]->lote) {
 
