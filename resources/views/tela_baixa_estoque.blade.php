@@ -31,11 +31,11 @@
                 </div>
                 <div class="form-group row">
                     @csrf <!--{{ csrf_field() }}-->
-                    <label for="senha" class="col-sm-1 col-form-label">Senha</label>
+                    <label for="senha" class="col-sm-1 col-form-label text-right">Senha</label>
                     <div class="col-sm-2">
                         <input type="password" id="senha" name="senha" class="form-control col-md-7 col-xs-12" value="">
                     </div>
-                    <label for="id" class="col-sm-2 col-form-label">ID Estoque</label>
+                    <label for="id" class="col-sm-2 col-form-label text-right">Lote</label>
                     <div class="col-sm-2">
                         <input type="text" id="id" name="id" class="form-control col-md-7 col-xs-12" value="">
                     </div>
@@ -50,9 +50,9 @@
             <table class="table table-striped text-center" id="table_composicao">
                 <thead >
                     <tr>
-                        <th scope="col">ID Lote</th>
+                        <th scope="col">Lote</th>
                         <th scope="col">Material</th>
-                        <th scope="col">Fornecedor</th>
+                        {{-- <th scope="col">Fornecedor</th> --}}
                         <th scope="col">Ação</th>
                     </tr>
                 </thead>
@@ -62,7 +62,7 @@
                                     <tr style="padding-top: 10px">
                                         <td style="margin-top: 10px" scope="col">{{$estoque->lote}}</td>
                                         <td scope="col">{{$materiais[$estoque->material_id]['material']}}</td>
-                                        <td scope="col">{{\Illuminate\Support\Str::words($fornecedores[$estoque->fornecedor_id]['nome_cliente'], 2, '') }}</td>
+                                        {{-- <td scope="col">{{\Illuminate\Support\Str::words($fornecedores[$estoque->fornecedor_id]['nome_cliente'], 2, '') }}</td> --}}
                                         <td scope="col">
                                             <button class="btn btn-primary baixar_estoque" data-id="{{$estoque->id}}">Baixar</button>
                                         </td>

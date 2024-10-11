@@ -107,7 +107,8 @@ class EstoqueController extends Controller
                                                                 ON B.id = C.material_id
                                                             WHERE
                                                                 C.status = 'A' AND
-                                                                C.material_id = A.material_id)  as qtde_total_estoque_material
+                                                                C.material_id = A.material_id)  as qtde_total_estoque_material,
+                                            A.alerta_baixa_errada
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -195,6 +196,7 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['estoque_comprado'] = number_format($estoque_comprado,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
             $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
+            $array_estoque[$value->id]['alerta_baixa_errada'] = $value->alerta_baixa_errada;
 
         }
 
@@ -349,31 +351,27 @@ class EstoqueController extends Controller
             $estoque->qtde_chapa_peca_mo = trim($request->input('qtde_chapa_peca_mo')) != '' ? str_replace('.', '',$request->input('qtde_chapa_peca_mo', '0')) : 0;
             $estoque->qtde_por_pacote_mo = trim($request->input('qtde_por_pacote_mo')) != '' ? str_replace('.', '',$request->input('qtde_por_pacote_mo', '0')) : 0;
             $estoque->observacaoes = $request->input('observacaoes');
+            $estoque->alerta_baixa_errada = $request->input('alerta_baixa_errada');
 
             $estoque->save();
 
-            $material = new Materiais();
-            $material = $material->find($request->input('material_id'));
-            if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
+            // $material = new Materiais();
+            // $material = $material->find($request->input('material_id'));
+            // if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
 
-                $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
-                $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
-                $material->save();
+            //     $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
+            //     $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
+            //     $material->save();
 
-                if(!empty($historico)) {
-                    $historicos = new HistoricosMateriais();
-                    $historicos->materiais_id = $material->id;
-                    $historicos->historico = $historico;
-                    $historicos->status = 'A';
-                    $historicos->save();
-                }
+            //     if(!empty($historico)) {
+            //         $historicos = new HistoricosMateriais();
+            //         $historicos->materiais_id = $material->id;
+            //         $historicos->historico = $historico;
+            //         $historicos->status = 'A';
+            //         $historicos->save();
+            //     }
 
-            }
-
-
-
-
-
+            // }
 
             return $estoque->id;
         });

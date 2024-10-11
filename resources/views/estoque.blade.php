@@ -128,7 +128,8 @@
                   <tbody>
                   @if(isset($array_estoque))
                         @foreach ($array_estoque as $item_estoque)
-                            <tr>
+
+                            <tr style="@if (isset($item_estoque['alerta_baixa_errada']) && $item_estoque['alerta_baixa_errada'] =='1'){{ ' background-color: rgb(233, 76, 76) '}}@else @endif">
                                 <th data-sortable='true' data-field="id" scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque['id'] )) }}>{{$item_estoque['id']}}</a></th>
                                 <td data-sortable='true' data-field="fornecedor" nowrap >{{$item_estoque['fornecedor']}}</td>
                                 <td data-sortable='true' data-field="lote">{{$item_estoque['lote']}}</td>
@@ -385,6 +386,13 @@
                 <select class="form-control custom-select col-md-2 " id="status_estoque" name="status_estoque">
                     <option value="A" @if (isset($estoque[0]->status_estoque) && $estoque[0]->status_estoque == 'A'){{ ' selected '}}@else @endif>Em andamento</option>
                     <option value="F" @if (isset($estoque[0]->status_estoque) && $estoque[0]->status_estoque =='F'){{ ' selected '}}@else @endif>Finalizado</option>
+                </select>
+            </div>
+            <div class="form-group row " >
+                <label for="alerta_baixa_errada" class="col-sm-2 col-form-label">Alerta baixa indevida</label>
+                <select class="form-control custom-select col-md-2 " id="alerta_baixa_errada" name="alerta_baixa_errada">
+                    <option value="0" @if (isset($estoque[0]->alerta_baixa_errada) && $estoque[0]->alerta_baixa_errada == '0'){{ ' selected '}}@else @endif>Sem alerta</option>
+                    <option value="1" @if (isset($estoque[0]->alerta_baixa_errada) && $estoque[0]->alerta_baixa_errada =='1'){{ ' selected '}}@else @endif>Em alerta</option>
                 </select>
             </div>
             <div class="form-group row">

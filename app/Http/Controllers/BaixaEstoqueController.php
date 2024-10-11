@@ -101,6 +101,23 @@ class BaixaEstoqueController extends Controller
     public function baixarEstoque(Request $request) {
 
         try {
+
+            $estoque = new Estoque();
+            $estoque = $estoque->where('id', '=', $request->input('id'))->get();
+
+            $estoqueTodos = new Estoque();
+            $estoqueTodos = $estoqueTodos->where('material_id', '=', $estoque[0]->material_id)
+                                ->where('status_estoque', '=', 'A')
+                                ->where('status', '=', 'A');
+            $estoqueTodos = $estoqueTodos->orderBy('created_at', 'asc')->get();
+
+            if($estoque[0]->lote != $estoqueTodos[0]->lote) {
+
+                $estoqueAltera = new Estoque();
+                $estoqueAltera = $estoqueAltera->where('id', '=', $estoque[0]->id)
+                                ->update(['alerta_baixa_errada' => 1]);
+            }
+
             $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
             $LoteEstoqueBaixados->estoque_id=$request->input('id');
             $LoteEstoqueBaixados->data_baixa = now();
