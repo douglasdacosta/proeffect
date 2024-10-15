@@ -95,19 +95,15 @@ class EstoqueController extends Controller
                                                     lote_estoque_baixados X
                                                 where
                                                     X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque_atual,
+                                            ((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id)) as estoque_pacote_atual,
                                             B.material,
                                             A.material_id,
                                             B.consumo_medio_mensal,
-                                            (SELECT
-                                                                sum((C.qtde_chapa_peca * C.qtde_por_pacote) + (C.qtde_chapa_peca_mo * C.qtde_por_pacote_mo)) as qtde_total
-                                                            FROM
-                                                                estoque C
-                                                            INNER JOIN
-                                                                materiais B
-                                                                ON B.id = C.material_id
-                                                            WHERE
-                                                                C.status = 'A' AND
-                                                                C.material_id = A.material_id)  as qtde_total_estoque_material,
                                             A.alerta_baixa_errada
                                         FROM
                                             estoque A
@@ -152,7 +148,18 @@ class EstoqueController extends Controller
                                                                 C.material_id = $value->material_id
                                                                 and C.status = 'A'
                                                         "));
-
+            $qtde_total_pacote_material = 0;
+            $qtde_total_pacote_material = DB::select(DB::raw("SELECT
+                                                                sum(qtde_por_pacote + qtde_por_pacote_mo) as qtde_total
+                                                            FROM
+                                                                estoque C
+                                                            INNER JOIN
+                                                                materiais B
+                                                                ON B.id = C.material_id
+                                                            WHERE
+                                                                C.material_id = $value->material_id
+                                                                and C.status = 'A'
+                                                        "));
             if(isset($dados_estoque[$value->material_id]['gasto_total'])) {
                 $dados_estoque[$value->material_id]['gasto_total'] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             } else {
@@ -182,6 +189,7 @@ class EstoqueController extends Controller
         }
         $array_estoque = [];
         foreach($estoque as $key => $value) {
+
             $pacote = $value->qtde_por_pacote + $value->qtde_por_pacote_mo;
             $estoque_comprado = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo);
 
@@ -189,7 +197,8 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['fornecedor'] = implode(' ', array_slice(explode(' ', $value->fornecedor), 0, 1));
             $array_estoque[$value->id]['lote'] = $value->lote;
             $array_estoque[$value->id]['data'] = $value->data;
-            $array_estoque[$value->id]['pacote'] = number_format($pacote,0, '','.');
+            $array_estoque[$value->id]['pacote'] = number_format($value->estoque_pacote_atual,0, '','.');
+
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->material_id]['previsao_meses'];
