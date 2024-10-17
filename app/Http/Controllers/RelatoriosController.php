@@ -166,14 +166,14 @@ class RelatoriosController extends Controller
             $data_fim = DateHelpers::formatDate_dmY($data_fim);
             if (!empty($data_inicio) && !empty($data_fim)){
 
-                $where[] = "A.data_gerado between '$data_inicio 00:00:01' and '$data_fim 23:59:59'";
+                $where[] = "A.data_entrega between '$data_inicio 00:00:01' and '$data_fim 23:59:59'";
             }
             if (empty($data_inicio) && !empty($data_fim)){
-                $where[] = "A.data_gerado <= '$data_fim 23:59:59'";
+                $where[] = "A.data_entrega <= '$data_fim 23:59:59'";
 
             }
             if (!empty($data_inicio) && empty($data_fim)){
-                $where[] = "A.data_gerado >= '$data_inicio 00:00:01'" ;
+                $where[] = "A.data_entrega >= '$data_inicio 00:00:01'" ;
             }
 
             $status_pedido = "A.status = 'A'";
@@ -205,8 +205,6 @@ class RelatoriosController extends Controller
                                             on
                                                 D.id = C.materiais_id
                                             $condicao
-                                            ORDER BY
-                                                A.data_gerado DESC
                                         "));
             }
         $array_materiais=$arr_pedidos=[];
