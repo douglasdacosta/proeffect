@@ -89,3 +89,4 @@ Route::match(['get', 'post'],'/incluir-estoque', [App\Http\Controllers\EstoqueCo
 Route::match(['get', 'post'],'/tela-baixa-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'telaBaixaEstoque'])->name('tela-baixa-estoque');
 Route::match(['get', 'post'],'/baixar-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'baixarEstoque'])->name('baixar-estoque');
 Route::match(['get', 'post'],'/altera-qtde-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'alterarEstoque'])->name('altera-qtde-estoque');
+Route::match(['get', 'post'],'/relatorio-previsao-material', [App\Http\Controllers\RelatoriosController::class, 'relatorioPrevisaoMaterial'])->name('relatorio-previsao-material');

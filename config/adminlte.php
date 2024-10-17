@@ -392,6 +392,13 @@ return [
             'label'       => '',
             'label_color' => '',
         ],
+        [
+            'text'        => 'Relatório previsão material',
+            'url'         => 'relatorio-previsao-material',
+            'icon'        => 'fas fa-plus',
+            'label'       => '',
+            'label_color' => '',
+        ],
         // [
         //     'text'        => 'Relatório produção',
         //     'url'         => 'relatorio-producao',
