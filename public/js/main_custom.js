@@ -202,39 +202,56 @@ $(function ($) {
     });
 
     if (typeof DataTable !== 'undefined') {
-        let table = new DataTable('#table_estoque', {
+        let table_estoque = new DataTable('#table_estoque', {
             responsive: true,
-            "paging": false,         // Desativa a paginação
-            "info": false,           // Remove o label "Showing X to Y of  Z entries"
-            "lengthChange": false,  // Desativa o "entries per page"
+            "paging": false,
+            "info": false,
+            "lengthChange": false,
             "pageLength": 15000,
             "language": {
-                "search": "Pesquisar:"  // Altera o label de "Search" para "Pesquisar"
+                "search": "Pesquisar:",
+                "emptyTable": "Nenhum dado encontrado"
             }
         });
 
-        // Função para atualizar ícones com base no aria-sort
+
+        table_estoque.on('order.dt', function() {
+            updateSortIcons();
+        });
+
+        let table_material = new DataTable('#table_material', {
+            responsive: true,
+            "paging": false,
+            "info": false,
+            "lengthChange": false,
+            "pageLength": 15000,
+            "language": {
+                "search": "Pesquisar:",
+                "emptyTable": "Nenhum dado encontrado"
+            }
+        });
+        table_material.on('order.dt', function() {
+            updateSortIcons();
+        });
+
+
         function updateSortIcons() {
-            // Remove a classe 'sorted' de todas as colunas
+
             $('th').removeClass('sorting_asc');
             $('th').removeClass('sorting_desc');
 
-            // Para cada cabeçalho de coluna, verifique o valor de aria-sort
             $('th[aria-sort]').each(function() {
                 var sortOrder = $(this).attr('aria-sort');
                 if (sortOrder === 'ascending' ){
-                    $(this).addClass('sorting_asc');  // Adiciona a classe 'sorted' para aplicar o CSS
+                    $(this).addClass('sorting_asc');
                 }
                 if (sortOrder === 'descending'){
-                    $(this).addClass('sorting_desc');  // Adiciona a classe 'sorted' para aplicar o CSS
+                    $(this).addClass('sorting_desc');
                 }
             });
         }
 
-        // Atualiza os ícones após a ordenação
-        table.on('order.dt', function() {
-            updateSortIcons();  // Chama a função quando uma ordenação acontece
-        });
+
 
         updateSortIcons();
 
@@ -597,6 +614,15 @@ $(function ($) {
 
     show_mo();
     $('.calcula_peso_chapa').blur();
+
+    $(document).on('click', '.ver_materiais', function () {
+        pedidoid = $(this).data('pedidoid');
+        $('#' + pedidoid).show();
+    });
+    $(document).on('click', '.close', function () {
+        $('.modal').hide();
+    })
+
 
 }); //FIM DO BLOCO DE JQUERY READY
 

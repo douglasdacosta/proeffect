@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\PedidosController;
+use App\Models\HistoricosEtapas;
 use App\Models\Materiais;
 use App\Providers\DateHelpers;
 use DateTime;
@@ -152,6 +153,7 @@ class RelatoriosController extends Controller
 
         $data_inicio = !empty($request->input('data')) ? $request->input('data') : '';
         $data_fim = !empty($request->input('data_fim')) ? $request->input('data_fim') : '';
+        $status_id = !empty($request->input('status_id')) ? $request->input('status_id') : '';
         $pedidos = [];
 
         $intervalo_dias = 0;
@@ -164,16 +166,54 @@ class RelatoriosController extends Controller
 
             $data_inicio = DateHelpers::formatDate_dmY($data_inicio);
             $data_fim = DateHelpers::formatDate_dmY($data_fim);
-            if (!empty($data_inicio) && !empty($data_fim)){
 
-                $where[] = "A.data_entrega between '$data_inicio 00:00:01' and '$data_fim 23:59:59'";
-            }
-            if (empty($data_inicio) && !empty($data_fim)){
-                $where[] = "A.data_entrega <= '$data_fim 23:59:59'";
+            $coluna = 'A.data_gerado';
+            if($request->input('tipo_consulta') == 'P') {
+                $coluna = 'A.data_entrega';
 
-            }
-            if (!empty($data_inicio) && empty($data_fim)){
-                $where[] = "A.data_entrega >= '$data_inicio 00:00:01'" ;
+                if (!empty($data_inicio) && !empty($data_fim)){
+
+                    $where[] = "$coluna between '$data_inicio 00:00:01' and '$data_fim 23:59:59'";
+                }
+                if (empty($data_inicio) && !empty($data_fim)){
+                    $where[] = "$coluna <= '$data_fim 23:59:59'";
+
+                }
+                if (!empty($data_inicio) && empty($data_fim)){
+                    $where[] = "$coluna >= '$data_inicio 00:00:01'" ;
+                }
+
+                if($status_id) {
+                    $where[] = "A.status_id in(".implode(',', $status_id).")";
+                }
+
+            } else {
+                $historicos_etapas = new HistoricosEtapas();
+                $historicos_etapas = $historicos_etapas->select('pedidos_id');
+                $historicos_etapas = $historicos_etapas->whereIn('status_id', $request->input('status_id'));
+                $historicos_etapas = $historicos_etapas->where('etapas_pedidos_id', '=', 4 );
+
+                if (!empty($data_inicio) && !empty($data_fim)){
+                    $historicos_etapas = $historicos_etapas->whereBetween('created_at', [$data_inicio . ' 00:00:01' , $data_fim . ' 23:59:59']);
+                }
+                if (empty($data_inicio) && !empty($data_fim)){
+                    $historicos_etapas = $historicos_etapas->where('created_at', '<=', $data_fim . ' 23:59:59');
+
+                }
+                if (!empty($data_inicio) && empty($data_fim)){
+                    $historicos_etapas = $historicos_etapas->where('created_at', '>=', $data_inicio . ' 00:00:01');
+                }
+
+                $historicos_etapas = $historicos_etapas->get();
+
+                $array_pedidos = $historicos_etapas->pluck('pedidos_id')->toArray();
+
+                $busca_id = "A.id in (0)";
+
+                if(!empty($array_pedidos)) {
+                    $busca_id= "A.id in (".implode(',', $array_pedidos).")";
+                }
+                $where[] = $busca_id;
             }
 
             $status_pedido = "A.status = 'A'";
@@ -190,7 +230,9 @@ class RelatoriosController extends Controller
                                                 D.id as material_id,
                                                 D.consumo_medio_mensal,
                                                 B.ep,
-                                                C.qtde_blank
+                                                D.valor as valor_material,
+                                                C.qtde_blank,
+                                                A.qtde
                                             FROM
                                                 pedidos A
                                             INNER JOIN
@@ -210,14 +252,28 @@ class RelatoriosController extends Controller
         $array_materiais=$arr_pedidos=[];
 
         foreach ($pedidos as $key => &$pedido) {
-            $arr_pedidos[$pedido->material_id] = [
-                'id' => $pedido->id,
-                'material' => $pedido->material,
-                'material_id' => $pedido->material_id,
-                'consumo_medio_mensal' =>$pedido->consumo_medio_mensal
-            ];
-        }
 
+            if(isset($arr_pedidos[$pedido->material_id]['qtde_consumo'])) {
+                $quantidade = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $pedido->qtde * $pedido->qtde_blank;
+                $valor_previsto = $arr_pedidos[$pedido->material_id]['valor_previsto'] + $quantidade * $pedido->valor_material;
+            }  else {
+                $quantidade = $pedido->qtde * $pedido->qtde_blank;
+                $valor_previsto = $quantidade * $pedido->valor_material;
+            }
+
+            $arr_pedidos[$pedido->material_id]['id'] = $pedido->id;
+            $arr_pedidos[$pedido->material_id]['material'] = $pedido->material;
+            $arr_pedidos[$pedido->material_id]['material_id'] = $pedido->material_id;
+            $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade;
+            $arr_pedidos[$pedido->material_id]['valor_previsto'] = $valor_previsto;
+            $arr_pedidos[$pedido->material_id]['pedidos_ids'][$pedido->id] = [
+                'os' => $pedido->os,
+                'pedidos_ids' => $pedido->id,
+                'qtde' => $pedido->qtde * $pedido->qtde_blank
+            ];
+
+        }
+        $totalizadores = [];
         foreach ($arr_pedidos as $key => $pedido) {
 
             $estoque = DB::select(DB::raw("SELECT
@@ -248,21 +304,34 @@ class RelatoriosController extends Controller
                                             A.data DESC
                                     "));
 
-            $media_uso_mensal_dia = $pedido['consumo_medio_mensal']/30;
-
             $estoque_atual = !empty($estoque[0]->estoque_atual) ? $estoque[0]->estoque_atual : 0;
-            $consumo_previsto = number_format($media_uso_mensal_dia * $intervalo_dias, 0, '.', '');
+            $diferenca = $estoque_atual - $pedido['qtde_consumo'];
             $array_materiais[$pedido['material_id']] = [
                 'id' => $pedido['id'],
                 'material_id' => $pedido['material_id'],
                 'material' => $pedido['material'],
                 'estoque_atual' => $estoque_atual,
-                'consumo_medio_mensal' => $pedido['consumo_medio_mensal'],
-                'media_uso_mensal_dia' => $media_uso_mensal_dia,
-                'consumo_previsto' => $consumo_previsto,
-                'diferenca' => $estoque_atual - $consumo_previsto,
-                'alerta' => $estoque_atual < $consumo_previsto ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>'
+                'consumo_previsto' => $pedido['qtde_consumo'],
+                'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
+                'diferenca' =>  $diferenca,
+                'alerta' => $estoque_atual < $pedido['qtde_consumo'] || ($estoque_atual==0 && $pedido['qtde_consumo']==0) ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>',
+                'os' => $pedido['pedidos_ids']
             ];
+
+            $estoque_atual =  isset($totalizadores['estoque_atual']) ? $totalizadores['estoque_atual'] + $estoque_atual : $estoque_atual;
+            $consumo_previsto =   isset($totalizadores['consumo_previsto']) ? $totalizadores['consumo_previsto'] + $pedido['qtde_consumo'] : $pedido['qtde_consumo'];
+            $valor_previsto =  isset($totalizadores['valor_previsto']) ? $totalizadores['valor_previsto'] + $pedido['valor_previsto'] : $pedido['valor_previsto'];
+            $diferenca =  isset($totalizadores['diferenca']) ? $totalizadores['diferenca'] +  $diferenca :  $diferenca;
+
+            $totalizadores = [
+                'estoque_atual' => $estoque_atual,
+                'consumo_previsto' =>  $consumo_previsto,
+                'valor_previsto' => $valor_previsto,
+                'diferenca' => $diferenca,
+            ];
+        }
+        if(count($totalizadores)) {
+            $totalizadores['valor_previsto'] = number_format($totalizadores['valor_previsto'], 2, ',', '.');
         }
         $data = array(
             'tela' => 'relatorio-previsao-material',
@@ -271,7 +340,8 @@ class RelatoriosController extends Controller
             'request' => $request,
             'status' => (new PedidosController)->getAllStatus(),
             'rotaIncluir' => '',
-            'rotaAlterar' => ''
+            'rotaAlterar' => '',
+            'totalizadores' => $totalizadores
         );
 
         return view('relatorios', $data);
