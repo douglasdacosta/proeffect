@@ -111,6 +111,7 @@ use App\Http\Controllers\PedidosController;
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
                                                                 </div>
+                                                                <p>{{ $material['material'] }}</p>
                                                                 <div class="modal-body text-Left" style="overflow-y: auto">
                                                                     <label for="" class="col-sm-6 col-form-label "></label>
                                                                     @if (isset($material['os']))
@@ -118,7 +119,7 @@ use App\Http\Controllers\PedidosController;
                                                                             <p>
                                                                                 Ver dados O.S: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>
                                                                                 {{$pedido_id['os']}}
-                                                                            </a> quantidade: {{$pedido_id['qtde']}}
+                                                                            </a> quantidade: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['qtde_itens']}}</a> Qtde pedido: {{$pedido_id['qtde']}}
                                                                             </p>
                                                                         @endforeach
                                                                     @endif
