@@ -85,7 +85,7 @@ use App\Http\Controllers\PedidosController;
                                             <th>Valor previsto</th>
                                             <th>Alerta</th>
                                         @else
-                                            <th>Valor previsto</th>
+                                            <th>Valor</th>
                                         @endif
                                         <th>Ver ficha técnica</th>
                                     </tr>
