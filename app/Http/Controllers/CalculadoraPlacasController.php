@@ -27,6 +27,9 @@ class CalculadoraPlacasController extends Controller{
 
         $area_chapa_util = ($this->chapa['sheetWidth'] * $this->chapa['sheetHeight']) * (1 - $this->perda);
 
+        if($total_area_peca == 0 || $area_chapa_util == 0) {
+            return 0;
+        }
         $numero_placas = round($total_area_peca / $area_chapa_util, 3, PHP_ROUND_HALF_UP);
 
         return $numero_placas;

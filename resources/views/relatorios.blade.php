@@ -84,6 +84,8 @@ use App\Http\Controllers\PedidosController;
                                             <th>Diferença unidade</th>
                                             <th>Valor previsto</th>
                                             <th>Alerta</th>
+                                        @else
+                                            <th>Valor previsto</th>
                                         @endif
                                         <th>Ver ficha técnica</th>
                                     </tr>
@@ -99,6 +101,8 @@ use App\Http\Controllers\PedidosController;
                                                     <td data-sortable='true' >{{ $material['diferenca'] }}</td>
                                                     <td data-sortable='true' >{{ $material['valor_previsto'] }}</td>
                                                     <td >{!! $material['alerta'] !!}</td>
+                                                @else
+                                                    <td data-sortable='true' >{{ $material['valor_previsto'] }}</td>
                                                 @endif
                                                 <td scope="row">
 
