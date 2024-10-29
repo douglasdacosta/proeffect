@@ -92,20 +92,37 @@
         @endif
             @csrf <!--{{ csrf_field() }}-->
             <div class="form-group row">
-                <label for="nome" class="col-sm-2 col-form-label">Nome</label>
+                <label for="nome" class="col-sm-2 col-form-label">Nome*</label>
                 <div class="col-sm-6">
                 <input type="text" class="form-control is-invalid" required id="nome"  name="nome" value="@if (isset($funcionarios[0]->nome)){{$funcionarios[0]->nome}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
-                <label for="funcao" class="col-sm-2 col-form-label">Função</label>
+                <label for="email" class="col-sm-2 col-form-label">Email*</label>
                 <div class="col-sm-4">
+                <input type="text" class="form-control" required id="email"  name="email" value="@if (isset($funcionarios[0]->email)){{$funcionarios[0]->email}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="funcao" class="col-sm-2 col-form-label">Cargo</label>
+                <div class="col-sm-3">
                 <input type="text" class="form-control" id="funcao"  name="funcao" value="@if (isset($funcionarios[0]->funcao)){{$funcionarios[0]->funcao}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">
+                <label for="perfil" class="col-sm-2 col-form-label">Perfil</label>
+                <div class="col-sm-2">
+                    <select class="form-control" id="perfil" name="perfil">
+                        @foreach ($perfis as $perfil)
+                            <option value="{{$perfil->id}}" @if (isset($funcionarios[0]->perfil) && $funcionarios[0]->perfil == $perfil->id){{ ' selected '}}@else @endif>{{$perfil->nome}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
                 <label for="senha" class="col-sm-2 col-form-label">Senha</label>
-                <div class="col-sm-4">
+                <div class="col-sm-2">
                 <input type="text" class="form-control" id="senha"  name="senha" value="@if (isset($funcionarios[0]->senha)){{$funcionarios[0]->senha}}@else{{''}}@endif">
                 </div>
             </div>

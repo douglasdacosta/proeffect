@@ -316,89 +316,187 @@ return [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],
-        ['header' => 'Cadastros'],
+        ['header' => 'Lançamentos'],   #Lançamentos -----------------------------------------------------
         [
-            'text' => 'blog',
-            'url'  => 'admin/blog',
-            'can'  => 'manage-blog',
+            'text'    => 'Cadastros',
+            'icon'    => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text'        => 'Clientes',
+                    'url'         => 'clientes',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+                [
+                    'text'        => 'Colaboradores',
+                    'url'         => 'funcionarios',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+                [
+                    'text'        => 'Materiais',
+                    'url'         => 'materiais',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+                [
+                    'text'        => 'Status',
+                    'url'         => 'status',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+            ],
         ],
         [
-            'text'        => 'Pedidos',
-            'url'         => 'pedidos',
-            'icon'        => 'fa fa-fw fa-arrow-right',
-            'label'       => '',
-            'label_color' => '',
+            'text'    => 'Projetos',
+            'icon'    => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text'        => 'Ficha técnica',
+                    'url'         => 'fichatecnica',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+            ],
         ],
         [
-            'text'        => 'Followup',
-            'url'         => 'followup',
-            'icon'        => 'far fa-fw fa-calendar',
-            'label'       => '',
-            'label_color' => '',
+            'text'    => 'Produção',
+            'icon'    => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text'        => 'Maquinas',
+                    'url'         => 'maquinas',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+            ],
+        ],
+        ['header' => 'Relatórios',
+        'icon'    => 'fas fa-fw fa-share',
+    ],#Relatórios -----------------------------------------------------
+        [
+            'text'    => 'Geral',
+            'icon'    => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text'        => 'Followup',
+                    'url'         => 'followup',
+                    'icon'        => 'fas fa-chart-pie',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+            ],
         ],
         [
-            'text'        => 'Materiais',
-            'url'         => 'materiais',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
+            'text'    => 'Produção',
+            'icon'    => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text'        => 'Produção de Maquinas',
+                    'url'         => 'producao-maquinas',
+                    'icon'        => 'fas fa-chart-pie',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+            ],
         ],
         [
-            'text'        => 'Consumo Materiais',
-            'url'         => 'consumo-materiais',
-            'icon'        => 'fas fa-chart-pie',
-            'label'       => '',
-            'label_color' => '',
+            'text'    => 'Vendas',
         ],
+        ['header' => 'Análise'],#Relatórios -----------------------------------------------------
         [
-            'text'        => 'Ficha técnica',
-            'url'         => 'fichatecnica',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
+            'text'    => 'Análise',
+            'icon'    => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text'        => 'Pedidos',
+                    'url'         => 'pedidos',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+                [
+                    'text'        => 'Orçamentos',
+                    'url'         => 'orcamentos',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+                [
+                    'text'        => 'Estoque',
+                    'url'         => 'estoque',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+                [
+                    'text'        => 'Consumo Materiais',
+                    'url'         => 'consumo-materiais',
+                    'icon'        => 'fa fa-fw fa-arrow-right',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+                [
+                    'text'        => 'Painéis',
+                    'url'         => 'paineis',
+                    'icon'        => 'fas fa-solar-panel',
+                    'icon_color' => 'yellow',
+                ],
+                [
+                    'text'        => 'Relatório previsão material',
+                    'url'         => 'relatorio-previsao-material',
+                    'icon'        => 'fas fa-chart-pie',
+                    'icon_color' => 'yellow',
+                    'label'       => '',
+                    'label_color' => '',
+                ],
+            ],
         ],
+        ['header' => 'Configurações'],#Configurações -----------------------------------------------------
         [
-            'text'        => 'Status',
-            'url'         => 'status',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
+            'text'    => 'Configurações',
+            'icon'    => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text' => 'Conta',
+                    'url'  => 'admin/settings',
+                    'icon' => 'fas fa-fw fa-user',
+                ],
+                [
+                    'text' => 'Alterar senha',
+                    'url'  => 'admin/settings',
+                    'icon' => 'fas fa-fw fa-lock',
+                ],
+            ],
         ],
-        [
-            'text'        => 'Clientes',
-            'url'         => 'clientes',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
-        ],
-        [
-            'text'        => 'Maquinas',
-            'url'         => 'maquinas',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
-        ],
-        [
-            'text'        => 'Funcionários',
-            'url'         => 'funcionarios',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
-        ],
-        [
-            'text'        => 'Estoque',
-            'url'         => 'estoque',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
-        ],
-        [
-            'text'        => 'Relatório previsão material',
-            'url'         => 'relatorio-previsao-material',
-            'icon'        => 'fas fa-plus',
-            'label'       => '',
-            'label_color' => '',
-        ],
+
+
+
+
+
+
+
+
+
+
         // [
         //     'text'        => 'Relatório produção',
         //     'url'         => 'relatorio-producao',
@@ -406,38 +504,8 @@ return [
         //     'label'       => '',
         //     'label_color' => '',
         // ],
-        ['header' => 'Operação'],
-        [
-            'text'        => 'Painéis',
-            'url'         => 'paineis',
-            'icon'        => 'fas fa-solar-panel',
-        ],
-        [
-            'text'        => 'Orçamentos',
-            'url'         => 'orcamentos',
-            'icon'        => 'far fa-fw fa-file',
-            'label'       => '',
-            'label_color' => '',
-        ],
-        ['header' => 'Produção'],
-        [
-            'text'        => 'Produção de Maquinas',
-            'url'         => 'producao-maquinas',
-            'icon'        => 'fas fa-chart-pie',
-            'label'       => '',
-            'label_color' => '',
-        ],
-        ['header' => 'Configurações'],
-        [
-            'text' => 'Conta',
-            'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'Alterar senha',
-            'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
+
+
 
         // [
         //     'text'    => 'multilevel',
