@@ -234,7 +234,8 @@ class RelatoriosController extends Controller
                                                 B.ep,
                                                 D.valor as valor_material,
                                                 C.qtde_blank,
-                                                A.qtde
+                                                A.qtde,
+                                                D.peca_padrao
                                             FROM
                                                 pedidos A
                                             INNER JOIN
@@ -268,29 +269,49 @@ class RelatoriosController extends Controller
 
             $dados_material = $this->detalhes($pedido->id, $pedido->material_id);
             $dados_material = $dados_material[$pedido->material];
+
+
             if(isset($arr_pedidos[$pedido->material_id]['qtde_consumo'])) {
-                $quantidade = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $dados_material['quantidade_chapas'];
-                $valor_previsto = $arr_pedidos[$pedido->material_id]['valor_previsto'] + $dados_material['valor_total'];
+                if($pedido->peca_padrao == 1) {
+                    $quantidade_chapas = $pedido->qtde_blank * $pedido->qtde;
+                    $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $quantidade_chapas;
+                }  else {
+                    $quantidade_chapas = $dados_material['quantidade_chapas'];
+                    $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $dados_material['quantidade_chapas'];
+                }
+
             }  else {
-                $quantidade = $dados_material['quantidade_chapas'];
+                if($pedido->peca_padrao == 1) {
+                    $quantidade_chapas = $pedido->qtde_blank * $pedido->qtde;
+                    $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade_chapas;
+                }  else {
+                    $quantidade_chapas = $dados_material['quantidade_chapas'];
+                    $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $dados_material['quantidade_chapas'];
+                }
+            }
+
+            if(isset($arr_pedidos[$pedido->material_id]['valor_previsto'])) {
+                $valor_previsto = $arr_pedidos[$pedido->material_id]['valor_previsto'] + $dados_material['valor_total'];
+            } else {
                 $valor_previsto = $dados_material['valor_total'];
             }
+
+
 
             $arr_pedidos[$pedido->material_id]['id'] = $pedido->id;
             $arr_pedidos[$pedido->material_id]['material'] = $pedido->material;
             $arr_pedidos[$pedido->material_id]['material_id'] = $pedido->material_id;
-            $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade;
+            // $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade;
             $arr_pedidos[$pedido->material_id]['valor_previsto'] = $valor_previsto;
             $arr_pedidos[$pedido->material_id]['pedidos_ids'][$pedido->id] = [
                 'os' => $pedido->os,
                 'material' => $pedido->material,
                 'pedidos_ids' => $pedido->id,
-                'qtde' => $pedido->qtde,
-                'qtde_itens' => $dados_material['quantidade_chapas']
+                'qtde_itens' => $quantidade_chapas,
+                'qtde' => $pedido->qtde
             ];
 
         }
-        // dd($arr_pedidos[70]);
         $totalizadores = [];
         foreach ($arr_pedidos as $key => $pedido) {
             // dd($pedido);
@@ -331,7 +352,7 @@ class RelatoriosController extends Controller
                 'estoque_atual' => $estoque_atual,
                 'consumo_previsto' => $pedido['qtde_consumo'],
                 'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
-                'diferenca' =>  $diferenca,
+                'diferenca' =>  round($diferenca, 2),
                 'alerta' => $estoque_atual < $pedido['qtde_consumo'] || ($estoque_atual==0 && $pedido['qtde_consumo']==0) ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>',
                 'os' => $pedido['pedidos_ids']
             ];
@@ -344,7 +365,7 @@ class RelatoriosController extends Controller
                 'estoque_atual' => $estoque_atual,
                 'consumo_previsto' =>  $consumo_previsto,
                 'valor_previsto' => $valor_previsto,
-                'diferenca' => $diferenca,
+                'diferenca' => round($diferenca, 2),
             ];
         }
         if(count($totalizadores)) {
