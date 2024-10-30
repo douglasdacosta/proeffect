@@ -121,9 +121,10 @@ use App\Http\Controllers\PedidosController;
                                                                     @if (isset($material['os']))
                                                                         @foreach ($material['os'] as $pedido_id)
                                                                             <p>
-                                                                                Ver dados O.S: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>
-                                                                                {{$pedido_id['os']}}
-                                                                            </a> quantidade: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['qtde_itens']}}</a> Qtde pedido: {{$pedido_id['qtde']}}
+                                                                                O.S: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['os']}}</a>
+                                                                                &nbsp;Qtde: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['qtde_itens']}}</a>
+                                                                                &nbsp;Blank: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['blank']}}</a>
+                                                                                &nbsp;Qtde: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['qtde']}}</a>
                                                                             </p>
                                                                         @endforeach
                                                                     @endif
@@ -146,9 +147,9 @@ use App\Http\Controllers\PedidosController;
                                     <tfoot>
                                         <tr>
                                             <th></th>
-                                            <th>{{$totalizadores['estoque_atual']}}</th>
+                                            <th>{{$totalizadores['consumo_previsto']}}</th>
                                             @if($request->input('tipo_consulta') == 'P')
-                                                <th>{{$totalizadores['consumo_previsto']}}</th>
+                                            <th>{{$totalizadores['estoque_atual']}}</th>
                                                 <th>{{$totalizadores['diferenca']}}</th>
                                                 <th>{{$totalizadores['valor_previsto']}}</th>
                                             @endif
