@@ -22,7 +22,7 @@ class CalculadoraPlacasController extends Controller{
         $total_area_peca = 0;
         foreach ($this->pecas_necessarias as $peca) {
 
-            $total_area_peca += $peca['quantidade'] * ($peca['width']+ $this->adicao_w ) * ($peca['height']+ $this->adicao_h ) ;
+            $total_area_peca += $peca['quantidade'] * ($peca['width'] + $this->adicao_w ) * ($peca['height'] + $this->adicao_h ) ;
         }
 
         $area_chapa_util = ($this->chapa['sheetWidth'] * $this->chapa['sheetHeight']) * (1 - $this->perda);
@@ -30,8 +30,8 @@ class CalculadoraPlacasController extends Controller{
         if($total_area_peca == 0 || $area_chapa_util == 0) {
             return 0;
         }
-        $numero_placas = round($total_area_peca / $area_chapa_util, 3, PHP_ROUND_HALF_UP);
-        // $numero_placas = $total_area_peca / $area_chapa_util;
+        $numero_placas = number_format(round($total_area_peca / $area_chapa_util, 3, PHP_ROUND_HALF_UP), '3', '.', '');
+        //$numero_placas = round($total_area_peca / $area_chapa_util, 3, PHP_ROUND_HALF_UP);
 
         return $numero_placas;
     }

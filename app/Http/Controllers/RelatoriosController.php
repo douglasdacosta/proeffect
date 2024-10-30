@@ -249,7 +249,7 @@ class RelatoriosController extends Controller
                                             on
                                                 D.id = C.materiais_id
                                             $condicao
-                                                -- AND D.material = 'PSAI Preto 3mm'
+                                                 -- AND D.material = 'Inserto IM3-3'
                                             group by
                                                 A.id,
                                                 A.os,
@@ -274,37 +274,26 @@ class RelatoriosController extends Controller
 
 
             if(isset($arr_pedidos[$pedido->material_id]['qtde_consumo'])) {
-                if($pedido->peca_padrao == 1) {
-
-                    $quantidade_chapas = $pedido->qtde_blank * $pedido->qtde;
-                }  else {
-                    $quantidade_chapas = $dados_material['quantidade_chapas'];
-                }
-
+                $quantidade_chapas = $dados_material['quantidade_chapas'];
                 $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $quantidade_chapas;
 
             } else {
-
-                if($pedido->peca_padrao == 1) {
-                    $quantidade_chapas = $pedido->qtde_blank * $pedido->qtde;
-                }  else {
-                    $quantidade_chapas = $dados_material['quantidade_chapas'];
-                }
-
+                $quantidade_chapas = $dados_material['quantidade_chapas'];
                 $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade_chapas;
 
             }
 
             if(isset($arr_pedidos[$pedido->material_id]['valor_previsto'])) {
-                $valor_previsto = $arr_pedidos[$pedido->material_id]['valor_previsto'] + $dados_material['valor_total'];
+                $arr_pedidos[$pedido->material_id]['valor_previsto'] = $arr_pedidos[$pedido->material_id]['valor_previsto'] + $dados_material['valor_total'];
+
             } else {
-                $valor_previsto = $dados_material['valor_total'];
+                $arr_pedidos[$pedido->material_id]['valor_previsto'] = $dados_material['valor_total'];
+
             }
+
             $arr_pedidos[$pedido->material_id]['id'] = $pedido->id;
             $arr_pedidos[$pedido->material_id]['material'] = $pedido->material;
             $arr_pedidos[$pedido->material_id]['material_id'] = $pedido->material_id;
-            $arr_pedidos[$pedido->material_id]['valor_previsto'] = $valor_previsto;
-
             $material_calculado[$pedido->id][$pedido->material_id] = true;
             $arr_pedidos[$pedido->material_id]['fichas'][] = [
                 'os' => $pedido->os,
