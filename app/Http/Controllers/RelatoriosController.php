@@ -232,7 +232,6 @@ class RelatoriosController extends Controller
                                                 D.id as material_id,
                                                 B.ep,
                                                 D.valor as valor_material,
-                                                C.qtde_blank,
                                                 A.qtde,
                                                 D.peca_padrao
                                             FROM
@@ -257,7 +256,6 @@ class RelatoriosController extends Controller
                                                 D.id,
                                                 B.ep,
                                                 D.valor,
-                                                C.qtde_blank,
                                                 A.qtde,
                                                 D.peca_padrao
                                             order by
