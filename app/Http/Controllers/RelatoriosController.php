@@ -249,7 +249,7 @@ class RelatoriosController extends Controller
                                             on
                                                 D.id = C.materiais_id
                                             $condicao
-                                                 -- AND D.material = 'Inserto IM3-3'
+                                                  -- AND D.material = 'PSAI Preto 3mm'
                                             group by
                                                 A.id,
                                                 A.os,
@@ -271,7 +271,7 @@ class RelatoriosController extends Controller
 
             $dados_material = $this->detalhes($pedido->id, $pedido->material_id);
             $dados_material = $dados_material[$pedido->material];
-
+            // info($dados_material);
 
             if(isset($arr_pedidos[$pedido->material_id]['qtde_consumo'])) {
                 $quantidade_chapas = $dados_material['quantidade_chapas'];
@@ -404,6 +404,7 @@ class RelatoriosController extends Controller
         $dados_materiais = $dados_materiais->where('materiais.id', '=', $material_id);
         $dados_materiais = $dados_materiais->get()->toArray();
         $total_somado=0;
+        info($dados_materiais);
         foreach ($dados_materiais as $array_material) {
             $tamanho_chapa = '';
             if(!empty($array_material->medidax)) {
@@ -439,10 +440,6 @@ class RelatoriosController extends Controller
                 $quantidade_chapas =  $calculadora->calcularNumeroPlacas();
                 $dados_totais[$nome_material]['quantidade_chapas'] = $quantidade_chapas;
             }
-        } else {
-
-            $quantidade_chapas = $dados_materiais[0]->qtde;
-            $dados_totais[$dados_materiais[0]->nome_material]['quantidade_chapas'] = $quantidade_chapas;
         }
 
         foreach($dados_totais as $nome_material => $value) {
