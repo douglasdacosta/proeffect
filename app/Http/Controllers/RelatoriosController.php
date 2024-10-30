@@ -230,11 +230,9 @@ class RelatoriosController extends Controller
                                                 A.os,
                                                 D.material,
                                                 D.id as material_id,
-                                                D.consumo_medio_mensal,
                                                 B.ep,
                                                 D.valor as valor_material,
                                                 C.qtde_blank,
-                                                C.blank,
                                                 A.qtde,
                                                 D.peca_padrao
                                             FROM
@@ -251,12 +249,24 @@ class RelatoriosController extends Controller
                                             on
                                                 D.id = C.materiais_id
                                             $condicao
+                                                -- AND D.material = 'PSAI Preto 3mm'
+                                            group by
+                                                A.id,
+                                                A.os,
+                                                D.material,
+                                                D.id,
+                                                B.ep,
+                                                D.valor,
+                                                C.qtde_blank,
+                                                A.qtde,
+                                                D.peca_padrao
                                             order by
-                                                D.material, A.os, B.ep, C.blank
+                                                D.material, A.os, B.ep
                                         "));
             }
         $array_materiais=$arr_pedidos=[];
         $soma=0;
+        $material_calculado=[];
         foreach ($pedidos as $key => &$pedido) {
 
             $dados_material = $this->detalhes($pedido->id, $pedido->material_id);
@@ -265,21 +275,24 @@ class RelatoriosController extends Controller
 
             if(isset($arr_pedidos[$pedido->material_id]['qtde_consumo'])) {
                 if($pedido->peca_padrao == 1) {
+
                     $quantidade_chapas = $pedido->qtde_blank * $pedido->qtde;
-                    $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $quantidade_chapas;
                 }  else {
                     $quantidade_chapas = $dados_material['quantidade_chapas'];
-                    $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $dados_material['quantidade_chapas'];
                 }
 
-            }  else {
+                $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $quantidade_chapas;
+
+            } else {
+
                 if($pedido->peca_padrao == 1) {
                     $quantidade_chapas = $pedido->qtde_blank * $pedido->qtde;
-                     $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade_chapas;
                 }  else {
                     $quantidade_chapas = $dados_material['quantidade_chapas'];
-                     $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $dados_material['quantidade_chapas'];
                 }
+
+                $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade_chapas;
+
             }
 
             if(isset($arr_pedidos[$pedido->material_id]['valor_previsto'])) {
@@ -287,21 +300,22 @@ class RelatoriosController extends Controller
             } else {
                 $valor_previsto = $dados_material['valor_total'];
             }
-
             $arr_pedidos[$pedido->material_id]['id'] = $pedido->id;
             $arr_pedidos[$pedido->material_id]['material'] = $pedido->material;
             $arr_pedidos[$pedido->material_id]['material_id'] = $pedido->material_id;
             $arr_pedidos[$pedido->material_id]['valor_previsto'] = $valor_previsto;
+
+            $material_calculado[$pedido->id][$pedido->material_id] = true;
             $arr_pedidos[$pedido->material_id]['fichas'][] = [
                 'os' => $pedido->os,
                 'material' => $pedido->material,
                 'pedidos_ids' => $pedido->id,
-                'blank' => $pedido->blank,
                 'qtde_itens' => $quantidade_chapas,
                 'qtde' => $pedido->qtde
             ];
 
         }
+        // dd($arr_pedidos);
         $totalizadores = [];
         foreach ($arr_pedidos as $key => $pedido) {
             // dd($pedido);

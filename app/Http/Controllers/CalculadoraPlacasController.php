@@ -31,6 +31,7 @@ class CalculadoraPlacasController extends Controller{
             return 0;
         }
         $numero_placas = round($total_area_peca / $area_chapa_util, 3, PHP_ROUND_HALF_UP);
+        // $numero_placas = $total_area_peca / $area_chapa_util;
 
         return $numero_placas;
     }
