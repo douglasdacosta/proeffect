@@ -404,7 +404,7 @@ class RelatoriosController extends Controller
         $dados_materiais = $dados_materiais->where('materiais.id', '=', $material_id);
         $dados_materiais = $dados_materiais->get()->toArray();
         $total_somado=0;
-        info($dados_materiais);
+        // info($dados_materiais);
         foreach ($dados_materiais as $array_material) {
             $tamanho_chapa = '';
             if(!empty($array_material->medidax)) {
