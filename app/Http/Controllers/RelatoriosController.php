@@ -295,6 +295,7 @@ class RelatoriosController extends Controller
             $material_calculado[$pedido->id][$pedido->material_id] = true;
             $arr_pedidos[$pedido->material_id]['fichas'][] = [
                 'os' => $pedido->os,
+                'ep' => $pedido->ep,
                 'material' => $pedido->material,
                 'pedidos_ids' => $pedido->id,
                 'qtde_itens' => $quantidade_chapas,
