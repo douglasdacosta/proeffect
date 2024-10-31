@@ -345,6 +345,7 @@ class RelatoriosController extends Controller
                                         WHERE A.status = 'A' AND B.id = {$pedido['material_id']}"
                                             ));
 
+                            $estoque_total = $gasto_total  = 0;
                             foreach ($estoque as $key => $value) {
                                 $qtde_baixa = DB::select(DB::raw("SELECT
                                                                 count(1) as qtde_baixa
@@ -362,41 +363,12 @@ class RelatoriosController extends Controller
                                                                 A.estoque_id = $value->id
                                                         "));
 
-                                $qtde_total_estoque_material = DB::select(DB::raw("SELECT
-                                                                                    sum((qtde_chapa_peca * qtde_por_pacote)+(qtde_chapa_peca_mo * qtde_por_pacote_mo)) as qtde_total
-                                                                                FROM
-                                                                                    estoque C
-                                                                                INNER JOIN
-                                                                                    materiais B
-                                                                                    ON B.id = C.material_id
-                                                                                WHERE
-                                                                                    C.material_id = $value->material_id
-                                                                                    and C.status = 'A'
-                                                                            "));
-                                $qtde_total_pacote_material = 0;
-                                $qtde_total_pacote_material = DB::select(DB::raw("SELECT
-                                                                                    sum(qtde_por_pacote + qtde_por_pacote_mo) as qtde_total
-                                                                                FROM
-                                                                                    estoque C
-                                                                                INNER JOIN
-                                                                                    materiais B
-                                                                                    ON B.id = C.material_id
-                                                                                WHERE
-                                                                                    C.material_id = $value->material_id
-                                                                                    and C.status = 'A'
-                                                                            "));
-                                if(isset($dados_estoque[$value->material_id]['gasto_total'])) {
-                                    $dados_estoque[$value->material_id]['gasto_total'] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
-                                } else {
-                                    $dados_estoque[$value->material_id]['gasto_total'] = ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
-                                }
+                                $gasto_total += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
 
-                                $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'];
-
-                                $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'];
+                                $estoque_total += ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo);
 
                             }
-            $estoque_atual = !empty($estoque[0]->estoque_atual) ? $estoque[0]->estoque_atual : 0;
+                            $estoque_atual = $estoque_total - $gasto_total;
 
             $diferenca = $estoque_atual - $pedido['qtde_consumo'];
             $array_materiais[$pedido['material_id']] = [
