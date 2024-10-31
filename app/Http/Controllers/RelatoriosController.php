@@ -307,35 +307,24 @@ class RelatoriosController extends Controller
         $totalizadores = [];
         foreach ($arr_pedidos as $key => $pedido) {
             // dd($pedido);
-            $estoque = DB::select(DB::raw("SELECT
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque_atual,
-                                            ((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id)) as estoque_pacote_atual
-                                        FROM
-                                            estoque A
-                                        INNER JOIN
-                                            materiais B
-                                            ON B.id = A.material_id
-                                        INNER JOIN
-                                            pessoas C
-                                        ON
-                                            C.id = A.fornecedor_id
-                                        WHERE
-                                            B.id = {$pedido['material_id']}
-                                        ORDER BY
-                                            A.data DESC
-                                    "));
-
+            $estoque = DB::select(DB::raw("SELECT SUM(estoque_atual) AS estoque_atual
+                                            FROM (
+                                                SELECT
+                                                    ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) -
+                                                    (
+                                                        (SELECT COUNT(1)
+                                                        FROM lote_estoque_baixados X
+                                                        WHERE X.estoque_id = A.id) *
+                                                        (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)
+                                                    ) AS estoque_atual
+                                                FROM estoque A
+                                                INNER JOIN materiais B ON B.id = A.material_id
+                                                INNER JOIN pessoas C ON C.id = A.fornecedor_id
+                                                WHERE A.status = 'A' AND B.id = {$pedido['material_id']}
+                                            ) AS total_estoque"));
+            info(print_r($estoque[0]->estoque_atual, true));
             $estoque_atual = !empty($estoque[0]->estoque_atual) ? $estoque[0]->estoque_atual : 0;
+
             $diferenca = $estoque_atual - $pedido['qtde_consumo'];
             $array_materiais[$pedido['material_id']] = [
                 'id' => $pedido['id'],
