@@ -146,29 +146,20 @@ class EstoqueController extends Controller
                                                                 ON B.id = C.material_id
                                                             WHERE
                                                                 C.material_id = $value->material_id
+                                                                and C.lote = '$value->lote'
                                                                 and C.status = 'A'
                                                         "));
-            $qtde_total_pacote_material = 0;
-            $qtde_total_pacote_material = DB::select(DB::raw("SELECT
-                                                                sum(qtde_por_pacote + qtde_por_pacote_mo) as qtde_total
-                                                            FROM
-                                                                estoque C
-                                                            INNER JOIN
-                                                                materiais B
-                                                                ON B.id = C.material_id
-                                                            WHERE
-                                                                C.material_id = $value->material_id
-                                                                and C.status = 'A'
-                                                        "));
-            if(isset($dados_estoque[$value->material_id]['gasto_total'])) {
-                $dados_estoque[$value->material_id]['gasto_total'] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
+            info($value->lote);
+            info($qtde_total_estoque_material);
+            if(isset($dados_estoque[$value->material_id]['gasto_total'][$value->lote])) {
+                $dados_estoque[$value->material_id]['gasto_total'][$value->lote] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             } else {
-                $dados_estoque[$value->material_id]['gasto_total'] = ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
+                $dados_estoque[$value->material_id]['gasto_total'][$value->lote] = ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             }
 
-            $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'];
+            $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'][$value->lote];
 
-            $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'];
+            $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'][$value->lote];
 
             $dados_estoque[$value->material_id]['alerta']=1; //1 = estoque alto
             if($dados_estoque[$value->material_id]['estoque'] <= $value->estoque_minimo) {
