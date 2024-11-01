@@ -17,7 +17,7 @@ $(function ($) {
             },
             success: function (data) {
                 history.replaceState(null, null, window.location.pathname);
-                location.reload();
+                window.location.href = baseUrl + '/tela-baixa-estoque?salvo=true';
             },
             error: function (data, textStatus, errorThrown) {
 

@@ -149,8 +149,6 @@ class EstoqueController extends Controller
                                                                 and C.lote = '$value->lote'
                                                                 and C.status = 'A'
                                                         "));
-            info($value->lote);
-            info($qtde_total_estoque_material);
             if(isset($dados_estoque[$value->material_id]['gasto_total'][$value->lote])) {
                 $dados_estoque[$value->material_id]['gasto_total'][$value->lote] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             } else {
@@ -197,6 +195,8 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
             $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
             $array_estoque[$value->id]['alerta_baixa_errada'] = $value->alerta_baixa_errada;
+            $array_estoque[$value->id]['alerta_estoque_zerado'] = ($value->estoque_atual == 0) ? 1 : 0;
+
 
         }
 
@@ -355,23 +355,23 @@ class EstoqueController extends Controller
 
             $estoque->save();
 
-            // $material = new Materiais();
-            // $material = $material->find($request->input('material_id'));
-            // if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
+            $material = new Materiais();
+            $material = $material->find($request->input('material_id'));
+            if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
 
-            //     $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
-            //     $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
-            //     $material->save();
+                $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
+                $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
+                $material->save();
 
-            //     if(!empty($historico)) {
-            //         $historicos = new HistoricosMateriais();
-            //         $historicos->materiais_id = $material->id;
-            //         $historicos->historico = $historico;
-            //         $historicos->status = 'A';
-            //         $historicos->save();
-            //     }
+                if(!empty($historico)) {
+                    $historicos = new HistoricosMateriais();
+                    $historicos->materiais_id = $material->id;
+                    $historicos->historico = $historico;
+                    $historicos->status = 'A';
+                    $historicos->save();
+                }
 
-            // }
+            }
 
             return $estoque->id;
         });

@@ -201,8 +201,9 @@ class ManutencaoProducaoController extends Controller
             return view('manutencao_producao', $dados);
 
         }
-        if(!empty($os)) {
 
+        info('antes');
+        if(!empty($os)) {
             $pedidos = DB::table('pedidos')
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
@@ -214,7 +215,8 @@ class ManutencaoProducaoController extends Controller
 
             $pedidos = $pedidos->where('os', '=', $os)->where('pedidos.status', '=', 'A')->get();
 
-            if(!empty($pedidos)) {
+            $mensagem = 'OS não encontrada';
+            if(!empty($pedidos) && count($pedidos) > 0) {
                 $status = new Status();
                 $status = $status->orderby('id')->get();
 
@@ -228,8 +230,14 @@ class ManutencaoProducaoController extends Controller
                 $status = $status->orderby('id')->get();
 
                 $pedidos =$painelController->buscaDadosEtapa($pedidos);
+                $mensagem = '';
             }
 
+        } else {
+            info($request->input());
+            if (!empty($request->input('os'))) {
+                $mensagem = 'OS não encontrada';
+            }
         }
 
 
@@ -237,7 +245,7 @@ class ManutencaoProducaoController extends Controller
             'pedidos' => $pedidos,
             'status' => $dados_status,
             'senha' => $senha,
-            'mensagem'=>'',
+            'mensagem'=>$mensagem,
             'materiais' => $materiais,
             'motivosPausa' => $painelController->getMotivosPausa(),
         ];

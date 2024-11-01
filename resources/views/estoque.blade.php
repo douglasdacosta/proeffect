@@ -129,7 +129,9 @@
                   @if(isset($array_estoque))
                         @foreach ($array_estoque as $item_estoque)
 
-                            <tr style="@if (isset($item_estoque['alerta_baixa_errada']) && $item_estoque['alerta_baixa_errada'] =='1'){{ ' background-color: rgb(233, 76, 76) '}}@else @endif">
+                            <tr style="@if (isset($item_estoque['alerta_baixa_errada']) && $item_estoque['alerta_baixa_errada'] =='1') {{ ' background-color: rgb(233, 76, 76) '}}@else
+                            @if (isset($item_estoque['alerta_estoque_zerado']) && $item_estoque['alerta_estoque_zerado'] =='1') {{ ' background-color: yellow '}}@else @endif
+                            @endif">
                                 <th data-sortable='true' data-field="id" scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque['id'] )) }}>{{$item_estoque['id']}}</a></th>
                                 <td data-sortable='true' data-field="fornecedor" nowrap >{{$item_estoque['fornecedor']}}</td>
                                 <td data-sortable='true' data-field="lote">{{$item_estoque['lote']}}</td>
@@ -281,7 +283,7 @@
                 <div class="row">
                     <div class="col col-lg-6">
                         <div class="form-group row">
-                            <label for="valor_unitario" class="col-sm-4 col-form-label">Valor unitário </label>
+                            <label for="valor_unitario" class="col-sm-4 col-form-label">Valor unitário c/ imposto</label>
                             <div class="col-sm-4">
                                 <input type="text" class="form-control mask_valor" id="valor_unitario" name="valor_unitario"  value="@if (isset($estoque[0]->valor_unitario)){{ number_format($estoque[0]->valor_unitario,2, ',','.')}}@else{{''}}@endif">
                             </div>
@@ -300,7 +302,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="imposto" class="col-sm-4 col-form-label">Imposto</label>
+                            <label for="imposto" class="col-sm-4 col-form-label">Imposto total NF</label>
                             <div class="col-sm-4">
                                 <input type="text" class="form-control mask_valor" id="imposto" name="imposto"  value="@if (isset($estoque[0]->imposto)){{ number_format($estoque[0]->imposto,2, ',','.')}}@else{{''}}@endif">
                             </div>
@@ -318,7 +320,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="total" class="col-sm-4 col-form-label">Total</label>
+                            <label for="total" class="col-sm-4 col-form-label">Valor Total NF</label>
                             <div class="col-sm-4">
                                 <input type="text" class="form-control mask_valor" id="total" name="total"  value="@if (isset($estoque[0]->total)){{ number_format($estoque[0]->total,2, ',','.')}}@else{{''}}@endif">
                             </div>

@@ -36,7 +36,7 @@ class BaixaEstoqueController extends Controller
             $array_senha_producao[] = $funcionario->senha;
         }
 
-        if(!empty($request->input()) && !in_array($senha, $array_senha_producao)) {
+        if(!empty($request->input('senha')) && !in_array($senha, $array_senha_producao)) {
             $dados = [
                 'pedidos' => '',
                 'status' => '',
@@ -80,11 +80,10 @@ class BaixaEstoqueController extends Controller
                         ));
 
             $mensagem = '';
-
-
-            if (empty($estoque)) {
+            if (empty($estoque) && !empty($request->input('id'))) {
                 $mensagem = 'Estoque não encontrado/senha incorreta';
             }
+
             $dados = [
                 'pedidos' => '',
                 'status' => '',
