@@ -149,8 +149,10 @@ use App\Http\Controllers\PedidosController;
                                             <th></th>
                                             <th>{{$totalizadores['consumo_previsto']}}</th>
                                             @if($request->input('tipo_consulta') == 'P')
-                                            <th>{{$totalizadores['estoque_atual']}}</th>
+                                                <th>{{$totalizadores['estoque_atual']}}</th>
                                                 <th>{{$totalizadores['diferenca']}}</th>
+                                                <th>{{$totalizadores['valor_previsto']}}</th>
+                                            @else
                                                 <th>{{$totalizadores['valor_previsto']}}</th>
                                             @endif
                                             <th></th>
