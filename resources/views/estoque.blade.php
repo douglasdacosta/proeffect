@@ -141,7 +141,7 @@
                                 <td data-sortable='true' data-field="estoque_atual" >{{$item_estoque['estoque_atual']}}</td>
                                 <td data-sortable='true' data-field="pacote" >{{$item_estoque['pacote']}}</td>
                                 <td data-sortable='true' data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
-                                <td data-sortable='true' data-field="alerta" > {{$item_estoque['alerta']}}@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
+                                <td data-sortable='true' data-field="alerta" >@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
                                 <td data-sortable='true' data-field="previsao" title="{{$item_estoque['previsao_meses']}} meses">{{$item_estoque['previsao_meses'] }}</td>
                                 <th  scope="row">
                                     <a href="#">
