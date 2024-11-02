@@ -119,8 +119,8 @@ class EstoqueController extends Controller
                                             A.data DESC
                                     "));
 
-        $dados_estoque = [];
-        $estoque_atual_somado=0;
+        $estoque_atual_somado=$dados_estoque = [];
+
         foreach ($estoque as $key => $value) {
             $qtde_baixa = DB::select(DB::raw("SELECT
                                             count(1) as qtde_baixa
@@ -157,11 +157,17 @@ class EstoqueController extends Controller
             }
 
             $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'][$value->lote];
-            $estoque_atual_somado +=$dados_estoque[$value->material_id]['estoque'];
+
             $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'][$value->lote];
 
+            if(isset($estoque_atual_somado[$value->material_id]['somado'])){
+                $estoque_atual_somado[$value->material_id]['somado'] +=$dados_estoque[$value->material_id]['estoque'];
+            } else {
+                $estoque_atual_somado[$value->material_id]['somado'] =$dados_estoque[$value->material_id]['estoque'];
+            }
+
             $dados_estoque[$value->material_id]['alerta']=1; //1 = estoque alto
-            if($estoque_atual_somado <= $value->estoque_minimo) {
+            if($estoque_atual_somado[$value->material_id]['somado'] <= $value->estoque_minimo) {
                 $dados_estoque[$value->material_id]['alerta'] = 0;
             }
 
