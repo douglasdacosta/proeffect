@@ -159,9 +159,9 @@ class EstoqueController extends Controller
 
             $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'][$value->lote];
 
-            $dados_estoque[$value->material_id]['alerta']=1; //1 = estoque alto
+            $dados_estoque[$value->id]['alerta']=1; //1 = estoque alto
             if($dados_estoque[$value->material_id]['estoque'] <= $value->estoque_minimo) {
-                $dados_estoque[$value->material_id]['alerta'] = 0;
+                $dados_estoque[$value->id]['alerta'] = 0;
             }
 
             $value->consumo_medio_mensal = $value->consumo_medio_mensal == 0 ? 1 : $value->consumo_medio_mensal;
@@ -189,7 +189,7 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['pacote'] = number_format($value->estoque_pacote_atual,0, '','.');
 
             $array_estoque[$value->id]['material'] = $value->material;
-            $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
+            $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->material_id]['previsao_meses'];
             $array_estoque[$value->id]['estoque_comprado'] = number_format($estoque_comprado,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
