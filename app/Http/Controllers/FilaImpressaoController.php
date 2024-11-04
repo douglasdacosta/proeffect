@@ -34,17 +34,17 @@ class FilaImpressaoController extends Controller
             $estoque = DB::table('estoque')
                 ->join('materiais', 'materiais.id', '=', 'estoque.material_id')
                 ->join('pessoas', 'pessoas.id', '=', 'estoque.fornecedor_id')
-                ->select('estoque.data', 'estoque.lote', 'pessoas.nome_cliente', 'materiais.codigo')
+                ->select('estoque.data', 'estoque.lote', 'pessoas.nome_cliente', 'materiais.codigo', 'estoque.qtde_chapa_peca')
                 ->where('estoque.id', '=', $fila->estoque_id)
                 ->orderby('estoque.data', 'desc')
                 ->first();
 
             $nome_cliente = $estoque->nome_cliente;
-            $nome_cliente = implode(' ', array_slice(explode(' ', $nome_cliente), 0, 2));
+            $nome_cliente = implode(' ', array_slice(explode(' ', $nome_cliente), 0, 1));
 
             $array[] = [
                 'material' => $estoque->codigo,
-                'fornecedor' => $nome_cliente,
+                'fornecedor' => $nome_cliente . ' ' . $estoque->qtde_chapa_peca . 'P',
                 'estoque_id' => $estoque->lote,
                 'qtde' => $fila->qtde_etiqueta,
                 'data' => $estoque->data ? Carbon::parse($estoque->data)->format('d/m/y') : $estoque->data,

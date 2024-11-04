@@ -179,17 +179,8 @@
                     if (xhr.readyState === 4) {
                         if (xhr.status >= 200 && xhr.status < 300) {
                             alert('Alterado com sucesso!')
-                            var data = JSON.parse(xhr.responseText);
-                            if(data.mostrar_caixa == 1) {
-                                $('#modal_caixas').modal('show');
-                                var statusAtual = $(this).data('statusatual');
-                                var descricaoproximostatus = $(this).data('descricaoproximostatus');
-                                texto_status = "Adicionar caixas para expedição";
-                                $('#texto_status_caixas').text(texto_status);
-                            } else {
-                                history.replaceState(null, null, window.location.pathname);
-                                location.reload();
-                            }
+                            history.replaceState(null, null, window.location.pathname);
+                            location.reload();
                         } else {
                             var data = JSON.parse(xhr.responseText);
                             alert('Ocorreu um erro al alterar o status!')

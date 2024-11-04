@@ -100,7 +100,6 @@ class FuncionariosController extends Controller
      */
     public function alterar(Request $request)
     {
-        info($request->input());
         $funcionarios = new Funcionarios();
 
 

@@ -84,6 +84,8 @@ use App\Http\Controllers\PedidosController;
                                             <th>Diferença unidade</th>
                                             <th>Valor previsto</th>
                                             <th>Alerta</th>
+                                        @else
+                                            <th>Valor</th>
                                         @endif
                                         <th>Ver ficha técnica</th>
                                     </tr>
@@ -99,6 +101,8 @@ use App\Http\Controllers\PedidosController;
                                                     <td data-sortable='true' >{{ $material['diferenca'] }}</td>
                                                     <td data-sortable='true' >{{ $material['valor_previsto'] }}</td>
                                                     <td >{!! $material['alerta'] !!}</td>
+                                                @else
+                                                    <td data-sortable='true' >{{ $material['valor_previsto'] }}</td>
                                                 @endif
                                                 <td scope="row">
 
@@ -111,14 +115,16 @@ use App\Http\Controllers\PedidosController;
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
                                                                 </div>
+                                                                <p>{{ $material['material'] }}</p>
                                                                 <div class="modal-body text-Left" style="overflow-y: auto">
                                                                     <label for="" class="col-sm-6 col-form-label "></label>
                                                                     @if (isset($material['os']))
                                                                         @foreach ($material['os'] as $pedido_id)
                                                                             <p>
-                                                                                Ver dados O.S: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>
-                                                                                {{$pedido_id['os']}}
-                                                                            </a> quantidade: {{$pedido_id['qtde']}}
+                                                                                O.S: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['os']}}</a>
+                                                                                &nbsp;Qtde: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['qtde_itens']}}</a>
+                                                                                &nbsp;EP: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['ep']}}</a>
+                                                                                &nbsp;Qtde pedido: <a href={{ URL::route('consumo-materiais-detalhes', ['id' => $pedido_id['pedidos_ids']]) }}>{{$pedido_id['qtde']}}</a>
                                                                             </p>
                                                                         @endforeach
                                                                     @endif
@@ -141,10 +147,12 @@ use App\Http\Controllers\PedidosController;
                                     <tfoot>
                                         <tr>
                                             <th></th>
-                                            <th>{{$totalizadores['estoque_atual']}}</th>
+                                            <th>{{$totalizadores['consumo_previsto']}}</th>
                                             @if($request->input('tipo_consulta') == 'P')
-                                                <th>{{$totalizadores['consumo_previsto']}}</th>
+                                                <th>{{$totalizadores['estoque_atual']}}</th>
                                                 <th>{{$totalizadores['diferenca']}}</th>
+                                                <th>{{$totalizadores['valor_previsto']}}</th>
+                                            @else
                                                 <th>{{$totalizadores['valor_previsto']}}</th>
                                             @endif
                                             <th></th>

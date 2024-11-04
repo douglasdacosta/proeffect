@@ -119,7 +119,8 @@ class EstoqueController extends Controller
                                             A.data DESC
                                     "));
 
-        $dados_estoque = [];
+        $estoque_atual_somado=$dados_estoque = [];
+
         foreach ($estoque as $key => $value) {
             $qtde_baixa = DB::select(DB::raw("SELECT
                                             count(1) as qtde_baixa
@@ -146,32 +147,27 @@ class EstoqueController extends Controller
                                                                 ON B.id = C.material_id
                                                             WHERE
                                                                 C.material_id = $value->material_id
+                                                                and C.lote = '$value->lote'
                                                                 and C.status = 'A'
                                                         "));
-            $qtde_total_pacote_material = 0;
-            $qtde_total_pacote_material = DB::select(DB::raw("SELECT
-                                                                sum(qtde_por_pacote + qtde_por_pacote_mo) as qtde_total
-                                                            FROM
-                                                                estoque C
-                                                            INNER JOIN
-                                                                materiais B
-                                                                ON B.id = C.material_id
-                                                            WHERE
-                                                                C.material_id = $value->material_id
-                                                                and C.status = 'A'
-                                                        "));
-            if(isset($dados_estoque[$value->material_id]['gasto_total'])) {
-                $dados_estoque[$value->material_id]['gasto_total'] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
+            if(isset($dados_estoque[$value->material_id]['gasto_total'][$value->lote])) {
+                $dados_estoque[$value->material_id]['gasto_total'][$value->lote] += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             } else {
-                $dados_estoque[$value->material_id]['gasto_total'] = ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
+                $dados_estoque[$value->material_id]['gasto_total'][$value->lote] = ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
             }
 
-            $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'];
+            $dados_estoque[$value->material_id]['estoque'] = $qtde_total_estoque_material[0]->qtde_total - $dados_estoque[$value->material_id]['gasto_total'][$value->lote];
 
-            $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'];
+            $value->estoque_atual = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo) - $dados_estoque[$value->material_id]['gasto_total'][$value->lote];
+
+            if(isset($estoque_atual_somado[$value->material_id]['somado'])){
+                $estoque_atual_somado[$value->material_id]['somado'] +=$dados_estoque[$value->material_id]['estoque'];
+            } else {
+                $estoque_atual_somado[$value->material_id]['somado'] =$dados_estoque[$value->material_id]['estoque'];
+            }
 
             $dados_estoque[$value->material_id]['alerta']=1; //1 = estoque alto
-            if($dados_estoque[$value->material_id]['estoque'] <= $value->estoque_minimo) {
+            if($estoque_atual_somado[$value->material_id]['somado'] <= $value->estoque_minimo) {
                 $dados_estoque[$value->material_id]['alerta'] = 0;
             }
 
@@ -179,11 +175,11 @@ class EstoqueController extends Controller
 
             $previsao_meses = ($dados_estoque[$value->material_id]['estoque']  - $value->estoque_minimo) / $value->consumo_medio_mensal;
             if($previsao_meses <= 0) {
-                $dados_estoque[$value->material_id]['previsao_meses'] = 0;
+                $dados_estoque[$value->id]['previsao_meses'] = 0;
             } else {
 
                 $previsao_meses = round($previsao_meses, 1);
-                $dados_estoque[$value->material_id]['previsao_meses'] = $previsao_meses;
+                $dados_estoque[$value->id]['previsao_meses'] = $previsao_meses;
             }
 
         }
@@ -201,11 +197,13 @@ class EstoqueController extends Controller
 
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
-            $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->material_id]['previsao_meses'];
+            $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->id]['previsao_meses'];
             $array_estoque[$value->id]['estoque_comprado'] = number_format($estoque_comprado,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
             $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
             $array_estoque[$value->id]['alerta_baixa_errada'] = $value->alerta_baixa_errada;
+            $array_estoque[$value->id]['alerta_estoque_zerado'] = ($value->estoque_atual == 0) ? 1 : 0;
+
 
         }
 
@@ -364,23 +362,23 @@ class EstoqueController extends Controller
 
             $estoque->save();
 
-            // $material = new Materiais();
-            // $material = $material->find($request->input('material_id'));
-            // if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
+            $material = new Materiais();
+            $material = $material->find($request->input('material_id'));
+            if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
 
-            //     $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
-            //     $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
-            //     $material->save();
+                $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
+                $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
+                $material->save();
 
-            //     if(!empty($historico)) {
-            //         $historicos = new HistoricosMateriais();
-            //         $historicos->materiais_id = $material->id;
-            //         $historicos->historico = $historico;
-            //         $historicos->status = 'A';
-            //         $historicos->save();
-            //     }
+                if(!empty($historico)) {
+                    $historicos = new HistoricosMateriais();
+                    $historicos->materiais_id = $material->id;
+                    $historicos->historico = $historico;
+                    $historicos->status = 'A';
+                    $historicos->save();
+                }
 
-            // }
+            }
 
             return $estoque->id;
         });

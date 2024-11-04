@@ -10,6 +10,8 @@ use App\Models\Materiais;
 use App\Providers\DateHelpers;
 use DateTime;
 
+use App\Http\Controllers\CalculadoraPlacasController;
+
 class RelatoriosController extends Controller
 {
     public function index(Request $request)
@@ -223,16 +225,15 @@ class RelatoriosController extends Controller
                 $condicao = ' WHERE '.implode(' AND ', $where);
             }
 
-            $pedidos = DB::select(DB::raw("SELECT
+            $pedidos = DB::select(DB::raw("SELECT DISTINCT
                                                 A.id,
                                                 A.os,
                                                 D.material,
                                                 D.id as material_id,
-                                                D.consumo_medio_mensal,
                                                 B.ep,
                                                 D.valor as valor_material,
-                                                C.qtde_blank,
-                                                A.qtde
+                                                A.qtde,
+                                                D.peca_padrao
                                             FROM
                                                 pedidos A
                                             INNER JOIN
@@ -247,39 +248,75 @@ class RelatoriosController extends Controller
                                             on
                                                 D.id = C.materiais_id
                                             $condicao
+                                                  -- AND D.material = 'PSAI Preto 3mm'
+                                            group by
+                                                A.id,
+                                                A.os,
+                                                D.material,
+                                                D.id,
+                                                B.ep,
+                                                D.valor,
+                                                A.qtde,
+                                                D.peca_padrao
+                                            order by
+                                                D.material, A.os, B.ep
                                         "));
             }
         $array_materiais=$arr_pedidos=[];
-
+        $soma=0;
+        $material_calculado=[];
         foreach ($pedidos as $key => &$pedido) {
 
             $dados_material = $this->detalhes($pedido->id, $pedido->material_id);
             $dados_material = $dados_material[$pedido->material];
+            // info($dados_material);
+
             if(isset($arr_pedidos[$pedido->material_id]['qtde_consumo'])) {
-                $quantidade = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $dados_material['quantidade_chapas'];
-                $valor_previsto = $arr_pedidos[$pedido->material_id]['valor_previsto'] + $dados_material['valor_total'];
-            }  else {
-                $quantidade = $dados_material['quantidade_chapas']; //$pedido->qtde * $pedido->qtde_blank;
-                $valor_previsto = $dados_material['valor_total'];
+                $quantidade_chapas = $dados_material['quantidade_chapas'];
+                $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $arr_pedidos[$pedido->material_id]['qtde_consumo'] + $quantidade_chapas;
+
+            } else {
+                $quantidade_chapas = $dados_material['quantidade_chapas'];
+                $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade_chapas;
+
+            }
+
+            if(isset($arr_pedidos[$pedido->material_id]['valor_previsto'])) {
+                $arr_pedidos[$pedido->material_id]['valor_previsto'] = $arr_pedidos[$pedido->material_id]['valor_previsto'] + $dados_material['valor_total'];
+
+            } else {
+                $arr_pedidos[$pedido->material_id]['valor_previsto'] = $dados_material['valor_total'];
+
             }
 
             $arr_pedidos[$pedido->material_id]['id'] = $pedido->id;
             $arr_pedidos[$pedido->material_id]['material'] = $pedido->material;
             $arr_pedidos[$pedido->material_id]['material_id'] = $pedido->material_id;
-            $arr_pedidos[$pedido->material_id]['qtde_consumo'] = $quantidade;
-            $arr_pedidos[$pedido->material_id]['valor_previsto'] = $valor_previsto;
-            $arr_pedidos[$pedido->material_id]['pedidos_ids'][$pedido->id] = [
+            $material_calculado[$pedido->id][$pedido->material_id] = true;
+            $arr_pedidos[$pedido->material_id]['fichas'][] = [
                 'os' => $pedido->os,
+                'ep' => $pedido->ep,
+                'material' => $pedido->material,
                 'pedidos_ids' => $pedido->id,
-                'qtde' => $dados_material['quantidade_chapas'] // $pedido->qtde * $pedido->qtde_blank
+                'qtde_itens' => $quantidade_chapas,
+                'qtde' => $pedido->qtde
             ];
 
         }
-        // dd($arr_pedidos[70]);
+        // dd($arr_pedidos);
         $totalizadores = [];
         foreach ($arr_pedidos as $key => $pedido) {
             // dd($pedido);
             $estoque = DB::select(DB::raw("SELECT
+                                            A.data,
+                                            A.id,
+                                            A.qtde_chapa_peca,
+                                            A.qtde_chapa_peca_mo,
+                                            A.qtde_por_pacote,
+                                            A.qtde_por_pacote_mo,
+                                            B.estoque_minimo,
+                                            A.lote,
+                                            C.nome_cliente as fornecedor,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                     count(1)
                                                 from
@@ -291,7 +328,11 @@ class RelatoriosController extends Controller
                                                 from
                                                     lote_estoque_baixados X
                                                 where
-                                                    X.estoque_id = A.id)) as estoque_pacote_atual
+                                                    X.estoque_id = A.id)) as estoque_pacote_atual,
+                                            B.material,
+                                            A.material_id,
+                                            B.consumo_medio_mensal,
+                                            A.alerta_baixa_errada
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -301,13 +342,34 @@ class RelatoriosController extends Controller
                                             pessoas C
                                         ON
                                             C.id = A.fornecedor_id
-                                        WHERE
-                                            B.id = {$pedido['material_id']}
-                                        ORDER BY
-                                            A.data DESC
-                                    "));
+                                        WHERE A.status = 'A' AND B.id = {$pedido['material_id']}"
+                                            ));
 
-            $estoque_atual = !empty($estoque[0]->estoque_atual) ? $estoque[0]->estoque_atual : 0;
+                            $estoque_total = $gasto_total  = 0;
+                            foreach ($estoque as $key => $value) {
+                                $qtde_baixa = DB::select(DB::raw("SELECT
+                                                                count(1) as qtde_baixa
+                                                            FROM
+                                                                lote_estoque_baixados A
+                                                            INNER JOIN
+                                                                estoque C
+                                                            on
+                                                                C.id = A.estoque_id
+                                                                and C.status = 'A'
+                                                            INNER JOIN
+                                                                materiais B
+                                                                ON B.id = C.material_id
+                                                            WHERE
+                                                                A.estoque_id = $value->id
+                                                        "));
+
+                                $gasto_total += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
+
+                                $estoque_total += ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo);
+
+                            }
+                            $estoque_atual = $estoque_total - $gasto_total;
+
             $diferenca = $estoque_atual - $pedido['qtde_consumo'];
             $array_materiais[$pedido['material_id']] = [
                 'id' => $pedido['id'],
@@ -316,11 +378,10 @@ class RelatoriosController extends Controller
                 'estoque_atual' => $estoque_atual,
                 'consumo_previsto' => $pedido['qtde_consumo'],
                 'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
-                'diferenca' =>  $diferenca,
+                'diferenca' =>  round($diferenca, 2),
                 'alerta' => $estoque_atual < $pedido['qtde_consumo'] || ($estoque_atual==0 && $pedido['qtde_consumo']==0) ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>',
-                'os' => $pedido['pedidos_ids']
+                'os' => $pedido['fichas']
             ];
-            // dd($array_materiais);
             $estoque_atual =  isset($totalizadores['estoque_atual']) ? $totalizadores['estoque_atual'] + $estoque_atual : $estoque_atual;
             $consumo_previsto =   isset($totalizadores['consumo_previsto']) ? $totalizadores['consumo_previsto'] + $pedido['qtde_consumo'] : $pedido['qtde_consumo'];
             $valor_previsto =  isset($totalizadores['valor_previsto']) ? $totalizadores['valor_previsto'] + $pedido['valor_previsto'] : $pedido['valor_previsto'];
@@ -330,7 +391,7 @@ class RelatoriosController extends Controller
                 'estoque_atual' => $estoque_atual,
                 'consumo_previsto' =>  $consumo_previsto,
                 'valor_previsto' => $valor_previsto,
-                'diferenca' => $diferenca,
+                'diferenca' => round($diferenca, 2),
             ];
         }
         if(count($totalizadores)) {
@@ -376,6 +437,7 @@ class RelatoriosController extends Controller
         $dados_materiais = $dados_materiais->where('materiais.id', '=', $material_id);
         $dados_materiais = $dados_materiais->get()->toArray();
         $total_somado=0;
+        // info($dados_materiais);
         foreach ($dados_materiais as $array_material) {
             $tamanho_chapa = '';
             if(!empty($array_material->medidax)) {
@@ -407,14 +469,10 @@ class RelatoriosController extends Controller
         if(!empty($array_pecas_necessarias)) {
             foreach ($array_pecas_necessarias as $nome_material => $pecas_necessarias) {
 
-                $calculadora = new CalculadoraPlacas($pecas_necessarias, $chapa[$nome_material]);
+                $calculadora = new CalculadoraPlacasController($pecas_necessarias, $chapa[$nome_material]);
                 $quantidade_chapas =  $calculadora->calcularNumeroPlacas();
                 $dados_totais[$nome_material]['quantidade_chapas'] = $quantidade_chapas;
             }
-        } else {
-
-            $quantidade_chapas = $dados_materiais[0]->qtde;
-            $dados_totais[$dados_materiais[0]->nome_material]['quantidade_chapas'] = $quantidade_chapas;
         }
 
         foreach($dados_totais as $nome_material => $value) {
@@ -427,39 +485,3 @@ class RelatoriosController extends Controller
         return $dados_totais;
     }
 }
-
-class CalculadoraPlacas {
-    private $pecas_necessarias;
-    private $chapa;
-    private $perda;
-    private $adicao_w;
-    private $adicao_h;
-
-    public function __construct($pecas_necessarias, $chapa) {
-
-        $this->pecas_necessarias = $pecas_necessarias;
-        $this->chapa = $chapa;
-        $this->perda = env('PERCENTUAL_PERDA_CHAPA');
-        $this->adicao_w = env('PERCENTUAL_x');
-        $this->adicao_h = env('PERCENTUAL_h');
-    }
-
-    public function calcularNumeroPlacas() {
-        $total_area_peca = 0;
-        foreach ($this->pecas_necessarias as $peca) {
-
-            $total_area_peca += $peca['quantidade'] * ($peca['width']+ $this->adicao_w ) * ($peca['height']+ $this->adicao_h ) ;
-        }
-
-        $area_chapa_util = ($this->chapa['sheetWidth'] * $this->chapa['sheetHeight']) * (1 - $this->perda);
-
-        $numero_placas = ceil($total_area_peca / $area_chapa_util);
-
-        return $numero_placas;
-    }
-}
-
-
-
-
-

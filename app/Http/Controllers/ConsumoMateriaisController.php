@@ -153,7 +153,7 @@ class ConsumoMateriaisController extends Controller
         foreach ($array_pecas_necessarias as $nome_material => $pecas_necessarias) {
 
             $quantidade_chapas = 0;
-            $calculadora = new CalculadoraPlacas($pecas_necessarias, $chapa[$nome_material]);
+            $calculadora = new CalculadoraPlacasController($pecas_necessarias, $chapa[$nome_material]);
             $quantidade_chapas =  $calculadora->calcularNumeroPlacas();
             $dados_totais[$nome_material]['quantidade_chapas'] = $quantidade_chapas;
         }
@@ -309,34 +309,5 @@ class Empacotamento {
 
     public function getChapaOrganizada() {
         return $this->chapaOrganizada;
-    }
-}
-
-
-
-
-class CalculadoraPlacas {
-    private $pecas_necessarias;
-    private $chapa;
-    private $perda;
-
-    public function __construct($pecas_necessarias, $chapa) {
-
-        $this->pecas_necessarias = $pecas_necessarias;
-        $this->chapa = $chapa;
-        $this->perda = env('PERCENTUAL_PERDA_CHAPA');
-    }
-
-    public function calcularNumeroPlacas() {
-        $total_area_peca = 0;
-        foreach ($this->pecas_necessarias as $peca) {
-            $total_area_peca += $peca['quantidade'] * $peca['width'] * $peca['height'];
-        }
-
-        $area_chapa_util = ($this->chapa['sheetWidth'] * $this->chapa['sheetHeight']) * (1 - $this->perda);
-
-        $numero_placas = ceil($total_area_peca / $area_chapa_util);
-
-        return $numero_placas;
     }
 }
