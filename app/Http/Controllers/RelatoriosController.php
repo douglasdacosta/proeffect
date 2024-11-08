@@ -484,5 +484,4 @@ class RelatoriosController extends Controller
         };
         return $dados_totais;
     }
-
 }

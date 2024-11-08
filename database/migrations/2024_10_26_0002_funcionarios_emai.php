@@ -14,18 +14,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('categoria_tela', function (Blueprint $table) {
-            $table->id();
-            $table->string('nome',100);
+
+        Schema::table('funcionarios', function($table) {
+            $table->string('email')->unique()->nullable()->after('nome');
+            $table->bigInteger('perfil')->unsigned()->index()->default(1)->after('nome');
+            $table->foreign('perfil')->references('id')->on('perfis');
         });
 
-        DB::table('categoria_tela')->insert(
-            [
-                ['id'=> '1', 'nome'=>'Cadastros'],
-                ['id'=> '2', 'nome'=>'Produção'],
-                ['id'=> '3', 'nome'=>'Configurações'],
-            ]
-            );
     }
 
 
@@ -36,6 +31,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categoria_tela');
+        Schema::table('funcionarios', function($table) {
+            $table->dropColumn('email');
+        });
     }
 };

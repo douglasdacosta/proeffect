@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class CategoriaTela extends Model
+class CategoriaMenus extends Model
 {
     use HasFactory;
 
-    protected $table = 'categoria_tela';
+    protected $table = 'categoria_menus';
 }

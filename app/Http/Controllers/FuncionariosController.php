@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Funcionarios;
+use App\Models\Perfis;
 use Illuminate\Http\Request;
 use App\Models\Pessoas;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
 class FuncionariosController extends Controller
 {
     /**
@@ -52,6 +56,7 @@ class FuncionariosController extends Controller
                 'nome_tela' => 'funcionarios',
 				'funcionarios'=> $funcionarios,
 				'request' => $request,
+                'perfis' => (new Perfis())->get(),
 				'rotaIncluir' => 'incluir-funcionarios',
 				'rotaAlterar' => 'alterar-funcionarios'
 			);
@@ -80,6 +85,7 @@ class FuncionariosController extends Controller
 				'tela' => $tela,
                 'nome_tela' => 'funcionarios',
 				'request' => $request,
+                'perfis' => (new Perfis())->get(),
 				'rotaIncluir' => 'incluir-funcionarios',
 				'rotaAlterar' => 'alterar-funcionarios'
 			);
@@ -113,6 +119,7 @@ class FuncionariosController extends Controller
                 'nome_tela' => 'funcionarios',
 				'funcionarios'=> $funcionario,
 				'request' => $request,
+                'perfis' => (new Perfis())->get(),
 				'rotaIncluir' => 'incluir-funcionarios',
 				'rotaAlterar' => 'alterar-funcionarios'
 			);
@@ -126,12 +133,26 @@ class FuncionariosController extends Controller
             $funcionarios = $funcionarios::find($request->input('id'));
         }
         $funcionarios->nome = $request->input('nome');
+        $funcionarios->perfil = $request->input('perfil');
         $funcionarios->funcao = $request->input('funcao');
+        $funcionarios->email = $request->input('email');
         $funcionarios->status = $request->input('status');
         $funcionarios->senha = $request->input('senha');
         $funcionarios->save();
 
+        $users = new User();
+        $users = $users->where('email', '=', $request->input('email'))->first();
+        if(empty($users)) {
+            $users = new User();
+        }
+        $users->name = $request->input('nome');
+        $users->email = $request->input('email');
+        $users->password = Hash::make($request->input('senha'));
+        $users->save();
+
         return $funcionarios->id;
+
+
 
 }
 }
