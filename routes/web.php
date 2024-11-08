@@ -74,7 +74,7 @@ Route::match(['get', 'post'],'/consumo-materiais-detalhes', [App\Http\Controller
 
 Route::match(['get', 'post'],'/maquinas', [App\Http\Controllers\MaquinasController::class, 'index'])->name('maquinas')->middleware('afterAuth:maquinas');
 
-Route::match(['get', 'post'],'/producao-maquinas', [App\Http\Controllers\MaquinasController::class, 'producaoMaquinas'])->name('producao_maquinas')->middleware('afterAuth:producao_maquinas');
+Route::match(['get', 'post'],'/producao-maquinas', [App\Http\Controllers\MaquinasController::class, 'producaoMaquinas'])->name('producao_maquinas')->middleware('afterAuth:producao-maquinas');
 
 Route::match(['get', 'post'],'/orcamentos', [App\Http\Controllers\OrcamentosController::class, 'index'])->name('orcamentos')->middleware('afterAuth:orcamentos');
 Route::match(['get', 'post'],'/alterar-orcamentos', [App\Http\Controllers\OrcamentosController::class, 'alterar'])->name('alterar-orcamentos')->middleware('afterAuth:orcamentos');
