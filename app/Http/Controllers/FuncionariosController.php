@@ -145,6 +145,7 @@ class FuncionariosController extends Controller
         if(empty($users)) {
             $users = new User();
         }
+        $users->id = $funcionarios->id;
         $users->name = $request->input('nome');
         $users->email = $request->input('email');
         $users->password = Hash::make($request->input('senha'));
