@@ -11,4 +11,9 @@ class Perfis extends Model
     use HasFactory;
 
     protected $table = 'perfis';
+
+    public function subMenus()
+    {
+        return $this->belongsToMany(SubMenus::class, 'perfil_submenu', 'perfil_id', 'submenu_id');
+    }
 }

@@ -14,16 +14,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('categoria_tela', function (Blueprint $table) {
+        Schema::create('categoria_menus', function (Blueprint $table) {
             $table->id();
             $table->string('nome',100);
         });
 
-        DB::table('categoria_tela')->insert(
+        DB::table('categoria_menus')->insert(
             [
-                ['id'=> '1', 'nome'=>'Cadastros'],
-                ['id'=> '2', 'nome'=>'Produção'],
-                ['id'=> '3', 'nome'=>'Configurações'],
+                ['id'=> '1', 'nome'=>'Lançamentos'],
+                ['id'=> '2', 'nome'=>'Relatórios'],
+                ['id'=> '3', 'nome'=>'Análise'],
+                ['id'=> '4', 'nome'=>'Configuração'],
             ]
             );
     }
@@ -36,6 +37,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categoria_tela');
+        Schema::dropIfExists('categoria_menus');
     }
 };

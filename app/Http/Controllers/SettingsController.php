@@ -74,7 +74,7 @@ class SettingsController extends Controller
     		$user->email = $request->input('email');
     		$user->password = Hash::make($request->input('password'));
     		$user->save();
-         
+
         return redirect()->route('settings');
     }
 
