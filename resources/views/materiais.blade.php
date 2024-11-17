@@ -114,6 +114,20 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
+                <select class="form-control col-sm-1 custom-select" id="categoria" name="categoria">
+                    <option value=""></option>
+                    @if (isset($categorias))
+                        @foreach ($categorias as $categoria)
+                            <option value="{{ $categoria->id }}"
+                                @if (isset($materiais[0]->categoria_id) && $materiais[0]->categoria_id == $categoria->id) selected="selected" @else{{ '' }} @endif>
+                                {{ $categoria->nome}}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+            <div class="form-group row">
                 <label for="peca_padrao" class="col-sm-2 col-form-label">Peça padrão</label>
                 <select class="form-control col-sm-1 custom-select" id="peca_padrao" name="peca_padrao">
                     <option value="2" @if ((isset($materiais[0]->peca_padrao) && $materiais[0]->peca_padrao == 2)){{"selected='selected'"}}@else{{''}}@endif>Não</option>

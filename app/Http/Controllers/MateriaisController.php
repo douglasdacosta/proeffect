@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoriasMateriais;
 use App\Models\HistoricosMateriais;
 use Illuminate\Http\Request;
 use App\Models\Materiais;
@@ -86,6 +87,7 @@ class MateriaisController extends Controller
 				'tela' => $tela,
                 'nome_tela' => 'materiais',
 				'request' => $request,
+                'categorias' => (new CategoriasMateriais())->where('status', '=', 'A')->get(),
 				'rotaIncluir' => 'incluir-materiais',
 				'rotaAlterar' => 'alterar-materiais'
 			);
@@ -127,6 +129,7 @@ class MateriaisController extends Controller
                 'nome_tela' => 'materiais',
 				'materiais'=> $material,
 				'request' => $request,
+                'categorias' => (new CategoriasMateriais())->where('status', '=', 'A')->get(),
                 'historicos'=> $historicos,
 				'rotaIncluir' => 'incluir-materiais',
 				'rotaAlterar' => 'alterar-materiais'
@@ -156,6 +159,7 @@ class MateriaisController extends Controller
             $materiais->peca_padrao = $request->input('peca_padrao');
             $materiais->estoque_minimo = $request->input('estoque_minimo');
             $materiais->consumo_medio_mensal = $request->input('consumo_medio_mensal');
+            $materiais->categoria_id = $request->input('categoria');
             $materiais->peso = $request->input('peso');
             $materiais->tempo_montagem_torre = $tempo_torre;
             $materiais->valor = DateHelpers::formatFloatValue($request->input('valor'));

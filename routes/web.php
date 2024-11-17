@@ -101,3 +101,7 @@ Route::match(['get', 'post'],'/relatorio-previsao-material', [App\Http\Controlle
 Route::match(['get', 'post'],'/perfis', [App\Http\Controllers\PerfisController::class, 'index'])->name('perfis')->middleware('afterAuth:perfis');
 Route::match(['get', 'post'],'/alterar-perfis', [App\Http\Controllers\PerfisController::class, 'alterar'])->name('alterar-perfis')->middleware('afterAuth:perfis');
 Route::match(['get', 'post'],'/incluir-perfis', [App\Http\Controllers\PerfisController::class, 'incluir'])->name('incluir-perfis')->middleware('afterAuth:perfis');
+
+Route::match(['get', 'post'],'/categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'index'])->name('categorias-materiais')->middleware('afterAuth:categorias-materiais');
+Route::match(['get', 'post'],'/alterar-categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'alterar'])->name('alterar-categorias-materiais')->middleware('afterAuth:categorias-materiais');
+Route::match(['get', 'post'],'/incluir-categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'incluir'])->name('incluir-categorias-materiais')->middleware('afterAuth:categorias-materiais');
