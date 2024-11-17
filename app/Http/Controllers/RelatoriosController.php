@@ -11,6 +11,7 @@ use App\Providers\DateHelpers;
 use DateTime;
 
 use App\Http\Controllers\CalculadoraPlacasController;
+use App\Models\HistoricosPedidos;
 
 class RelatoriosController extends Controller
 {
@@ -190,32 +191,73 @@ class RelatoriosController extends Controller
                 }
 
             } else {
-                $historicos_etapas = new HistoricosEtapas();
-                $historicos_etapas = $historicos_etapas->select('pedidos_id');
-                $historicos_etapas = $historicos_etapas->whereIn('status_id', $request->input('status_id'));
-                $historicos_etapas = $historicos_etapas->where('etapas_pedidos_id', '=', 4 );
 
-                if (!empty($data_inicio) && !empty($data_fim)){
-                    $historicos_etapas = $historicos_etapas->whereBetween('created_at', [$data_inicio . ' 00:00:01' , $data_fim . ' 23:59:59']);
+
+                // Usinagem
+                // Acabamento
+                // Montagem
+                // Inspeção
+                // Embalar
+                $status_com_inicio_fim = ["4", "5", "6", "7", "8"];
+
+                // Verifica se há interseção entre os arrays
+                if (empty(array_intersect($status_id, $status_com_inicio_fim))) {
+
+                    $historicos_pedidos = new HistoricosPedidos();
+                    $historicos_pedidos = $historicos_pedidos->select('pedidos_id');
+                    $historicos_pedidos = $historicos_pedidos->whereIn('status_id', $request->input('status_id'));
+
+                    if (!empty($data_inicio) && !empty($data_fim)){
+                        $historicos_pedidos = $historicos_pedidos->whereBetween('created_at', [$data_inicio . ' 00:00:01' , $data_fim . ' 23:59:59']);
+                    }
+                    if (empty($data_inicio) && !empty($data_fim)){
+                        $historicos_pedidos = $historicos_pedidos->where('created_at', '<=', $data_fim . ' 23:59:59');
+
+                    }
+                    if (!empty($data_inicio) && empty($data_fim)){
+                        $historicos_pedidos = $historicos_pedidos->where('created_at', '>=', $data_inicio . ' 00:00:01');
+                    }
+
+                    $historicos_pedidos = $historicos_pedidos->get();
+
+                    $array_pedidos = $historicos_pedidos->pluck('pedidos_id')->toArray();
+
+                    $busca_id = "A.id in (0)";
+
+                    if(!empty($array_pedidos)) {
+                        $busca_id= "A.id in (".implode(',', $array_pedidos).")";
+                    }
+                    $where[] = $busca_id;
+
+
+                } else {
+                    $historicos_etapas = new HistoricosEtapas();
+                    $historicos_etapas = $historicos_etapas->select('pedidos_id');
+                    $historicos_etapas = $historicos_etapas->whereIn('status_id', $request->input('status_id'));
+                    $historicos_etapas = $historicos_etapas->where('etapas_pedidos_id', '=', 4 );
+
+                    if (!empty($data_inicio) && !empty($data_fim)){
+                        $historicos_etapas = $historicos_etapas->whereBetween('created_at', [$data_inicio . ' 00:00:01' , $data_fim . ' 23:59:59']);
+                    }
+                    if (empty($data_inicio) && !empty($data_fim)){
+                        $historicos_etapas = $historicos_etapas->where('created_at', '<=', $data_fim . ' 23:59:59');
+
+                    }
+                    if (!empty($data_inicio) && empty($data_fim)){
+                        $historicos_etapas = $historicos_etapas->where('created_at', '>=', $data_inicio . ' 00:00:01');
+                    }
+
+                    $historicos_etapas = $historicos_etapas->get();
+
+                    $array_pedidos = $historicos_etapas->pluck('pedidos_id')->toArray();
+
+                    $busca_id = "A.id in (0)";
+
+                    if(!empty($array_pedidos)) {
+                        $busca_id= "A.id in (".implode(',', $array_pedidos).")";
+                    }
+                    $where[] = $busca_id;
                 }
-                if (empty($data_inicio) && !empty($data_fim)){
-                    $historicos_etapas = $historicos_etapas->where('created_at', '<=', $data_fim . ' 23:59:59');
-
-                }
-                if (!empty($data_inicio) && empty($data_fim)){
-                    $historicos_etapas = $historicos_etapas->where('created_at', '>=', $data_inicio . ' 00:00:01');
-                }
-
-                $historicos_etapas = $historicos_etapas->get();
-
-                $array_pedidos = $historicos_etapas->pluck('pedidos_id')->toArray();
-
-                $busca_id = "A.id in (0)";
-
-                if(!empty($array_pedidos)) {
-                    $busca_id= "A.id in (".implode(',', $array_pedidos).")";
-                }
-                $where[] = $busca_id;
             }
 
             $status_pedido = "A.status = 'A'";
@@ -247,6 +289,10 @@ class RelatoriosController extends Controller
                                                 materiais D
                                             on
                                                 D.id = C.materiais_id
+                                            left join
+                                                historicos E
+                                            on
+                                                E.pedidos_id = A.id
                                             $condicao
                                                   -- AND D.material = 'PSAI Preto 3mm'
                                             group by

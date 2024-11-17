@@ -39,7 +39,7 @@ use App\Http\Controllers\PedidosController;
                     <div class="col-md-5 themed-grid-col " >
                         <div class="row">
                             <label for="ep" class="col-sm-3 col-form-label text-right">Status do pedido</label>
-                            <div class="col-sm-8" style="overflow-y: auto; height: 175px; border:1px solid #97928b">
+                            <div class="col-sm-8" style="overflow-y: auto; height: 175px; border:1px solid #ced4da; border-radius: .25rem;">
                                 <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
                                     <div class="col-sm-6 form-check">

@@ -202,7 +202,7 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
             $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
             $array_estoque[$value->id]['alerta_baixa_errada'] = $value->alerta_baixa_errada;
-            $array_estoque[$value->id]['alerta_estoque_zerado'] = ($value->estoque_atual == 0) ? 1 : 0;
+            $array_estoque[$value->id]['alerta_estoque_zerado'] = ($value->estoque_atual == 0 && $value->estoque_minimo > 0) ? 1 : 0;
 
 
         }

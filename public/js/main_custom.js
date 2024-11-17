@@ -623,6 +623,15 @@ $(function ($) {
         $('.modal').hide();
     })
 
+    $(document).on('click', '.checkbox_emails_todos', function(){
+        if($(this).is(':checked')) {
+            $('.checkbox_emails').prop('checked', true);
+        } else {
+            $('.checkbox_emails').prop('checked', false);
+        }
+    })
+
+    $('#modal_alerta').modal('show');
 
 }); //FIM DO BLOCO DE JQUERY READY
 

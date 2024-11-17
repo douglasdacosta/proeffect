@@ -151,16 +151,14 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     </div>
                     <div class="col-md-3 themed-grid-col row">
                         <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
-                            <div class="col-sm-7" style="overflow-y: auto; height: 175px; border:1px solid #97928b">
-                                {{-- <div class="" role="main"> --}}
-                                        @foreach ($AllStatus as $status)
-                                            <div class="col-sm-8 form-check">
-                                                <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
-                                                @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
-                                                <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
-                                            </div>
-                                        @endforeach
-                                {{-- </div> --}}
+                            <div class="col-sm-7" style="overflow-y: auto; height: 175px; border:1px solid #ced4da; border-radius: .25rem;">
+                                @foreach ($AllStatus as $status)
+                                    <div class="col-sm-8 form-check">
+                                        <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                        @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                        <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                    </div>
+                                @endforeach
                             </div>
                     </div>
 
@@ -508,7 +506,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 <div class="col-md-3 themed-grid-col row" >
                     <div class="row">
                         <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
-                        <div class="col-sm-8" style="overflow-y: auto; height: 175px; border:1px solid #97928b">
+                        <div class="col-sm-8" style="overflow-y: auto; height: 175px; border:1px solid #ced4da; border-radius: .25rem;">
                             <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
                                         <div class="col-sm-6 form-check">
@@ -877,7 +875,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col" title="Data da entrega">Data Entrega</th>
                                 <th scope="col" title="Alerta de dias">Alerta</th>
                                 <th scope="col">Email</th>
-                                <th scope="col">Enviar</th>
+                                <th scope="col">Enviar
+                                    <input type="checkbox" class="checkbox_emails_todos" checked>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -903,7 +903,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td>{{ $pedido->email }}</td>
                                     <td>
                                         <input type="hidden" name="emails[]" value="{{ $pedido->id }}">
-                                        <input type="checkbox" class="" checked value="{{ $pedido->id }}"
+                                        <input type="checkbox" class="checkbox_emails" checked value="{{ $pedido->id }}"
                                             id="enviar" name="enviar[]">
                                     </td>
                                 </tr>

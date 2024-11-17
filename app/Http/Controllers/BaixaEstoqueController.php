@@ -77,7 +77,34 @@ class BaixaEstoqueController extends Controller
                                                         lote_estoque_baixados
                                                     where
                                                         estoque_id = A.id) < (A.qtde_por_pacote+A.qtde_por_pacote_mo) "
-                        ));
+            ));
+
+
+            $mensagem_alerta_estoque =[
+                "mensagem" => "",
+                "alerta" => false
+            ];
+
+            if(!empty($estoque)) {
+
+                $estoqueTodos = new Estoque();
+                $estoqueTodos = $estoqueTodos->where('material_id', '=', $estoque[0]->material_id)
+                ->where('status_estoque', '=', 'A')
+                ->where('status', '=', 'A');
+                $estoqueTodos = $estoqueTodos->orderBy('data', 'asc')->get();
+
+
+
+                if($estoque[0]->lote != $estoqueTodos[0]->lote) {
+
+                    $mensagem_alerta_estoque =[
+                        "mensagem" => "Atenção: existe outro lote ".$estoqueTodos[0]->lote." anterior com pacotes pendentes de baixa.",
+                        "alerta" => true
+                    ];
+
+                }
+            }
+
 
             $mensagem = '';
             if (empty($estoque) && !empty($request->input('id'))) {
@@ -89,6 +116,7 @@ class BaixaEstoqueController extends Controller
                 'status' => '',
                 'mensagem' => $mensagem ,
                 'materiais' => $array_materiais,
+                'mensagem_alerta_estoque' => $mensagem_alerta_estoque,
                 'fornecedores' => $array_fornecedores,
                 'estoque' =>$estoque
             ];

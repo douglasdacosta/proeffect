@@ -47,12 +47,40 @@
             <input type="hidden" id="senha_funcionario" name="senha_funcionario" value="{{isset($senha) ? $senha : ''}}">
             <hr class="my-5">
             <h4><b>Encontrados</b></h4>
+
+            @if($mensagem_alerta_estoque['alerta'] == true)
+                <div id='modal_alerta' class="modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content" style="width: 100%">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id='texto_status_caixas'>Atenção</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+
+                            <div class="modal-body text-danger" >
+                                {{$mensagem_alerta_estoque['mensagem']}}
+                            </div>
+                            <div class="modal-footer">
+                                <div class="col-sm-5 text-left text-bold">
+
+                                    <a href="tela-baixa-estoque" class="btn btn-danger text-left" >Cancelar</a>
+                                </div>
+                                <div class="col-sm-6 text-right">
+                                    <button type="button" class="btn btn-success" data-dismiss="modal" >Continuar mesmo assim</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
             <table class="table table-striped text-center" id="table_composicao">
                 <thead >
                     <tr>
                         <th scope="col">Lote</th>
                         <th scope="col">Material</th>
-                        {{-- <th scope="col">Fornecedor</th> --}}
                         <th scope="col">Ação</th>
                     </tr>
                 </thead>
@@ -62,7 +90,6 @@
                                     <tr style="padding-top: 10px">
                                         <td style="margin-top: 10px" scope="col">{{$estoque->lote}}</td>
                                         <td scope="col">{{$materiais[$estoque->material_id]['material']}}</td>
-                                        {{-- <td scope="col">{{\Illuminate\Support\Str::words($fornecedores[$estoque->fornecedor_id]['nome_cliente'], 2, '') }}</td> --}}
                                         <td scope="col">
                                             <button class="btn btn-primary baixar_estoque" data-id="{{$estoque->id}}">Baixar</button>
                                         </td>
