@@ -37,6 +37,7 @@ class JobImportarPedido implements ShouldQueue
      */
     public function handle()
     {
+        info("Dentro do job instance");
         $dados_pedidos = [];
         $id = DB::transaction(function () {
 
@@ -106,8 +107,6 @@ class JobImportarPedido implements ShouldQueue
                     ];
 
                     $this->savePedidos($pedido, $dados);
-
-                    break;
 
                 }
             }

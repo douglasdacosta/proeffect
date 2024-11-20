@@ -202,7 +202,6 @@ class ManutencaoProducaoController extends Controller
 
         }
 
-        info('antes');
         if(!empty($os)) {
             $pedidos = DB::table('pedidos')
             ->join('status', 'pedidos.status_id', '=', 'status.id')
@@ -234,7 +233,6 @@ class ManutencaoProducaoController extends Controller
             }
 
         } else {
-            info($request->input());
             if (!empty($request->input('os'))) {
                 $mensagem = 'OS não encontrada';
             }

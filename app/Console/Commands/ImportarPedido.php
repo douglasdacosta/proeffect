@@ -29,11 +29,16 @@ class ImportarPedido extends Command
     public function handle()
     {
 
-        if(env('habilita_busca') == 1){
-
-            JobImportarPedido::dispatch();
+        try {
+            if(env('habilita_busca') == 1){
+                info('Chamando o JobImportarPedido');
+                 JobImportarPedido::dispatch();
+            }
+    
+            return true;
+        } catch (\Exception $th) {
+            info($th);
         }
-
-        return true;
+        
     }
 }
