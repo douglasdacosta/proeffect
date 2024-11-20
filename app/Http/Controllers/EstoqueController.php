@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\HistoricosEstoque;
 use App\Models\HistoricosMateriais;
 use App\Models\Materiais;
+use App\Models\MateriaisHistoricosValores;
 use Illuminate\Http\Request;
 use App\Models\Estoque;
 use App\Providers\DateHelpers;
@@ -371,6 +372,12 @@ class EstoqueController extends Controller
                 $material->save();
 
                 if(!empty($historico)) {
+
+                    $MateriaisHistoricosValores = new MateriaisHistoricosValores();
+                    $MateriaisHistoricosValores->materiais_id = $material->id;
+                    $MateriaisHistoricosValores->valor = DateHelpers::formatFloatValue($material->valor);
+                    $MateriaisHistoricosValores->save();
+
                     $historicos = new HistoricosMateriais();
                     $historicos->materiais_id = $material->id;
                     $historicos->historico = $historico;

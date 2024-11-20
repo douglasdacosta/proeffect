@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Transportes extends Model
+class MateriaisHistoricosValores extends Model
 {
     use HasFactory;
 
+    protected $table = 'materiais_historicos_valores';
 }

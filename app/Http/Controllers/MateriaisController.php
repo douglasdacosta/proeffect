@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoriasMateriais;
 use App\Models\HistoricosMateriais;
+use App\Models\MateriaisHistoricosValores;
 use Illuminate\Http\Request;
 use App\Models\Materiais;
 use App\Providers\DateHelpers;
@@ -141,7 +142,7 @@ class MateriaisController extends Controller
     public function salva($request, $historico = null) {
 
         $id = DB::transaction(function () use ($request, $historico) {
-
+            $salva_historico = false;
             $materiais = new Materiais();
             $tempo_torre = '00:00:00';
             if(!empty($request->input('tempo_montagem_torre'))) {
@@ -150,7 +151,13 @@ class MateriaisController extends Controller
 
             if($request->input('id')) {
                 $materiais = $materiais::find($request->input('id'));
+
+                if($materiais->valor != DateHelpers::formatFloatValue($request->input('valor'))) {
+                    $salva_historico = true;
+                }
+
             }
+
             $materiais->codigo = $request->input('codigo');
             $materiais->material = $request->input('material');
             $materiais->espessura = $request->input('espessura');
@@ -167,6 +174,11 @@ class MateriaisController extends Controller
             $materiais->save();
 
             if(!empty($historico)) {
+                $MateriaisHistoricosValores = new MateriaisHistoricosValores();
+                $MateriaisHistoricosValores->materiais_id = $materiais->id;
+                $MateriaisHistoricosValores->valor = DateHelpers::formatFloatValue($request->input('valor'));
+                $MateriaisHistoricosValores->save();
+
                 $historicos = new HistoricosMateriais();
                 $historicos->materiais_id = $materiais->id;
                 $historicos->historico = $historico;
