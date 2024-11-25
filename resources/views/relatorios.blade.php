@@ -262,16 +262,19 @@ use App\Http\Controllers\PedidosController;
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (isset($materiais))
-                                    @foreach ($materiais as $material)
+                                @if (!empty($dadosMaterialRetroativo))
+
+                                    @foreach ($dadosMaterialRetroativo as $material)
+
                                         <tr>
+
                                             <td data-sortable='true' >{{ $material['material'] }}</td>
                                             <td data-sortable='true' >{{ number_format($material['estoque_atual'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['dadosMaterialRetroativo']['valor_estoque_atual'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['dadosMaterialRetroativo']['entradas'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['dadosMaterialRetroativo']['valor_entradas'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['dadosMaterialRetroativo']['consumido'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['dadosMaterialRetroativo']['valor_consumido'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['entradas'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['valor_entradas'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['consumido'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['valor_consumido'], 0, '.', '.') }}</td>
 
                                             <td scope="row">
                                                 <div id='modal_ver_materiais_{{ $material['material_id'] }}'  class="modal" tabindex="-1" role="dialog">

@@ -333,14 +333,7 @@ class RelatoriosController extends Controller
         $totalizadores = $totalizadoresRetroativo = [];
 
         foreach ($arr_pedidos as $key => $pedido) {
-            $dadosMaterialRetroativo = [
-                'estoque_atual' => 0,
-                'valor_estoque_atual' =>0,
-                'entradas' => 0,
-                'valor_entradas' => 0,
-                'consumido' => 0,
-                'valor_consumido' => 0
-            ];
+            $dadosMaterialRetroativo = [];
 
             $estoque = $this->getEstoqueByMaterial($pedido['material_id']);
             $estoque_atual = $this->CalculaEstoqueAtual($estoque);
@@ -353,6 +346,8 @@ class RelatoriosController extends Controller
 
 
                     $estoques = $this->getEstoqueByMaterialDataCategoria($pedido['material_id'], $data_inicio, $data_fim, $categoria);
+                    info($estoques);
+
                     if(!empty($estoques)) {
                         foreach ($estoques as $key => $value) {
                             $entradas += $value->estoque_total;
@@ -368,7 +363,9 @@ class RelatoriosController extends Controller
 
                         $valor_consumido = $estoque_baixado * $valorMaterialRetroativo;
 
-                        $dadosMaterialRetroativo = [
+                        $dadosMaterialRetroativo[] = [
+                            'material' => $pedido['material'],
+                            'material_id' => $pedido['material_id'],
                             'estoque_atual' => $estoque_atual,
                             'valor_estoque_atual' =>$valor_estoque_atual,
                             'entradas' => $entradas,
@@ -391,6 +388,7 @@ class RelatoriosController extends Controller
                             'valor_entradas' => $valor_entradas_retroativo,
                             'consumido' => $consumido_retroativo,
                             'valor_consumido' => $valor_consumido_retroativo,
+                            'os' => $pedido['fichas']
                         ];
 
                     }
@@ -412,7 +410,6 @@ class RelatoriosController extends Controller
                 'material_id' => $pedido['material_id'],
                 'material' => $pedido['material'],
                 'estoque_atual' => $estoque_atual,
-                'dadosMaterialRetroativo' => $dadosMaterialRetroativo,
                 'consumo_previsto' => $pedido['qtde_consumo'],
                 'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
                 'diferenca' =>  round($diferenca, 2),
@@ -442,6 +439,7 @@ class RelatoriosController extends Controller
             'tela' => $tela,
             'nome_tela' => 'previsão de materiais',
             'materiais' => $array_materiais,
+            'dadosMaterialRetroativo' => $dadosMaterialRetroativo,
             'request' => $request,
             'status' => (new PedidosController)->getAllStatus(),
             'CategoriasMateriais' => (new CategoriasMateriais)->get(),
