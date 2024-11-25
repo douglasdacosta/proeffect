@@ -34,11 +34,11 @@ class ImportarPedido extends Command
                 info('Chamando o JobImportarPedido');
                  JobImportarPedido::dispatch();
             }
-    
+
             return true;
         } catch (\Exception $th) {
             info($th);
         }
-        
+
     }
 }

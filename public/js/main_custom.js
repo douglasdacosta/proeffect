@@ -633,6 +633,17 @@ $(function ($) {
 
     $('#modal_alerta').modal('show');
 
+    $(document).on('change', '.tipo_consulta', function(){
+
+        if($(this).val() == 'V') {
+            $('.campo_categorias').show();
+        } else {
+            $('.campo_categorias').hide();
+        }
+
+    })
+
+    $('.tipo_consulta').change();
 }); //FIM DO BLOCO DE JQUERY READY
 
 $(document).on('click', '.painel', function(){
