@@ -204,7 +204,6 @@ class RelatoriosController extends Controller
             }
 
             $categoria_id = $request->input('categorias');
-            dd($categoria_id);
             if(!empty($categoria_id)) {
                 $where[] = "D.categoria_id = $categoria_id";
             }
