@@ -262,6 +262,9 @@ use App\Http\Controllers\PedidosController;
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                        info($dadosMaterialRetroativo);
+                                    @endphp
                                 @if (!empty($dadosMaterialRetroativo))
 
                                     @foreach ($dadosMaterialRetroativo as $material)
@@ -270,11 +273,11 @@ use App\Http\Controllers\PedidosController;
 
                                             <td data-sortable='true' >{{ $material['material'] }}</td>
                                             <td data-sortable='true' >{{ number_format($material['estoque_atual'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 2, '.', '.') }}</td>
                                             <td data-sortable='true' >{{ number_format($material['entradas'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['valor_entradas'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['valor_entradas'], 2, '.', '.') }}</td>
                                             <td data-sortable='true' >{{ number_format($material['consumido'], 0, '.', '.') }}</td>
-                                            <td data-sortable='true' >{{ number_format($material['valor_consumido'], 0, '.', '.') }}</td>
+                                            <td data-sortable='true' >{{ number_format($material['valor_consumido'], 2, '.', '.') }}</td>
 
                                             <td scope="row">
                                                 <div id='modal_ver_materiais_{{ $material['material_id'] }}'  class="modal" tabindex="-1" role="dialog">

@@ -324,6 +324,7 @@ class RelatoriosController extends Controller
 
         $pedidos = $this->getDadosPedidosPorCondicao($condicao);
 
+
         $array_materiais=$arr_pedidos=[];
         if(!empty($pedidos)) {
 
@@ -331,9 +332,9 @@ class RelatoriosController extends Controller
         }
 
         $totalizadores = $totalizadoresRetroativo = [];
-
+        // info($arr_pedidos);
+        $dadosMaterialRetroativo = [];
         foreach ($arr_pedidos as $key => $pedido) {
-            $dadosMaterialRetroativo = [];
 
             $estoque = $this->getEstoqueByMaterial($pedido['material_id']);
             $estoque_atual = $this->CalculaEstoqueAtual($estoque);
@@ -346,7 +347,6 @@ class RelatoriosController extends Controller
 
 
                     $estoques = $this->getEstoqueByMaterialDataCategoria($pedido['material_id'], $data_inicio, $data_fim, $categoria);
-                    info($estoques);
 
                     if(!empty($estoques)) {
                         foreach ($estoques as $key => $value) {
@@ -434,6 +434,7 @@ class RelatoriosController extends Controller
             $totalizadores['valor_previsto'] = number_format($totalizadores['valor_previsto'], 2, ',', '.');
         }
 
+        info($dadosMaterialRetroativo);
 
         $data = array(
             'tela' => $tela,
