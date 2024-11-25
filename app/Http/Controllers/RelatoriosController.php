@@ -332,7 +332,7 @@ class RelatoriosController extends Controller
         }
 
         $totalizadores = $totalizadoresRetroativo = [];
-        // info($arr_pedidos);
+
         $dadosMaterialRetroativo = [];
         foreach ($arr_pedidos as $key => $pedido) {
 
@@ -434,7 +434,6 @@ class RelatoriosController extends Controller
             $totalizadores['valor_previsto'] = number_format($totalizadores['valor_previsto'], 2, ',', '.');
         }
 
-        info($dadosMaterialRetroativo);
 
         $data = array(
             'tela' => $tela,

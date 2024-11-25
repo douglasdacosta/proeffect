@@ -262,9 +262,6 @@ use App\Http\Controllers\PedidosController;
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                        info($dadosMaterialRetroativo);
-                                    @endphp
                                 @if (!empty($dadosMaterialRetroativo))
 
                                     @foreach ($dadosMaterialRetroativo as $material)
