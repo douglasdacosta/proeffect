@@ -449,6 +449,52 @@ class RelatoriosController extends Controller
     }
 
 
+     /**
+     * Summary of getEstoqueByMaterial
+     * @param mixed $material_id
+     * @return array
+     */
+    public function getEstoqueByMaterial($material_id) {
+
+        return DB::select(DB::raw("SELECT
+                                            A.data,
+                                            A.id,
+                                            A.qtde_chapa_peca,
+                                            A.qtde_chapa_peca_mo,
+                                            A.qtde_por_pacote,
+                                            A.qtde_por_pacote_mo,
+                                            B.estoque_minimo,
+                                            A.lote,
+                                            C.nome_cliente as fornecedor,
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque_atual,
+                                            ((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id)) as estoque_pacote_atual,
+                                            B.material,
+                                            A.material_id,
+                                            B.consumo_medio_mensal,
+                                            A.alerta_baixa_errada
+                                        FROM
+                                            estoque A
+                                        INNER JOIN
+                                            materiais B
+                                            ON B.id = A.material_id
+                                        INNER JOIN
+                                            pessoas C
+                                        ON
+                                            C.id = A.fornecedor_id
+                                        WHERE A.status = 'A' AND B.id = $material_id"
+                                            ));
+    }
+
     /**
      * Summary of calculaDadosMaterial
      * @param mixed $pedidos
