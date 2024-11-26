@@ -347,17 +347,17 @@ class RelatoriosController extends Controller
 
             ##Estoque atual
             $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
-            $estoque = $key !== false ? $entrada_estoque_no_periodo[$key]->id : 0;
+            $estoque = $key !== false && !empty($entrada_estoque_no_periodo[$key]->id) ? $entrada_estoque_no_periodo[$key]->id : 0;
 
             //    $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque : 0;
             $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque_atual : 0;
-            $valor_estoque_atual = $key !== false ? $estoque_na_data[$key]->valor : 0;
+            $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]->id) ? $estoque_na_data[$key]->valor : 0;
 
 
             ##entradas
             $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
             $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->estoque : 0;
-            $valor_entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->valor : 0;
+            $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]->id) ? $entrada_estoque_no_periodo[$key]->valor : 0;
 
             ##consumido
             $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
@@ -465,6 +465,7 @@ class RelatoriosController extends Controller
                                             A.qtde_por_pacote_mo,
                                             B.estoque_minimo,
                                             A.lote,
+                                            A.valor_unitario as valor,
                                             C.nome_cliente as fornecedor,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                     count(1)
