@@ -635,9 +635,11 @@ $(function ($) {
 
     $(document).on('change', '.tipo_consulta', function(){
 
-        if($(this).val() == 'V') {
+        if($(this).val() == 'V' || $(this).val() == 'C') {
             $('.campo_categorias').show();
+            $('.status_pedido').hide();
         } else {
+            $('.status_pedido').show();
             $('.campo_categorias').hide();
         }
 

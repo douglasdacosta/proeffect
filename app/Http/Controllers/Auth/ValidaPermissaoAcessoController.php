@@ -29,6 +29,9 @@ class ValidaPermissaoAcessoController extends Controller
     public function GetSubMenuLiberado($path = '') {
 
         $user = \Auth::user();
+        if(empty($user)){
+            return redirect()->route('login');
+        }
         $users = new Funcionarios();
         $users = $users->where('id', '=', $user->id)->first();
         $perfil = $users->perfil;
@@ -62,7 +65,6 @@ class ValidaPermissaoAcessoController extends Controller
 
 
         $path = $this->GetSubMenuLiberado($path);
-        //dd($path);
         if(count($path) > 0) {
             return true;
         }
