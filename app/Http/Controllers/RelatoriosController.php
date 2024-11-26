@@ -286,7 +286,9 @@ class RelatoriosController extends Controller
 
         $coluna = 'A.data_gerado';
 
-        switch ($request->input('tipo_consulta')) {
+        $tipo_consulta = $request->input('tipo_consulta');
+        switch ($tipo_consulta) {
+
 
             //prevista
             case 'P':
@@ -329,117 +331,104 @@ class RelatoriosController extends Controller
             $condicao = ' WHERE '.implode(' AND ', $where);
         }
 
-        $materiais = $this->buscaMaterialPorCateroria($categoria);
+        $totalizadores = $totalizadoresRetroativo = [];
+        $array_materiais=$arr_pedidos= $dadosMaterialRetroativo =[];
+        if($tipo_consulta == 'V' || $tipo_consulta =='C') {
 
-        $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria);
+            $materiais = $this->buscaMaterialPorCateroria($categoria);
 
-        $entrada_estoque_no_periodo = $this->getEntradaEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
+            $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria);
 
-        $consumido_no_periodo = $this->getConsumoEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
+            $entrada_estoque_no_periodo = $this->getEntradaEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
 
-        info($entrada_estoque_no_periodo);
+            $consumido_no_periodo = $this->getConsumoEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
 
-        foreach ($materiais as $material) {
+            foreach ($materiais as $material) {
 
-           ##Estoque atual
-           $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
-           $estoque = $key !== false ? $entrada_estoque_no_periodo[$key]->id : 0;
+            ##Estoque atual
+            $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
+            $estoque = $key !== false ? $entrada_estoque_no_periodo[$key]->id : 0;
 
-        //    $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque : 0;
-           $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque_atual : 0;
-           $valor_estoque_atual = $key !== false ? $estoque_na_data[$key]->valor : 0;
+            //    $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque : 0;
+            $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque_atual : 0;
+            $valor_estoque_atual = $key !== false ? $estoque_na_data[$key]->valor : 0;
 
 
-           ##entradas
-           $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
-           $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->estoque : 0;
-           $valor_entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->valor : 0;
+            ##entradas
+            $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
+            $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->estoque : 0;
+            $valor_entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->valor : 0;
 
-           ##consumido
-           $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
-           $consumido = $key !== false ? $consumido_no_periodo[$key]->estoque_consumido : 0;
-           $valor_consumido = $key !== false ? $consumido_no_periodo[$key]->valor_consumido : 0;
+            ##consumido
+            $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
+            $consumido = $key !== false ? $consumido_no_periodo[$key]->estoque_consumido : 0;
+            $valor_consumido = $key !== false ? $consumido_no_periodo[$key]->valor_consumido : 0;
 
-           $array_materiais[$material->id] = [
-                'id' => $material->id,
-                'material_id' => $material->id,
-                'material' => $material->material,
-                'estoque_atual' => $estoque_atual,
-                'valor_estoque_atual' => $valor_estoque_atual,
-                'entradas' => $entradas,
-                'valor_entradas' => $valor_entradas,
-                'consumido' => $consumido,
-                'valor_consumido' => $valor_consumido,
-                'os' => []
-            ];
+            $array_materiais[$material->id] = [
+                    'id' => $material->id,
+                    'material_id' => $material->id,
+                    'material' => $material->material,
+                    'estoque_atual' => $estoque_atual,
+                    'valor_estoque_atual' => $valor_estoque_atual,
+                    'entradas' => $entradas,
+                    'valor_entradas' => $valor_entradas,
+                    'consumido' => $consumido,
+                    'valor_consumido' => $valor_consumido,
+                    'os' => []
+                ];
+            }
+
+        } else {
+
+
+            $pedidos = $this->getDadosPedidosPorCondicao($condicao);
+
+
+
+            if(!empty($pedidos)) {
+
+                $arr_pedidos = $this->calculaDadosMaterial($pedidos);
+            }
+
+
+
+
+            foreach ($arr_pedidos as $key => $pedido) {
+
+                $estoque = $this->getEstoqueByMaterial($pedido['material_id']);
+                $estoque_atual = $this->CalculaEstoqueAtual($estoque);
+
+                $diferenca = $estoque_atual['estoque_atual'] - $pedido['qtde_consumo'];
+
+                $array_materiais[$pedido['material_id']] = [
+                    'id' => $pedido['id'],
+                    'material_id' => $pedido['material_id'],
+                    'material' => $pedido['material'],
+                    'estoque_atual' => $estoque_atual,
+                    'consumo_previsto' => $pedido['qtde_consumo'],
+                    'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
+                    'diferenca' =>  round($diferenca, 2),
+                    'alerta' => $estoque_atual < $pedido['qtde_consumo'] || ($estoque_atual['estoque_atual']==0 && $pedido['qtde_consumo']==0) ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>',
+                    'os' => $pedido['fichas']
+                ];
+
+                $estoque_atual =  isset($totalizadores['estoque_atual']) ? $totalizadores['estoque_atual'] + $estoque_atual : $estoque_atual;
+                $consumo_previsto =   isset($totalizadores['consumo_previsto']) ? $totalizadores['consumo_previsto'] + $pedido['qtde_consumo'] : $pedido['qtde_consumo'];
+                $valor_previsto =  isset($totalizadores['valor_previsto']) ? $totalizadores['valor_previsto'] + $pedido['valor_previsto'] : $pedido['valor_previsto'];
+                $diferenca =  isset($totalizadores['diferenca']) ? $totalizadores['diferenca'] +  $diferenca :  $diferenca;
+
+                $totalizadores = [
+                    'estoque_atual' => $estoque_atual,
+                    'consumo_previsto' =>  $consumo_previsto,
+                    'valor_previsto' => $valor_previsto,
+                    'diferenca' => round($diferenca, 2),
+                ];
+            }
+
+            if(count($totalizadores)) {
+                $totalizadores['valor_previsto'] = number_format($totalizadores['valor_previsto'], 2, ',', '.');
+            }
         }
-
-
-//retirar depoois ###########################################################################################################################
-        $data = array(
-            'tela' => $tela,
-            'nome_tela' => 'previsão de materiais',
-            'array_materiais' => $array_materiais,
-            'dadosMaterialRetroativo' => [],
-            'request' => $request,
-            'status' => (new PedidosController)->getAllStatus(),
-            'CategoriasMateriais' => (new CategoriasMateriais)->get(),
-            'rotaIncluir' => '',
-            'rotaAlterar' => '',
-            'totalizadores' => [],
-            'totalizadoresRetroativo' => []
-        );
-
-        return view('relatorios', $data);
-//retirar depoois ###########################################################################################################################
-        if(empty($request->input('tipo_consulta'))) {
-            $data = array(
-                'tela' => $tela,
-                'nome_tela' => 'previsão de materiais',
-                'materiais' => [],
-                'dadosMaterialRetroativo' => [],
-                'request' => $request,
-                'status' => (new PedidosController)->getAllStatus(),
-                'CategoriasMateriais' => (new CategoriasMateriais)->get(),
-                'rotaIncluir' => '',
-                'rotaAlterar' => '',
-                'totalizadores' => [],
-                'totalizadoresRetroativo' => []
-            );
-
-            return view('relatorios', $data);
-        };
-
-           // $diferenca = 0;
-
-            // $array_materiais[$pedido['material_id']] = [
-            //     'id' => $pedido['id'],
-            //     'material_id' => $pedido['material_id'],
-            //     'material' => $pedido['material'],
-            //     'estoque_atual' => $estoque_atual,
-            //     'consumo_previsto' => $pedido['qtde_consumo'],
-            //     'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
-            //     'diferenca' =>  round($diferenca, 2),
-            //     'alerta' => $estoque_atual < $pedido['qtde_consumo'] || ($estoque_atual==0 && $pedido['qtde_consumo']==0) ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>',
-            //     'os' => $pedido['fichas']
-            // ];
-
-        //     $estoque_atual =  isset($totalizadores['estoque_atual']) ? $totalizadores['estoque_atual'] + $estoque_atual : $estoque_atual;
-        //     $consumo_previsto =   isset($totalizadores['consumo_previsto']) ? $totalizadores['consumo_previsto'] + $pedido['qtde_consumo'] : $pedido['qtde_consumo'];
-        //     $valor_previsto =  isset($totalizadores['valor_previsto']) ? $totalizadores['valor_previsto'] + $pedido['valor_previsto'] : $pedido['valor_previsto'];
-        //     $diferenca =  isset($totalizadores['diferenca']) ? $totalizadores['diferenca'] +  $diferenca :  $diferenca;
-
-        //     $totalizadores = [
-        //         'estoque_atual' => $estoque_atual,
-        //         'consumo_previsto' =>  $consumo_previsto,
-        //         'valor_previsto' => $valor_previsto,
-        //         'diferenca' => round($diferenca, 2),
-        //     ];
-        // }
-
-        // if(count($totalizadores)) {
-        //     $totalizadores['valor_previsto'] = number_format($totalizadores['valor_previsto'], 2, ',', '.');
-        // }
 
 
         $data = array(
@@ -459,14 +448,6 @@ class RelatoriosController extends Controller
         return view('relatorios', $data);
     }
 
-
-    public function buscaMaterialPorCateroria($categoria) {
-            $valorMaterial = new Materiais();
-            $valorMaterial = $valorMaterial->where('categoria_id', '=',$categoria)
-                ->get();
-
-            return $valorMaterial;
-    }
 
     /**
      * Summary of calculaDadosMaterial
@@ -624,81 +605,8 @@ class RelatoriosController extends Controller
 
 
 
-    /**
-     * Summary of getEntradaEstoquePorDataCategoria
-     * @param mixed $material_id
-     * @param mixed $data_inicial
-     * @param mixed $data_final
-     * @return array
-     */
-    public function getConsumoEstoquePorDataCategoria($data_inicial, $data_final, $categoria) {
 
-        $filtro_categoria = '';
-        if(!empty($categoria)) {
-            $filtro_categoria = "AND B.categoria_id = $categoria";
-        }
-        return DB::select(DB::raw("SELECT
-                                        A.id,
-                                        A.material_id,
-                                        (
-                                            (((select
-                                                count(1)
-                                            from
-                                                lote_estoque_baixados X
-                                            where
-                                                X.data_baixa between '$data_inicial 00:00:00' and '$data_final 23:59:59'  AND
-                                                X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
-                                            ) * A.valor_unitario
-                                        ) as valor_consumido,
-                                        (((select
-                                                count(1)
-                                            from
-                                                lote_estoque_baixados X
-                                            where
-                                                X.data_baixa between '$data_inicial 00:00:00' and '$data_final 23:59:59'
-                                                AND X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_consumido
-                                FROM
-                                    estoque A
-                                INNER JOIN
-                                    materiais B
-                                    ON B.id = A.material_id
-                                WHERE
-                                    A.status = 'A'
-                                    $filtro_categoria"
-                                ));
 
-    }
-    /**
-     * Summary of getEntradaEstoquePorDataCategoria
-     * @param mixed $material_id
-     * @param mixed $data_inicial
-     * @param mixed $data_final
-     * @return array
-     */
-    public function getEntradaEstoquePorDataCategoria($data_inicial, $data_final, $categoria) {
-
-        $filtro_categoria = '';
-        if(!empty($categoria)) {
-            $filtro_categoria = "AND B.categoria_id = $categoria";
-        }
-        return DB::select(DB::raw("SELECT
-                                            A.id,
-                                            A.material_id,
-                                            A.valor_unitario,
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) * A.valor_unitario as valor,
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque
-                                        FROM
-                                            estoque A
-                                        INNER JOIN
-                                            materiais B
-                                            ON B.id = A.material_id
-                                        WHERE
-                                            A.status = 'A'
-                                            AND A.data between '$data_inicial' and '$data_final'
-                                            $filtro_categoria"
-                                        ));
-
-    }
     /**
      * Summary of getEstoqueByDataCategoria
      * @param mixed $material_id
@@ -750,6 +658,95 @@ class RelatoriosController extends Controller
                                         ));
 
 
+
+    }
+
+
+    public function buscaMaterialPorCateroria($categoria) {
+            $valorMaterial = new Materiais();
+            $valorMaterial = $valorMaterial->where('categoria_id', '=',$categoria)
+                ->get();
+
+            return $valorMaterial;
+    }
+
+
+
+    /**
+     * Summary of getEntradaEstoquePorDataCategoria
+     * @param mixed $material_id
+     * @param mixed $data_inicial
+     * @param mixed $data_final
+     * @return array
+     */
+    public function getEntradaEstoquePorDataCategoria($data_inicial, $data_final, $categoria) {
+
+        $filtro_categoria = '';
+        if(!empty($categoria)) {
+            $filtro_categoria = "AND B.categoria_id = $categoria";
+        }
+        return DB::select(DB::raw("SELECT
+                                            A.id,
+                                            A.material_id,
+                                            A.valor_unitario,
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) * A.valor_unitario as valor,
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque
+                                        FROM
+                                            estoque A
+                                        INNER JOIN
+                                            materiais B
+                                            ON B.id = A.material_id
+                                        WHERE
+                                            A.status = 'A'
+                                            AND A.data between '$data_inicial' and '$data_final'
+                                            $filtro_categoria"
+                                        ));
+
+    }
+
+
+    /**
+     * Summary of getEntradaEstoquePorDataCategoria
+     * @param mixed $material_id
+     * @param mixed $data_inicial
+     * @param mixed $data_final
+     * @return array
+     */
+    public function getConsumoEstoquePorDataCategoria($data_inicial, $data_final, $categoria) {
+
+        $filtro_categoria = '';
+        if(!empty($categoria)) {
+            $filtro_categoria = "AND B.categoria_id = $categoria";
+        }
+        return DB::select(DB::raw("SELECT
+                                        A.id,
+                                        A.material_id,
+                                        (
+                                            (((select
+                                                count(1)
+                                            from
+                                                lote_estoque_baixados X
+                                            where
+                                                X.data_baixa between '$data_inicial 00:00:00' and '$data_final 23:59:59'  AND
+                                                X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
+                                            ) * A.valor_unitario
+                                        ) as valor_consumido,
+                                        (((select
+                                                count(1)
+                                            from
+                                                lote_estoque_baixados X
+                                            where
+                                                X.data_baixa between '$data_inicial 00:00:00' and '$data_final 23:59:59'
+                                                AND X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_consumido
+                                FROM
+                                    estoque A
+                                INNER JOIN
+                                    materiais B
+                                    ON B.id = A.material_id
+                                WHERE
+                                    A.status = 'A'
+                                    $filtro_categoria"
+                                ));
 
     }
 

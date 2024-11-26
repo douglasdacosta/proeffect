@@ -161,9 +161,9 @@ use App\Http\Controllers\PedidosController;
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (!empty($array_materiais))
+                                    @if (!empty($materiais))
 
-                                        @foreach ($array_materiais as $material)
+                                        @foreach ($materiais as $material)
 
                                             <tr>
                                                 <td data-sortable='true' >{{ $material['material'] }}</td>
