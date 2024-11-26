@@ -708,6 +708,30 @@ class RelatoriosController extends Controller
     }
 
 
+    /**
+     * Summary of getEstoqueById
+     * @param mixed $id
+     * @return array
+     */
+    public function getEstoqueById($id) {
+
+        return DB::select(DB::raw("SELECT
+                                        count(1) as qtde_baixa
+                                    FROM
+                                        lote_estoque_baixados A
+                                    INNER JOIN
+                                        estoque C
+                                    on
+                                        C.id = A.estoque_id
+                                        and C.status = 'A'
+                                    INNER JOIN
+                                        materiais B
+                                        ON B.id = C.material_id
+                                    WHERE
+                                        A.estoque_id = $id
+                                "));
+    }
+
     public function buscaMaterialPorCateroria($categoria) {
             $valorMaterial = new Materiais();
             $valorMaterial = $valorMaterial->where('categoria_id', '=',$categoria)
