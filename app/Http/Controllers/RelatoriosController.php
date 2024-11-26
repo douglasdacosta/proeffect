@@ -404,7 +404,7 @@ class RelatoriosController extends Controller
                     'id' => $pedido['id'],
                     'material_id' => $pedido['material_id'],
                     'material' => $pedido['material'],
-                    'estoque_atual' => $estoque_atual,
+                    'estoque_atual' => $estoque_atual['estoque_atual'],
                     'consumo_previsto' => $pedido['qtde_consumo'],
                     'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
                     'diferenca' =>  round($diferenca, 2),
@@ -412,7 +412,7 @@ class RelatoriosController extends Controller
                     'os' => $pedido['fichas']
                 ];
 
-                $estoque_atual =  isset($totalizadores['estoque_atual']) ? $totalizadores['estoque_atual'] + $estoque_atual : $estoque_atual;
+                $estoque_atual =  isset($totalizadores['estoque_atual']) ? $totalizadores['estoque_atual'] + $estoque_atual['estoque_atual'] : $estoque_atual['estoque_atual'];
                 $consumo_previsto =   isset($totalizadores['consumo_previsto']) ? $totalizadores['consumo_previsto'] + $pedido['qtde_consumo'] : $pedido['qtde_consumo'];
                 $valor_previsto =  isset($totalizadores['valor_previsto']) ? $totalizadores['valor_previsto'] + $pedido['valor_previsto'] : $pedido['valor_previsto'];
                 $diferenca =  isset($totalizadores['diferenca']) ? $totalizadores['diferenca'] +  $diferenca :  $diferenca;
