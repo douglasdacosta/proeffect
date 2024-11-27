@@ -343,6 +343,8 @@ class RelatoriosController extends Controller
 
             $consumido_no_periodo = $this->getConsumoEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
 
+            info($estoque_na_data);
+
             foreach ($materiais as $material) {
 
                 ##Estoque atual
@@ -664,62 +666,23 @@ class RelatoriosController extends Controller
             $filtro_categoria = "AND B.categoria_id = $categoria";
         }
 
-        info("SELECT
-                                            A.id,
-                                            A.material_id,
-                                            (
-                                                (((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
-                                                ) * A.valor_unitario
-                                            ) as valor,
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque,
-                                            (((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_atual
-                                        FROM
-                                            estoque A
-                                        INNER JOIN
-                                            materiais B
-                                            ON B.id = A.material_id
-                                        INNER JOIN
-                                            pessoas C
-                                        ON
-                                            C.id = A.fornecedor_id
-                                        WHERE
-                                            A.status = 'A'
-                                            AND A.data < '$data_inicial'
-                                            $filtro_categoria");
-
         return DB::select(DB::raw("SELECT
                                             A.id,
                                             A.material_id,
-                                            (
-                                                (((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
-                                                ) * A.valor_unitario
-                                            ) as valor,
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque,
                                             (((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
                                                     count(1)
                                                 from
                                                     lote_estoque_baixados X
                                                 where
                                                     X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_atual
+                                                    AND X.data_baixa < '$data_inicial 00:00:01')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) * A.valor_unitario as valor,
+                                            (((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id
+                                                    AND X.data_baixa < '$data_inicial 00:00:01')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_atual
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -734,11 +697,7 @@ class RelatoriosController extends Controller
                                             AND A.data < '$data_inicial'
                                             $filtro_categoria"
                                         ));
-
-
-
     }
-
 
     /**
      * Summary of getEstoqueById
