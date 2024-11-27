@@ -345,38 +345,34 @@ class RelatoriosController extends Controller
 
             foreach ($materiais as $material) {
 
-            ##Estoque atual
-            $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
-            $estoque = $key !== false && !empty($entrada_estoque_no_periodo[$key]->id) ? $entrada_estoque_no_periodo[$key]->id : 0;
+                ##Estoque atual
+                $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
+                $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque_atual : 0;
+                $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]->id) ? $estoque_na_data[$key]->valor : 0;
 
-            //    $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque : 0;
-            $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque_atual : 0;
-            $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]->id) ? $estoque_na_data[$key]->valor : 0;
+                ##entradas
+                $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
+                $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->estoque : 0;
+                $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]->id) ? $entrada_estoque_no_periodo[$key]->valor : 0;
 
+                ##consumido
+                $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
+                $consumido = $key !== false ? $consumido_no_periodo[$key]->estoque_consumido : 0;
+                $valor_consumido = $key !== false ? $consumido_no_periodo[$key]->valor_consumido : 0;
 
-            ##entradas
-            $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
-            $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->estoque : 0;
-            $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]->id) ? $entrada_estoque_no_periodo[$key]->valor : 0;
-
-            ##consumido
-            $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
-            $consumido = $key !== false ? $consumido_no_periodo[$key]->estoque_consumido : 0;
-            $valor_consumido = $key !== false ? $consumido_no_periodo[$key]->valor_consumido : 0;
-
-            $array_materiais[$material->id] = [
-                    'id' => $material->id,
-                    'material_id' => $material->id,
-                    'material' => $material->material,
-                    'estoque_atual' => $estoque_atual,
-                    'valor_estoque_atual' => $valor_estoque_atual,
-                    'entradas' => $entradas,
-                    'valor_entradas' => $valor_entradas,
-                    'consumido' => $consumido,
-                    'valor_consumido' => $valor_consumido,
-                    'os' => []
-                ];
-            }
+                $array_materiais[$material->id] = [
+                        'id' => $material->id,
+                        'material_id' => $material->id,
+                        'material' => $material->material,
+                        'estoque_atual' => $estoque_atual,
+                        'valor_estoque_atual' => $valor_estoque_atual,
+                        'entradas' => $entradas,
+                        'valor_entradas' => $valor_entradas,
+                        'consumido' => $consumido,
+                        'valor_consumido' => $valor_consumido,
+                        'os' => []
+                    ];
+                }
 
         } else {
 
@@ -668,10 +664,45 @@ class RelatoriosController extends Controller
             $filtro_categoria = "AND B.categoria_id = $categoria";
         }
 
+        info("SELECT
+                                            A.id,
+                                            A.material_id,
+                                            (
+                                                (((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id
+                                                    AND X.data_baixa < '$data_inicial')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
+                                                ) * A.valor_unitario
+                                            ) as valor,
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque,
+                                            (((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id
+                                                    AND X.data_baixa < '$data_inicial')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_atual
+                                        FROM
+                                            estoque A
+                                        INNER JOIN
+                                            materiais B
+                                            ON B.id = A.material_id
+                                        INNER JOIN
+                                            pessoas C
+                                        ON
+                                            C.id = A.fornecedor_id
+                                        WHERE
+                                            A.status = 'A'
+                                            AND A.data < '$data_inicial'
+                                            $filtro_categoria");
+
         return DB::select(DB::raw("SELECT
                                             A.id,
                                             A.material_id,
-                                                (
+                                            (
                                                 (((select
                                                     count(1)
                                                 from

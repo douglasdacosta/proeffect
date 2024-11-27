@@ -168,16 +168,16 @@ use App\Http\Controllers\PedidosController;
                                             <tr>
                                                 <td data-sortable='true' >{{ $material['material'] }}</td>
                                                 <td data-sortable='true' >{{ number_format($material['estoque_atual'], 0, '.', '.') }}</td>
-                                                <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 2, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 2, ',', '.') }}</td>
 
                                                 @if ($request->input('tipo_consulta') == 'V')
                                                     <td data-sortable='true' >{{ number_format($material['entradas'], 0, '.', '.') }}</td>
-                                                    <td data-sortable='true' >{{ number_format($material['valor_entradas'], 2, '.', '.') }}</td>
+                                                    <td data-sortable='true' >{{ number_format($material['valor_entradas'], 2, ',', '.') }}</td>
                                                 @endif
 
                                                 @if ($request->input('tipo_consulta') == 'C')
                                                     <td data-sortable='true' >{{ number_format($material['consumido'], 0, '.', '.') }}</td>
-                                                    <td data-sortable='true' >{{ number_format($material['valor_consumido'], 2, '.', '.') }}</td>
+                                                    <td data-sortable='true' >{{ number_format($material['valor_consumido'], 2, ',', '.') }}</td>
                                                 @endif
 
                                                 <td scope="row">
