@@ -711,7 +711,7 @@ class RelatoriosController extends Controller
                                                     where
                                                         X.estoque_id = A.id
                                                         AND X.data_baixa < '$data_inicial 00:00:01')
-                                                )  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)
+                                                )  * (A.qtde_chapa_peca)
                                             ) * A.valor_unitario as valor,
                                             ((((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - (select
                                                     count(1)
@@ -719,7 +719,7 @@ class RelatoriosController extends Controller
                                                     lote_estoque_baixados X
                                                 where
                                                     X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial 00:00:01'))  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque
+                                                    AND X.data_baixa < '$data_inicial 00:00:01'))  * (A.qtde_chapa_peca)) as estoque
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -794,7 +794,7 @@ class RelatoriosController extends Controller
         $resultados = DB::select(DB::raw("SELECT
                                             A.material_id,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) * A.valor_unitario as valor,
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca))  as estoque
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -833,7 +833,7 @@ class RelatoriosController extends Controller
                                                 lote_estoque_baixados X
                                             where
                                                 X.data_baixa between '$data_inicial 00:00:01' and '$data_final 23:59:59'  AND
-                                                X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
+                                                X.estoque_id = A.id)  * (A.qtde_chapa_peca))
                                             ) * A.valor_unitario
                                         ) as valor,
                                         (((select
@@ -842,7 +842,7 @@ class RelatoriosController extends Controller
                                                 lote_estoque_baixados X
                                             where
                                                 X.data_baixa between '$data_inicial 00:00:01' and '$data_final 23:59:59'
-                                                AND X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque
+                                                AND X.estoque_id = A.id)  * (A.qtde_chapa_peca))) as estoque
                                 FROM
                                     estoque A
                                 INNER JOIN
