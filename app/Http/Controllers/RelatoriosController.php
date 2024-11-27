@@ -338,40 +338,41 @@ class RelatoriosController extends Controller
             $materiais = $this->buscaMaterialPorCateroria($categoria);
 
             $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria);
+            $estoque_na_data = $this->somaAgrupa($estoque_na_data);
 
             $entrada_estoque_no_periodo = $this->getEntradaEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
+            $entrada_estoque_no_periodo = $this->somaAgrupa($entrada_estoque_no_periodo);
 
             $consumido_no_periodo = $this->getConsumoEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
-
-            info($estoque_na_data);
+            $consumido_no_periodo = $this->somaAgrupa($consumido_no_periodo);
 
             foreach ($materiais as $material) {
 
                 ##Estoque atual
                 $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
-                $estoque_atual = $key !== false ? $estoque_na_data[$key]->estoque_atual : 0;
-                $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]->id) ? $estoque_na_data[$key]->valor : 0;
+                $estoque_atual = $key !== false ? $estoque_na_data[$key]['estoque'] : 0;
+                $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]['material_id']) ? $estoque_na_data[$key]['valor'] : 0;
 
                 ##entradas
                 $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
-                $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]->estoque : 0;
-                $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]->id) ? $entrada_estoque_no_periodo[$key]->valor : 0;
+                $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]['estoque'] : 0;
+                $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]['material_id']) ? $entrada_estoque_no_periodo[$key]['valor'] : 0;
 
                 ##consumido
                 $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
-                $consumido = $key !== false ? $consumido_no_periodo[$key]->estoque_consumido : 0;
-                $valor_consumido = $key !== false ? $consumido_no_periodo[$key]->valor_consumido : 0;
+                $consumido = $key !== false ? $consumido_no_periodo[$key]['estoque'] : 0;
+                $valor_consumido = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['valor'] : 0;
 
                 $array_materiais[$material->id] = [
                         'id' => $material->id,
                         'material_id' => $material->id,
                         'material' => $material->material,
-                        'estoque_atual' => $estoque_atual,
-                        'valor_estoque_atual' => $valor_estoque_atual,
-                        'entradas' => $entradas,
-                        'valor_entradas' => $valor_entradas,
-                        'consumido' => $consumido,
-                        'valor_consumido' => $valor_consumido,
+                        'estoque_atual' => !empty($array_materiais[$material->id]['estoque_atual']) ? $array_materiais[$material->id]['estoque_atual'] + $estoque_atual : $estoque_atual,
+                        'valor_estoque_atual' => !empty($array_materiais[$material->id]['valor_estoque_atual']) ? $array_materiais[$material->id]['valor_estoque_atual'] + $valor_estoque_atual : $valor_estoque_atual,
+                        'entradas' => !empty($array_materiais[$material->id]['entradas']) ? $array_materiais[$material->id]['entradas'] + $entradas : $entradas,
+                        'valor_entradas' => !empty($array_materiais[$material->id]['valor_entradas']) ? $array_materiais[$material->id]['valor_entradas'] + $valor_entradas : $valor_entradas,
+                        'consumido' => !empty($array_materiais[$material->id]['consumido']) ? $array_materiais[$material->id]['consumido'] + $consumido : $consumido,
+                        'valor_consumido' => !empty($array_materiais[$material->id]['valor_consumido']) ? $array_materiais[$material->id]['valor_consumido'] + $valor_consumido : $valor_consumido,
                         'os' => []
                     ];
                 }
@@ -650,6 +651,27 @@ class RelatoriosController extends Controller
 
 
 
+    public function somaAgrupa($array) {
+        $resultadoAgrupado = [];
+
+        foreach ($array as $item) {
+            $materialId = $item['material_id'];
+
+            if (!isset($resultadoAgrupado[$materialId])) {
+                $resultadoAgrupado[$materialId] = [
+                    'material_id' => $materialId,
+                    'valor' => 0,
+                    'estoque' => 0,
+                ];
+            }
+
+            $resultadoAgrupado[$materialId]['valor'] += $item['valor'];
+            $resultadoAgrupado[$materialId]['estoque'] += $item['estoque'];
+        }
+
+        // Reorganizar como um array numérico (opcional)
+        return  array_values($resultadoAgrupado);
+    }
 
 
     /**
@@ -666,8 +688,7 @@ class RelatoriosController extends Controller
             $filtro_categoria = "AND B.categoria_id = $categoria";
         }
 
-        return DB::select(DB::raw("SELECT
-                                            A.id,
+        $resultados =  DB::select(DB::raw("SELECT
                                             A.material_id,
                                             (
                                                 (
@@ -677,7 +698,7 @@ class RelatoriosController extends Controller
                                                         lote_estoque_baixados X
                                                     where
                                                         X.estoque_id = A.id
-                                                        AND X.data_baixa < '2024-11-28 00:00:01')
+                                                        AND X.data_baixa < '$data_inicial 00:00:01')
                                                 )  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)
                                             ) * A.valor_unitario as valor,
                                             ((((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - (select
@@ -686,7 +707,7 @@ class RelatoriosController extends Controller
                                                     lote_estoque_baixados X
                                                 where
                                                     X.estoque_id = A.id
-                                                    AND X.data_baixa < '2024-11-28 00:00:01'))  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque_atual
+                                                    AND X.data_baixa < '$data_inicial 00:00:01'))  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -699,8 +720,12 @@ class RelatoriosController extends Controller
                                         WHERE
                                             A.status = 'A'
                                             AND A.data < '$data_inicial'
+                                            AND B.material = 'Acrílico Branco Cod. 7 3mm'
                                             $filtro_categoria"
                                         ));
+
+                                        $arrayResultados = json_decode(json_encode($resultados), true);
+                                        return $arrayResultados;
     }
 
     /**
@@ -755,10 +780,8 @@ class RelatoriosController extends Controller
         if(!empty($categoria)) {
             $filtro_categoria = "AND B.categoria_id = $categoria";
         }
-        return DB::select(DB::raw("SELECT
-                                            A.id,
+        $resultados = DB::select(DB::raw("SELECT
                                             A.material_id,
-                                            A.valor_unitario,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) * A.valor_unitario as valor,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque
                                         FROM
@@ -771,6 +794,8 @@ class RelatoriosController extends Controller
                                             AND A.data between '$data_inicial' and '$data_final'
                                             $filtro_categoria"
                                         ));
+        $arrayResultados = json_decode(json_encode($resultados), true);
+        return $arrayResultados;
 
     }
 
@@ -788,8 +813,7 @@ class RelatoriosController extends Controller
         if(!empty($categoria)) {
             $filtro_categoria = "AND B.categoria_id = $categoria";
         }
-        return DB::select(DB::raw("SELECT
-                                        A.id,
+        $resultados = DB::select(DB::raw("SELECT
                                         A.material_id,
                                         (
                                             (((select
@@ -800,14 +824,14 @@ class RelatoriosController extends Controller
                                                 X.data_baixa between '$data_inicial 00:00:01' and '$data_final 23:59:59'  AND
                                                 X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
                                             ) * A.valor_unitario
-                                        ) as valor_consumido,
+                                        ) as valor,
                                         (((select
                                                 count(1)
                                             from
                                                 lote_estoque_baixados X
                                             where
                                                 X.data_baixa between '$data_inicial 00:00:01' and '$data_final 23:59:59'
-                                                AND X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_consumido
+                                                AND X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque
                                 FROM
                                     estoque A
                                 INNER JOIN
@@ -817,6 +841,9 @@ class RelatoriosController extends Controller
                                     A.status = 'A'
                                     $filtro_categoria"
                                 ));
+
+        $arrayResultados = json_decode(json_encode($resultados), true);
+        return $arrayResultados;
 
     }
 
