@@ -218,16 +218,20 @@ use App\Http\Controllers\PedidosController;
                                         @endforeach
                                     @endif
                                 </tbody>
-                                @if (!empty($totalizadoresRetroativo))
+                                @if (!empty($totalizadores))
                                     <tfoot>
                                         <tr>
                                             <th></th>
-                                            <th>{{number_format($totalizadoresRetroativo['estoque_atual'], 0 , '.','.')}}</th>
-                                            <th>{{number_format($totalizadoresRetroativo['valor_estoque_atual'], 0 , '.','.')}}</th>
-                                            <th>{{number_format($totalizadoresRetroativo['entradas'], 0 , '.','.')}}</th>
-                                            <th>{{number_format($totalizadoresRetroativo['valor_entradas'], 0 , '.','.')}}</th>
-                                            <th>{{number_format($totalizadoresRetroativo['consumido'], 0 , '.','.')}}</th>
-                                            <th>{{number_format($totalizadoresRetroativo['valor_consumido'], 0 , '.','.')}}</th>
+                                            <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
+                                            <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th>
+                                            @if ($request->input('tipo_consulta') == 'V')
+                                                <th>{{number_format($totalizadores['total_entradas'], 0 , '.','.')}}</th>
+                                                <th>{{number_format($totalizadores['total_valor_entradas'], 2 , ',','.')}}</th>
+                                            @endif
+                                            @if ($request->input('tipo_consulta') == 'C')
+                                                <th>{{number_format($totalizadores['total_consumido'], 0 , '.','.')}}</th>
+                                                <th>{{number_format($totalizadores['total_valor_consumido'], 2 , ',','.')}}</th>
+                                            @endif
                                             <th></th>
                                         </tr>
                                     </tfoot>

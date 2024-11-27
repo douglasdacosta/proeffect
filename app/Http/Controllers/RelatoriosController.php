@@ -375,7 +375,20 @@ class RelatoriosController extends Controller
                         'valor_consumido' => !empty($array_materiais[$material->id]['valor_consumido']) ? $array_materiais[$material->id]['valor_consumido'] + $valor_consumido : $valor_consumido,
                         'os' => []
                     ];
-                }
+            }
+
+            //cria totalizadores dos campos
+            foreach ($array_materiais as $key => $material) {
+
+                $totalizadores['total_estoque_atual'] = isset($totalizadores['total_estoque_atual']) ? $totalizadores['total_estoque_atual'] + $material['estoque_atual'] : $material['estoque_atual'];
+                $totalizadores['total_valor_estoque_atual'] = isset($totalizadores['total_valor_estoque_atual']) ? $totalizadores['total_valor_estoque_atual'] + $material['valor_estoque_atual'] : $material['valor_estoque_atual'];
+                $totalizadores['total_entradas'] = isset($totalizadores['total_entradas']) ? $totalizadores['total_entradas'] + $material['entradas'] : $material['entradas'];
+                $totalizadores['total_valor_entradas'] = isset($totalizadores['total_valor_entradas']) ? $totalizadores['total_valor_entradas'] + $material['valor_entradas'] : $material['valor_entradas'];
+                $totalizadores['total_consumido'] = isset($totalizadores['total_consumido']) ? $totalizadores['total_consumido'] + $material['consumido'] : $material['consumido'];
+                $totalizadores['total_valor_consumido'] = isset($totalizadores['total_valor_consumido']) ? $totalizadores['total_valor_consumido'] + $material['valor_consumido'] : $material['valor_consumido'];
+
+            }
+
 
         } else {
 
@@ -441,7 +454,6 @@ class RelatoriosController extends Controller
             'rotaIncluir' => '',
             'rotaAlterar' => '',
             'totalizadores' => $totalizadores,
-            'totalizadoresRetroativo' => $totalizadoresRetroativo
         );
 
         return view('relatorios', $data);
