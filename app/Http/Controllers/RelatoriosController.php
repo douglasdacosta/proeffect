@@ -732,7 +732,6 @@ class RelatoriosController extends Controller
                                         WHERE
                                             A.status = 'A'
                                             AND A.data < '$data_inicial'
-                                            AND B.material = 'Acrílico Branco Cod. 7 3mm'
                                             $filtro_categoria"
                                         ));
 
