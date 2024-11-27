@@ -123,7 +123,7 @@ class RelatoriosController extends Controller
 
                 foreach ($dados_pedido as $key => &$pedido) {
 
-                    $horas = !empty($arr_status[$pedido['status']]['horas'])? $arr_status[$pedido['status']]['horas'] : '00:00:00' ;
+                    $horas = !empty($arr_status[$pedido['status']]['horas'])? $arr_status[$pedido['status']]['horas'] : '00:00:01' ;
 
                     if(isset($dados_pedido[$key+1])){
                         $hora_proximo_status = $dados_pedido[$key+1]['data_status_alterado'];
@@ -669,20 +669,24 @@ class RelatoriosController extends Controller
         return DB::select(DB::raw("SELECT
                                             A.id,
                                             A.material_id,
-                                            (((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
+                                            (
+                                                (
+                                                    ((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - (select
+                                                        count(1)
+                                                    from
+                                                        lote_estoque_baixados X
+                                                    where
+                                                        X.estoque_id = A.id
+                                                        AND X.data_baixa < '2024-11-28 00:00:01')
+                                                )  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)
+                                            ) * A.valor_unitario as valor,
+                                            ((((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - (select
                                                     count(1)
                                                 from
                                                     lote_estoque_baixados X
                                                 where
                                                     X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial 00:00:01')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) * A.valor_unitario as valor,
-                                            (((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial 00:00:01')  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_atual
+                                                    AND X.data_baixa < '2024-11-28 00:00:01'))  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque_atual
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -725,8 +729,13 @@ class RelatoriosController extends Controller
 
     public function buscaMaterialPorCateroria($categoria) {
             $valorMaterial = new Materiais();
-            $valorMaterial = $valorMaterial->where('categoria_id', '=',$categoria)
-                ->get();
+
+            if(!empty($categoria)) {
+
+                $valorMaterial = $valorMaterial->where('categoria_id', '=',$categoria);
+            }
+
+            $valorMaterial = $valorMaterial->get();
 
             return $valorMaterial;
     }
@@ -788,7 +797,7 @@ class RelatoriosController extends Controller
                                             from
                                                 lote_estoque_baixados X
                                             where
-                                                X.data_baixa between '$data_inicial 00:00:00' and '$data_final 23:59:59'  AND
+                                                X.data_baixa between '$data_inicial 00:00:01' and '$data_final 23:59:59'  AND
                                                 X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
                                             ) * A.valor_unitario
                                         ) as valor_consumido,
@@ -797,7 +806,7 @@ class RelatoriosController extends Controller
                                             from
                                                 lote_estoque_baixados X
                                             where
-                                                X.data_baixa between '$data_inicial 00:00:00' and '$data_final 23:59:59'
+                                                X.data_baixa between '$data_inicial 00:00:01' and '$data_final 23:59:59'
                                                 AND X.estoque_id = A.id)  * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))) as estoque_consumido
                                 FROM
                                     estoque A
