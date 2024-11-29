@@ -266,7 +266,6 @@ class RelatoriosController extends Controller
         $status_id = !empty($request->input('status_id')) ? $request->input('status_id') : '';
         $pedidos = [];
 
-        $intervalo_dias = 0;
         $tela = 'relatorio-previsao-material';
 
         if(empty($data_inicio) && empty($data_fim)) {
@@ -289,7 +288,6 @@ class RelatoriosController extends Controller
         $formato = 'd/m/Y';
         $inicio = DateTime::createFromFormat($formato, $data_inicio);
         $fim = DateTime::createFromFormat($formato, $data_fim);
-        $intervalo_dias = $inicio->diff($fim)->days;
 
         $data_inicio = DateHelpers::formatDate_dmY($data_inicio);
         $data_fim = DateHelpers::formatDate_dmY($data_fim);
