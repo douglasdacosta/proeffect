@@ -129,35 +129,39 @@ class BaixaEstoqueController extends Controller
 
         try {
 
-            $estoque = new Estoque();
-            $estoque = $estoque->where('id', '=', $request->input('id'))->get();
+            $id = DB::transaction(function () use ($request) {
+                $estoque = new Estoque();
+                $estoque = $estoque->where('id', '=', $request->input('id'))->get();
 
-            $estoqueTodos = new Estoque();
-            $estoqueTodos = $estoqueTodos->where('material_id', '=', $estoque[0]->material_id)
-                                ->where('status_estoque', '=', 'A')
-                                ->where('status', '=', 'A');
-            $estoqueTodos = $estoqueTodos->orderBy('data', 'asc')->get();
+                $estoqueTodos = new Estoque();
+                $estoqueTodos = $estoqueTodos->where('material_id', '=', $estoque[0]->material_id)
+                                    ->where('status_estoque', '=', 'A')
+                                    ->where('status', '=', 'A');
+                $estoqueTodos = $estoqueTodos->orderBy('data', 'asc')->get();
 
-            if($estoque[0]->lote != $estoqueTodos[0]->lote) {
+                if($estoque[0]->lote != $estoqueTodos[0]->lote) {
 
-                $estoqueAltera = new Estoque();
-                $estoqueAltera = $estoqueAltera->where('id', '=', $estoque[0]->id)
-                                ->update(['alerta_baixa_errada' => 1]);
-            }
+                    $estoqueAltera = new Estoque();
+                    $estoqueAltera = $estoqueAltera->where('id', '=', $estoque[0]->id)
+                                    ->update(['alerta_baixa_errada' => 1]);
+                }
 
-            $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
-            $LoteEstoqueBaixados->estoque_id=$request->input('id');
-            $LoteEstoqueBaixados->data_baixa = now();
-            $LoteEstoqueBaixados->save();
+                $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
+                $LoteEstoqueBaixados->estoque_id=$request->input('id');
+                $LoteEstoqueBaixados->data_baixa = now();
+                $LoteEstoqueBaixados->save();
 
-            $historico = "Retirada de 1 de pacote do estoque - tela de baixa de estoque";
-            $historico_estoque = new HistoricosEstoque();
-            $historico_estoque->estoque_id = $request->input('id');
-            $historico_estoque->historico = $historico;
-            $historico_estoque->status = 'A';
-            $historico_estoque->save();
+                $historico = "Retirada de 1 de pacote do estoque - tela de baixa de estoque";
+                $historico_estoque = new HistoricosEstoque();
+                $historico_estoque->estoque_id = $request->input('id');
+                $historico_estoque->historico = $historico;
+                $historico_estoque->status = 'A';
+                $historico_estoque->save();
+
+            });
 
             return true;
+
         } catch (\Exception $e) {
             info('erro para Baixar -> '.$e);
             return false;

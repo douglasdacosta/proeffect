@@ -635,13 +635,32 @@ $(function ($) {
 
     $(document).on('change', '.tipo_consulta', function(){
 
-        if($(this).val() == 'V' || $(this).val() == 'C') {
-            $('.campo_categorias').show();
-            $('.status_pedido').hide();
-        } else {
-            $('.status_pedido').show();
+        $('.campo_categorias').show();
+        $('.status_pedido').show();
+        $('.regra_data_fim').show();
+
+        if($('#tipo_consulta').val() == 'P' || $('#tipo_consulta').val() == 'E') {
+            $('#campo_categorias').val('');
             $('.campo_categorias').hide();
         }
+        if($('#tipo_consulta').val() == 'V' || $('#tipo_consulta').val() == 'C') {
+            $('.campo_categorias').show();
+            $('.status_pedido').hide();
+
+        }
+
+        if($('#tipo_consulta').val() == 'ED') {
+            $('.campo_categorias').show();
+            $('.status_pedido').hide();
+            $('.regra_data_fim').hide();
+        }
+
+        if($('#tipo_consulta').val() == 'EEC') {
+            $('.campo_categorias').show();
+            $('.status_pedido').hide();
+        }
+
+
 
     })
 

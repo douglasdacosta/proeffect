@@ -7,9 +7,9 @@
                         <input type="text" class="form-control mask_date" id="data" name="data" value="{{$request->input('data', '')}}"
                             placeholder="DD/MM/AAAA">
                     </div>
-                    <label for="data_fim" class="col-form-label text-right">até</label>
+                    <label for="data_fim" class="col-form-label text-right regra_data_fim">até</label>
                     <div class="col-sm-2">
-                        <input type="text" class="form-control mask_date" id="data_fim" name="data_fim" value="{{$request->input('data_fim', '')}}"
+                        <input type="text" class="form-control mask_date regra_data_fim" id="data_fim" name="data_fim" value="{{$request->input('data_fim', '')}}"
                             placeholder="DD/MM/AAAA">
                     </div>
                 </div>
@@ -17,17 +17,19 @@
                     <label for="lote" class="col-sm-2 col-form-label text-right tipo_consulta ">Tipo de consulta</label>
                     <div class="col-sm-2">
                         <select class="form-control col-sm-12 tipo_consulta" id="tipo_consulta" name="tipo_consulta">
-                            <option value="P" @if($request->input('tipo_consulta') == 'P'){{ ' selected '}}@else @endif>Prevista</option>
-                            <option value="E" @if($request->input('tipo_consulta') == 'E'){{ ' selected '}}@else @endif>Executada</option>
+                            <option value="P" @if($request->input('tipo_consulta') == 'P'){{ ' selected '}}@else @endif>Previsto</option>
+                            <option value="E" @if($request->input('tipo_consulta') == 'E'){{ ' selected '}}@else @endif>Realizado</option>
+                            <option value="ED" @if($request->input('tipo_consulta') == 'ED'){{ ' selected '}}@else @endif>Estoque MP por Data</option>
                             <option value="V" @if($request->input('tipo_consulta') == 'V'){{ ' selected '}}@else @endif>Entrada de MP por período</option>
                             <option value="C" @if($request->input('tipo_consulta') == 'C'){{ ' selected '}}@else @endif>Consumo de MP por período</option>
+                            <option value="EEC" @if($request->input('tipo_consulta') == 'EEC'){{ ' selected '}}@else @endif>Estoque x Entradas x Consumo por período</option>
                         </select>
                     </div>
                     <label for="categorias" class="col-sm-1 col-form-label text-right campo_categorias">Categorias</label>
                     <div class="col-sm-2">
-                        <select class="form-control col-sm-10 campo_categorias" id="categorias" name="categorias">
+                        <select class="form-control col-sm-10 campo_categorias" id="campo_categorias" name="categorias">
                             @if(!empty($CategoriasMateriais))
-                                <option value=""></option>
+                                <option value="">Todos</option>
                                 @foreach ($CategoriasMateriais as $categoria)
                                     <option value="{{$categoria->id}}" @if($request->input('categorias') == $categoria->id){{ ' selected '}}@else @endif>{{$categoria->nome}}</option>
                                 @endforeach

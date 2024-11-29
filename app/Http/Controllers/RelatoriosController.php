@@ -268,10 +268,22 @@ class RelatoriosController extends Controller
 
         $intervalo_dias = 0;
         $tela = 'relatorio-previsao-material';
-        if(empty($data_inicio) && empty($data_fim)) {
-            $data_inicio= \Carbon\Carbon::now()->startOfMonth()->format('d/m/Y');
-            $data_fim = \Carbon\Carbon::now()->endOfMonth()->format('d/m/Y');
 
+        if(empty($data_inicio) && empty($data_fim)) {
+            $data = array(
+                'tela' => $tela,
+                'nome_tela' => 'previsão de materiais',
+                'materiais' => [],
+
+                'request' => $request,
+                'status' => (new PedidosController)->getAllStatus(),
+                'CategoriasMateriais' => (new CategoriasMateriais)->get(),
+                'rotaIncluir' => '',
+                'rotaAlterar' => '',
+                'totalizadores' => [],
+            );
+
+            return view('relatorios', $data);
         }
 
         $formato = 'd/m/Y';
@@ -287,31 +299,37 @@ class RelatoriosController extends Controller
         $coluna = 'A.data_gerado';
 
         $tipo_consulta = $request->input('tipo_consulta');
+
         switch ($tipo_consulta) {
 
 
             //prevista
             case 'P':
-
-            $where = $this->consulta_previsao_material($data_inicio, $data_fim, $status_id);
-
+                $where = $this->consulta_previsao_material($data_inicio, $data_fim, $status_id);
             break;
 
             //executada
             case 'E':
-
                 $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
-
             break;
-            //entrada_por_periodo
-            case 'V':
 
+            //Estoque por data
+            case 'ED':
+                $data_fim = $data_inicio;
+                $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
+                $tela = 'entrada_por_periodo';
+            break;
+
+            //Estoque x Entrada x Consumo de MP por período
+            //Entrada de MP por período
+            case 'EEC':
+            case 'V':
                 $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
                 $tela = 'entrada_por_periodo';
 
             break;
-            //entrada_por_periodo
 
+            //Consumo de MP por período
             case 'C':
                 $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
                 $tela = 'entrada_por_periodo';
@@ -319,7 +337,6 @@ class RelatoriosController extends Controller
 
             default:
                 $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
-
             break;
 
         }
@@ -331,9 +348,10 @@ class RelatoriosController extends Controller
             $condicao = ' WHERE '.implode(' AND ', $where);
         }
 
-        $totalizadores = $totalizadoresRetroativo = [];
+        $totalizadores = [];
         $array_materiais=$arr_pedidos= $dadosMaterialRetroativo =[];
-        if($tipo_consulta == 'V' || $tipo_consulta =='C') {
+
+        if($tipo_consulta == 'V' || $tipo_consulta =='C' || $tipo_consulta == 'ED' || $tipo_consulta == 'EEC') {
 
             $materiais = $this->buscaMaterialPorCateroria($categoria);
 
@@ -352,16 +370,20 @@ class RelatoriosController extends Controller
                 $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
                 $estoque_atual = $key !== false ? $estoque_na_data[$key]['estoque'] : 0;
                 $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]['material_id']) ? $estoque_na_data[$key]['valor'] : 0;
+                $estoque_atual_ids = $key !== false && !empty($estoque_na_data[$key]['estoqueIds']) ? $estoque_na_data[$key]['estoqueIds'] : [];
 
                 ##entradas
                 $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
                 $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]['estoque'] : 0;
                 $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]['material_id']) ? $entrada_estoque_no_periodo[$key]['valor'] : 0;
+                $entradas_ids = $key !== false && !empty($entrada_estoque_no_periodo[$key]['estoqueIds']) ? $entrada_estoque_no_periodo[$key]['estoqueIds'] : [];
 
                 ##consumido
                 $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
                 $consumido = $key !== false ? $consumido_no_periodo[$key]['estoque'] : 0;
                 $valor_consumido = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['valor'] : 0;
+                $consumido_ids = $key !== false && !empty($consumido_no_periodo[$key]['estoqueIds']) ? $consumido_no_periodo[$key]['estoqueIds'] : [];
+
 
                 $array_materiais[$material->id] = [
                         'id' => $material->id,
@@ -373,7 +395,11 @@ class RelatoriosController extends Controller
                         'valor_entradas' => !empty($array_materiais[$material->id]['valor_entradas']) ? $array_materiais[$material->id]['valor_entradas'] + $valor_entradas : $valor_entradas,
                         'consumido' => !empty($array_materiais[$material->id]['consumido']) ? $array_materiais[$material->id]['consumido'] + $consumido : $consumido,
                         'valor_consumido' => !empty($array_materiais[$material->id]['valor_consumido']) ? $array_materiais[$material->id]['valor_consumido'] + $valor_consumido : $valor_consumido,
-                        'os' => []
+                        'os' => [
+                            'Estoque atual' => $estoque_atual_ids,
+                            'Entradas' => $entradas_ids,
+                            'Consumido' => $consumido_ids
+                        ]
                     ];
             }
 
@@ -679,6 +705,7 @@ class RelatoriosController extends Controller
 
             $resultadoAgrupado[$materialId]['valor'] += $item['valor'];
             $resultadoAgrupado[$materialId]['estoque'] += $item['estoque'];
+            $resultadoAgrupado[$materialId]['estoqueIds'][$item['id']] = $item['id'];
         }
 
         // Reorganizar como um array numérico (opcional)
@@ -701,6 +728,7 @@ class RelatoriosController extends Controller
         }
 
         $resultados =  DB::select(DB::raw("SELECT
+                                            A.id,
                                             A.material_id,
                                             (
                                                 (
@@ -792,9 +820,10 @@ class RelatoriosController extends Controller
             $filtro_categoria = "AND B.categoria_id = $categoria";
         }
         $resultados = DB::select(DB::raw("SELECT
+                                            A.id,
                                             A.material_id,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) * A.valor_unitario as valor,
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca))  as estoque
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -825,6 +854,7 @@ class RelatoriosController extends Controller
             $filtro_categoria = "AND B.categoria_id = $categoria";
         }
         $resultados = DB::select(DB::raw("SELECT
+                                        A.id,
                                         A.material_id,
                                         (
                                             (((select
