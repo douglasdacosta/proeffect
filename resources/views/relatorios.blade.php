@@ -145,15 +145,15 @@ use App\Http\Controllers\PedidosController;
                                     <tr>
                                         <th>Material</th>
                                         @if ($request->input('tipo_consulta') == 'V')
-                                            <th>Estoque na data</th>
-                                            <th>Valor estoque</th>
+                                            {{-- <th>Estoque na data</th>
+                                            <th>Valor estoque</th> --}}
                                             <th>Entradas</th>
                                             <th>Valor entradas</th>
                                         @endif
 
                                         @if ($request->input('tipo_consulta') == 'C')
-                                            <th>Estoque na data</th>
-                                            <th>Valor estoque</th>
+                                            {{-- <th>Estoque na data</th>
+                                            <th>Valor estoque</th> --}}
                                             <th>Consumo</th>
                                             <th>Valor consumido</th>
                                         @endif
@@ -187,15 +187,15 @@ use App\Http\Controllers\PedidosController;
                                             <tr>
                                                 <td data-sortable='true' >{{ $material['material'] }}</td>
                                                 @if ($request->input('tipo_consulta') == 'V')
-                                                    <td data-sortable='true' >{{ number_format($material['estoque_atual'], 0, '.', '.') }}</td>
-                                                    <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 2, ',', '.') }}</td>
+                                                    {{-- <td data-sortable='true' >{{ number_format($material['estoque_atual'], 0, '.', '.') }}</td>
+                                                    <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 2, ',', '.') }}</td> --}}
                                                     <td data-sortable='true' >{{ number_format($material['entradas'], 0, '.', '.') }}</td>
                                                     <td data-sortable='true' >{{ number_format($material['valor_entradas'], 2, ',', '.') }}</td>
                                                 @endif
 
                                                 @if ($request->input('tipo_consulta') == 'C')
-                                                    <td data-sortable='true' >{{ number_format($material['estoque_atual'], 0, '.', '.') }}</td>
-                                                    <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 2, ',', '.') }}</td>
+                                                    {{-- <td data-sortable='true' >{{ number_format($material['estoque_atual'], 0, '.', '.') }}</td>
+                                                    <td data-sortable='true' >{{ number_format($material['valor_estoque_atual'], 2, ',', '.') }}</td> --}}
                                                     <td data-sortable='true' >{{ number_format($material['consumido'], 0, '.', '.') }}</td>
                                                     <td data-sortable='true' >{{ number_format($material['valor_consumido'], 2, ',', '.') }}</td>
                                                 @endif
@@ -298,14 +298,14 @@ use App\Http\Controllers\PedidosController;
                                         <tr>
                                             <th></th>
                                             @if ($request->input('tipo_consulta') == 'V')
-                                                <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th>
+                                                {{-- <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
+                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th> --}}
                                                 <th>{{number_format($totalizadores['total_entradas'], 0 , '.','.')}}</th>
                                                 <th>{{number_format($totalizadores['total_valor_entradas'], 2 , ',','.')}}</th>
                                             @endif
                                             @if ($request->input('tipo_consulta') == 'C')
-                                                <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th>
+                                                {{-- <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
+                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th> --}}
                                                 <th>{{number_format($totalizadores['total_consumido'], 0 , '.','.')}}</th>
                                                 <th>{{number_format($totalizadores['total_valor_consumido'], 2 , ',','.')}}</th>
                                             @endif
