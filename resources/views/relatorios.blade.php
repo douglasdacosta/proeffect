@@ -253,10 +253,10 @@ use App\Http\Controllers\PedidosController;
                                                                                     @continue
                                                                                 @endif
 
-                                                                                @if(($request->input('tipo_consulta') == 'V' ) && $tipo != 'Estoque atual' && $tipo != 'Entradas')
+                                                                                @if(($request->input('tipo_consulta') == 'V' ) && $tipo != 'Entradas')
                                                                                     @continue
                                                                                 @endif
-                                                                                @if(($request->input('tipo_consulta') == 'C') && $tipo != 'Estoque atual' && $tipo != 'Consumido')
+                                                                                @if(($request->input('tipo_consulta') == 'C') && $tipo != 'Consumido')
                                                                                     @continue
                                                                                 @endif
                                                                                 {{-- regra para não mostrar estoques diferente do tipo de consulta --}}
