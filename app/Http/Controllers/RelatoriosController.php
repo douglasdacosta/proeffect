@@ -705,7 +705,9 @@ class RelatoriosController extends Controller
 
             $resultadoAgrupado[$materialId]['valor'] += $item['valor'];
             $resultadoAgrupado[$materialId]['estoque'] += $item['estoque'];
-            $resultadoAgrupado[$materialId]['estoqueIds'][$item['id']] = $item['id'];
+            if($item['estoque'] > 0) {
+                $resultadoAgrupado[$materialId]['estoqueIds'][$item['id']] = $item['id'];
+            }
         }
 
         // Reorganizar como um array numérico (opcional)
