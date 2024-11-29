@@ -266,7 +266,7 @@ class RelatoriosController extends Controller
         $status_id = !empty($request->input('status_id')) ? $request->input('status_id') : '';
         $pedidos = [];
 
-        $tela = 'relatorio-previsao-material';
+        $tela = 'entrada_por_periodo';
 
         if(empty($data_inicio) && empty($data_fim)) {
             $data = array(

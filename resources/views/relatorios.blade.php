@@ -140,47 +140,48 @@ use App\Http\Controllers\PedidosController;
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_content">
-                            <table id="table_material" class="table table-striped  text-center">
-                                <thead>
-                                    <tr>
-                                        <th>Material</th>
-                                        @if ($request->input('tipo_consulta') == 'V')
-                                            {{-- <th>Estoque na data</th>
-                                            <th>Valor estoque</th> --}}
-                                            <th>Entradas</th>
-                                            <th>Valor entradas</th>
-                                        @endif
+                            @if (!empty($materiais))
+                                <table id="table_material" class="table table-striped  text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            @if ($request->input('tipo_consulta') == 'V')
+                                                {{-- <th>Estoque na data</th>
+                                                <th>Valor estoque</th> --}}
+                                                <th>Entradas</th>
+                                                <th>Valor entradas</th>
+                                            @endif
 
-                                        @if ($request->input('tipo_consulta') == 'C')
-                                            {{-- <th>Estoque na data</th>
-                                            <th>Valor estoque</th> --}}
-                                            <th>Consumo</th>
-                                            <th>Valor consumido</th>
-                                        @endif
+                                            @if ($request->input('tipo_consulta') == 'C')
+                                                {{-- <th>Estoque na data</th>
+                                                <th>Valor estoque</th> --}}
+                                                <th>Consumo</th>
+                                                <th>Valor consumido</th>
+                                            @endif
 
-                                        @if ($request->input('tipo_consulta') == 'ED')
-                                            <th>Estoque na data</th>
-                                            <th>Valor estoque</th>
-                                        @endif
+                                            @if ($request->input('tipo_consulta') == 'ED')
+                                                <th>Estoque na data</th>
+                                                <th>Valor estoque</th>
+                                            @endif
 
-                                        @if ($request->input('tipo_consulta') == 'EEC')
-                                            <th>Estoque na data</th>
-                                            <th>Valor estoque</th>
-                                            <th>Entradas</th>
-                                            <th>Valor entradas</th>
-                                            <th>Consumo</th>
-                                            <th>Valor consumido</th>
-                                        @endif
+                                            @if ($request->input('tipo_consulta') == 'EEC')
+                                                <th>Estoque na data</th>
+                                                <th>Valor estoque</th>
+                                                <th>Entradas</th>
+                                                <th>Valor entradas</th>
+                                                <th>Consumo</th>
+                                                <th>Valor consumido</th>
+                                            @endif
 
-                                        @if(in_array($request->input('tipo_consulta'), ['P', 'E']))
-                                            <th>Ver ficha técnica</th>
-                                        @else
-                                        <th>Ver Estoques</th>
-                                        @endif
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (!empty($materiais))
+                                            @if(in_array($request->input('tipo_consulta'), ['P', 'E']))
+                                                <th>Ver ficha técnica</th>
+                                            @else
+                                            <th>Ver Estoques</th>
+                                            @endif
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
 
                                         @foreach ($materiais as $material)
 
@@ -291,39 +292,41 @@ use App\Http\Controllers\PedidosController;
                                                 </td>
                                             </tr>
                                         @endforeach
+                                    </tbody>
+                                    @if (!empty($totalizadores))
+                                        <tfoot>
+                                            <tr>
+                                                <th></th>
+                                                @if ($request->input('tipo_consulta') == 'V')
+                                                    {{-- <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th> --}}
+                                                    <th>{{number_format($totalizadores['total_entradas'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_entradas'], 2 , ',','.')}}</th>
+                                                @endif
+                                                @if ($request->input('tipo_consulta') == 'C')
+                                                    {{-- <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th> --}}
+                                                    <th>{{number_format($totalizadores['total_consumido'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_consumido'], 2 , ',','.')}}</th>
+                                                @endif
+                                                @if ($request->input('tipo_consulta') == 'ED')
+                                                    <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th>
+                                                @endif
+                                                @if ($request->input('tipo_consulta') == 'EEC')
+                                                    <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_entradas'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_entradas'], 2 , ',','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_consumido'], 0 , '.','.')}}</th>
+                                                    <th>{{number_format($totalizadores['total_valor_consumido'], 2 , ',','.')}}</th>
+                                                @endif
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
                                     @endif
-                                </tbody>
-                                @if (!empty($totalizadores))
-                                    <tfoot>
-                                        <tr>
-                                            <th></th>
-                                            @if ($request->input('tipo_consulta') == 'V')
-                                                {{-- <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th> --}}
-                                                <th>{{number_format($totalizadores['total_entradas'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_entradas'], 2 , ',','.')}}</th>
-                                            @endif
-                                            @if ($request->input('tipo_consulta') == 'C')
-                                                {{-- <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th> --}}
-                                                <th>{{number_format($totalizadores['total_consumido'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_consumido'], 2 , ',','.')}}</th>
-                                            @endif
-                                            @if ($request->input('tipo_consulta') == 'ED')
-                                                <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th>
-                                            @endif
-                                            @if ($request->input('tipo_consulta') == 'EEC')
-                                                <th>{{number_format($totalizadores['total_estoque_atual'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_estoque_atual'], 2 , ',','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_entradas'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_entradas'], 2 , ',','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_consumido'], 0 , '.','.')}}</th>
-                                                <th>{{number_format($totalizadores['total_valor_consumido'], 2 , ',','.')}}</th>
-                                            @endif
-                                            <th></th>
-                                        </tr>
-                                    </tfoot>
+                                @else
+                                <h4>Nenhum registro encontrado</h4>
                                 @endif
                             </table>
                         </div>
