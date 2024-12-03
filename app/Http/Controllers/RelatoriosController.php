@@ -681,7 +681,7 @@ class RelatoriosController extends Controller
                                         ON B.id = C.material_id
                                     WHERE
                                         A.estoque_id = $id
-                                        AND A.data_baixa < $data
+                                        AND A.data_baixa <= $data
                                 "));
     }
 
@@ -738,7 +738,7 @@ class RelatoriosController extends Controller
                                                         lote_estoque_baixados X
                                                     where
                                                         X.estoque_id = A.id
-                                                        AND X.data_baixa < '$data_inicial 00:00:01')
+                                                        AND X.data_baixa <= '$data_inicial 23:59:59')
                                                 )  * (A.qtde_chapa_peca)
                                             ) * A.valor_unitario as valor,
                                             ((((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - (select
@@ -747,7 +747,7 @@ class RelatoriosController extends Controller
                                                     lote_estoque_baixados X
                                                 where
                                                     X.estoque_id = A.id
-                                                    AND X.data_baixa < '$data_inicial 00:00:01'))  * (A.qtde_chapa_peca)) as estoque
+                                                    AND X.data_baixa <= '$data_inicial 23:59:59'))  * (A.qtde_chapa_peca)) as estoque
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -759,7 +759,7 @@ class RelatoriosController extends Controller
                                             C.id = A.fornecedor_id
                                         WHERE
                                             A.status = 'A'
-                                            AND A.data < '$data_inicial'
+                                            AND A.data <= '$data_inicial'
                                             $filtro_categoria"
                                         ));
 

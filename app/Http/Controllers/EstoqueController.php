@@ -365,7 +365,7 @@ class EstoqueController extends Controller
 
             $material = new Materiais();
             $material = $material->find($request->input('material_id'));
-            if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario'))) {
+            if($material->valor != DateHelpers::formatFloatValue($request->input('valor_unitario')) && DateHelpers::formatFloatValue($request->input('valor_unitario')) > 0) {
 
                 $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $request->input('valor_unitario');
                 $material->valor = trim($request->input('valor_unitario')) != '' ? DateHelpers::formatFloatValue($request->input('valor_unitario')): null;
