@@ -741,15 +741,17 @@ class RelatoriosController extends Controller
                                                     from
                                                         lote_estoque_baixados X
                                                     where
-                                                        X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
+                                                        X.estoque_id = A.id
+                                                        AND X.data_baixa <= '$data_inicial 23:59:59') * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
                                                     ) * (case (A.valor_unitario) when 0.00 then A.valor_mo else A.valor_unitario END)
                                                 ) as valor,
-                                                ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
+                                                ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo)  + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                         count(1)
                                                     from
                                                         lote_estoque_baixados X
                                                     where
-                                                        X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque
+                                                        X.estoque_id = A.id
+                                                        AND X.data_baixa <= '$data_inicial 23:59:59') * (A.qtde_chapa_peca)) as estoque
                                         FROM
                                             estoque A
                                         INNER JOIN
