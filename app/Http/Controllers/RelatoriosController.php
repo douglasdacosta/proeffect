@@ -155,7 +155,12 @@ class RelatoriosController extends Controller
     }
 
 
-    public function consulta_previsao_material($data_inicio, $data_fim, $status_id) {
+    public function consulta_previsao_material($data_inicio, $data_fim, $status_id, $request) {
+
+        $categoria_id = $request->input('categorias');
+        if(!empty($categoria_id)) {
+            $where[] = "D.categoria_id = $categoria_id";
+        }
 
         $coluna = 'A.data_entrega';
 
@@ -303,7 +308,7 @@ class RelatoriosController extends Controller
 
             //prevista
             case 'P':
-                $where = $this->consulta_previsao_material($data_inicio, $data_fim, $status_id);
+                $where = $this->consulta_previsao_material($data_inicio, $data_fim, $status_id, $request);
             break;
 
             //executada
