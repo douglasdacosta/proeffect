@@ -266,7 +266,7 @@ class RelatoriosController extends Controller
         $status_id = !empty($request->input('status_id')) ? $request->input('status_id') : '';
         $pedidos = [];
 
-        $tela = 'entrada_por_periodo';
+        $tela = 'relatorio-previsao-material';
 
         if(empty($data_inicio) && empty($data_fim)) {
             $data = array(
@@ -728,26 +728,23 @@ class RelatoriosController extends Controller
         }
 
         $resultados =  DB::select(DB::raw("SELECT
-                                            A.id,
-                                            A.material_id,
-                                            (
+                                                A.id,
+                                                A.material_id,
                                                 (
-                                                    ((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - (select
+                                                    (((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                         count(1)
                                                     from
                                                         lote_estoque_baixados X
                                                     where
-                                                        X.estoque_id = A.id
-                                                        AND X.data_baixa <= '$data_inicial 23:59:59')
-                                                )  * (A.qtde_chapa_peca)
-                                            ) * A.valor_unitario as valor,
-                                            ((((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - (select
-                                                    count(1)
-                                                from
-                                                    lote_estoque_baixados X
-                                                where
-                                                    X.estoque_id = A.id
-                                                    AND X.data_baixa <= '$data_inicial 23:59:59'))  * (A.qtde_chapa_peca)) as estoque
+                                                        X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
+                                                    ) * (case (A.valor_unitario) when 0.00 then A.valor_mo else A.valor_unitario END)
+                                                ) as valor,
+                                                ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
+                                                        count(1)
+                                                    from
+                                                        lote_estoque_baixados X
+                                                    where
+                                                        X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -822,7 +819,7 @@ class RelatoriosController extends Controller
         $resultados = DB::select(DB::raw("SELECT
                                             A.id,
                                             A.material_id,
-                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) * A.valor_unitario as valor,
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) * (case (A.valor_unitario) when 0.00 then A.valor_mo else A.valor_unitario END) as valor,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote))  as estoque
                                         FROM
                                             estoque A
