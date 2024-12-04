@@ -742,7 +742,7 @@ class RelatoriosController extends Controller
                                                         lote_estoque_baixados X
                                                     where
                                                         X.estoque_id = A.id
-                                                        AND X.data_baixa <= '$data_inicial 23:59:59') * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo))
+                                                        AND X.data_baixa <= '$data_inicial 23:59:59') * (A.qtde_chapa_peca))
                                                     ) * (case (A.valor_unitario) when 0.00 then A.valor_mo else A.valor_unitario END)
                                                 ) as valor,
                                                 ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo)  + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
