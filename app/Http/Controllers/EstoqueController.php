@@ -11,6 +11,7 @@ use App\Models\Estoque;
 use App\Providers\DateHelpers;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\OrcamentosController;
+use App\Models\CategoriasMateriais;
 use App\Models\Pessoas;
 use PhpParser\Node\Expr\Cast\Object_;
 
@@ -68,11 +69,17 @@ class EstoqueController extends Controller
             $where[] = "A.material_id = " . $request->input('material_id');
         }
 
+        if (!empty($request->input('categoria_id'))){
+            $categoria = $request->input('categoria_id');
+            $where[] = "B.categoria_id = $categoria";
+        }
+
         $status_estoque = "A.status_estoque = 'A'";
 
         if ($request->input('status_estoque') == 'F'){
             $status_estoque  = "A.status_estoque = 'F'";
         }
+
 
         $where[] = $status_estoque;
 
@@ -88,6 +95,7 @@ class EstoqueController extends Controller
                                             A.qtde_por_pacote,
                                             A.qtde_por_pacote_mo,
                                             B.estoque_minimo,
+                                            D.nome as categoria,
                                             A.lote,
                                             C.nome_cliente as fornecedor,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
@@ -115,6 +123,10 @@ class EstoqueController extends Controller
                                             pessoas C
                                         ON
                                             C.id = A.fornecedor_id
+                                        INNER JOIN
+                                            categorias_materiais D
+                                        ON
+                                            D.id = B.categoria_id
                                         $condicao
                                         ORDER BY
                                             A.data DESC
@@ -196,6 +208,7 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['data'] = $value->data;
             $array_estoque[$value->id]['pacote'] = number_format($value->estoque_pacote_atual,0, '','.');
 
+            $array_estoque[$value->id]['categoria'] = $value->categoria;
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->id]['previsao_meses'];
@@ -215,6 +228,7 @@ class EstoqueController extends Controller
 				'array_estoque'=> $array_estoque,
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
+                'CategoriasMateriais' => (new CategoriasMateriais)->get(),
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'

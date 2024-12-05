@@ -67,15 +67,15 @@
                     <option value="F" @if (isset($request) && $request->input('status_estoque')  == 'F'){{ ' selected '}}@else @endif>Finalizado</option>
                 </select>
 
-                <label for="Material" class="col-sm-2 col-form-label text-right">Matéria prima</label>
+                <label for="categoria_id" class="col-sm-2 col-form-label text-right">Categorias</label>
                 <div class="col-sm-2">
-                    <select class="form-control" id="material_id" name="material_id">
+                    <select class="form-control" id="categoria_id" name="categoria_id">
                         <option value=""></option>
-                        @if (isset($materiais))
-                            @foreach ($materiais as $material)
+                        @if (isset($CategoriasMateriais))
+                            @foreach ($CategoriasMateriais as $CategoriasMaterial)
                                 <option
-                                @if(isset($estoque[0]->material_id) && $material->id == $estoque[0]->material_id) selected="selected" @else {{''}}@endif
-                                value="{{ $material->id }}">{{ $material->codigo . ' - ' . $material->material }}
+                                @if(!empty($request->input('categoria_id')) && $CategoriasMaterial->id == $request->input('categoria_id')) selected="selected" @else {{''}}@endif
+                                value="{{ $CategoriasMaterial->id }}">{{ $CategoriasMaterial->nome }}
                                 </option>
                             @endforeach
                         @endif
@@ -116,6 +116,7 @@
                       <th>Lote</th>
                       <th>Data</th>
                       <th>Material</th>
+                      <th>Categoria</th>
                       <th>Estoque comprado</th>
                       <th>Estoque atual</th>
                       <th>Pacote</th>
@@ -137,6 +138,7 @@
                                 <td data-sortable='true' data-field="lote">{{$item_estoque['lote']}}</td>
                                 <td data-sortable='true' data-field="data" >{{Carbon\Carbon::parse($item_estoque['data'])->format('d/m/Y')}}</td>
                                 <td data-sortable='true' data-field="material" nowrap>{{$item_estoque['material']}}</td>
+                                <td data-sortable='true' data-field="categoria" nowrap>{{$item_estoque['categoria']}}</td>
                                 <td data-sortable='true' data-field="estoque_comprado" >{{$item_estoque['estoque_comprado']}}</td>
                                 <td data-sortable='true' data-field="estoque_atual" >{{$item_estoque['estoque_atual']}}</td>
                                 <td data-sortable='true' data-field="pacote" >{{$item_estoque['pacote']}}</td>
@@ -406,7 +408,7 @@
             </div>
             @if (!empty($historicos))
                 <div class="form-group row">
-                    <label for="observacao" class="col-sm-2 col-form-label">Histórico do Estoque</label>
+                    <label for="observacao" class="col-sm-2 col-form-label">Histórico de baixa de Estoque</label>
                     <div class="col-sm-8">
                         <div class="d-flex p-2 bd-highlight overflow-auto">
                             @foreach ($historicos as $historico)
@@ -426,7 +428,7 @@
             </div>
             @if (!empty($historicosMateriais))
                 <div class="form-group row">
-                    <label for="observacao" class="col-sm-2 col-form-label">Histórico dos Materiais</label>
+                    <label for="observacao" class="col-sm-2 col-form-label">Histórico de valores ds Materiais</label>
                     <div class="col-sm-8">
                         <div class="d-flex p-2 bd-highlight overflow-auto">
                             @foreach ($historicosMateriais as $historicoMateriais)

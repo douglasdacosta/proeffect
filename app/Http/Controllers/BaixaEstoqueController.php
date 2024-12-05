@@ -151,7 +151,9 @@ class BaixaEstoqueController extends Controller
                 $LoteEstoqueBaixados->data_baixa = now();
                 $LoteEstoqueBaixados->save();
 
-                $historico = "Retirada de 1 de pacote do estoque - tela de baixa de estoque";
+                $name = auth()->user()->name;
+
+                $historico = "Retirada de 1 de pacote do estoque - tela de baixa de estoque - por $name";
                 $historico_estoque = new HistoricosEstoque();
                 $historico_estoque->estoque_id = $request->input('id');
                 $historico_estoque->historico = $historico;
@@ -175,10 +177,11 @@ class BaixaEstoqueController extends Controller
             $id = DB::transaction(function () use ($request) {
                 $qtde = $request->input('qtde');
 
+                $name = auth()->user()->name;
                 if($request->input('acao_estoque') == 'adicionar') {
-                    $historico = "Devolução de $qtde de pacotes para estoque";
+                    $historico = "Devolução de $qtde de pacotes para estoque - por $name";
                 } else {
-                    $historico = "Retirada de $qtde de pacotes do estoque";
+                    $historico = "Retirada de $qtde de pacotes do estoque - por $name";
                 }
 
                 $historico_estoque = new HistoricosEstoque();
