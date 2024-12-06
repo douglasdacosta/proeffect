@@ -47,7 +47,6 @@ class BaixaEstoqueController extends Controller
         ];
 
         if(!empty($request->input('senha')) && empty($array_senha_producao)) {
-            dd('aqui');
             $dados = [
                 'pedidos' => '',
                 'status' => '',
