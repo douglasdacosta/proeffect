@@ -5,6 +5,7 @@ $(function ($) {
 
     $(document).on('click', '.baixar_estoque', function (e) {
         id_estoque = $(this).data('id')
+        usuario = $(this).data('usuario')
         if (!confirm("Confirma baixar estoque?")) {
             return false;
         }
@@ -13,6 +14,7 @@ $(function ($) {
             url: baseUrl + '/baixar-estoque',
             data: {
                 'id': id_estoque,
+                'usuario': usuario,
                 '_token': $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {

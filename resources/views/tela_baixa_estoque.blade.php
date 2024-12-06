@@ -91,7 +91,7 @@
                                         <td style="margin-top: 10px" scope="col">{{$estoque->lote}}</td>
                                         <td scope="col">{{$materiais[$estoque->material_id]['material']}}</td>
                                         <td scope="col">
-                                            <button class="btn btn-primary baixar_estoque" data-id="{{$estoque->id}}">Baixar</button>
+                                            <button class="btn btn-primary baixar_estoque" data-id="{{$estoque->id}} " data-usuario="{{$usuario}}">Baixar</button>
                                         </td>
                                     </tr>
                         @endforeach

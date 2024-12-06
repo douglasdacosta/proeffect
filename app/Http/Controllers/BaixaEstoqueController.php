@@ -25,23 +25,36 @@ class BaixaEstoqueController extends Controller
     public function telaBaixaEstoque(Request $request) {
 
 
-        $id = $request->input('id');
-        $senha = $request->input('senha');
 
+        $id = $request->input('id');
+
+        $senha = $request->input('senha');
+        $nome = '';
         $funcionarios = new Funcionarios();
         $funcionarios = $funcionarios->where(column: 'status', operator: '=', value: 'A');
+
+        $funcionarios = $funcionarios->where(column: 'senha', operator: '=', value: $senha);
+
         $funcionarios = $funcionarios->get();
 
-        foreach($funcionarios as $funcionario) {
-            $array_senha_producao[] = $funcionario->senha;
+        if(!empty($funcionarios[0]->senha))  {
+            $array_senha_producao = $funcionarios[0]->senha;
+            $nome = $funcionarios[0]->nome;
         }
+        $mensagem_alerta_estoque =[
+            "mensagem" => "",
+            "alerta" => false
+        ];
 
-        if(!empty($request->input('senha')) && !in_array($senha, $array_senha_producao)) {
+        if(!empty($request->input('senha')) && empty($array_senha_producao)) {
+            dd('aqui');
             $dados = [
                 'pedidos' => '',
                 'status' => '',
                 'mensagem' => 'Estoque não encontrado/senha incorreta',
+                'usuario' => '',
                 'materiais' => [],
+                'mensagem_alerta_estoque' => $mensagem_alerta_estoque,
                 'fornecedores' => [],
                 'estoque' =>[]
             ];
@@ -116,6 +129,7 @@ class BaixaEstoqueController extends Controller
                 'status' => '',
                 'mensagem' => $mensagem ,
                 'materiais' => $array_materiais,
+                'usuario' => $nome,
                 'mensagem_alerta_estoque' => $mensagem_alerta_estoque,
                 'fornecedores' => $array_fornecedores,
                 'estoque' =>$estoque
@@ -128,10 +142,10 @@ class BaixaEstoqueController extends Controller
     public function baixarEstoque(Request $request) {
 
         try {
-
             $id = DB::transaction(function () use ($request) {
                 $estoque = new Estoque();
                 $estoque = $estoque->where('id', '=', $request->input('id'))->get();
+
 
                 $estoqueTodos = new Estoque();
                 $estoqueTodos = $estoqueTodos->where('material_id', '=', $estoque[0]->material_id)
@@ -151,9 +165,9 @@ class BaixaEstoqueController extends Controller
                 $LoteEstoqueBaixados->data_baixa = now();
                 $LoteEstoqueBaixados->save();
 
-                $name = auth()->user()->name;
+                $usuario = $request->input('usuario');
 
-                $historico = "Retirada de 1 de pacote do estoque - tela de baixa de estoque - por $name";
+                $historico = "Retirada de 1 de pacote do estoque - tela de baixa de estoque - por $usuario";
                 $historico_estoque = new HistoricosEstoque();
                 $historico_estoque->estoque_id = $request->input('id');
                 $historico_estoque->historico = $historico;
