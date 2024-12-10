@@ -335,4 +335,74 @@ use App\Http\Controllers\PedidosController;
             </div>
         @stop
     @break
+
+    @case('consumo_realizado_ficha')
+        @section('content_header')
+        <div class="form-group row">
+            <h1 class="m-0 text-dark col-sm-11 col-form-label">Relatório de {{ $nome_tela }}</h1>
+        </div>
+        @stop
+
+        @section('content')
+
+            @include('relatoriosPesquisa')
+
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            @if (!empty($materiais))
+                                <table id="table_material" class="table table-striped  text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                                <th>Consumo</th>
+                                                <th>Peso</th>
+                                                <th>Valor consumido</th>
+                                                <th>Realizado</th>
+                                                <th>Peso</th>
+                                                <th>Valor estoque</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                        @foreach ($materiais as $material)
+
+                                            <tr>
+                                                <td data-sortable='true' >{{ $material['material'] }}</td>
+                                                <td data-sortable='true' >{{ $material['consumido'] }}</td>
+                                                <td data-sortable='true' >{{ $material['peso_consumido'] }}</td>
+                                                <td data-sortable='true' >{{ number_format($material['valor_consumido'], 2, ',', '.') }}</td>
+                                                <td data-sortable='true' >{{ $material['realizado'] }}</td>
+                                                <td data-sortable='true' >{{ $material['peso_realizado'] }}</td>
+                                                <td data-sortable='true' >{{ number_format($material['valor_realizado'], 2, ',', '.') }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    @if (!empty($totalizadores))
+                                        <tfoot>
+                                            <tr>
+                                                <th></th>
+                                                {{-- <td data-sortable='true' >{{ number_format($totalizadores['consumido'], 0, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($totalizadores['peso_consumido'], 0, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($totalizadores['valor_consumido'], 2, ',', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($totalizadores['realizado'], 0, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($totalizadores['peso_realizado'], 0, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($totalizadores['valor_realizado'], 2, ',', '.') }}</td> --}}
+                                            </tr>
+                                        </tfoot>
+                                    @endif
+                                @else
+                                    <h4>Nenhum registro encontrado</h4>
+                                @endif
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @stop
+    @break
+
 @endswitch

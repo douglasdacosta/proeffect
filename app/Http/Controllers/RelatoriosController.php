@@ -17,6 +17,7 @@ use App\Models\HistoricosPedidos;
 
 class RelatoriosController extends Controller
 {
+    private $busca_os = true;
     public function index(Request $request)
     {
 
@@ -305,7 +306,6 @@ class RelatoriosController extends Controller
 
         switch ($tipo_consulta) {
 
-
             //prevista
             case 'P':
                 $where = $this->consulta_previsao_material($data_inicio, $data_fim, $status_id, $request);
@@ -338,101 +338,211 @@ class RelatoriosController extends Controller
                 $tela = 'entrada_por_periodo';
             break;
 
+            //Consumo Realizado fichatécnica
+            case 'CRF':
+                $this->busca_os = false;
+                $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
+                $tela = 'consumo_realizado_ficha';
+            break;
+
             default:
                 $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
             break;
 
         }
-        $status_pedido = "A.status = 'A'";
 
-        $where[] = $status_pedido;
-
-        if(count($where)) {
-            $condicao = ' WHERE '.implode(' AND ', $where);
-        }
 
         $totalizadores = [];
-        $array_materiais=$arr_pedidos= $dadosMaterialRetroativo =[];
+        $array_materiais=$arr_pedidos= [];
 
         if($tipo_consulta == 'V' || $tipo_consulta =='C' || $tipo_consulta == 'ED' || $tipo_consulta == 'EEC') {
 
-            $materiais = $this->buscaMaterialPorCateroria($categoria);
+            $status_pedido = "A.status = 'A'";
 
-            $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria);
-            $estoque_na_data = $this->somaAgrupa($estoque_na_data);
+            $where[] = $status_pedido;
 
-            $entrada_estoque_no_periodo = $this->getEntradaEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
-            $entrada_estoque_no_periodo = $this->somaAgrupa($entrada_estoque_no_periodo);
-
-            $consumido_no_periodo = $this->getConsumoEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
-            $consumido_no_periodo = $this->somaAgrupa($consumido_no_periodo);
-
-            foreach ($materiais as $material) {
-
-                ##Estoque atual
-                $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
-                $estoque_atual = $key !== false ? $estoque_na_data[$key]['estoque'] : 0;
-                $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]['material_id']) ? $estoque_na_data[$key]['valor'] : 0;
-                $estoque_atual_ids = $key !== false && !empty($estoque_na_data[$key]['estoqueIds']) ? $estoque_na_data[$key]['estoqueIds'] : [];
-
-                ##entradas
-                $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
-                $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]['estoque'] : 0;
-                $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]['material_id']) ? $entrada_estoque_no_periodo[$key]['valor'] : 0;
-                $entradas_ids = $key !== false && !empty($entrada_estoque_no_periodo[$key]['estoqueIds']) ? $entrada_estoque_no_periodo[$key]['estoqueIds'] : [];
-
-                ##consumido
-                $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
-                $consumido = $key !== false ? $consumido_no_periodo[$key]['estoque'] : 0;
-                $valor_consumido = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['valor'] : 0;
-                $consumido_ids = $key !== false && !empty($consumido_no_periodo[$key]['estoqueIds']) ? $consumido_no_periodo[$key]['estoqueIds'] : [];
-
-
-                $array_materiais[$material->id] = [
-                        'id' => $material->id,
-                        'material_id' => $material->id,
-                        'material' => $material->material,
-                        'estoque_atual' => !empty($array_materiais[$material->id]['estoque_atual']) ? $array_materiais[$material->id]['estoque_atual'] + $estoque_atual : $estoque_atual,
-                        'valor_estoque_atual' => !empty($array_materiais[$material->id]['valor_estoque_atual']) ? $array_materiais[$material->id]['valor_estoque_atual'] + $valor_estoque_atual : $valor_estoque_atual,
-                        'entradas' => !empty($array_materiais[$material->id]['entradas']) ? $array_materiais[$material->id]['entradas'] + $entradas : $entradas,
-                        'valor_entradas' => !empty($array_materiais[$material->id]['valor_entradas']) ? $array_materiais[$material->id]['valor_entradas'] + $valor_entradas : $valor_entradas,
-                        'consumido' => !empty($array_materiais[$material->id]['consumido']) ? $array_materiais[$material->id]['consumido'] + $consumido : $consumido,
-                        'valor_consumido' => !empty($array_materiais[$material->id]['valor_consumido']) ? $array_materiais[$material->id]['valor_consumido'] + $valor_consumido : $valor_consumido,
-                        'os' => [
-                            'Estoque atual' => $estoque_atual_ids,
-                            'Entradas' => $entradas_ids,
-                            'Consumido' => $consumido_ids
-                        ]
-                    ];
+            if(count($where)) {
+                $condicao = ' WHERE '.implode(' AND ', $where);
             }
 
-            //cria totalizadores dos campos
-            foreach ($array_materiais as $key => $material) {
+            $retorno = $this->buscaPorDatasCategorias($data_inicio, $data_fim, $categoria);
+            $totalizadores = $retorno['totalizadores'];
+            $array_materiais = $retorno['array_materiais'];
 
-                $totalizadores['total_estoque_atual'] = isset($totalizadores['total_estoque_atual']) ? $totalizadores['total_estoque_atual'] + $material['estoque_atual'] : $material['estoque_atual'];
-                $totalizadores['total_valor_estoque_atual'] = isset($totalizadores['total_valor_estoque_atual']) ? $totalizadores['total_valor_estoque_atual'] + $material['valor_estoque_atual'] : $material['valor_estoque_atual'];
-                $totalizadores['total_entradas'] = isset($totalizadores['total_entradas']) ? $totalizadores['total_entradas'] + $material['entradas'] : $material['entradas'];
-                $totalizadores['total_valor_entradas'] = isset($totalizadores['total_valor_entradas']) ? $totalizadores['total_valor_entradas'] + $material['valor_entradas'] : $material['valor_entradas'];
-                $totalizadores['total_consumido'] = isset($totalizadores['total_consumido']) ? $totalizadores['total_consumido'] + $material['consumido'] : $material['consumido'];
-                $totalizadores['total_valor_consumido'] = isset($totalizadores['total_valor_consumido']) ? $totalizadores['total_valor_consumido'] + $material['valor_consumido'] : $material['valor_consumido'];
+        }
 
+        if($tipo_consulta == 'P' || $tipo_consulta == 'E') {
+
+            $status_pedido = "A.status = 'A'";
+
+            $where[] = $status_pedido;
+
+            if(count($where)) {
+                $condicao = ' WHERE '.implode(' AND ', $where);
             }
 
+            $retorno = $this->buscaPorCondicoes($condicao);
+            $totalizadores = $retorno['totalizadores'];
+            $array_materiais = $retorno['array_materiais'];
+        }
 
-        } else {
+        if($tipo_consulta == 'CRF') {
+
+            $status_pedido = "A.status = 'A'";
+
+            $where[] = $status_pedido;
+
+            if(count($where)) {
+                $condicao = ' WHERE '.implode(' AND ', $where);
+            }
+
+            $retorno_realizado = $this->buscaPorCondicoes($condicao);
+            // dd($retorno_realizado);
+            $retorno_consumo = $this->buscaPorDatasCategorias($data_inicio, $data_fim, $categoria);
+
+            $novo_array_materiais = [];
+            foreach($retorno_realizado['array_materiais'] as $key => $value) {
+                $novo_array_materiais['array_materiais'][$value['material_id']]= [
+                    "id" => $value['id'],
+                    "material_id" => $value['material_id'],
+                    "material" => $value['material'],
+
+                    "consumido" => isset($retorno_consumo['array_materiais'][$value['material_id']]) ? $retorno_consumo['array_materiais'][$value['material_id']]['consumido'] : 0,
+                    "peso_consumido" => 0,
+                    "valor_consumido" => isset($retorno_consumo['array_materiais'][$value['material_id']]) ? $retorno_consumo['array_materiais'][$value['material_id']]['valor_consumido'] : 0,
+
+                    "realizado" => $value['consumo_previsto'],
+                    "peso_realizado" => 0,
+                    "valor_realizado" => DateHelpers::formatFloatValue($value['valor_previsto']),
+                ];
+            }
+
+            // $retorno_realizado = array_merge($retorno_realizado1, $retorno_realizado2);
+            $subCaregorias = $this->getSubCategoriasStatus();
+            $keysSubcategorias = array();
+            foreach ($status_id as $statusId) {
+                if (isset($subCaregorias[$statusId])) {
+                   $keysSubcategorias = array_merge($keysSubcategorias, array_keys($subCaregorias[$statusId]['subcategoorias']));
+                }
+            }
+
+            $materiaisCategorias = (new Materiais())->whereIn('categoria_id', $keysSubcategorias)->get()->pluck('id')->toArray();
+
+            foreach($novo_array_materiais['array_materiais'] as $key => $value) {
+
+                if(!in_array($key, $materiaisCategorias)) {
+                    unset($novo_array_materiais['array_materiais'][$key]);
+                }
+            }
+
+            $totalizadores = $retorno_realizado['totalizadores'];
+            $array_materiais = $novo_array_materiais['array_materiais'];
+        }
+
+        info($array_materiais);
+
+        $data = array(
+            'tela' => $tela,
+            'nome_tela' => 'previsão de materiais',
+            'materiais' => $array_materiais,
+            'request' => $request,
+            'status' => (new PedidosController)->getAllStatus(),
+            'CategoriasMateriais' => (new CategoriasMateriais)->get(),
+            'rotaIncluir' => '',
+            'rotaAlterar' => '',
+            'totalizadores' => $totalizadores,
+        );
+
+        return view('relatorios', $data);
+    }
 
 
-            $pedidos = $this->getDadosPedidosPorCondicao($condicao);
 
 
+    public function buscaPorDatasCategorias($data_inicio, $data_fim, $categoria){
+
+        $totalizadores = [];
+        $array_materiais=$arr_pedidos= [];
+
+        $materiais = $this->buscaMaterialPorCateroria($categoria);
+
+        $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria);
+        $estoque_na_data = $this->somaAgrupa($estoque_na_data);
+
+        $entrada_estoque_no_periodo = $this->getEntradaEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
+        $entrada_estoque_no_periodo = $this->somaAgrupa($entrada_estoque_no_periodo);
+
+        $consumido_no_periodo = $this->getConsumoEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
+        $consumido_no_periodo = $this->somaAgrupa($consumido_no_periodo);
+
+        foreach ($materiais as $material) {
+
+            ##Estoque atual
+            $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
+            $estoque_atual = $key !== false ? $estoque_na_data[$key]['estoque'] : 0;
+            $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]['material_id']) ? $estoque_na_data[$key]['valor'] : 0;
+            $estoque_atual_ids = $key !== false && !empty($estoque_na_data[$key]['estoqueIds']) ? $estoque_na_data[$key]['estoqueIds'] : [];
+
+            ##entradas
+            $key = array_search($material->id, array_column($entrada_estoque_no_periodo, 'material_id'));
+            $entradas = $key !== false ? $entrada_estoque_no_periodo[$key]['estoque'] : 0;
+            $valor_entradas = $key !== false && !empty($entrada_estoque_no_periodo[$key]['material_id']) ? $entrada_estoque_no_periodo[$key]['valor'] : 0;
+            $entradas_ids = $key !== false && !empty($entrada_estoque_no_periodo[$key]['estoqueIds']) ? $entrada_estoque_no_periodo[$key]['estoqueIds'] : [];
+
+            ##consumido
+            $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
+            $consumido = $key !== false ? $consumido_no_periodo[$key]['estoque'] : 0;
+            $valor_consumido = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['valor'] : 0;
+            $consumido_ids = $key !== false && !empty($consumido_no_periodo[$key]['estoqueIds']) ? $consumido_no_periodo[$key]['estoqueIds'] : [];
+
+            $os =  [];
+            if($this->busca_os) {
+                $os =  [
+                    'Estoque atual' => $estoque_atual_ids,
+                    'Entradas' => $entradas_ids,
+                    'Consumido' => $consumido_ids
+                ];
+            }
+
+            $array_materiais[$material->id] = [
+                    'id' => $material->id,
+                    'material_id' => $material->id,
+                    'material' => $material->material,
+                    'estoque_atual' => !empty($array_materiais[$material->id]['estoque_atual']) ? $array_materiais[$material->id]['estoque_atual'] + $estoque_atual : $estoque_atual,
+                    'valor_estoque_atual' => !empty($array_materiais[$material->id]['valor_estoque_atual']) ? $array_materiais[$material->id]['valor_estoque_atual'] + $valor_estoque_atual : $valor_estoque_atual,
+                    'entradas' => !empty($array_materiais[$material->id]['entradas']) ? $array_materiais[$material->id]['entradas'] + $entradas : $entradas,
+                    'valor_entradas' => !empty($array_materiais[$material->id]['valor_entradas']) ? $array_materiais[$material->id]['valor_entradas'] + $valor_entradas : $valor_entradas,
+                    'consumido' => !empty($array_materiais[$material->id]['consumido']) ? $array_materiais[$material->id]['consumido'] + $consumido : $consumido,
+                    'valor_consumido' => !empty($array_materiais[$material->id]['valor_consumido']) ? $array_materiais[$material->id]['valor_consumido'] + $valor_consumido : $valor_consumido,
+                    'os' => $os
+                ];
+        }
+
+        //cria totalizadores dos campos
+        foreach ($array_materiais as $key => $material) {
+
+            $totalizadores['total_estoque_atual'] = isset($totalizadores['total_estoque_atual']) ? $totalizadores['total_estoque_atual'] + $material['estoque_atual'] : $material['estoque_atual'];
+            $totalizadores['total_valor_estoque_atual'] = isset($totalizadores['total_valor_estoque_atual']) ? $totalizadores['total_valor_estoque_atual'] + $material['valor_estoque_atual'] : $material['valor_estoque_atual'];
+            $totalizadores['total_entradas'] = isset($totalizadores['total_entradas']) ? $totalizadores['total_entradas'] + $material['entradas'] : $material['entradas'];
+            $totalizadores['total_valor_entradas'] = isset($totalizadores['total_valor_entradas']) ? $totalizadores['total_valor_entradas'] + $material['valor_entradas'] : $material['valor_entradas'];
+            $totalizadores['total_consumido'] = isset($totalizadores['total_consumido']) ? $totalizadores['total_consumido'] + $material['consumido'] : $material['consumido'];
+            $totalizadores['total_valor_consumido'] = isset($totalizadores['total_valor_consumido']) ? $totalizadores['total_valor_consumido'] + $material['valor_consumido'] : $material['valor_consumido'];
+
+        }
+
+        return [
+            'array_materiais' => $array_materiais,
+            'totalizadores' => $totalizadores
+        ];
+
+    }
+    public function buscaPorCondicoes($condicao){
+        $pedidos = $this->getDadosPedidosPorCondicao($condicao);
 
             if(!empty($pedidos)) {
 
                 $arr_pedidos = $this->calculaDadosMaterial($pedidos);
             }
-
-
-
 
             foreach ($arr_pedidos as $key => $pedido) {
 
@@ -469,25 +579,12 @@ class RelatoriosController extends Controller
             if(count($totalizadores)) {
                 $totalizadores['valor_previsto'] = number_format($totalizadores['valor_previsto'], 2, ',', '.');
             }
-        }
 
-
-        $data = array(
-            'tela' => $tela,
-            'nome_tela' => 'previsão de materiais',
-            'materiais' => $array_materiais,
-            'dadosMaterialRetroativo' => $dadosMaterialRetroativo,
-            'request' => $request,
-            'status' => (new PedidosController)->getAllStatus(),
-            'CategoriasMateriais' => (new CategoriasMateriais)->get(),
-            'rotaIncluir' => '',
-            'rotaAlterar' => '',
-            'totalizadores' => $totalizadores,
-        );
-
-        return view('relatorios', $data);
+            return [
+                'array_materiais' => $array_materiais,
+                'totalizadores' => $totalizadores
+            ];
     }
-
 
      /**
      * Summary of getEstoqueByMaterial
@@ -505,6 +602,7 @@ class RelatoriosController extends Controller
                                             A.qtde_por_pacote_mo,
                                             B.estoque_minimo,
                                             A.lote,
+                                            A.peso_material,
                                             A.valor_unitario as valor,
                                             C.nome_cliente as fornecedor,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
@@ -565,20 +663,25 @@ class RelatoriosController extends Controller
                 $arr_pedidos[$pedido->material_id]['valor_previsto'] = $dados_material['valor_total'];
 
             }
+            $os = [];
+            if($this->busca_os) {
+                $os = [
+                    'os' => $pedido->os,
+                    'ep' => $pedido->ep,
+                    'material' => $pedido->material,
+                    'pedidos_ids' => $pedido->id,
+                    'qtde_itens' => $quantidade_chapas,
+                    'qtde' => $pedido->qtde
+                ];
+            }
+
 
             $arr_pedidos[$pedido->material_id]['id'] = $pedido->id;
             $arr_pedidos[$pedido->material_id]['material'] = $pedido->material;
             $arr_pedidos[$pedido->material_id]['material_id'] = $pedido->material_id;
             $arr_pedidos[$pedido->material_id]['valor_material'] = $pedido->valor_material;
             $material_calculado[$pedido->id][$pedido->material_id] = true;
-            $arr_pedidos[$pedido->material_id]['fichas'][] = [
-                'os' => $pedido->os,
-                'ep' => $pedido->ep,
-                'material' => $pedido->material,
-                'pedidos_ids' => $pedido->id,
-                'qtde_itens' => $quantidade_chapas,
-                'qtde' => $pedido->qtde
-            ];
+            $arr_pedidos[$pedido->material_id]['fichas'][] = $os;
 
         }
 
@@ -735,6 +838,7 @@ class RelatoriosController extends Controller
         $resultados =  DB::select(DB::raw("SELECT
                                                 A.id,
                                                 A.material_id,
+                                                A.peso_material,
                                                 (
                                                     (((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                         count(1)
@@ -962,5 +1066,33 @@ class RelatoriosController extends Controller
             $total_somado = $total_somado + $dados_totais[$nome_material]['valor_total'];
         };
         return $dados_totais;
+    }
+
+
+    public function getSubCategoriasStatus() {
+        return [
+            '4' => [
+                'status_nome' => 'Usinagem',
+                'subcategoorias' => [
+                    3 => 'PSAI',
+                    6 => 'Acrilicos',
+                    7=> 'PSAI Variados'
+                ],
+            ],
+            '5' => [
+                'status_nome' => 'Acabamento',
+                'subcategoorias' => [
+                    4 => 'Inserto',
+                ],
+            ],
+            '6' => [
+                'status_nome' => 'Montagem',
+                'subcategoorias' => [
+                    1 => 'Torre',
+                    2 => 'Espaçador',
+                    8 => 'Porcas e Parafusos',
+                ],
+            ]
+            ];
     }
 }

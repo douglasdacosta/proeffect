@@ -270,6 +270,12 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="lote_manual" class="col-sm-2 col-form-label  text-center">Lote manual</label>
+                <div class="col-sm-2">
+                    <input type="checkbox" class="form-control form-check-input" id="lote_manual" name="lote_manual" value="1">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="lote" class="col-sm-2 col-form-label">Lote</label>
                 <div class="col-sm-2">
                     <input type="text" readonly class="form-control" id="lote" name="lote" value="@if (isset($estoque[0]->lote)){{$estoque[0]->lote}}@else{{''}}@endif">

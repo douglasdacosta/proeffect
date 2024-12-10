@@ -462,9 +462,12 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
         @section('content')
 
         <form id="filtro" action="followup" method="get" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
-            <div class="row" role="main">
+
+
+            <div class="form-group row">
+
                 <div class="col-md-9 themed-grid-col row">
-                    <div class="row">
+                    <div class="form-group row">
                         <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
                         <div class="col-sm-1">
                             <input type="text" id="os" name="os" class="form-control col-md-13" value="">
@@ -473,24 +476,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                         <div class="col-sm-1">
                             <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                         </div>
-                        <label for="data_gerado" class="col-sm-3 col-form-label text-right">Data pedido: de</label>
-                        <div class="col-sm-2">
-                            <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
-                                placeholder="DD/MM/AAAA">
+                        <label for="lote" class="col-sm-3 col-form-label text-right tipo_consulta ">Tipo de consulta</label>
+                        <div class="col-sm-3">
+                            <select class="form-control col-sm-12 tipo_consulta_followup" id="tipo_consulta" name="tipo_consulta">
+                                <option value="F" @if($request->input('tipo_consulta') == 'F'){{ ' selected '}}@else @endif>Followup</option>
+                                <option value="R" @if($request->input('tipo_consulta') == 'R'){{ ' selected '}}@else @endif>Realizado</option>
+                                <option value="C" @if($request->input('tipo_consulta') == 'C'){{ ' selected '}}@else @endif>Ciclo de produção</option>
+                            </select>
                         </div>
-                        <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
-                        <div class="col-sm-2">
-                            <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
-                                placeholder="DD/MM/AAAA">
-                        </div>
-
                     </div>
-                    <div class="row">
-                        {{-- <label for="data_entrega" class="col-sm-1 col-form-label text-right">&nbsp;&nbsp;</label>
-                        <div class="col-sm-1"><span class="col-md-13" >&nbsp;</span></div>
-                        <label for="data_entrega" class="col-sm-1 col-form-label text-right">&nbsp;&nbsp;</label>
-                        <div class="col-sm-1"><span class="col-md-13" >&nbsp;</span></div> --}}
-                        <label for="data_entrega" class="col-sm-3 col-form-label text-right">Data entrega: de</label>
+                    <div class="form-group row campos_followup">
+                        <label for="data_entrega" class="col-sm-4 col-form-label text-right ">Data entrega: de</label>
                         <div class="col-sm-3">
                             <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
                                 placeholder="DD/MM/AAAA">
@@ -500,7 +496,30 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
                                 placeholder="DD/MM/AAAA">
                         </div>
-
+                    </div>
+                    <div class="form-group row campos_followup">
+                        <label for="data_gerado" class="col-sm-4 col-form-label text-right">Data pedido: de</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+                        <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+                    </div>
+                    <div class="form-group row campos_ciclo_producao">
+                        <label for="data_apontamento" class="col-sm-4 col-form-label text-right">Data apontamento: de</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_apontamento" name="data_apontamento"
+                                placeholder="DD/MM/AAAA">
+                        </div>
+                        <label for="data_apontamento_fim" class=" col-form-label text-right">até</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mask_date" id="data_apontamento_fim" name="data_apontamento_fim"
+                                placeholder="DD/MM/AAAA">
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3 themed-grid-col row" >
@@ -510,7 +529,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
                                         <div class="col-sm-6 form-check">
-                                            <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                            <input class="form-check-input col-sm-4 status_pedido"  name="status_id[]" id="{{$status->id}}" type="checkbox"
                                             @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
                                             <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
                                         </div>

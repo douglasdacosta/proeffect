@@ -663,8 +663,93 @@ $(function ($) {
 
 
     })
-
     $('.tipo_consulta').change();
+
+    $(document).on('click', '#lote_manual', function(){
+        if($(this).is(':checked')) {
+
+            // salva dos do lote anterior no storage
+            lote_anterior = $('#lote').val();
+            localStorage.setItem('lote_anterior', lote_anterior);
+
+            // retira readonly do campo "lote"
+            $('#lote').attr('readonly', false);
+            $('#lote').val('');
+
+        } else {
+            $('#lote').attr('readonly', true);
+
+            lote_anterior = localStorage.getItem('lote_anterior');
+
+            $('#lote').val(lote_anterior);
+        }
+    })
+
+    $(document).on('change', '.tipo_consulta_followup', function(){
+        if($('.tipo_consulta_followup').val() == 'F' )        {
+
+            $('.campos_ciclo_producao').hide();
+            $('.campos_followup').show();
+            $('.status_pedido').attr('checked', false);
+
+            Status_pedido = $('.status_pedido');
+
+            $.each(Status_pedido, function(i,j) {
+
+                if(j.value == 11 || j.value == 12 || j.value == 13) {
+                    j.checked = false;
+                } else {
+                    j.checked = true;
+                }
+
+            });
+        }
+
+        if($('.tipo_consulta_followup').val() == 'R' )        {
+
+            $('.campos_ciclo_producao').show();
+            $('.campos_followup').hide();
+
+            $('.status_pedido').attr('checked', false);
+
+            Status_pedido = $('.status_pedido');
+
+            $.each(Status_pedido, function(i,j) {
+                console.log(j);
+                if(j.value == 11 || j.value == 12 || j.value == 13) {
+                    j.checked = false;
+                } else {
+                    j.checked = true;
+                }
+
+            });
+        }
+
+        if($('.tipo_consulta_followup').val() == 'C' )        {
+
+            $('.campos_ciclo_producao').show();
+            $('.campos_followup').hide();
+
+            $('.status_pedido').attr('checked', false);
+
+            Status_pedido = $('.status_pedido');
+
+            $.each(Status_pedido, function(i,j) {
+                console.log(j);
+                if(j.value == 11) {
+                    j.checked = true;
+                } else {
+                    j.checked = false;
+                }
+
+            });
+        }
+    })
+
+    $('.tipo_consulta_followup').change();
+
+
+
 }); //FIM DO BLOCO DE JQUERY READY
 
 $(document).on('click', '.painel', function(){
