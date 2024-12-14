@@ -552,7 +552,7 @@ class RelatoriosController extends Controller
     }
     public function buscaPorCondicoes($condicao){
             $pedidos = $this->getDadosPedidosPorCondicao($condicao);
-
+            $arr_pedidos = $totalizadores = $array_materiais = [];
             if(!empty($pedidos)) {
 
                 $arr_pedidos = $this->calculaDadosMaterial($pedidos);
@@ -591,7 +591,7 @@ class RelatoriosController extends Controller
                 ];
             }
 
-            if(count($totalizadores)) {
+            if(count($totalizadores)>0) {
                 $totalizadores['valor_previsto'] = number_format($totalizadores['valor_previsto'], 2, ',', '.');
             }
 
