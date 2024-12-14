@@ -311,7 +311,7 @@ class RelatoriosController extends Controller
                 $where = $this->consulta_previsao_material($data_inicio, $data_fim, $status_id, $request);
             break;
 
-            //executada
+            //realizado
             case 'E':
                 $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
             break;
@@ -380,6 +380,7 @@ class RelatoriosController extends Controller
             }
 
             $retorno = $this->buscaPorCondicoes($condicao);
+
             $totalizadores = $retorno['totalizadores'];
             $array_materiais = $retorno['array_materiais'];
         }
@@ -447,11 +448,12 @@ class RelatoriosController extends Controller
                 $totalizadores = $retorno_realizado['totalizadores'];
                 $array_materiais[] = $novo_array_materiais['array_materiais'];
             }
+
+            $array_materiais = array_reduce($array_materiais, function ($carry, $item) {
+                return $carry + $item;
+            }, []);
         }
 
-        $array_materiais = array_reduce($array_materiais, function ($carry, $item) {
-            return $carry + $item;
-        }, []);
 
         $data = array(
             'tela' => $tela,
@@ -550,7 +552,7 @@ class RelatoriosController extends Controller
     }
     public function buscaPorCondicoes($condicao){
             $pedidos = $this->getDadosPedidosPorCondicao($condicao);
-            // dd($pedidos);
+
             if(!empty($pedidos)) {
 
                 $arr_pedidos = $this->calculaDadosMaterial($pedidos);

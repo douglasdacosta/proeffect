@@ -176,7 +176,6 @@ $(function ($) {
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 if (xhr.status >= 200 && xhr.status < 300) {
-                    console.log(JSON.parse(xhr.responseText))
                     dados = JSON.parse(xhr.responseText)
 
                     if(dados[0].peso != null) {
@@ -713,9 +712,8 @@ $(function ($) {
             $('.status_pedido').attr('checked', false);
 
             Status_pedido = $('.status_pedido');
-
             $.each(Status_pedido, function(i,j) {
-                console.log(j);
+
                 if(j.value == 11 || j.value == 12 || j.value == 13) {
                     j.checked = false;
                 } else {
@@ -735,7 +733,6 @@ $(function ($) {
             Status_pedido = $('.status_pedido');
 
             $.each(Status_pedido, function(i,j) {
-                console.log(j);
                 if(j.value == 11) {
                     j.checked = true;
                 } else {
