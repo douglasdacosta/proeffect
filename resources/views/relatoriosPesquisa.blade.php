@@ -39,6 +39,9 @@
                         </select>
                     </div>
                 </div>
+                @php
+                    $selectedStatuses = request()->query('status_id', []);
+                @endphp
                 <div class="form-group row col-sm-12">
                     <div class="col-md-5 themed-grid-col">
                         <div class="row">
@@ -46,11 +49,24 @@
                             <div class="col-sm-6 status_pedido" style="overflow-y: auto; height: 175px; border:1px solid #ced4da; border-radius: .25rem;">
                                 <div class="right_col col-sm-6" role="main">
                                     @foreach ($status as $status)
-                                    <div class="col-sm-6 form-check">
-                                        <input class="form-check-input col-sm-4"  name="status_id[]" id="{{$status->id}}" type="checkbox"
-                                        @if($status->id > 4) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
-                                        <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
-                                    </div>
+                                        <div class="col-sm-6 form-check">
+                                            <input class="form-check-input col-sm-4" name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                            @php
+                                                if(count($selectedStatuses) > 0 ) {
+                                                    if(in_array($status->id, $selectedStatuses)) {
+                                                        echo 'checked';
+                                                    }
+                                                } else {
+                                                    if($status->id > 4) {
+                                                        echo '';
+                                                    } else {
+                                                        echo 'checked';
+                                                    }
+                                                }
+                                            @endphp
+                                            value="{{$status->id}}">
+                                            <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                        </div>
                                     @endforeach
                                 </div>
                             </div>

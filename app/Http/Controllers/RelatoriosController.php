@@ -196,7 +196,7 @@ class RelatoriosController extends Controller
 
             $historicos_pedidos = new HistoricosPedidos();
             $historicos_pedidos = $historicos_pedidos->select('pedidos_id');
-            $historicos_pedidos = $historicos_pedidos->whereIn('status_id', $request->input('status_id'));
+            $historicos_pedidos = $historicos_pedidos->whereIn('status_id', $status_id);
 
             if (!empty($data_inicio) && !empty($data_fim)){
                 $historicos_pedidos = $historicos_pedidos->whereBetween('created_at', [$data_inicio . ' 00:00:01' , $data_fim . ' 23:59:59']);
@@ -227,10 +227,10 @@ class RelatoriosController extends Controller
 
 
         } else {
-            if(!empty($request->input('status_id'))){
+            if(!empty($status_id)){
                 $historicos_etapas = new HistoricosEtapas();
                 $historicos_etapas = $historicos_etapas->select('pedidos_id');
-                $historicos_etapas = $historicos_etapas->whereIn('status_id', $request->input('status_id'));
+                $historicos_etapas = $historicos_etapas->whereIn('status_id', $status_id);
                 $historicos_etapas = $historicos_etapas->where('etapas_pedidos_id', '=', 4 );
 
                 if (!empty($data_inicio) && !empty($data_fim)){
@@ -340,8 +340,6 @@ class RelatoriosController extends Controller
 
             //Consumo Realizado fichatécnica
             case 'CRF':
-                $this->busca_os = false;
-                $where = $this->consulta_executados($data_inicio, $data_fim, $status_id, $request);
                 $tela = 'consumo_realizado_ficha';
             break;
 
@@ -388,58 +386,72 @@ class RelatoriosController extends Controller
 
         if($tipo_consulta == 'CRF') {
 
-            $status_pedido = "A.status = 'A'";
+            foreach($status_id as $key => $status) {
 
-            $where[] = $status_pedido;
+                $where = $this->consulta_executados($data_inicio, $data_fim, [$status], $request);
 
-            if(count($where)) {
-                $condicao = ' WHERE '.implode(' AND ', $where);
-            }
+                $status_pedido = "A.status = 'A'";
 
-            $retorno_realizado = $this->buscaPorCondicoes($condicao);
-            // dd($retorno_realizado);
-            $retorno_consumo = $this->buscaPorDatasCategorias($data_inicio, $data_fim, $categoria);
+                $where[] = $status_pedido;
 
-            $novo_array_materiais = [];
-            foreach($retorno_realizado['array_materiais'] as $key => $value) {
-                $novo_array_materiais['array_materiais'][$value['material_id']]= [
-                    "id" => $value['id'],
-                    "material_id" => $value['material_id'],
-                    "material" => $value['material'],
-
-                    "consumido" => isset($retorno_consumo['array_materiais'][$value['material_id']]) ? $retorno_consumo['array_materiais'][$value['material_id']]['consumido'] : 0,
-                    "peso_consumido" => 0,
-                    "valor_consumido" => isset($retorno_consumo['array_materiais'][$value['material_id']]) ? $retorno_consumo['array_materiais'][$value['material_id']]['valor_consumido'] : 0,
-
-                    "realizado" => $value['consumo_previsto'],
-                    "peso_realizado" => 0,
-                    "valor_realizado" => DateHelpers::formatFloatValue($value['valor_previsto']),
-                ];
-            }
-
-            // $retorno_realizado = array_merge($retorno_realizado1, $retorno_realizado2);
-            $subCaregorias = $this->getSubCategoriasStatus();
-            $keysSubcategorias = array();
-            foreach ($status_id as $statusId) {
-                if (isset($subCaregorias[$statusId])) {
-                   $keysSubcategorias = array_merge($keysSubcategorias, array_keys($subCaregorias[$statusId]['subcategoorias']));
+                if(count($where)) {
+                    $condicao = ' WHERE '.implode(' AND ', $where);
                 }
-            }
 
-            $materiaisCategorias = (new Materiais())->whereIn('categoria_id', $keysSubcategorias)->get()->pluck('id')->toArray();
+                $retorno_realizado = '';
+                $retorno_realizado = $this->buscaPorCondicoes($condicao);
 
-            foreach($novo_array_materiais['array_materiais'] as $key => $value) {
+                $retorno_consumo = $this->buscaPorDatasCategorias($data_inicio, $data_fim, $categoria);
 
-                if(!in_array($key, $materiaisCategorias)) {
-                    unset($novo_array_materiais['array_materiais'][$key]);
+                $novo_array_materiais = [];
+
+                foreach($retorno_realizado['array_materiais'] as $key => $value) {
+
+                    $peso_material_consumido = isset($retorno_consumo['array_materiais'][$value['material_id']]) ? $retorno_consumo['array_materiais'][$value['material_id']]['peso_material'] : 0;
+                    $consumido = isset($retorno_consumo['array_materiais'][$value['material_id']]) ? $retorno_consumo['array_materiais'][$value['material_id']]['consumido'] : 0;
+
+
+                    $peso_material_realizado = $value['peso_material'];
+                    $realizado = $value['consumo_previsto'];
+
+                    $novo_array_materiais['array_materiais'][$value['material_id']]= [
+                        "id" => $value['id'],
+                        "material_id" => $value['material_id'],
+                        "material" => $value['material'],
+                        "consumido" => $consumido,
+                        "peso_consumido" => $peso_material_consumido*$consumido,
+                        "valor_consumido" => isset($retorno_consumo['array_materiais'][$value['material_id']]) ? $retorno_consumo['array_materiais'][$value['material_id']]['valor_consumido'] : 0,
+                        "realizado" => $value['consumo_previsto'],
+                        "peso_realizado" => $realizado*$peso_material_realizado,
+                        "valor_realizado" => DateHelpers::formatFloatValue($value['valor_previsto']),
+                    ];
                 }
-            }
 
-            $totalizadores = $retorno_realizado['totalizadores'];
-            $array_materiais = $novo_array_materiais['array_materiais'];
+                // $retorno_realizado = array_merge($retorno_realizado1, $retorno_realizado2);
+                $subCaregorias = $this->getSubCategoriasStatus();
+                $keysSubcategorias = array();
+
+                if (isset($subCaregorias[$status])) {
+                   $keysSubcategorias = array_merge($keysSubcategorias, array_keys($subCaregorias[$status]['subcategoorias']));
+                }
+
+                $materiaisCategorias = (new Materiais())->whereIn('categoria_id', $keysSubcategorias)->get()->pluck('id')->toArray();
+
+                foreach($novo_array_materiais['array_materiais'] as $key => $value) {
+
+                    if(!in_array($key, $materiaisCategorias)) {
+                        unset($novo_array_materiais['array_materiais'][$key]);
+                    }
+                }
+
+                $totalizadores = $retorno_realizado['totalizadores'];
+                $array_materiais[] = $novo_array_materiais['array_materiais'];
+            }
         }
 
-        info($array_materiais);
+        $array_materiais = array_reduce($array_materiais, function ($carry, $item) {
+            return $carry + $item;
+        }, []);
 
         $data = array(
             'tela' => $tela,
@@ -455,8 +467,6 @@ class RelatoriosController extends Controller
 
         return view('relatorios', $data);
     }
-
-
 
 
     public function buscaPorDatasCategorias($data_inicio, $data_fim, $categoria){
@@ -493,6 +503,7 @@ class RelatoriosController extends Controller
             $key = array_search($material->id, array_column($consumido_no_periodo, 'material_id'));
             $consumido = $key !== false ? $consumido_no_periodo[$key]['estoque'] : 0;
             $valor_consumido = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['valor'] : 0;
+            $peso_material = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['peso_material'] : 0;
             $consumido_ids = $key !== false && !empty($consumido_no_periodo[$key]['estoqueIds']) ? $consumido_no_periodo[$key]['estoqueIds'] : [];
 
             $os =  [];
@@ -514,6 +525,7 @@ class RelatoriosController extends Controller
                     'valor_entradas' => !empty($array_materiais[$material->id]['valor_entradas']) ? $array_materiais[$material->id]['valor_entradas'] + $valor_entradas : $valor_entradas,
                     'consumido' => !empty($array_materiais[$material->id]['consumido']) ? $array_materiais[$material->id]['consumido'] + $consumido : $consumido,
                     'valor_consumido' => !empty($array_materiais[$material->id]['valor_consumido']) ? $array_materiais[$material->id]['valor_consumido'] + $valor_consumido : $valor_consumido,
+                    'peso_material' => !empty($array_materiais[$material->id]['peso_material']) ? $array_materiais[$material->id]['peso_material'] + $peso_material : $peso_material,
                     'os' => $os
                 ];
         }
@@ -537,8 +549,8 @@ class RelatoriosController extends Controller
 
     }
     public function buscaPorCondicoes($condicao){
-        $pedidos = $this->getDadosPedidosPorCondicao($condicao);
-
+            $pedidos = $this->getDadosPedidosPorCondicao($condicao);
+            // dd($pedidos);
             if(!empty($pedidos)) {
 
                 $arr_pedidos = $this->calculaDadosMaterial($pedidos);
@@ -556,6 +568,7 @@ class RelatoriosController extends Controller
                     'material_id' => $pedido['material_id'],
                     'material' => $pedido['material'],
                     'estoque_atual' => $estoque_atual['estoque_atual'],
+                    'peso_material' => $estoque_atual['peso_material'],
                     'consumo_previsto' => $pedido['qtde_consumo'],
                     'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
                     'diferenca' =>  round($diferenca, 2),
@@ -743,7 +756,7 @@ class RelatoriosController extends Controller
      */
     public function CalculaEstoqueAtual($estoque) {
 
-        $estoque_total = $gasto_total  = $valor_estoque_atual = 0.00;
+        $estoque_total = $gasto_total =$peso_material= $valor_estoque_atual = 0.00;
         foreach ($estoque as $key => $value) {
 
             $qtde_baixa = $this->getEstoqueById($value->id);
@@ -751,6 +764,8 @@ class RelatoriosController extends Controller
             $gasto_total += ($qtde_baixa[0]->qtde_baixa * ($value->qtde_chapa_peca));
 
             $qtde_estoque =($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo);
+
+            $peso_material = $value->peso_material;
 
             $estoque_total += $qtde_estoque;
 
@@ -764,6 +779,7 @@ class RelatoriosController extends Controller
 
         return [
             'estoque_atual' =>$estoque_atual,
+            'peso_material' =>$peso_material,
             'valor_estoque_atual' => $valor_estoque_atual
          ];
     }
@@ -799,17 +815,22 @@ class RelatoriosController extends Controller
         $resultadoAgrupado = [];
 
         foreach ($array as $item) {
+
             $materialId = $item['material_id'];
 
             if (!isset($resultadoAgrupado[$materialId])) {
                 $resultadoAgrupado[$materialId] = [
                     'material_id' => $materialId,
                     'valor' => 0,
+                    'peso_material' => 0,
                     'estoque' => 0,
                 ];
             }
 
             $resultadoAgrupado[$materialId]['valor'] += $item['valor'];
+            if(!empty($item['peso_material'])) {
+                $resultadoAgrupado[$materialId]['peso_material'] += $item['peso_material'];
+            }
             $resultadoAgrupado[$materialId]['estoque'] += $item['estoque'];
             if($item['estoque'] > 0) {
                 $resultadoAgrupado[$materialId]['estoqueIds'][$item['id']] = $item['id'];
@@ -963,6 +984,7 @@ class RelatoriosController extends Controller
         }
         $resultados = DB::select(DB::raw("SELECT
                                         A.id,
+                                        A.peso_material,
                                         A.material_id,
                                         (
                                             (((select
