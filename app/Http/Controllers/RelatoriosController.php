@@ -398,13 +398,14 @@ class RelatoriosController extends Controller
                 if(count($where)) {
                     $condicao = ' WHERE '.implode(' AND ', $where);
                 }
-
+                dd($condicao);
                 $retorno_realizado = '';
                 $retorno_realizado = $this->buscaPorCondicoes($condicao);
 
                 $retorno_consumo = $this->buscaPorDatasCategorias($data_inicio, $data_fim, $categoria);
 
                 $novo_array_materiais = [];
+                $novo_array_materiais['array_materiais'] = [];
 
                 foreach($retorno_realizado['array_materiais'] as $key => $value) {
 

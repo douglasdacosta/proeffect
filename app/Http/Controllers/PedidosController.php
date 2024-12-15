@@ -411,8 +411,9 @@ class PedidosController extends Controller
             ->orderby('status_id', 'desc')
             ->orderby('data_entrega');
 
+        $status_id = $request->input('status_id');
         if(!empty($request->input('status_id'))) {
-            $pedidos = $pedidos->whereIn('status_id', $request->input('status_id'));
+            $pedidos = $pedidos->whereIn('status_id', $status_id);
             $filtrado++;
         }
         if(!empty($request->input('os'))) {
@@ -610,6 +611,148 @@ class PedidosController extends Controller
             $tela = 'followup-detalhes-geral';
             $nome_da_tela ='followup geral';
         }
+
+        $data = array(
+            'tela' => $tela,
+            'nome_tela' => $nome_da_tela,
+            'dados_pedido_status' => $dados_pedido_status,
+            'totalGeral' => $totalGeral,
+            'request' => $request,
+            'status' => $this->getAllStatus(),
+            'rotaIncluir' => 'incluir-pedidos',
+            'rotaAlterar' => 'alterar-pedidos'
+        );
+
+
+        return view('pedidos', $data);
+    }
+
+
+    /**
+    * Show the application dashboard.
+    *
+    * @return \Illuminate\Contracts\Support\Renderable
+    */
+    public function followupRealizado(Request $request)
+    {
+        $pedidos = new Pedidos();
+
+        $nome_tela = !empty($request->input('nome_tela')) ? $request->input('nome_tela') : 'tempos' ;
+
+        if(empty($request->input('pedidos_encontrados'))) {
+            return redirect()->route('followup');
+        }
+        $pedidos_encontrados = json_decode($request->input('pedidos_encontrados'));
+
+        $pedidos = $pedidos::with('tabelaStatus', 'tabelaF
+        ichastecnicas', 'tabelaPessoas')
+        ->wherein('id', $pedidos_encontrados)
+        ->orderby('status_id', 'desc')
+        ->orderby('data_entrega')->get();
+
+        $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
+        $dados_pedido_status=[];
+
+        foreach ($pedidos as $pedido) {
+            $dados_pedido_status[$pedido->tabelaStatus->nome]['classe'][] = $pedido;
+            $dados_pedido_status[$pedido->tabelaStatus->nome]['id_status'][] = $pedido->tabelaStatus->id;
+        }
+
+        $MaquinasController = new MaquinasController();
+
+        $Maquinas = new Maquinas();
+
+        $maquinas = $Maquinas->get();
+
+        $qtde_maquinas =$maquinas[0]->qtde_maquinas;
+        $horas_maquinas =$maquinas[0]->horas_maquinas;
+        $pessoas_acabamento =$maquinas[0]->pessoas_acabamento;
+        $pessoas_montagem =$maquinas[0]->pessoas_montagem;
+        $pessoas_montagem_torres =$maquinas[0]->pessoas_montagem_torres;
+        $pessoas_inspecao =$maquinas[0]->pessoas_inspecao;
+        $horas_dia =$maquinas[0]->horas_dia;
+        $total_horas_usinagem_maquinas_dia = $this->multiplyTimeByInteger($horas_maquinas, $qtde_maquinas);
+        $total_horas_pessoas_acabamento_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_acabamento);
+        $total_horas_pessoas_pessoas_montagem_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem);
+        $total_horas_pessoas_pessoas_montagem_torres_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem_torres);
+        $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
+
+        $totalGeral = [];
+        foreach ($dados_pedido_status as $status => $pedidos) {
+
+            foreach ($pedidos['classe'] as $chave =>  $pedido) {
+
+                $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem_torre=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
+
+                $total_tempo_usinagem = $this->somarHoras($total_tempo_usinagem , $pedido->tabelaFichastecnicas->tempo_usinagem);
+                $total_tempo_usinagem = $MaquinasController->multiplicarHoras($total_tempo_usinagem,$pedido->qtde);
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['usinagem'] = $total_tempo_usinagem;
+
+                $total_tempo_acabamento = $this->somarHoras($total_tempo_acabamento , $pedido->tabelaFichastecnicas->tempo_acabamento);
+                $total_tempo_acabamento = $MaquinasController->multiplicarHoras($total_tempo_acabamento,$pedido->qtde);
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['acabamento'] = $total_tempo_acabamento;
+
+                $total_tempo_montagem_torre = $this->somarHoras($total_tempo_montagem_torre , $pedido->tabelaFichastecnicas->tempo_montagem_torre);
+                $total_tempo_montagem_torre = $MaquinasController->multiplicarHoras($total_tempo_montagem_torre,$pedido->qtde);
+
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem_torre'] = $total_tempo_montagem_torre;
+                $total_tempo_montagem = $this->somarHoras($total_tempo_montagem , $pedido->tabelaFichastecnicas->tempo_montagem);
+                $total_tempo_montagem = $MaquinasController->multiplicarHoras($total_tempo_montagem,$pedido->qtde);
+
+                if($nome_tela == 'geral') {
+                    $total_tempo_montagem = $this->somarHoras($total_tempo_montagem, $total_tempo_montagem_torre) ;
+                }
+
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem'] = $total_tempo_montagem;
+
+                $total_tempo_inspecao = $this->somarHoras($total_tempo_inspecao , $pedido->tabelaFichastecnicas->tempo_inspecao);
+                $total_tempo_inspecao = $MaquinasController->multiplicarHoras($total_tempo_inspecao,$pedido->qtde);
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['inspecao'] = $total_tempo_inspecao;
+
+                $dados_pedido_status[$status]['totais']['total_tempo_usinagem'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_usinagem']) ? $dados_pedido_status[$status]['totais']['total_tempo_usinagem']: '00:00:00' , $total_tempo_usinagem);
+                $dados_pedido_status[$status]['totais']['total_tempo_acabamento'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_acabamento']) ? $dados_pedido_status[$status]['totais']['total_tempo_acabamento'] : "00:00:00", $total_tempo_acabamento);
+                $dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre']) ? $dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'] : "00:00:00", $total_tempo_montagem_torre);
+                $dados_pedido_status[$status]['totais']['total_tempo_montagem'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_montagem']) ? $dados_pedido_status[$status]['totais']['total_tempo_montagem'] : "00:00:00", $total_tempo_montagem);
+                $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_inspecao']) ? $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] : "00:00:00", $total_tempo_inspecao);
+            }
+
+            $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia);
+            $dados_pedido_status[$status]['pessoas_acabamento'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_acabamento'], $total_horas_pessoas_acabamento_dia);
+
+
+            $dados_pedido_status[$status]['pessoas_montagem_torre'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'], $total_horas_pessoas_pessoas_montagem_torres_dia);
+
+            $dados_pedido_status[$status]['pessoas_montagem'] = $this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_montagem'], $total_horas_pessoas_pessoas_montagem_dia);
+            $dados_pedido_status[$status]['pessoas_inspecao'] =$this->divideHoursAndReturnWorkDays($dados_pedido_status[$status]['totais']['total_tempo_inspecao'], $total_horas_pessoas_inspecao_dia);
+
+            if($pedidos['id_status'][$chave] <= 4 ){
+                $totalGeral['totalGeralusinagens'] = ((!empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['maquinas_usinagens']) );
+                $totalGeral['totalGeralacabamento'] = ((!empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_acabamento']) );
+                $totalGeral['totalGeralmontagem_torre'] = ((!empty($totalGeral['totalGeralmontagem_torre']) ? $totalGeral['totalGeralmontagem_torre'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem_torre']) );
+                $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
+            if($pedidos['id_status'][$chave] == 5 ){
+                $totalGeral['totalGeralacabamento'] = ((!empty($totalGeral['totalGeralacabamento']) ? $totalGeral['totalGeralacabamento'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_acabamento']) );
+                $totalGeral['totalGeralmontagem_torre'] = ((!empty($totalGeral['totalGeralmontagem_torre']) ? $totalGeral['totalGeralmontagem_torre'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem_torre']) );
+                $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
+            if($pedidos['id_status'][$chave] == 6 ){
+                $totalGeral['totalGeralmontagem_torre'] = ((!empty($totalGeral['totalGeralmontagem_torre']) ? $totalGeral['totalGeralmontagem_torre'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem_torre']) );
+                $totalGeral['totalGeralmontagem'] = ((!empty($totalGeral['totalGeralmontagem']) ? $totalGeral['totalGeralmontagem'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_montagem']) );
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
+            if($pedidos['id_status'][$chave] == 7 ){
+                $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
+            }
+
+
+        }
+
+
+        $tela = 'followup-realizado';
+        $nome_da_tela ='followup realizado';
 
         $data = array(
             'tela' => $tela,
