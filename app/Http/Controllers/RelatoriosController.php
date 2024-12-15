@@ -528,7 +528,7 @@ class RelatoriosController extends Controller
                     'valor_entradas' => !empty($array_materiais[$material->id]['valor_entradas']) ? $array_materiais[$material->id]['valor_entradas'] + $valor_entradas : $valor_entradas,
                     'consumido' => !empty($array_materiais[$material->id]['consumido']) ? $array_materiais[$material->id]['consumido'] + $consumido : $consumido,
                     'valor_consumido' => !empty($array_materiais[$material->id]['valor_consumido']) ? $array_materiais[$material->id]['valor_consumido'] + $valor_consumido : $valor_consumido,
-                    'peso_material' => !empty($array_materiais[$material->id]['peso_material']) ? $array_materiais[$material->id]['peso_material'] + $peso_material : $peso_material,
+                    'peso_material' => $peso_material,
                     'os' => $os
                 ];
         }
@@ -832,7 +832,7 @@ class RelatoriosController extends Controller
 
             $resultadoAgrupado[$materialId]['valor'] += $item['valor'];
             if(!empty($item['peso_material'])) {
-                $resultadoAgrupado[$materialId]['peso_material'] += $item['peso_material'];
+                $resultadoAgrupado[$materialId]['peso_material'] = $item['peso_material'];
             }
             $resultadoAgrupado[$materialId]['estoque'] += $item['estoque'];
             if($item['estoque'] > 0) {

@@ -366,31 +366,47 @@ use App\Http\Controllers\PedidosController;
                                         </tr>
                                     </thead>
                                     <tbody>
-
+                                        @php
+                                                $totalizadores['consumido'] =0;
+                                                $totalizadores['peso_consumido'] =0;
+                                                $totalizadores['valor_consumido'] =0;
+                                                $totalizadores['realizado'] =0;
+                                                $totalizadores['peso_realizado'] =0;
+                                                $totalizadores['valor_realizado'] =0;
+                                            @endphp
 
                                         @foreach ($materiais as $material)
 
                                             <tr>
                                                 <td data-sortable='true' >{{ $material['material'] }}</td>
-                                                <td data-sortable='true' >{{ $material['consumido'] }}</td>
-                                                <td data-sortable='true' >{{ $material['peso_consumido'] }}</td>
+                                                <td data-sortable='true' >{{ number_format($material['consumido'], 0, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($material['peso_consumido'], 3, '.', '.') }}</td>
                                                 <td data-sortable='true' >{{ number_format($material['valor_consumido'], 2, ',', '.') }}</td>
-                                                <td data-sortable='true' >{{ $material['realizado'] }}</td>
-                                                <td data-sortable='true' >{{ $material['peso_realizado'] }}</td>
+                                                <td data-sortable='true' >{{ number_format($material['realizado'], 0, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($material['peso_realizado'], 3, '.', '.') }}</td>
                                                 <td data-sortable='true' >{{ number_format($material['valor_realizado'], 2, ',', '.') }}</td>
                                             </tr>
+
+                                            @php
+                                                $totalizadores['consumido'] += $material['consumido'];
+                                                $totalizadores['peso_consumido'] += $material['peso_consumido'];
+                                                $totalizadores['valor_consumido'] += $material['valor_consumido'];
+                                                $totalizadores['realizado'] += $material['realizado'];
+                                                $totalizadores['peso_realizado'] += $material['peso_realizado'];
+                                                $totalizadores['valor_realizado'] += $material['valor_realizado'];
+                                            @endphp
                                         @endforeach
                                     </tbody>
                                     @if (!empty($totalizadores))
                                         <tfoot>
                                             <tr>
                                                 <th></th>
-                                                {{-- <td data-sortable='true' >{{ number_format($totalizadores['consumido'], 0, '.', '.') }}</td>
+                                                <td data-sortable='true' >{{ number_format($totalizadores['consumido'], 0, '.', '.') }}</td>
                                                 <td data-sortable='true' >{{ number_format($totalizadores['peso_consumido'], 0, '.', '.') }}</td>
                                                 <td data-sortable='true' >{{ number_format($totalizadores['valor_consumido'], 2, ',', '.') }}</td>
                                                 <td data-sortable='true' >{{ number_format($totalizadores['realizado'], 0, '.', '.') }}</td>
                                                 <td data-sortable='true' >{{ number_format($totalizadores['peso_realizado'], 0, '.', '.') }}</td>
-                                                <td data-sortable='true' >{{ number_format($totalizadores['valor_realizado'], 2, ',', '.') }}</td> --}}
+                                                <td data-sortable='true' >{{ number_format($totalizadores['valor_realizado'], 2, ',', '.') }}</td>
                                             </tr>
                                         </tfoot>
                                     @endif
