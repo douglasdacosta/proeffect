@@ -389,6 +389,7 @@ class RelatoriosController extends Controller
 
             foreach($status_id as $key => $status) {
 
+
                 $where = $this->consulta_executados($data_inicio, $data_fim, [$status], $request);
 
                 $status_pedido = "A.status = 'A'";
@@ -398,7 +399,6 @@ class RelatoriosController extends Controller
                 if(count($where)) {
                     $condicao = ' WHERE '.implode(' AND ', $where);
                 }
-                dd($condicao);
                 $retorno_realizado = '';
                 $retorno_realizado = $this->buscaPorCondicoes($condicao);
 
