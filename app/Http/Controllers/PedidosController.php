@@ -405,6 +405,7 @@ class PedidosController extends Controller
     {
         $filtrado = 0;
         $pedidos = DB::table('pedidos')
+            ->distinct()
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
