@@ -93,7 +93,6 @@ class RelatoriosController extends Controller
             $pedidos = $pedidos->where('pedidos.data_gerado', '<=', DateHelpers::formatDate_dmY($request->input('data_gerado_fim')));
             $filtrado++;
         }
-
         if ($codigo_cliente) {
             $pedidos = $pedidos->where('pessoas.codigo_cliente', '=', $codigo_cliente);
             $filtrado++;

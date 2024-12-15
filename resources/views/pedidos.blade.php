@@ -542,8 +542,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     <div class="col-sm-5">
                         <button type="submit" class="btn btn-primary">Pesquisar</button>
                     </div>
-                    <div class="col-sm-5">
-                    </div>
                 </div>
             </div>
             </form>
@@ -896,47 +894,37 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
         @stop
         @section('content')
             @if (isset($dados_pedido_status))
-                @foreach ($dados_pedido_status as $key => $dado_pedido_status)
-                    <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
-                    <div class="form-group row" style="overflow-x:auto;  ">
-                        <table class="table table-sm table-striped text-center" id="table_composicao">
-                            <thead style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
-                                <tr>
-                                    <th scope="col" title="Código do cliente">Cliente</th>
-                                    <th scope="col">Assistente</th>
-                                    <th scope="col">EP</th>
-                                    <th scope="col">OS</th>
-                                    <th scope="col">Qtde</th>
-                                    <th scope="col" title="Data do pedido">Data</th>
-                                    <th scope="col" title="Data da entrega">Entrega</th>
-                                    <th scope="col">Apontamento</th>
-                                    <th scope="col">Usinagem</th>
-                                    <th scope="col">Apontamento</th>
-                                    <th scope="col">Acabamento</th>
-                                    <th scope="col">Apontamento</th>
-                                    <th scope="col">Montagem</th>
-                                    <th scope="col">Apontamento</th>
-                                    <th scope="col">Montagem torres</th>
-                                    <th scope="col">Inspeção</th>
-                                    <th scope="col">Embalar</th>
-                                    <th scope="col">Estoque</th>
-                                    <th scope="col">Apontamento</th>
-                                    <th scope="col">Entregue</th>
-                                    <th scope="col" title="Alerta de dias">Alerta</th>
-                                    <th scope="col">Prioridade</th>
-                                    <th scope="col" title="Observações">Obs</th>
-                                    <th scope="col">Transporte</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Usinagem</th>
-                                    <th scope="col">Acabamento</th>
-                                    <th scope="col">Montagem</th>
-                                    <th scope="col">Inspeção</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+            <div class="form-group row" style="overflow-x:auto;  ">
+                <table class="table table-sm table-striped text-center" id="table_composicao">
+                    <thead>
+                        {{-- style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }} --}}
+                        <tr>
+                            <th scope="col">EP</th>
+                            <th scope="col">OS</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col" title="Data do pedido">Data</th>
+                            <th scope="col" title="Data da entrega">Entrega</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Usinagem</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Acabamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Montagem</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[7] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[7] }}">Montagem Torre</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Inspeção</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Embalar</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Estoque</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Entregue</th>
+                            <th scope="col" title="Alerta de dias">Alerta</th>
 
-                                @foreach ($dado_pedido_status['classe'] as $pedido)
-                                    <?php
+                        </tr>
+                    </thead>
+                    <tbody>
+                         @foreach ($dados_pedido_status as $key => $dado_pedido_status)
+                            @foreach ($dado_pedido_status['classe'] as $pedido)
+                                <?php
                                     $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
                                     $hoje = date('Y-m-d');
                                     $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
@@ -945,105 +933,58 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     } else {
                                         $class_dias_alerta = 'text-primary';
                                     }
-                                    ?>
-                                    <tr>
-                                        <td>{{ $pedido->tabelaPessoas->codigo_cliente }}</td>
-                                        <td>{{ $pedido->tabelaPessoas->nome_assistente }}</td>
-                                        <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
-                                        <td>{{ $pedido->os }}</td>
-                                        <td>{{ $pedido->qtde }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
-                                        <td>Apontamento</td>8
-                                        <td>Usinagem</td>
-                                        <td>Apontamento</td>
-                                        <td>Acabamento</td>
-                                        <td>Apontamento</td>
-                                        <td>Montagem</td>
-                                        <td>Apontamento</td>
-                                        <td>Montagem torres</td>
-                                        <td>Inspeção</td>
-                                        <td>Embalar</td>
-                                        <td>Estoque</td>
-                                        <td>Apontamento</td>
-                                        <td>Entregue</td>
-                                        <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
-                                        <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
-                                        <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
-                                        <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
-                                        <td>{{ $pedido->tabelaStatus->nome }}</td>
-                                        <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
-                                        </td>
-                                        <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
-                                        </td>
-                                        <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem']) }}
-                                        </td>
-                                        <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                <tr>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <th scope="col">
-                                        {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem']) . ' horas' }}
-                                    </th>
-                                    <th scope="col">
-                                        {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento']) . ' horas' }}
-                                    </th>
-                                    <th scope="col">
-                                        {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem']) . ' horas' }}
-                                    </th>
-                                    <th scope="col">
-                                        {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao']) . ' horas' }}
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <th scope="col" colspan="2"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col">{!! Str::words($dado_pedido_status['maquinas_usinagens'], 2, '') !!}</th>
-                                    <th scope="col">{!! Str::words($dado_pedido_status['pessoas_acabamento'], 2, '') !!}</th>
-                                    <th scope="col">{!! Str::words($dado_pedido_status['pessoas_montagem'], 2, '') !!}</th>
-                                    <th scope="col">{!! Str::words($dado_pedido_status['pessoas_inspecao'], 2, '') !!}</th>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                ?>
 
+                                <tr>
+                                    <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
+                                    <td>{{ $pedido->os }}</td>
+                                    <td>{{ $pedido->qtde }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
+                                    <td style="background-color: {{ $palheta_cores[4] }}">{{ !empty($pedido->apontamento_usinagem) ? \Carbon\Carbon::parse($pedido->apontamento_usinagem)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[4] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[5] }}">{{ !empty($pedido->apontamento_acabamento) ? \Carbon\Carbon::parse($pedido->apontamento_acabamento)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[5] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[6] }}">{{ !empty($pedido->apontamento_montagem) ? \Carbon\Carbon::parse($pedido->apontamento_montagem)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[6] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[7] }}">{{ !empty($pedido->apontamento_montagem_torre) ? \Carbon\Carbon::parse($pedido->apontamento_montagem_torre)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[7] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem_torre']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[8] }}">{{ !empty($pedido->apontamento_inspecao) ? \Carbon\Carbon::parse($pedido->apontamento_inspecao)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[8] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) }}</td>
+
+                                    <td style="background-color: {{ $palheta_cores[9] }}">{{ !empty($pedido->apontamento_embalagem) ? \Carbon\Carbon::parse($pedido->apontamento_embalagem)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_estoque) ? \Carbon\Carbon::parse($pedido->apontamento_estoque)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->format('d/m/Y') : '' }}</td>
+                                    <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th style="background-color: {{ $palheta_cores[4] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[4] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[5] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[5] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[6] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[6] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[7] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[7] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem_torre']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[8] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[8] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao']) }}</th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+                </div>
                     <hr class="my-4">
-                @endforeach
+
             @endif
             </div>
 

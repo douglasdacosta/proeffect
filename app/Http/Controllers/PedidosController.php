@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Alertas;
 use App\Models\Funcionarios;
+use App\Models\HistoricosEtapas;
 use App\Models\HistoricosPedidos;
 use App\Models\PedidosFuncionariosMontagens;
 use Illuminate\Support\Facades\DB;
@@ -407,13 +408,14 @@ class PedidosController extends Controller
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
+            ->leftJoin('historicos_etapas', 'pedidos.id', '=', 'historicos_etapas.pedidos_id')
             ->select('pedidos.*', 'ficha_tecnica.ep', 'pessoas.nome_cliente', 'status.nome' , 'status.id as id_status')
             ->orderby('status_id', 'desc')
             ->orderby('data_entrega');
 
         $status_id = $request->input('status_id');
         if(!empty($request->input('status_id'))) {
-            $pedidos = $pedidos->whereIn('status_id', $status_id);
+            $pedidos = $pedidos->whereIn('pedidos.status_id', $status_id);
             $filtrado++;
         }
         if(!empty($request->input('os'))) {
@@ -451,6 +453,18 @@ class PedidosController extends Controller
         }
         if(empty($request->input('data_entrega')) && !empty($request->input('data_entrega_fim') )) {
             $pedidos = $pedidos->where('data_entrega', '<=', DateHelpers::formatDate_dmY($request->input('data_entrega_fim')));
+            $filtrado++;
+        }
+        if(!empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
+            $pedidos = $pedidos->whereBetween('historicos_etapas.created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')), DateHelpers::formatDate_dmY($request->input('data_apontamento_fim'))]);
+            $filtrado++;
+        }
+        if(!empty($request->input('data_apontamento')) && empty($request->input('data_apontamento_fim') )) {
+            $pedidos = $pedidos->where('historicos_etapas.created_at', '>=', DateHelpers::formatDate_dmY($request->input('data_apontamento')));
+            $filtrado++;
+        }
+        if(empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
+            $pedidos = $pedidos->where('historicos_etapas.created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')));
             $filtrado++;
         }
 
@@ -644,16 +658,74 @@ class PedidosController extends Controller
         }
         $pedidos_encontrados = json_decode($request->input('pedidos_encontrados'));
 
-        $pedidos = $pedidos::with('tabelaStatus', 'tabelaF
-        ichastecnicas', 'tabelaPessoas')
+        $pedidos = $pedidos::with('tabelaStatus', 'tabelaFichastecnicas', 'tabelaPessoas')
         ->wherein('id', $pedidos_encontrados)
         ->orderby('status_id', 'desc')
         ->orderby('data_entrega')->get();
 
-        $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
         $dados_pedido_status=[];
 
-        foreach ($pedidos as $pedido) {
+        foreach ($pedidos as &$pedido) {
+
+            $historicos_etapas = new HistoricosEtapas();
+
+            $historicos_etapas = $historicos_etapas->whereIn('status_id', [4,5,6,7,8]);
+            $historicos_etapas = $historicos_etapas->where('etapas_pedidos_id', '=', 4 );
+            $historicos_etapas = $historicos_etapas->where('pedidos_id', '=', $pedido->id);
+
+            $historicos_etapas = $historicos_etapas->get();
+
+            $historicos_etapas = $historicos_etapas->toArray();
+
+            // dd($historicos_etapas);
+            $historicos_apontamentos = [];
+            // $historicos_etapas
+            foreach ($historicos_etapas as $key => $historico_etapa) {
+                $historicos_apontamentos[$historico_etapa['status_id']] = [
+                    'data_apontamento' => $historico_etapa['created_at'],
+                    'torre' => ($historico_etapa['select_tipo_manutencao'] == 'A' ? 0 : 1)
+                ];
+            }
+
+            $pedido->apontamento_usinagem = !empty($historicos_apontamentos[4]['data_apontamento']) ? $historicos_apontamentos[4]['data_apontamento'] : null;
+            $pedido->apontamento_acabamento = !empty($historicos_apontamentos[5]['data_apontamento']) ? $historicos_apontamentos[5]['data_apontamento'] : null;
+
+            $pedido->apontamento_montagem = '';
+            $pedido->apontamento_montagem_torre = '';
+
+            if(!empty($historicos_apontamentos[6]['data_apontamento'])){
+                if ($historicos_apontamentos[6]['torre'] == 0 ) {
+                    $pedido->apontamento_montagem = !empty($historicos_apontamentos[6]['data_apontamento']) ? $historicos_apontamentos[6]['data_apontamento'] : null;
+                } else {
+                    $pedido->apontamento_montagem_torre = !empty($historicos_apontamentos[6]['data_apontamento']) ? $historicos_apontamentos[6]['data_apontamento'] : null;
+
+                }
+            }
+
+            $pedido->apontamento_inspecao = !empty($historicos_apontamentos[7]['data_apontamento']) ? $historicos_apontamentos[7]['data_apontamento'] : null;
+            $pedido->apontamento_embalagem = !empty($historicos_apontamentos[8]['data_apontamento']) ? $historicos_apontamentos[8]['data_apontamento'] : null;
+
+
+
+            $historicos_pedidos = new HistoricosPedidos();
+            $historicos_pedidos = $historicos_pedidos->whereIn('status_id', [9,10,11]);
+            $historicos_pedidos = $historicos_pedidos->where('pedidos_id', '=', $pedido->id );
+            $historicos_pedidos = $historicos_pedidos->get();
+            $historicos_pedidos = $historicos_pedidos->toArray();
+
+
+            $historicos_apontamentos = [];
+            foreach ($historicos_pedidos as $key => $historicos_pedido) {
+                $historicos_apontamentos[$historicos_pedido['status_id']] = [
+                    'data_apontamento' => $historicos_pedido['created_at'],
+                ];
+            }
+
+            $pedido->apontamento_expedicao = !empty($historicos_apontamentos[9]['data_apontamento']) ? $historicos_apontamentos[9]['data_apontamento'] : null;
+            $pedido->apontamento_estoque = !empty($historicos_apontamentos[10]['data_apontamento']) ? $historicos_apontamentos[10]['data_apontamento'] : null;
+            $pedido->apontamento_entregue = !empty($historicos_apontamentos[11]['data_apontamento']) ? $historicos_apontamentos[11]['data_apontamento'] : null;
+
+
             $dados_pedido_status[$pedido->tabelaStatus->nome]['classe'][] = $pedido;
             $dados_pedido_status[$pedido->tabelaStatus->nome]['id_status'][] = $pedido->tabelaStatus->id;
         }
@@ -676,9 +748,9 @@ class PedidosController extends Controller
         $total_horas_pessoas_pessoas_montagem_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem);
         $total_horas_pessoas_pessoas_montagem_torres_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem_torres);
         $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
-
         $totalGeral = [];
         foreach ($dados_pedido_status as $status => $pedidos) {
+
 
             foreach ($pedidos['classe'] as $chave =>  $pedido) {
 
@@ -746,10 +818,7 @@ class PedidosController extends Controller
             if($pedidos['id_status'][$chave] == 7 ){
                 $totalGeral['totalGeralinspecao'] = ((!empty($totalGeral['totalGeralinspecao']) ? $totalGeral['totalGeralinspecao'] : '0') + preg_replace('/[^0-9.]/', '', $dados_pedido_status[$status]['pessoas_inspecao']) );
             }
-
-
         }
-
 
         $tela = 'followup-realizado';
         $nome_da_tela ='followup realizado';
@@ -758,7 +827,6 @@ class PedidosController extends Controller
             'tela' => $tela,
             'nome_tela' => $nome_da_tela,
             'dados_pedido_status' => $dados_pedido_status,
-            'totalGeral' => $totalGeral,
             'request' => $request,
             'status' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
