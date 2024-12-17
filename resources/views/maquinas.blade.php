@@ -67,6 +67,12 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label for="horas_dia" class="col-sm-3 col-form-label">Prazo entrega (dias)</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control " id="prazo_entrega"  name="prazo_entrega" value="@if (isset($maquinas[0]->prazo_entrega)){{$maquinas[0]->prazo_entrega}}@else{{''}}@endif">
+                    </div>
+                </div>
+                <div class="form-group row">
                     <div class="col-sm-5">
                     </div>
                     <div class="col-sm-5">

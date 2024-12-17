@@ -530,7 +530,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     @foreach ($status as $status)
                                         <div class="col-sm-6 form-check">
                                             <input class="form-check-input col-sm-4 status_pedido"  name="status_id[]" id="{{$status->id}}" type="checkbox"
-                                            @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{ 'checked'}}@endif value="{{$status->id}}">
+                                            @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{' checked '}}@endif value="{{$status->id}}">
                                             <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
                                         </div>
                                     @endforeach
@@ -576,8 +576,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     @csrf <!--{{ csrf_field() }}-->
                                                     <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
                                                         value="{{ json_encode($pedidos_encontrados) }}">
-                                                    <input type="hidden" id="" name="nome_tela"
-                                                        value="{{ 'geral' }}">
+                                                    <input type="hidden" id="" name="nome_tela" value="{{ 'geral' }}">
                                                     <button type="submit" class="btn btn-primary"><span
                                                             class="far fa-fw fa-calendar"></span> Visualizar followups geral</button>
                                                     <div class="clearfix"></div>
@@ -592,10 +591,25 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     @csrf <!--{{ csrf_field() }}-->
                                                     <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
                                                         value="{{ json_encode($pedidos_encontrados) }}">
-                                                    <input type="hidden" id="" name="nome_tela"
-                                                        value="{{ 'realizados' }}">
+                                                    <input type="hidden" id="" name="nome_tela" value="{{ 'realizados' }}">
+                                                    <input type="hidden" id="data_inicio" name="data_apontamento" value="{{$request->input('data_apontamento')}}">
+                                                    <input type="hidden" id="data_fim" name="data_apontamento_fim" value="{{$request->input('data_apontamento_fim')}}">
                                                     <button type="submit" class="btn btn-primary"><span
                                                             class="far fa-fw fa-calendar"></span> Visualizar followups realizados</button>
+                                                    <div class="clearfix"></div>
+                                                </form>
+                                            </div>
+                                        @endif
+                                        @if($request->input('tipo_consulta') == 'C')
+                                            <div class="col-sm-5">
+                                                <form id="filtro" action="followup-ciclo-producao" method="post"
+                                                    data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+                                                    @csrf <!--{{ csrf_field() }}-->
+                                                    <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
+                                                        value="{{ json_encode($pedidos_encontrados) }}">
+                                                    <input type="hidden" id="" name="nome_tela" value="{{ 'ciclo_producao' }}">
+                                                    <button type="submit" class="btn btn-primary"><span
+                                                            class="far fa-fw fa-calendar"></span> Visualizar followups ciclo de produção</button>
                                                     <div class="clearfix"></div>
                                                 </form>
                                             </div>
@@ -915,26 +929,14 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Apontamento</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Inspeção</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Embalar</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Estoque</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Expedição</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Entregue</th>
-                            <th scope="col" title="Alerta de dias">Alerta</th>
 
                         </tr>
                     </thead>
                     <tbody>
                          @foreach ($dados_pedido_status as $key => $dado_pedido_status)
                             @foreach ($dado_pedido_status['classe'] as $pedido)
-                                <?php
-                                    $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
-                                    $hoje = date('Y-m-d');
-                                    $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
-                                    if ($dias_alerta < 6) {
-                                        $class_dias_alerta = 'text-danger';
-                                    } else {
-                                        $class_dias_alerta = 'text-primary';
-                                    }
-                                ?>
-
                                 <tr>
                                     <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
                                     <td>{{ $pedido->os }}</td>
@@ -942,20 +944,19 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td>{{ \Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                     <td style="background-color: {{ $palheta_cores[4] }}">{{ !empty($pedido->apontamento_usinagem) ? \Carbon\Carbon::parse($pedido->apontamento_usinagem)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[4] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[4] }}">{{ !empty($pedido->apontamento_usinagem) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[5] }}">{{ !empty($pedido->apontamento_acabamento) ? \Carbon\Carbon::parse($pedido->apontamento_acabamento)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[5] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[5] }}">{{ !empty($pedido->apontamento_acabamento) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[6] }}">{{ !empty($pedido->apontamento_montagem) ? \Carbon\Carbon::parse($pedido->apontamento_montagem)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[6] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[6] }}">{{ !empty($pedido->apontamento_montagem) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem']) : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[7] }}">{{ !empty($pedido->apontamento_montagem_torre) ? \Carbon\Carbon::parse($pedido->apontamento_montagem_torre)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[7] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem_torre']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[7] }}">{{ !empty($pedido->apontamento_montagem_torre) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem_torre']) : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[8] }}">{{ !empty($pedido->apontamento_inspecao) ? \Carbon\Carbon::parse($pedido->apontamento_inspecao)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[8] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) }}</td>
+                                    <td style="background-color: {{ $palheta_cores[8] }}">{{ !empty($pedido->apontamento_inspecao) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) : '' }}</td>
 
                                     <td style="background-color: {{ $palheta_cores[9] }}">{{ !empty($pedido->apontamento_embalagem) ? \Carbon\Carbon::parse($pedido->apontamento_embalagem)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_estoque) ? \Carbon\Carbon::parse($pedido->apontamento_estoque)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->format('d/m/Y') : '' }}</td>
-                                    <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                     </td>
                                 </tr>
                             @endforeach
@@ -978,6 +979,234 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th style="background-color: {{ $palheta_cores[7] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem_torre']) }}</th>
                             <th style="background-color: {{ $palheta_cores[8] }}"></th>
                             <th style="background-color: {{ $palheta_cores[8] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[9] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[10] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[11] }}"></th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+                </div>
+                    <hr class="my-4">
+
+            @endif
+            </div>
+
+        @stop
+    @break
+
+    @case('ciclo-producao')
+        @section('content_header')
+            <div class="form-group row">
+                <h1 class="m-0 text-dark col-sm-6 col-form-label">Tela de Followup ciclo de produção</h1>
+            </div>
+        @stop
+        @section('content')
+            @if (isset($dados_pedido_status))
+            <div class="form-group row" style="overflow-x:auto;  ">
+                <table class="table table-sm table-striped text-center" id="table_composicao">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col" title="Data do pedido"></th>
+                            <th scope="col" title="Data da entrega"></th>
+                            <th scope="col" title="Data da entrega"></th>
+                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[4] }}">Usinagem</th>
+
+                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[5] }}">Acabamento</th>
+
+                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[6] }}">Montagem</th>
+
+                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[8] }}">Inspeção</th>
+
+                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[9] }}">Embalar</th>
+
+                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[10] }}">Expedição</th>
+
+                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[11] }}">Entregue</th>
+
+                            <th scope="col"></th>
+
+                        </tr>
+                        {{-- style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }} --}}
+                        <tr>
+                            <th scope="col">EP</th>
+                            <th scope="col">OS</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Prioridade</th>
+                            <th scope="col" title="Data do pedido">Data</th>
+                            <th scope="col" title="Data da entrega">Entrega</th>
+                            <th scope="col" title="Data da entrega">Data de contagem</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Dias Parados</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Dias Parados</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Dias Parados</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Dias Parados</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Dias Parados</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Dias Parados</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Apontamento</th>
+                            <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Dias Parados</th>
+                            <th scope="col" title="Alerta de dias">Tempo da produção</th>
+                            <th scope="col" title="Alerta de dias">Tempo de entrega</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                                    $contador=0;
+                                    $dias_totais_usinagem=0;
+                                    $dias_totais_acabamento=0;
+                                    $dias_totais_montagem=0;
+                                    $dias_totais_inspecao=0;
+                                    $dias_totais_embalagem=0;
+                                    $dias_totais_expedicao=0;
+                                    $dias_totais_entregue=0;
+                                    $dias_totais_producao=0;
+                                ?>
+                         @foreach ($dados_pedido_status as $key => $dado_pedido_status)
+                            @foreach ($dado_pedido_status['classe'] as $pedido)
+                                @php
+                                    $contador++;
+                                    $tempo_producao=0;
+
+                                    $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
+                                    $hoje = date('Y-m-d');
+                                    $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                                    if ($dias_alerta < 6) {
+                                        $class_dias_alerta = 'text-danger';
+                                    } else {
+                                        $class_dias_alerta = 'text-primary';
+                                    }
+
+                                @endphp
+                                <tr>
+                                    <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
+                                    <td>{{ $pedido->os }}</td>
+                                    <td>{{ $pedido->qtde }}</td>
+                                    <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
+                                    <td>{{ \Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($dado_pedido_status['pedido'][$pedido->id]['data_prazo'])->format('d/m/Y') }}</td>
+                                    <td style="background-color: {{ $palheta_cores[4] }}">{{ !empty($pedido->apontamento_usinagem) ? \Carbon\Carbon::parse($pedido->apontamento_usinagem)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[4] }}">{{ !empty($pedido->apontamento_usinagem) ? \Carbon\Carbon::parse($pedido->apontamento_usinagem)->startOfDay()->diffInDays(\Carbon\Carbon::parse($dado_pedido_status['pedido'][$pedido->id]['data_prazo'])->startOfDay()) : ''  }}</td>
+                                    @php
+                                        $soma = !empty($pedido->apontamento_usinagem) ? \Carbon\Carbon::parse($pedido->apontamento_usinagem)->startOfDay()->diffInDays(\Carbon\Carbon::parse(\Carbon\Carbon::parse($dado_pedido_status['pedido'][$pedido->id]['data_prazo'])->startOfDay())->startOfDay()) : 0;
+                                        $dias_totais_usinagem += $soma;
+                                        $tempo_producao += $soma;
+                                        if(!empty($pedido->apontamento_usinagem)) {
+                                            $proxima_data=$pedido->apontamento_usinagem;
+                                        } else {
+                                            $proxima_data=$dado_pedido_status['pedido'][$pedido->id]['data_prazo'];
+                                        }
+
+                                     @endphp
+                                    <td style="background-color: {{ $palheta_cores[5] }}">{{  !empty($pedido->apontamento_acabamento) ? \Carbon\Carbon::parse($pedido->apontamento_acabamento)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[5] }}">{{ !empty($pedido->apontamento_acabamento) ? \Carbon\Carbon::parse($pedido->apontamento_acabamento)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
+                                    @php
+                                        $soma = !empty($pedido->apontamento_acabamento) ? \Carbon\Carbon::parse($pedido->apontamento_acabamento)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : 0;
+                                        $dias_totais_acabamento += $soma;
+                                        $tempo_producao += $soma;
+                                        if(!empty($pedido->apontamento_acabamento)) {
+                                            $proxima_data =$pedido->apontamento_acabamento;
+                                        }
+
+                                     @endphp
+                                    <td style="background-color: {{ $palheta_cores[6] }}">{{ !empty($pedido->apontamento_montagem) ? \Carbon\Carbon::parse($pedido->apontamento_montagem)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[6] }}">{{ !empty($pedido->apontamento_montagem) ? \Carbon\Carbon::parse($pedido->apontamento_montagem)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
+                                    @php
+                                        $soma = !empty($pedido->apontamento_montagem) ? \Carbon\Carbon::parse($pedido->apontamento_montagem)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : 0;
+                                        $dias_totais_montagem += $soma;
+                                        $tempo_producao += $soma;
+                                        if(!empty($pedido->apontamento_montagem)) {
+                                            $proxima_data =$pedido->apontamento_montagem;
+                                        }
+
+                                     @endphp
+                                    <td style="background-color: {{ $palheta_cores[8] }}">{{ !empty($pedido->apontamento_inspecao) ? \Carbon\Carbon::parse($pedido->apontamento_inspecao)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[8] }}">{{ !empty($pedido->apontamento_inspecao) ? \Carbon\Carbon::parse($pedido->apontamento_inspecao)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
+                                    @php
+                                        $soma = !empty($pedido->apontamento_inspecao) ? \Carbon\Carbon::parse($pedido->apontamento_inspecao)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : 0;
+                                        $dias_totais_inspecao += $soma;
+                                        $tempo_producao += $soma;
+                                        if(!empty($pedido->apontamento_inspecao)) {
+                                            $proxima_data =$pedido->apontamento_inspecao;
+                                        }
+
+                                     @endphp
+
+                                    <td style="background-color: {{ $palheta_cores[9] }}">{{ !empty($pedido->apontamento_embalagem) ? \Carbon\Carbon::parse($pedido->apontamento_embalagem)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[9] }}">{{ !empty($pedido->apontamento_embalagem) ? \Carbon\Carbon::parse($pedido->apontamento_embalagem)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
+                                    @php
+                                        $soma = !empty($pedido->apontamento_embalagem) ? \Carbon\Carbon::parse($pedido->apontamento_embalagem)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : 0;
+                                        $dias_totais_embalagem += $soma;
+                                        $tempo_producao += $soma;
+                                        if(!empty($pedido->apontamento_embalagem)) {
+                                            $proxima_data =$pedido->apontamento_embalagem;
+                                        }
+
+                                     @endphp
+                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
+                                    @php
+                                        $soma = !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : 0;
+                                        $dias_totais_expedicao += $soma;
+                                        $tempo_producao += $soma;
+                                        if(!empty($pedido->apontamento_expedicao)) {
+                                            $proxima_data =$pedido->apontamento_expedicao;
+                                        }
+
+                                     @endphp
+                                    <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->format('d/m/Y') : '' }}</td>
+                                    <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
+                                    @php
+                                        $soma = !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : 0;
+                                        $dias_totais_entregue += $soma;
+                                        $tempo_producao += $soma;
+                                        if(!empty($pedido->apontamento_entregue)) {
+                                            $proxima_data =$pedido->apontamento_entregue;
+                                        }
+
+                                     @endphp
+                                    <td >{{ $tempo_producao }}</td>
+                                    <td> {{\Carbon\Carbon::parse($pedido->data_entrega)->startOfDay()->diffInDays(\Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay())}}</td>
+                                    @php $dias_totais_producao += $tempo_producao; @endphp
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th style="background-color: {{ $palheta_cores[4] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[4] }}">{{ number_format($dias_totais_usinagem/$contador, 2, '.','.') }}</th>
+                            <th style="background-color: {{ $palheta_cores[5] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[5] }}">{{ number_format($dias_totais_acabamento/$contador, 2, '.','.') }}</th>
+                            <th style="background-color: {{ $palheta_cores[6] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[6] }}">{{ number_format($dias_totais_montagem/$contador, 2, '.','.') }}</th>
+                            <th style="background-color: {{ $palheta_cores[8] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[8] }}">{{ number_format($dias_totais_inspecao/$contador, 2, '.','.') }}</th>
+                            <th style="background-color: {{ $palheta_cores[9] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[9] }}">{{ number_format($dias_totais_embalagem/$contador, 2, '.','.') }}</th>
+                            <th style="background-color: {{ $palheta_cores[10] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[10] }}">{{ number_format($dias_totais_expedicao/$contador, 2, '.','.') }}</th>
+                            <th style="background-color: {{ $palheta_cores[11] }}"></th>
+                            <th style="background-color: {{ $palheta_cores[11] }}">{{ number_format($dias_totais_entregue/$contador, 2, '.','.') }}</th>
+                            <th>{{ number_format($dias_totais_producao/$contador, 2, '.','.') }}</th>
                         </tr>
                     </tfoot>
 

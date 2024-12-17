@@ -685,6 +685,9 @@ $(function ($) {
     })
 
     $(document).on('change', '.tipo_consulta_followup', function(){
+
+        $('.status_pedido').show();
+
         if($('.tipo_consulta_followup').val() == 'F' )        {
 
             $('.campos_ciclo_producao').hide();
