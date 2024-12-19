@@ -594,6 +594,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     <input type="hidden" id="" name="nome_tela" value="{{ 'realizados' }}">
                                                     <input type="hidden" id="data_inicio" name="data_apontamento" value="{{$request->input('data_apontamento')}}">
                                                     <input type="hidden" id="data_fim" name="data_apontamento_fim" value="{{$request->input('data_apontamento_fim')}}">
+                                                    <input type="hidden" id="status_id" name="status_id" value="{{ json_encode($request->input('status_id')) }}">
                                                     <button type="submit" class="btn btn-primary"><span
                                                             class="far fa-fw fa-calendar"></span> Visualizar followups realizados</button>
                                                     <div class="clearfix"></div>
@@ -935,6 +936,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                                    $totais_usinagem='00:00:00';
+                                    $totais_acabamento='00:00:00';
+                                    $totais_montagem='00:00:00';
+                                    $totais_montagem_torre='00:00:00';
+                                    $totais_inspecao='00:00:00';
+                                    $totais_embalagem='00:00:00';
+                                    $totais_expedicao='00:00:00';
+                                    $totais_entregue='00:00:00';
+                                    $totais_producao='00:00:00';
+                        @endphp
                          @foreach ($dados_pedido_status as $key => $dado_pedido_status)
                             @foreach ($dado_pedido_status['classe'] as $pedido)
                                 <tr>
@@ -945,15 +957,29 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                     <td style="background-color: {{ $palheta_cores[4] }}">{{ !empty($pedido->apontamento_usinagem) ? \Carbon\Carbon::parse($pedido->apontamento_usinagem)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[4] }}">{{ !empty($pedido->apontamento_usinagem) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) : '' }}</td>
+                                    @php
+                                        $totais_usinagem = (new PedidosController)->somarHoras($dado_pedido_status['pedido'][$pedido->id]['usinagem'], $totais_usinagem);
+                                    @endphp
                                     <td style="background-color: {{ $palheta_cores[5] }}">{{ !empty($pedido->apontamento_acabamento) ? \Carbon\Carbon::parse($pedido->apontamento_acabamento)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[5] }}">{{ !empty($pedido->apontamento_acabamento) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) : '' }}</td>
+                                    @php
+                                        $totais_acabamento = (new PedidosController)->somarHoras($dado_pedido_status['pedido'][$pedido->id]['acabamento'], $totais_acabamento);
+                                    @endphp
                                     <td style="background-color: {{ $palheta_cores[6] }}">{{ !empty($pedido->apontamento_montagem) ? \Carbon\Carbon::parse($pedido->apontamento_montagem)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[6] }}">{{ !empty($pedido->apontamento_montagem) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem']) : '' }}</td>
+                                    @php
+                                        $totais_montagem = (new PedidosController)->somarHoras($dado_pedido_status['pedido'][$pedido->id]['montagem'], $totais_montagem);
+                                    @endphp
                                     <td style="background-color: {{ $palheta_cores[7] }}">{{ !empty($pedido->apontamento_montagem_torre) ? \Carbon\Carbon::parse($pedido->apontamento_montagem_torre)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[7] }}">{{ !empty($pedido->apontamento_montagem_torre) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem_torre']) : '' }}</td>
+                                    @php
+                                        $totais_montagem_torre = (new PedidosController)->somarHoras($dado_pedido_status['pedido'][$pedido->id]['montagem_torre'], $totais_montagem_torre);
+                                    @endphp
                                     <td style="background-color: {{ $palheta_cores[8] }}">{{ !empty($pedido->apontamento_inspecao) ? \Carbon\Carbon::parse($pedido->apontamento_inspecao)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[8] }}">{{ !empty($pedido->apontamento_inspecao) ? PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) : '' }}</td>
-
+                                    @php
+                                        $totais_inspecao = (new PedidosController)->somarHoras($dado_pedido_status['pedido'][$pedido->id]['inspecao'], $totais_inspecao);
+                                    @endphp
                                     <td style="background-color: {{ $palheta_cores[9] }}">{{ !empty($pedido->apontamento_embalagem) ? \Carbon\Carbon::parse($pedido->apontamento_embalagem)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->format('d/m/Y') : '' }}</td>
@@ -970,15 +996,15 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th></th>
                             <th></th>
                             <th style="background-color: {{ $palheta_cores[4] }}"></th>
-                            <th style="background-color: {{ $palheta_cores[4] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[4] }}">{{ PedidosController::formatarHoraMinuto($totais_usinagem) }}</th>
                             <th style="background-color: {{ $palheta_cores[5] }}"></th>
-                            <th style="background-color: {{ $palheta_cores[5] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[5] }}">{{ PedidosController::formatarHoraMinuto($totais_acabamento) }}</th>
                             <th style="background-color: {{ $palheta_cores[6] }}"></th>
-                            <th style="background-color: {{ $palheta_cores[6] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[6] }}">{{ PedidosController::formatarHoraMinuto($totais_montagem) }}</th>
                             <th style="background-color: {{ $palheta_cores[7] }}"></th>
-                            <th style="background-color: {{ $palheta_cores[7] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem_torre']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[7] }}">{{ PedidosController::formatarHoraMinuto($totais_montagem_torre) }}</th>
                             <th style="background-color: {{ $palheta_cores[8] }}"></th>
-                            <th style="background-color: {{ $palheta_cores[8] }}">{{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao']) }}</th>
+                            <th style="background-color: {{ $palheta_cores[8] }}">{{ PedidosController::formatarHoraMinuto($totais_inspecao) }}</th>
                             <th style="background-color: {{ $palheta_cores[9] }}"></th>
                             <th style="background-color: {{ $palheta_cores[10] }}"></th>
                             <th style="background-color: {{ $palheta_cores[11] }}"></th>
@@ -1176,7 +1202,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                                      @endphp
                                     <td >{{ $tempo_producao }}</td>
-                                    <td> {{\Carbon\Carbon::parse($pedido->data_entrega)->startOfDay()->diffInDays(\Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay())}}</td>
+                                    <td> {{ \Carbon\Carbon::parse($pedido->data_entrega)->startOfDay()->diffInDays(\Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()) }}</td>
                                     @php $dias_totais_producao += $tempo_producao; @endphp
                                     </td>
                                 </tr>
@@ -1207,6 +1233,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th style="background-color: {{ $palheta_cores[11] }}"></th>
                             <th style="background-color: {{ $palheta_cores[11] }}">{{ number_format($dias_totais_entregue/$contador, 2, '.','.') }}</th>
                             <th>{{ number_format($dias_totais_producao/$contador, 2, '.','.') }}</th>
+                            <th>{{ number_format( \Carbon\Carbon::parse($pedido->data_entrega)->startOfDay()->diffInDays(\Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()) /$contador , 2, '.','.') }}</th>
                         </tr>
                     </tfoot>
 

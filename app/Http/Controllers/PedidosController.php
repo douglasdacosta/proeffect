@@ -410,17 +410,17 @@ class PedidosController extends Controller
             ->join('status', 'pedidos.status_id', '=', 'status.id')
             ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
             ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->select('pedidos.*',
-                    'ficha_tecnica.ep',
-                    'pessoas.nome_cliente',
-                    'status.nome',
-                    'historicos_etapas.created_at as historicos_etapas_created_at',
-                    'historicos_pedidos.created_at as historicos_pedidos_created_at',
-                    'status.id as id_status')
             ->orderby('status_id', 'desc')
             ->orderby('data_entrega');
 
         if(!empty($request->input('data_apontamento'))) {
+            $pedidos = $pedidos->select('pedidos.*',
+            'ficha_tecnica.ep',
+            'pessoas.nome_cliente',
+            'status.nome',
+            'historicos_etapas.created_at as historicos_etapas_created_at',
+            'historicos_pedidos.created_at as historicos_pedidos_created_at',
+            'status.id as id_status');
 
             $pedidos = $pedidos->leftJoin('historicos_etapas', function ($join) use ($status_id, $request) {
                 $join = $join->on('pedidos.id', '=', 'historicos_etapas.pedidos_id');
@@ -456,9 +456,14 @@ class PedidosController extends Controller
                 }
             });
 
-            // $pedidos = $pedidos->get();
-            // dd($pedidos);
+
             $filtrado++;
+        } else {
+            $pedidos = $pedidos->select('pedidos.*',
+            'ficha_tecnica.ep',
+            'pessoas.nome_cliente',
+            'status.nome',
+            'status.id as id_status');
         }
 
         if(!empty($request->input('os'))) {
@@ -520,14 +525,14 @@ class PedidosController extends Controller
             $pedidos = $pedidos->get();
 
 
-            foreach ($pedidos as $key => &$value) {
+            foreach ($pedidos as $key => $value) {
 
                 if($request->input('tipo_consulta') == 'R' || $request->input('tipo_consulta') == 'C') {
 
-                    //ignora casos sem apontamentos
                     if(empty($value->historicos_etapas_created_at) && empty($value->historicos_pedidos_created_at)) {
                         continue;
                     };
+
                 }
 
 
@@ -770,7 +775,7 @@ class PedidosController extends Controller
 
 
             $historicos_pedidos = new HistoricosPedidos();
-            $historicos_pedidos = $historicos_pedidos->whereIn('status_id', [9,10,11]);
+            $historicos_pedidos = $historicos_pedidos->whereIn('status_id', [1,2,3,9,10,11,12,13]);
             $historicos_pedidos = $historicos_pedidos->where('pedidos_id', '=', $pedido->id );
             if(!empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
                 $historicos_pedidos = $historicos_pedidos->whereBetween('created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')) . ' 00:00:00', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')). ' 23:59:59']);
@@ -821,10 +826,45 @@ class PedidosController extends Controller
         $total_horas_pessoas_pessoas_montagem_torres_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem_torres);
         $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
         $totalGeral = [];
-        foreach ($dados_pedido_status as $status => $pedidos) {
+
+        $status_id = json_decode($request->input('status_id'));
+
+        foreach ($dados_pedido_status as $status => &$pedidos) {
+
+            foreach ($pedidos['classe'] as $chave =>  &$pedido) {
 
 
-            foreach ($pedidos['classe'] as $chave =>  $pedido) {
+                $array_status = [
+                    '4' => 'apontamento_usinagem',
+                    '5' => 'apontamento_acabamento',
+                    '6' => 'apontamento_montagem',
+                    '7' => 'apontamento_inspecao',
+                    '8' => 'apontamento_embalagem',
+                    '9' => 'apontamento_expedicao',
+                    '10' => 'apontamento_estoque',
+                    '11' => 'apontamento_entregue',
+                ];
+
+                foreach(range(1,11) as $status_s){
+
+                    if(!in_array($status_s, $status_id)){
+                        if(isset($array_status[$status_s])) {
+
+                            $pedido->{$array_status[$status_s]} = '';
+                            if($status_s == 6) {
+                                $pedido->apontamento_montagem_torre = '';
+                            }
+
+                        }
+                    }
+                }
+
+
+                if(empty($pedido->apontamento_usinagem) && empty($pedido->apontamento_acabamento) &&  empty($pedido->apontamento_montagem) &&
+                    empty($pedido->apontamento_montagem_torre) && empty($pedido->apontamento_inspecao) && empty($pedido->apontamento_embalagem) &&
+                    empty($pedido->apontamento_expedicao) && empty($pedido->apontamento_estoque) && empty($pedido->apontamento_entregue)) {
+                        unset($pedidos['classe'][$chave ]);
+                }
 
                 $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem_torre=$total_tempo_montagem=$total_tempo_inspecao=$total_tempo_expedicao='00:00:00';
 
