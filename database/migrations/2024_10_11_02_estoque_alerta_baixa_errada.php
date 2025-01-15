@@ -16,7 +16,7 @@ return new class extends Migration
     {
 
         Schema::table('estoque', function($table) {
-            $table->float('peso_material',11, 3)->nullable()->after('peso');
+            $table->float('peso_material',11, 3)->nullable()->after('observacaoes');
             $table->integer('alerta_baixa_errada')->length(11)->default('0')->after('peso_material');
 
         });
