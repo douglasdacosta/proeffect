@@ -53,6 +53,8 @@ Route::match(['get', 'post'],'/ajax-getProducao', [App\Http\Controllers\HomeCont
 Route::match(['get', 'post'],'/followup', [App\Http\Controllers\PedidosController::class, 'followup'])->name('followup')->middleware('afterAuth:followup');
 Route::match(['get', 'post'],'/followup-geral', [App\Http\Controllers\PedidosController::class, 'followup'])->name('followup-geral')->middleware('afterAuth:followup');
 Route::match(['get', 'post'],'/followup-realizado', [App\Http\Controllers\PedidosController::class, 'followupRealizado'])->name('followup-realizado')->middleware('afterAuth:followup');
+Route::match(['get', 'post'],'/followup-gerencial', [App\Http\Controllers\PedidosController::class, 'followupgerencial'])->name('followup-gerencial')->middleware('afterAuth:followup-gerencial');
+Route::match(['get', 'post'],'/followup-gerencial-dados', [App\Http\Controllers\PedidosController::class, 'followupgerencialDados'])->name('followup-gerencial-dados')->middleware('afterAuth:followup-gerencial');
 Route::match(['get', 'post'],'/followup-ciclo-producao', [App\Http\Controllers\PedidosController::class, 'followupCicloProducao'])->name('followup-ciclo-producao')->middleware('afterAuth:followup');
 Route::match(['get', 'post'],'/imprimir-os', [App\Http\Controllers\PedidosController::class, 'imprimirOS'])->name('imprimirOS')->middleware('afterAuth:followup');
 Route::match(['get', 'post'],'/imprimir-mp', [App\Http\Controllers\PedidosController::class, 'imprimirMP'])->name('imprimirMP')->middleware('afterAuth:followup');

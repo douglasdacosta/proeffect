@@ -10,7 +10,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 <script src="js/main_custom.js?cache={{time()}}"></script>
 <script src="js/jquery.mask.js?cache={{time()}}"></script>
 <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
+
 @switch($tela)
+
     @case('pesquisar')
         @section('content_header')
             <div class="form-group row">
@@ -773,8 +775,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     </table>
                 </div>
             @endif
-            </div>
-
         @stop
     @break
 
@@ -896,8 +896,134 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     <hr class="my-4">
                 @endforeach
             @endif
-            </div>
+        @stop
+    @break
 
+    @case('pesquisa-gerencial')
+        @section('content_header')
+            <div class="form-group row">
+                <h1 class="m-0 text-dark col-sm-11 col-form-label">Pesquisa de {{ $nome_tela }}</h1>
+                <div class="col-sm-1">
+                    @include('layouts.nav-open-incluir', ['rotaIncluir => $rotaIncluir'])
+                </div>
+            </div>
+        @stop
+        @section('content')
+
+            <form id="filtro" action="followup-gerencial" method="get" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+                <div class="form-group row">
+                    <div class="col-md-9 themed-grid-col row">
+                        <div class="form-group row">
+                            <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
+                            <div class="col-sm-1">
+                                <input type="text" id="os" name="os" class="form-control col-md-13" value="">
+                            </div>
+                            <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
+                            <div class="col-sm-1">
+                                <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
+                            </div>
+                            <label for="lote" class="col-sm-3 col-form-label text-right tipo_consulta ">Tipo de consulta</label>
+                            <div class="col-sm-3">
+                                <select class="form-control col-sm-12 tipo_consulta_followup" id="tipo_consulta" name="tipo_consulta">
+                                    <option value="G" @if($request->input('tipo_consulta') == 'G'){{ ' selected '}}@else @endif>Gerêncial</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row campos_followup">
+                            <label for="data_entrega" class="col-sm-4 col-form-label text-right ">Data entrega: de</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="data_entrega_fim" class=" col-form-label text-right">até</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                        </div>
+                        <div class="form-group row campos_followup">
+                            <label for="data_gerado" class="col-sm-4 col-form-label text-right">Data pedido: de</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control mask_date" id="data_gerado" name="data_gerado"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="data_gerado_fim" class=" col-form-label text-right">até</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control mask_date" id="data_gerado_fim" name="data_gerado_fim"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                        </div>
+                        <div class="form-group row campos_ciclo_producao">
+                            <label for="data_apontamento" class="col-sm-4 col-form-label text-right">Data apontamento: de</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control mask_date" id="data_apontamento" name="data_apontamento"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="data_apontamento_fim" class=" col-form-label text-right">até</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control mask_date" id="data_apontamento_fim" name="data_apontamento_fim"
+                                    placeholder="DD/MM/AAAA">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 themed-grid-col row" >
+                        <div class="row">
+                            <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
+                            <div class="col-sm-8" style="overflow-y: auto; height: 175px; border:1px solid #ced4da; border-radius: .25rem;">
+                                <div class="right_col col-sm-6" role="main">
+                                        @foreach ($status as $status)
+                                            <div class="col-sm-6 form-check">
+                                                <input class="form-check-input col-sm-4 status_pedido"  name="status_id[]" id="{{$status->id}}" type="checkbox"
+                                                @if($status->id == 11 || $status->id == 12 || $status->id == 13) {{''}} @else {{' checked '}}@endif value="{{$status->id}}">
+                                                <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{$status->id}}">{{$status->nome}}</label>
+                                            </div>
+                                        @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-5">
+                            <button type="submit" class="btn btn-primary">Pesquisar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="right_col" role="main">
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                @if (!empty($pedidos_encontrados))
+                                    <h4>Encontrados {{ count($pedidos_encontrados) }} ordens de serviço</h4>
+                                    @if($request->input('tipo_consulta') == 'G')
+                                        <div class="form-group row">
+                                            <div class="col-sm-5">
+                                                <form id="filtro" action="followup-gerencial-dados" method="post"
+                                                    data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+                                                    @csrf <!--{{ csrf_field() }}-->
+                                                    <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
+                                                        value="{{ json_encode($pedidos_encontrados) }}">
+                                                    <input type="hidden" id="" name="nome_tela"
+                                                        value="{{ 'gerencial' }}">
+                                                    <button type="submit" class="btn btn-primary"><span
+                                                            class="far fa-fw fa-calendar"></span> Visualizar followups Gerêncial</button>
+                                                    <div class="clearfix"></div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @else
+                                    <h4>Nenhum registro encontrado</h4>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         @stop
     @break
 
@@ -1014,11 +1140,162 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 </table>
                 </div>
                     <hr class="my-4">
-
+                </div>
             @endif
-            </div>
-
         @stop
+    @break
+
+    @case('followup-gerencial')
+    @section('content_header')
+        <div class="form-group row">
+            <h1 class="m-0 text-dark col-sm-6 col-form-label">Tela de Followup Gerêncial</h1>
+        </div>
+    @stop
+    @section('content')
+        @if (isset($dados_pedido_status))
+            @foreach ($dados_pedido_status as $key => $dado_pedido_status)
+                <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
+                <div class="form-group row" style="overflow-x:auto;  ">
+                    <table class="table table-sm table-striped text-center" id="table_composicao">
+                        <thead style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
+                            <tr>
+                                <th scope="col" title="Código do cliente">Cliente</th>
+                                <th scope="col">Assistente</th>
+                                <th scope="col">EP</th>
+                                <th scope="col">OS</th>
+                                <th scope="col">Qtde</th>
+                                <th scope="col" title="Data do pedido">Data</th>
+                                <th scope="col" title="Data da entrega">Entrega</th>
+                                <th scope="col">Prioridade</th>
+                                <th scope="col" title="Observações">Obs</th>
+                                <th scope="col">Valor Unit</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">$MP</th>
+                                <th scope="col">%MP</th>
+                                <th scope="col">$MO</th>
+                                <th scope="col">%MO</th>
+                                <th scope="col">%HM</th>
+                                <th scope="col">%Usin Minut</th>
+                                <th scope="col">Transporte</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Usinagem</th>
+                                <th scope="col">Acabamento</th>
+                                <th scope="col">Montagem</th>
+                                <th scope="col">Inspeção</th>
+                                <th scope="col" title="Alerta de dias">Alerta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach ($dado_pedido_status['classe'] as $pedido)
+                                <?php
+                                $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
+                                $hoje = date('Y-m-d');
+                                $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                                if ($dias_alerta < 6) {
+                                    $class_dias_alerta = 'text-danger';
+                                } else {
+                                    $class_dias_alerta = 'text-primary';
+                                }
+                                ?>
+                                <tr>
+                                    <td>{{ $pedido->tabelaPessoas->codigo_cliente }}</td>
+                                    <td>{{ $pedido->tabelaPessoas->nome_assistente }}</td>
+                                    <td>{{ $pedido->tabelaFichastecnicas->ep }}</td>
+                                    <td>{{ $pedido->os }}</td>
+                                    <td>{{ $pedido->qtde }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($pedido->data_gerado)->format('d/m/Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
+                                    <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
+                                    <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
+                                    <td>{{ 0 }}</td>
+                                    <td>{{ 0 }}</td>
+                                    <td>{{ 0 }}</td>
+                                    <td>{{ 0 }}%</td>
+                                    <td>{{ 0 }}</td>
+                                    <td>{{ 0 }}%</td>
+                                    <td>{{ 0 }}%</td>
+                                    <td>{{ 0 }}%</td>
+                                    <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
+                                    <td>{{ $pedido->tabelaStatus->nome }}</td>
+                                    <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
+                                    </td>
+                                    <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
+                                    </td>
+                                    <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['montagem']) }}
+                                    </td>
+                                    <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) }}
+                                    </td>
+                                    <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
+                                </tr>
+                            @endforeach
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col">
+                                    {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_usinagem']) . ' horas' }}
+                                </th>
+                                <th scope="col">
+                                    {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_acabamento']) . ' horas' }}
+                                </th>
+                                <th scope="col">
+                                    {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_montagem']) . ' horas' }}
+                                </th>
+                                <th scope="col">
+                                    {{ PedidosController::formatarHoraMinuto($dado_pedido_status['totais']['total_tempo_inspecao']) . ' horas' }}
+                                </th>
+                                <th scope="col"></th>
+                            </tr>
+                            <tr>
+                                <th scope="col" colspan="2"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col">{!! Str::words($dado_pedido_status['maquinas_usinagens'], 2, '') !!}</th>
+                                <th scope="col">{!! Str::words($dado_pedido_status['pessoas_acabamento'], 2, '') !!}</th>
+                                <th scope="col">{!! Str::words($dado_pedido_status['pessoas_montagem'], 2, '') !!}</th>
+                                <th scope="col">{!! Str::words($dado_pedido_status['pessoas_inspecao'], 2, '') !!}</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr class="my-4">
+            @endforeach
+        @endif
+    @stop
     @break
 
     @case('ciclo-producao')
