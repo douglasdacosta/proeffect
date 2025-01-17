@@ -1977,6 +1977,9 @@ class PedidosController extends Controller
         $totalMinutosB = ($horasB * 60 * 60 + $minutosB * 60 + $segundosB) / 60;
 
         // Calculando a porcentagem de tempoA em relação a tempoB
+        if($totalMinutosA ==0 || $totalMinutosB == 0) {
+            return 0;
+        }
         $percentual = ($totalMinutosA / $totalMinutosB) * 100;
 
        return $percentual;
