@@ -1279,7 +1279,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'] }}</td>
                                     <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'] == 0 ? 0 : number_format(( DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'])/$pedido->qtde), 2, ',', '.') }}%</td>
 
-                                    <td>{{ ($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'] == 0 || strtotime($dado_pedido_status['pedido'][$pedido->id]['usinagem']) == 0) ? 0 : (DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'])*60)/(strtotime($dado_pedido_status['pedido'][$pedido->id]['usinagem'])/60) }}</td>
+                                    <td>{{ number_format(($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'] == 0 || strtotime($dado_pedido_status['pedido'][$pedido->id]['usinagem']) == 0) ? 0 : (DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'])*60)/(strtotime($dado_pedido_status['pedido'][$pedido->id]['usinagem'])/60), 2, ',', '.') }}</td>
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }}</td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
