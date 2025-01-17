@@ -688,6 +688,11 @@ $(function ($) {
 
         $('.status_pedido').show();
 
+        if($('.tipo_consulta_followup').val() == 'G' )        {
+            $('.campos_ciclo_producao').show();
+            $('.campos_followup').show();
+        }
+
         if($('.tipo_consulta_followup').val() == 'F' )        {
 
             $('.campos_ciclo_producao').hide();

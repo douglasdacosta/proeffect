@@ -1,5 +1,8 @@
 <?php
 use App\Http\Controllers\PedidosController;
+use App\Http\Controllers\AjaxOrcamentosController;
+use App\Providers\DateHelpers;
+
 $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 => '#c1d9d0', 10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071'];
 ?>
 @extends('adminlte::page')
@@ -925,8 +928,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <label for="lote" class="col-sm-3 col-form-label text-right tipo_consulta ">Tipo de consulta</label>
                             <div class="col-sm-3">
                                 <select class="form-control col-sm-12 tipo_consulta_followup" id="tipo_consulta" name="tipo_consulta">
+                                    <option value="F" @if($request->input('tipo_consulta') == 'F'){{ ' selected '}}@else @endif>Followup</option>
+                                    <option value="R" @if($request->input('tipo_consulta') == 'R'){{ ' selected '}}@else @endif>Realizado</option>
                                     <option value="G" @if($request->input('tipo_consulta') == 'G'){{ ' selected '}}@else @endif>Gerêncial</option>
-
                                 </select>
                             </div>
                         </div>
@@ -1016,6 +1020,67 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             </div>
                                         </div>
                                     @endif
+                                    @if($request->input('tipo_consulta') == 'F')
+                                        <div class="form-group row">
+                                            <div class="col-sm-5">
+                                                <form id="filtro" action="followup-detalhes" method="post"
+                                                    data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+                                                    @csrf <!--{{ csrf_field() }}-->
+                                                    <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
+                                                        value="{{ json_encode($pedidos_encontrados) }}">
+                                                    <input type="hidden" id="" name="nome_tela"
+                                                        value="{{ 'tempos' }}">
+                                                    <button type="submit" class="btn btn-primary"><span
+                                                            class="far fa-fw fa-calendar"></span> Visualizar followups tempos</button>
+                                                    <div class="clearfix"></div>
+                                                </form>
+                                            </div>
+
+                                            <div class="col-sm-5">
+                                                <form id="filtro" action="followup-detalhes" method="post"
+                                                    data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+                                                    @csrf <!--{{ csrf_field() }}-->
+                                                    <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
+                                                        value="{{ json_encode($pedidos_encontrados) }}">
+                                                    <input type="hidden" id="" name="nome_tela" value="{{ 'geral' }}">
+                                                    <button type="submit" class="btn btn-primary"><span
+                                                            class="far fa-fw fa-calendar"></span> Visualizar followups geral</button>
+                                                    <div class="clearfix"></div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @if($request->input('tipo_consulta') == 'R')
+                                            <div class="col-sm-5">
+                                                <form id="filtro" action="followup-realizado" method="post"
+                                                    data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+                                                    @csrf <!--{{ csrf_field() }}-->
+                                                    <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
+                                                        value="{{ json_encode($pedidos_encontrados) }}">
+                                                    <input type="hidden" id="" name="nome_tela" value="{{ 'realizados' }}">
+                                                    <input type="hidden" id="data_inicio" name="data_apontamento" value="{{$request->input('data_apontamento')}}">
+                                                    <input type="hidden" id="data_fim" name="data_apontamento_fim" value="{{$request->input('data_apontamento_fim')}}">
+                                                    <input type="hidden" id="status_id" name="status_id" value="{{ json_encode($request->input('status_id')) }}">
+                                                    <button type="submit" class="btn btn-primary"><span
+                                                            class="far fa-fw fa-calendar"></span> Visualizar followups realizados</button>
+                                                    <div class="clearfix"></div>
+                                                </form>
+                                            </div>
+                                        @endif
+                                        @if($request->input('tipo_consulta') == 'C')
+                                            <div class="col-sm-5">
+                                                <form id="filtro" action="followup-ciclo-producao" method="post"
+                                                    data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+                                                    @csrf <!--{{ csrf_field() }}-->
+                                                    <input type="hidden" id="pedidos_encontrados" name="pedidos_encontrados"
+                                                        value="{{ json_encode($pedidos_encontrados) }}">
+                                                    <input type="hidden" id="" name="nome_tela" value="{{ 'ciclo_producao' }}">
+                                                    <button type="submit" class="btn btn-primary"><span
+                                                            class="far fa-fw fa-calendar"></span> Visualizar followups ciclo de produção</button>
+                                                    <div class="clearfix"></div>
+                                                </form>
+                                            </div>
+                                        @endif
                                 @else
                                     <h4>Nenhum registro encontrado</h4>
                                 @endif
@@ -1174,8 +1239,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col">%MP</th>
                                 <th scope="col">$MO</th>
                                 <th scope="col">%MO</th>
-                                <th scope="col">%HM</th>
-                                <th scope="col">%Usin Minut</th>
+                                <th scope="col">$HM</th>
                                 <th scope="col">Transporte</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Usinagem</th>
@@ -1208,14 +1272,14 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                     <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
                                     <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
-                                    <td>{{ 0 }}</td>
-                                    <td>{{ 0 }}</td>
-                                    <td>{{ 0 }}</td>
-                                    <td>{{ 0 }}%</td>
-                                    <td>{{ 0 }}</td>
-                                    <td>{{ 0 }}%</td>
-                                    <td>{{ 0 }}%</td>
-                                    <td>{{ 0 }}%</td>
+                                    <td>{{ number_format($pedido->valor_unitario_adv, 2, ',', '.')  }}</td>
+                                    <td>{{ number_format(($pedido->valor_unitario_adv * $pedido->qtde), 2, ',', '.')  }}</td>
+                                    <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP'] }}</td>
+                                    <td>{{ number_format(( DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP'])/$pedido->qtde), 2, ',', '.') }}%</td>
+                                    <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'] }}</td>
+                                    <td>{{ number_format(( DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'])/$pedido->qtde), 2, ',', '.') }}%</td>
+
+                                    <td>{{ (DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMO'])*60)/(strtotime($dado_pedido_status['pedido'][$pedido->id]['usinagem'])/60) }}</td>
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }}</td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}

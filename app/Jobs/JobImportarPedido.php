@@ -62,11 +62,13 @@ class JobImportarPedido implements ShouldQueue
 
                 foreach($venda['itens'] as $itens) {
                     info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
+                    info($itens);
                     $pedidos = new Pedidos();
                     $pessoas = new Pessoas();
                     $fichatecnica = new Fichastecnicas();
                     $transportes = new transportes();
                     $ep = $itens['codigo'];
+                    $valor_unitario = $itens['unitario'];
 
                     $numeroOs = $venda['numeroOS'];
                     $dataOS = $venda['dataOS'];
@@ -103,7 +105,8 @@ class JobImportarPedido implements ShouldQueue
                         'transporte_id' => $transporte_id,
                         'dataOS' => $dataOS,
                         'prevEntrega' => $prevEntrega,
-                        'quantidade' => $itens['quantidade']
+                        'quantidade' => $itens['quantidade'],
+                        'valor_unitario_adv' => $valor_unitario
                     ];
 
                     $this->savePedidos($pedido, $dados);
@@ -130,8 +133,8 @@ class JobImportarPedido implements ShouldQueue
             $pedidos->qtde =$dados['quantidade'];
             $pedidos->data_gerado = substr($dados['dataOS'], 0, 10);
             $pedidos->data_entrega = substr($dados['prevEntrega'], 0, 10);
+            $pedidos->valor_unitario_adv = $dados['valor_unitario_adv'];
             $pedidos->status ='A';
-            info($pedidos);
             $pedidos->save();
 
             $this->historicosPedidos($pedidos->id, 1);

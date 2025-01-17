@@ -1113,7 +1113,7 @@ class PedidosController extends Controller
     public function followupgerencialDados(Request $request)
     {
         $pedidos = new Pedidos();
-
+        $AjaxOrcamentosController = new AjaxOrcamentosController();
         $nome_tela = !empty($request->input('nome_tela')) ? $request->input('nome_tela') : 'tempos' ;
 
         if(empty($request->input('pedidos_encontrados'))) {
@@ -1153,16 +1153,135 @@ class PedidosController extends Controller
         $total_horas_pessoas_pessoas_montagem_torres_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem_torres);
         $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
         $totalGeral = [];
+
+        // $fichatecnicas = new Fichastecnicas();
+
         foreach ($dados_pedido_status as $status => $pedidos) {
 
-
+            $totais = [];
             foreach ($pedidos['classe'] as $chave =>  $pedido) {
+
+
+                // calcula dados chapa e valores
+
+                $percentuais =[];
+
+                // $fichatecnica= $fichatecnicas->where('id', '=', $pedido->ep)->get();
+
+                $consumoMateriais = new ConsumoMateriaisController();
+                $fichatecnicasitens = new Fichastecnicasitens();
+                $fichatecnicasitens= $fichatecnicasitens::with('tabelaMateriais')->where('fichatecnica_id', '=', $pedido->fichatecnica_id)->orderByRaw("CASE WHEN blank='' THEN 1 ELSE 0 END ASC")->orderBy('blank','ASC')->get();
+
+                $tempo_fresa_total = '00:00:00';
+
+                foreach ($fichatecnicasitens as $key => $fichatecnicasitem) {
+                    $tempo_usinagem = $fichatecnicasitem->tempo_usinagem;
+                    $tempo_usinagem = $this->multiplyTimeByInteger($tempo_usinagem,$fichatecnicasitem->qtde_blank);
+                    $tempo_fresa_total = $this->somarHoras($tempo_fresa_total, $tempo_usinagem);
+                }
+
+                $Total_mo=$Total_mp=$Total_ci=0;
+
+                foreach ($fichatecnicasitens as $key => $fichatecnicasitem) {
+
+                    $tempo_usinagem = $fichatecnicasitem->tempo_usinagem;
+                    $tempo_usinagem = $this->multiplyTimeByInteger($tempo_usinagem,$fichatecnicasitem->qtde_blank);
+
+                    $percentuais[$key]['percentual']=round($this::calcularPorcentagemEntreMinutos($tempo_usinagem, $tempo_fresa_total));
+
+
+                    $pecas = [
+                        'width' => $fichatecnicasitem->medidax + 2,
+                        'height'=> $fichatecnicasitem->mediday + 10,
+                    ];
+
+                    $chapa = [
+                        'sheetWidth' => $fichatecnicasitem->tabelaMateriais->unidadex - 20,
+                        'sheetHeight'=> $fichatecnicasitem->tabelaMateriais->unidadey - 20
+                    ];
+
+                    if($fichatecnicasitem->tabelaMateriais->peca_padrao == 2){
+
+                        $blank_por_chapa = $consumoMateriais->calculaPecas($pecas, $chapa);
+                    } else {
+
+                        $blank_por_chapa = $fichatecnicasitem->qtde_blank;
+                    }
+
+
+
+                    // dd($fichatecnicasitem->tabelaMateriais->valor);
+//                     dd($fichatecnicasitem);
+// "id" => 2531
+//     "fichatecnica_id" => 90
+//     "materiais_id" => 77
+//     "blank" => "AA"
+//     "qtde_blank" => 1
+//     "medidax" => 66
+//     "mediday" => 30
+//     "tempo_usinagem" => "00:00:25"
+//     "tempo_acabamento" => "00:00:18"
+//     "tempo_montagem" => "00:00:00"
+//     "tempo_montagem_torre" => "00:00:00"
+//     "tempo_inspecao" => "00:00:00"
+//     "status" => "A"
+//     "created_at" => null
+//     "updated_at" => null
+
+                        $blank = $fichatecnicasitem->blank;
+                        $tmp = $fichatecnicasitem->tempo_usinagem;
+                        $val_chapa = $fichatecnicasitem->tabelaMateriais->valor;
+                        $qtde_CH = $blank_por_chapa;
+                        $qtde_ = $fichatecnicasitem->qtde_blank;
+
+                        if($blank != '') {
+
+                            $MP = $val_chapa/$qtde_CH*$qtde_;
+
+                            $tempo = $this->multiplyTimeByInteger($tmp,  $qtde_);
+                            $MO = $AjaxOrcamentosController->calcularValor('480.00', $tempo);
+                            // dd($MO);
+
+                            $Total_mo = $Total_mo + DateHelpers::formatFloatValue($MO);
+
+                        }
+                        else {
+                            $MP = $val_chapa*$qtde_CH;
+                            $MO = 0;
+                        }
+
+                        $Total_mp = $Total_mp + (($MP !='') ? $MP : 0);
+
+
+                    $Total_ci = $Total_mp + $Total_mo;
+                    $Total_mp_2 = $Total_mp * 0.37;
+                    $desc_10_1 = $Total_ci * 1.66;
+                    $desc_20_1 = $Total_ci * 1.50;
+                    $desc_30_1 = $Total_ci * 1.35;
+                    $desc_40_1 = $Total_ci * 1.25;
+                    $desc_50_1 = $Total_ci * 1.16;
+
+                    $totais = [
+                        'subTotalMO' => number_format($Total_mo, 2, ',',''),
+                        'subTotalMP' => number_format($Total_mp, 2, ',',''),
+                        'subTotalCI'=> number_format($Total_ci, 2, ',',''),
+                        'desc_10_total' => number_format($desc_10_1 + $Total_mp_2, 2, ',',''),
+                        'desc_20_total' => number_format($desc_20_1 + $Total_mp_2, 2, ',',''),
+                        'desc_30_total' => number_format($desc_30_1 + $Total_mp_2, 2, ',',''),
+                        'desc_40_total' => number_format($desc_40_1 + $Total_mp_2, 2, ',',''),
+                        'desc_50_total' => number_format($desc_50_1 + $Total_mp_2, 2, ',',''),
+                    ];
+
+                }
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['totais'] = $totais;
+                // $valores = $calcularOrcamento->ajaxCalculaOrcamentos();
 
                 $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem_torre=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
 
                 $total_tempo_usinagem = $this->somarHoras($total_tempo_usinagem , $pedido->tabelaFichastecnicas->tempo_usinagem);
                 $total_tempo_usinagem = $MaquinasController->multiplicarHoras($total_tempo_usinagem,$pedido->qtde);
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['usinagem'] = $total_tempo_usinagem;
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['valor_unitario'] = $pedido->valor_unitario_adv ;
 
                 $total_tempo_acabamento = $this->somarHoras($total_tempo_acabamento , $pedido->tabelaFichastecnicas->tempo_acabamento);
                 $total_tempo_acabamento = $MaquinasController->multiplicarHoras($total_tempo_acabamento,$pedido->qtde);
