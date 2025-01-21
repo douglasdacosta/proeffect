@@ -61,8 +61,10 @@ class JobImportarPedido implements ShouldQueue
                 }
 
                 foreach($venda['itens'] as $itens) {
-                    info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
-                    info($itens);
+                    // info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
+
+                    info("update pedidos set valor_unitario_adv = '".$itens['unitario']."' where os = '".$venda['numeroOS']."' and fichatecnica_id = '".$itens['fichaTecnicaId']."'");
+
                     $pedidos = new Pedidos();
                     $pessoas = new Pessoas();
                     $fichatecnica = new Fichastecnicas();

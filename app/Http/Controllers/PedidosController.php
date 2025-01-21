@@ -956,7 +956,7 @@ class PedidosController extends Controller
     */
     public function followupgerencial(Request $request) {
 
-
+// dd($request->all());
         $status_id = $request->input('status_id');
         $filtrado = 0;
         $pedidos = DB::table('pedidos')
@@ -1033,7 +1033,7 @@ class PedidosController extends Controller
             $filtrado++;
         }
 
-        if($request->input('tipo_consulta') == 'G') {
+        // if($request->input('tipo_consulta') == 'G') {
 
 
             if(!empty($request->input('status_id'))) {
@@ -1066,7 +1066,7 @@ class PedidosController extends Controller
                 $pedidos = $pedidos->where('data_entrega', '<=', DateHelpers::formatDate_dmY($request->input('data_entrega_fim')));
                 $filtrado++;
             }
-        }
+        // }
 
         $pedidos = $pedidos->where('pedidos.status', '=', 'A');
 
@@ -1093,6 +1093,8 @@ class PedidosController extends Controller
                 $pedidos_encontrados[] = $value->id;
             }
         }
+
+        $request->merge(['tipo_consulta' => 'G']);
         $tela = 'pesquisa-gerencial';
         $nome_tela = 'pesquisa gerêncial';
         $data = array(
