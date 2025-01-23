@@ -86,21 +86,10 @@ class ApiERPController extends Controller
         'Authorization' => "Bearer $this->token"
         ];
 
-        $NumRecords = 10000;
+        $NumRecords = 1000;
         $page = 1;
-        $url = env('URL_ERP')."api/VendaV2?Status=7974&NumRecords=$NumRecords&page=$page";
-// "idStatusVenda": 7974,
-// "descricao": "ENVIAR - TRANSPORTE"
-
-        // "idStatusVenda": 7972,
-        // "descricao": "PÓS VENDA"
-        // "idStatusVenda": 7973,
-        // "descricao": "FINALIZADO"
-
-
-
+        $url = env('URL_ERP')."api/VendaV2?Status=7968&NumRecords=$NumRecords&page=$page";
         $request = new Request('GET', $url, $headers);
-
         $response = $client->sendAsync($request)->wait();
         $body = $response->getBody();
         $resposta = json_decode($body, true);
