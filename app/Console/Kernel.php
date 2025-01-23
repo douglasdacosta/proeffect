@@ -10,6 +10,7 @@ class Kernel extends ConsoleKernel
 
     protected $commands = [
         Commands\ImportarPedido::class,
+        Commands\ImportarPedidoAntigo::class,
     ];
     /**
      * Define the application's command schedule.
@@ -22,6 +23,7 @@ class Kernel extends ConsoleKernel
         info('Dentro do schedule');
         try {
             $schedule->command('command:importarPedido')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '20:00');
+            $schedule->command('command:ImportarPedidoAntigo')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '22:00');
         } catch (\Exception $th) {
             info($th);
         }
