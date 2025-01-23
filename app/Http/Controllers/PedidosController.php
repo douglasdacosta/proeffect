@@ -1238,13 +1238,16 @@ class PedidosController extends Controller
 
                         if($blank != '') {
 
-                            $MP = $val_chapa/$qtde_CH*$qtde_;
+                            if(!empty($val_chapa) && !empty($qtde_CH)){
+                                $MP = $val_chapa/$qtde_CH*$qtde_;
 
-                            $tempo = $this->multiplyTimeByInteger($tmp,  $qtde_);
-                            $MO = $AjaxOrcamentosController->calcularValor('480.00', $tempo);
-                            // dd($MO);
+                                $tempo = $this->multiplyTimeByInteger($tmp,  $qtde_);
+                                $MO = $AjaxOrcamentosController->calcularValor('480.00', $tempo);
+                                $Total_mo = $Total_mo + DateHelpers::formatFloatValue($MO);
+                            } else {
+                                $Total_mo = 0;
+                            }
 
-                            $Total_mo = $Total_mo + DateHelpers::formatFloatValue($MO);
 
                         }
                         else {
