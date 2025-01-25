@@ -1210,26 +1210,6 @@ class PedidosController extends Controller
                         $blank_por_chapa = $fichatecnicasitem->qtde_blank;
                     }
 
-
-
-                    // dd($fichatecnicasitem->tabelaMateriais->valor);
-//                     dd($fichatecnicasitem);
-// "id" => 2531
-//     "fichatecnica_id" => 90
-//     "materiais_id" => 77
-//     "blank" => "AA"
-//     "qtde_blank" => 1
-//     "medidax" => 66
-//     "mediday" => 30
-//     "tempo_usinagem" => "00:00:25"
-//     "tempo_acabamento" => "00:00:18"
-//     "tempo_montagem" => "00:00:00"
-//     "tempo_montagem_torre" => "00:00:00"
-//     "tempo_inspecao" => "00:00:00"
-//     "status" => "A"
-//     "created_at" => null
-//     "updated_at" => null
-
                         $blank = $fichatecnicasitem->blank;
                         $tmp = $fichatecnicasitem->tempo_usinagem;
                         $val_chapa = $fichatecnicasitem->tabelaMateriais->valor;
