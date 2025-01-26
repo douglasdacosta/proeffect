@@ -1283,6 +1283,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     $total_mo = isset($total_mo) ? $total_mo + $valor_mo : $valor_mo ;
                                     $total_mp = isset($total_mp) ? $total_mp + $valor_mp : $valor_mp ;
 
+                                    $percentual_mo = ($mo == 0 || $pedido->valor_unitario_adv == 0) ? 0 : ($mo/$pedido->valor_unitario_adv)*100;
+                                    $percentual_mp = ($mp == 0 || $pedido->valor_unitario_adv == 0) ? 0 : ($mp/$pedido->valor_unitario_adv)*100;
+
                                 @endphp
 
                                 <tr>
@@ -1300,9 +1303,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td style="background-color: #d9edf7">{{ number_format($valor_mo, 2, ',', '.')  }}</td> <!--total mo-->
                                     <td style="background-color: #d9edf7">{{ number_format($valor_mp, 2, ',', '.')  }}</td> <!--total mp-->
                                     <td style="background-color: #f3f2b6">{{ number_format(($mp), 2, ',', '.')  }}</td> <!--mp-->
-                                    <td style="background-color: #f3f2b6">{{ number_format($mp/$pedido->valor_unitario_adv, 2, ',', '.') }}%</td> <!--%mp-->
+                                    <td style="background-color: #f3f2b6">{{ number_format($percentual_mp, 2, ',', '.') }}%</td> <!--%mp-->
                                     <td style="background-color: #b2eeaa">{{ number_format(($mo), 2, ',', '.')  }}</td> <!--mp-->
-                                    <td style="background-color: #b2eeaa">{{ number_format($mo/$pedido->valor_unitario_adv, 2, ',', '.') }}%</td> <!--%MO-->
+                                    <td style="background-color: #b2eeaa">{{ number_format($percentual_mo, 2, ',', '.') }}%</td> <!--%MO-->
 
                                     <td>{{ ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - (($mp*1.53))/(($tempo_usinagem/60)*1.16), 2, ',', '.')  }}</td> <!--%HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
 
