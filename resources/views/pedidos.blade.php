@@ -1321,7 +1321,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
 
                                     @endphp
-                                    <td @if($valotHM_float <300 ) class="text-danger" @endif >{{  number_format($valotHM_float, 2, ',', '.') }}</td> <!-- HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
+                                    <td @if($valotHM_float <300 ) style="background-color: #e25050; color: #FFFFFF" @endif >{{  number_format($valotHM_float, 2, ',', '.') }}</td> <!-- HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
 
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }} </td>
