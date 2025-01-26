@@ -1273,21 +1273,11 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                                     list($horas, $minutos, $segundos) = explode(':', $dado_pedido_status['pedido'][$pedido->id]['usinagem']);
 
-                                    // $tempo_usinagem = ($horas * 60) + $minutos + ($segundos / 60);
-                                    // $tempo_usinagem = ($tempo_usinagem/100);
-                                    // $tempo_usinagem  = number_format($tempo_usinagem, 2, '.', '.');
-
-                                    // Converte o tempo total para minutos fracionários
                                     $tempoEmDias = ($horas / 24) + ($minutos / 1440) + ($segundos / 86400);
-
-                                    // Aplica a fórmula do Excel
                                     $resultado = (($tempoEmDias / $pedido->qtde) * 24) * 60;
-
-                                    // Retorna o valor com duas casas decimais
                                     $tempo_usinagem = number_format($resultado, 2, '.', '');
 
                                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
-
                                     $total_soma = isset($total_soma) ? $total_soma + $total : $total;
 
                                     $valor_mo = $mo * $pedido->qtde;
@@ -1323,12 +1313,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     @php
                                     $valotHM = ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - ((($mp*1.53))/(($tempo_usinagem/60)*1.16)), 2, ',', '.');
 
-                                    // dd((3.00-(0.38*1.53))/((0.42/60)*1.16));
-
-                                    info("($pedido->valor_unitario_adv-($mp*1,53))/(($tempo_usinagem/60)*1,16)");
-
-                                    info((3-(0.38*1.53))/((0.42/60)*1.16) );
-
                                     if($mp ==0 || $tempo_usinagem == 0){
                                         $valotHM_float = 0.00;
                                     } else {
@@ -1340,7 +1324,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td @if($valotHM_float <300 ) class="text-danger" @endif >{{  number_format($valotHM_float, 2, ',', '.') }}</td> <!-- HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
 
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
-                                    <td>{{ $pedido->tabelaStatus->nome }} {{ $tempo_usinagem }}</td>
+                                    <td>{{ $pedido->tabelaStatus->nome }} </td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                     </td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
