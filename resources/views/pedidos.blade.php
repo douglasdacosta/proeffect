@@ -1320,9 +1320,22 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                                     @php
                                     $valotHM = ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - ((($mp*1.53))/(($tempo_usinagem/60)*1.16)), 2, ',', '.');
-                                    $valotHM_float = ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : $pedido->valor_unitario_adv - ((($mp*1.53))/(($tempo_usinagem/60)*1.16));
+
+                                    // dd((3.00-(0.38*1.53))/((0.42/60)*1.16));
+
+                                    info("($pedido->valor_unitario_adv-($mp*1,53))/(($tempo_usinagem/60)*1,16)");
+
+                                    info((3-(0.38*1.53))/((0.42/60)*1.16) );
+
+                                    if($mp ==0 || $tempo_usinagem == 0){
+                                        $valotHM_float = '0,00';
+                                    } else {
+                                        $valotHM_float = ($pedido->valor_unitario_adv - ($mp*1.53))/(($tempo_usinagem/60)*1.16);
+                                    }
+
+
                                     @endphp
-                                    <td @if($valotHM_float <300 ) class="text-danger" @endif >{{  $valotHM }}</td> <!-- HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
+                                    <td @if($valotHM_float <300 ) class="text-danger" @endif >{{  number_format($valotHM_float, 2, ',', '.') }}</td> <!-- HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
 
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }}</td>
