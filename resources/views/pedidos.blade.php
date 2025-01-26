@@ -1219,6 +1219,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
     @section('content')
         @if (isset($dados_pedido_status))
             @foreach ($dados_pedido_status as $key => $dado_pedido_status)
+                @php
+                $total_mo = $total_mp = $total_soma = 0.00;
+                @endphp
                 <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
                 <div class="form-group row" style="overflow-x:auto;  ">
                     <table class="table table-sm table-striped text-center" id="table_composicao">
@@ -1235,6 +1238,8 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col" title="Observações">Obs</th>
                                 <th scope="col">Valor Unit</th>
                                 <th scope="col">Total</th>
+                                <th scope="col">Total MO</th>
+                                <th scope="col">Total MP</th>
                                 <th scope="col">$MP</th>
                                 <th scope="col">%MP</th>
                                 <th scope="col">$MO</th>
@@ -1252,16 +1257,34 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                         <tbody>
 
                             @foreach ($dado_pedido_status['classe'] as $pedido)
-                                <?php
-                                $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
-                                $hoje = date('Y-m-d');
-                                $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
-                                if ($dias_alerta < 6) {
-                                    $class_dias_alerta = 'text-danger';
-                                } else {
-                                    $class_dias_alerta = 'text-primary';
-                                }
-                                ?>
+                                @php
+                                    $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
+                                    $hoje = date('Y-m-d');
+                                    $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                                    if ($dias_alerta < 6) {
+                                        $class_dias_alerta = 'text-danger';
+                                    } else {
+                                        $class_dias_alerta = 'text-primary';
+                                    }
+                                    $mp = DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP']);
+                                    $mp_numerico = $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP'];
+                                    $mo = $pedido->valor_unitario_adv - $mp;
+
+                                    list($horas, $minutos, $segundos) = explode(':', $dado_pedido_status['pedido'][$pedido->id]['usinagem']);
+                                    $tempo_usinagem = (int)$horas + ((int)$minutos / 60);
+
+                                    $total = $pedido->valor_unitario_adv * $pedido->qtde;
+
+                                    $total_soma = isset($total_soma) ? $total_soma + $total : $total;
+
+                                    $valor_mo = $mo * $pedido->qtde;
+                                    $valor_mp = $mp * $pedido->qtde;
+
+                                    $total_mo = isset($total_mo) ? $total_mo + $valor_mo : $valor_mo ;
+                                    $total_mp = isset($total_mp) ? $total_mp + $valor_mp : $valor_mp ;
+
+                                @endphp
+
                                 <tr>
                                     <td>{{ $pedido->tabelaPessoas->codigo_cliente }}</td>
                                     <td>{{ $pedido->tabelaPessoas->nome_assistente }}</td>
@@ -1272,14 +1295,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                     <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
                                     <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
-                                    <td>{{ number_format($pedido->valor_unitario_adv, 2, ',', '.')  }}</td>
-                                    <td>{{ number_format(($pedido->valor_unitario_adv * $pedido->qtde), 2, ',', '.')  }}</td>
-                                    <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP'] }}</td>
-                                    <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP'] == 0 ? 0 : number_format(( DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP'])/$pedido->qtde), 2, ',', '.') }}%</td>
-                                    <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['desc_50_total'] }}</td>
-                                    <td>{{ $dado_pedido_status['pedido'][$pedido->id]['totais']['desc_50_total'] == 0 ? 0 : number_format(( DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['desc_50_total'])/$pedido->qtde), 2, ',', '.') }}%</td>
+                                    <td>{{ number_format($pedido->valor_unitario_adv, 2, ',', '.')  }}</td> <!--valor_unitário-->
+                                    <td style="background-color: #d9edf7">{{ number_format($total, 2, ',', '.');  }}</td> <!--total-->
+                                    <td style="background-color: #d9edf7">{{ number_format($valor_mo, 2, ',', '.')  }}</td> <!--total mo-->
+                                    <td style="background-color: #d9edf7">{{ number_format($valor_mp, 2, ',', '.')  }}</td> <!--total mp-->
+                                    <td style="background-color: #f3f2b6">{{ number_format(($mp), 2, ',', '.')  }}</td> <!--mp-->
+                                    <td style="background-color: #f3f2b6">{{ number_format($mp/$pedido->valor_unitario_adv, 2, ',', '.') }}%</td> <!--%mp-->
+                                    <td style="background-color: #b2eeaa">{{ number_format(($mo), 2, ',', '.')  }}</td> <!--mp-->
+                                    <td style="background-color: #b2eeaa">{{ number_format($mo/$pedido->valor_unitario_adv, 2, ',', '.') }}%</td> <!--%MO-->
 
-                                    <td>{{ number_format(($dado_pedido_status['pedido'][$pedido->id]['totais']['desc_50_total'] == 0 || strtotime($dado_pedido_status['pedido'][$pedido->id]['usinagem']) == 0) ? 0 : (DateHelpers::formatFloatValue($dado_pedido_status['pedido'][$pedido->id]['totais']['desc_50_total'])*60)/(strtotime($dado_pedido_status['pedido'][$pedido->id]['usinagem'])/60), 2, ',', '.') }}</td>
+                                    <td>{{ ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - (($mp*1.53))/(($tempo_usinagem/60)*1.16), 2, ',', '.')  }}</td> <!--%HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
+
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }}</td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
@@ -1304,7 +1330,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
-                                <th scope="col"></th>
+                                <th scope="col" style="background-color: #d9edf7">{{number_format($total_soma, 2, ',', '.') }}</th>
+                                <th scope="col" style="background-color: #d9edf7">{{ number_format($total_mo, 2, ',', '.') }}</th>
+                                <th scope="col" style="background-color: #d9edf7">{{number_format($total_mp, 2, ',', '.')}}</th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
@@ -1337,6 +1365,8 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
+                                <th scope="col" style="background-color: #d9edf7">{{ number_format(($total_mo/$total_soma) * 100, 2, ',', '.') }}%</th>
+                                <th scope="col" style="background-color: #d9edf7">{{ number_format(($total_mp/$total_soma) * 100, 2, ',', '.') }}%</th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
