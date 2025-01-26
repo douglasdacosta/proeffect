@@ -1307,7 +1307,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td style="background-color: #b2eeaa">{{ number_format(($mo), 2, ',', '.')  }}</td> <!--mp-->
                                     <td style="background-color: #b2eeaa">{{ number_format($percentual_mo, 2, ',', '.') }}%</td> <!--%MO-->
 
-                                    <td>{{ ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - (($mp*1.53))/(($tempo_usinagem/60)*1.16), 2, ',', '.')  }}</td> <!--%HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
+                                    <td>{{ ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - ((($mp*1.53))/(($tempo_usinagem/60)*1.16)), 2, ',', '.')  }}</td> <!--%HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
 
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }}</td>
