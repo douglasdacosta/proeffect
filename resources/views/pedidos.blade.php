@@ -1270,8 +1270,19 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     $mp_numerico = $dado_pedido_status['pedido'][$pedido->id]['totais']['subTotalMP'];
                                     $mo = $pedido->valor_unitario_adv - $mp;
 
+
                                     list($horas, $minutos, $segundos) = explode(':', $dado_pedido_status['pedido'][$pedido->id]['usinagem']);
-                                    $tempo_usinagem = (int)$horas + ((int)$minutos / 60);
+
+                                    $tempo_usinagem = ($horas * 60) + $minutos + ($segundos / 60);
+                                    $tempo_usinagem = ($tempo_usinagem/100);
+                                    $tempo_usinagem  = number_format($tempo_usinagem, 2, '.', '.');
+                                    // dd($tempo_usinagem);
+
+
+                                    // $tempo_usinagem = (int)$horas + ((int)$minutos / 60);
+                                    // $tempo_usinagem = $tempo_usinagem/$pedido->qtde;
+                                    // info($dado_pedido_status['pedido'][$pedido->id]['usinagem']);
+                                    // info($tempo_usinagem);
 
                                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
 
@@ -1307,7 +1318,11 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td style="background-color: #b2eeaa">{{ number_format(($mo), 2, ',', '.')  }}</td> <!--mp-->
                                     <td style="background-color: #b2eeaa">{{ number_format($percentual_mo, 2, ',', '.') }}%</td> <!--%MO-->
 
-                                    <td>{{ ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - ((($mp*1.53))/(($tempo_usinagem/60)*1.16)), 2, ',', '.')  }}</td> <!--%HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
+                                    @php
+                                    $valotHM = ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : number_format($pedido->valor_unitario_adv - ((($mp*1.53))/(($tempo_usinagem/60)*1.16)), 2, ',', '.');
+                                    $valotHM_float = ($mp ==0 || $tempo_usinagem == 0) ? '0,00' : $pedido->valor_unitario_adv - ((($mp*1.53))/(($tempo_usinagem/60)*1.16));
+                                    @endphp
+                                    <td @if($valotHM_float <300 ) class="text-danger" @endif >{{  $valotHM }}</td> <!-- HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
 
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }}</td>

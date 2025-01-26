@@ -1264,7 +1264,8 @@ class PedidosController extends Controller
                 $total_tempo_usinagem=$total_tempo_acabamento=$total_tempo_montagem_torre=$total_tempo_montagem=$total_tempo_inspecao='00:00:00';
 
                 $total_tempo_usinagem = $this->somarHoras($total_tempo_usinagem , $pedido->tabelaFichastecnicas->tempo_usinagem);
-                $total_tempo_usinagem = $MaquinasController->multiplicarHoras($total_tempo_usinagem,$pedido->qtde);
+                $total_tempo_usinagem = $MaquinasController->multiplicarHoras($total_tempo_usinagem, $pedido->qtde);
+                info($total_tempo_usinagem);
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['usinagem'] = $total_tempo_usinagem;
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['valor_unitario'] = $pedido->valor_unitario_adv ;
 
