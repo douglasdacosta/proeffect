@@ -1273,16 +1273,18 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                                     list($horas, $minutos, $segundos) = explode(':', $dado_pedido_status['pedido'][$pedido->id]['usinagem']);
 
-                                    $tempo_usinagem = ($horas * 60) + $minutos + ($segundos / 60);
-                                    $tempo_usinagem = ($tempo_usinagem/100);
-                                    $tempo_usinagem  = number_format($tempo_usinagem, 2, '.', '.');
-                                    // dd($tempo_usinagem);
+                                    // $tempo_usinagem = ($horas * 60) + $minutos + ($segundos / 60);
+                                    // $tempo_usinagem = ($tempo_usinagem/100);
+                                    // $tempo_usinagem  = number_format($tempo_usinagem, 2, '.', '.');
 
+                                    // Converte o tempo total para minutos fracionários
+                                    $tempoEmDias = ($horas / 24) + ($minutos / 1440) + ($segundos / 86400);
 
-                                    // $tempo_usinagem = (int)$horas + ((int)$minutos / 60);
-                                    // $tempo_usinagem = $tempo_usinagem/$pedido->qtde;
-                                    // info($dado_pedido_status['pedido'][$pedido->id]['usinagem']);
-                                    // info($tempo_usinagem);
+                                    // Aplica a fórmula do Excel
+                                    $resultado = (($tempoEmDias / $pedido->qtde) * 24) * 60;
+
+                                    // Retorna o valor com duas casas decimais
+                                    $tempo_usinagem = number_format($resultado, 2, '.', '');
 
                                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
 
@@ -1338,7 +1340,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <td @if($valotHM_float <300 ) class="text-danger" @endif >{{  number_format($valotHM_float, 2, ',', '.') }}</td> <!-- HM  unitario - ((MP*1,53))/((Tempo_usinagem/60)*1,16) -->
 
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
-                                    <td>{{ $pedido->tabelaStatus->nome }}</td>
+                                    <td>{{ $pedido->tabelaStatus->nome }} {{ $tempo_usinagem }}</td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                     </td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
