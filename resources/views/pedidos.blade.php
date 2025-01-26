@@ -1328,7 +1328,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     info((3-(0.38*1.53))/((0.42/60)*1.16) );
 
                                     if($mp ==0 || $tempo_usinagem == 0){
-                                        $valotHM_float = '0,00';
+                                        $valotHM_float = 0.00;
                                     } else {
                                         $valotHM_float = ($pedido->valor_unitario_adv - ($mp*1.53))/(($tempo_usinagem/60)*1.16);
                                     }
