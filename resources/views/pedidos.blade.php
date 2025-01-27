@@ -1382,8 +1382,21 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
-                                <th scope="col" style="background-color: #d9edf7">{{ number_format(($total_mo/$total_soma) * 100, 2, ',', '.') }}%</th>
-                                <th scope="col" style="background-color: #d9edf7">{{ number_format(($total_mp/$total_soma) * 100, 2, ',', '.') }}%</th>
+                                @php
+                                    if($total_soma == 0 || $total_mo == 0 ){
+                                        $totalMO = 0;
+                                    } else {
+                                        $totalMO = $total_mo/$total_soma;
+                                    }
+
+                                    if($total_soma == 0 || $total_mo == 0 ){
+                                        $totalMP = 0;
+                                    } else {
+                                        $totalMP = $total_mp/$total_soma;
+                                    }
+                                @endphp
+                                <th scope="col" style="background-color: #d9edf7">{{ number_format(($totalMO) * 100, 2, ',', '.') }}%</th>
+                                <th scope="col" style="background-color: #d9edf7">{{ number_format(($totalMP) * 100, 2, ',', '.') }}%</th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
