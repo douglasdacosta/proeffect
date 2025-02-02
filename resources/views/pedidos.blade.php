@@ -200,6 +200,8 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <th>Data gerado</th>
                                         <th>Montadores</th>
                                         <th>Data entrega</th>
+                                        <th>Data antecipação</th>
+                                        <th>Hora retirada</th>
                                         <th>Alerta dias</th>
                                         <th>OS</th>
                                         <th>MP</th>
@@ -251,6 +253,8 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     {{ count($funcionarios_vinculados[$pedido->id]['funcionarios_montagens']) }}
                                                 </td>
                                                 <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
+                                                <td style="@if(!empty($pedido->data_antecipacao)) {{'background-color: red; font-weight: bold'}} @endif ">{{ Carbon\Carbon::parse($pedido->data_antecipacao)->format('d/m/Y') }}</td>
+                                                <td style="@if(!empty($pedido->hora_antecipacao)) {{'background-color: red; font-weight: bold'}} @endif ">{{ $pedido->hora_antecipacao }}</td>
                                                 <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                                 <th scope="row" title="Imprimir ordem de serviço">
                                                     <a target="_blank"
