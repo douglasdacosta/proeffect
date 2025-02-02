@@ -15,7 +15,7 @@
 
 setTimeout(function () {
     location.reload();
-    }, 3000);
+    }, 10000);
 </script>
 @section('content')
 

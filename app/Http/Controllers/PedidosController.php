@@ -70,6 +70,9 @@ class PedidosController extends Controller
             )
             ->addSelect(DB::raw('(SELECT COUNT(1) FROM caixas_pedidos where caixas_pedidos.pedidos_id = pedidos.id) as caixas'))
             ->orderby('pedidos.data_entrega');
+
+
+
         if (!empty($request->input('status'))){
             $pedidos = $pedidos->where('pedidos.status', '=', $request->input('status'));
         } else {
@@ -88,13 +91,31 @@ class PedidosController extends Controller
         if ($os) {
             $pedidos = $pedidos->where('pedidos.os',  'like', '%'.$os.'%');
         }
-        $status_id = $this->getAllStatusExcept([11]);
 
-        if(!empty($request->input('status_id'))) {
-            $status_id = $request->input('status_id');
+        if( null === $request->input('status_id')) {
+             $status_id = [
+                    0 => 1,
+                    1 => 2,
+                    2 => 3,
+                    3 => 4,
+                    4 => 5,
+                    5 => 6,
+                    6 => 7,
+                    7 => 8,
+                    8 => 9,
+                    9 => 10
+             ];
+
+        } else {
+            $status_id = $this->getAllStatusExcept([11,12,13]);
+            if(!empty($request->input('status_id'))) {
+                $status_id = $request->input('status_id');
+            }
+
         }
 
         if($status_id) {
+            info($status_id);
             $pedidos =$pedidos->whereIn('status_id', $status_id);
         }
 
@@ -203,8 +224,8 @@ class PedidosController extends Controller
                 $historico = "Data de entrega do pedido alterado de ".  DateHelpers::formatDate_ddmmYYYY(DateHelpers::formatDate_dmY($pedidos[0]->data_entrega)) . " para " . $request->input("data_entrega");
 
             }
-
-            if($pedidos[0]->status!= $request->input('status_id')) {
+            
+            if(!empty($request->input('status_id')) && $pedidos[0]->status_id != $request->input('status_id')) {
 
                 $this->historicosPedidos($request->input('id'), $request->input('status_id'));
 
@@ -369,6 +390,7 @@ class PedidosController extends Controller
             if ($request->input('id')) {
                 $pedidos = $pedidos::find($request->input('id'));
             }
+ 
             $pedidos->os = $request->input('os');
             $pedidos->fichatecnica_id = $request->input('fichatecnica');
             $pedidos->qtde = $request->input('qtde');
@@ -378,6 +400,8 @@ class PedidosController extends Controller
             $pedidos->pessoas_id = $request->input('clientes_id');
             $pedidos->prioridade_id = $request->input('prioridade_id');
             $pedidos->transporte_id = $request->input('transporte_id');
+            $pedidos->data_antecipacao = !empty($request->input('data_antecipacao')) ? DateHelpers::formatDate_dmY($request->input('data_antecipacao')) : null;
+            $pedidos->hora_antecipacao = !empty($request->input('hora_antecipacao')) ? $request->input('hora_antecipacao') : null;
             $pedidos->observacao = trim($request->input('observacao'));
             $pedidos->status = $request->input('status');
             $pedidos->save();
@@ -641,6 +665,12 @@ class PedidosController extends Controller
                 $dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre']) ? $dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'] : "00:00:00", $total_tempo_montagem_torre);
                 $dados_pedido_status[$status]['totais']['total_tempo_montagem'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_montagem']) ? $dados_pedido_status[$status]['totais']['total_tempo_montagem'] : "00:00:00", $total_tempo_montagem);
                 $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_inspecao']) ? $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] : "00:00:00", $total_tempo_inspecao);
+
+                $historicos_pedidos_datas = new HistoricosPedidos();
+                $historicos_pedidos_datas = $historicos_pedidos_datas->where('pedidos_id', '=', $pedido->id );
+                $historicos_pedidos_datas = $historicos_pedidos_datas->orderBy('created_at', 'desc')->limit(1)->get();
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['data_alteracao_status'] = !empty($historicos_pedidos_datas[0]->created_at) ? \Carbon\Carbon::parse($historicos_pedidos_datas[0]->created_at)->format('d/m/Y') : null;
+
             }
 
             $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia);
@@ -898,6 +928,12 @@ class PedidosController extends Controller
                 $dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_montagem_torre']) ? $dados_pedido_status[$status]['totais']['total_tempo_montagem_torre'] : "00:00:00", $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem_torre']);
                 $dados_pedido_status[$status]['totais']['total_tempo_montagem'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_montagem']) ? $dados_pedido_status[$status]['totais']['total_tempo_montagem'] : "00:00:00", $dados_pedido_status[$status]['pedido'][$pedido->id]['montagem']);
                 $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] = $this->somarHoras(!empty($dados_pedido_status[$status]['totais']['total_tempo_inspecao']) ? $dados_pedido_status[$status]['totais']['total_tempo_inspecao'] : "00:00:00", $dados_pedido_status[$status]['pedido'][$pedido->id]['inspecao']);
+
+                $historicos_pedidos_datas = new HistoricosPedidos();
+                $historicos_pedidos_datas = $historicos_pedidos_datas->where('pedidos_id', '=', $pedido->id );
+                $historicos_pedidos_datas = $historicos_pedidos_datas->orderBy('created_at', 'desc')->limit(1)->get();
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['data_alteracao_status'] = !empty($historicos_pedidos_datas[0]->created_at) ? \Carbon\Carbon::parse($historicos_pedidos_datas[0]->created_at)->format('d/m/Y') : null;
+
             }
 
             $dados_pedido_status[$status]['maquinas_usinagens'] = $this->divideHoursIntoDays($dados_pedido_status[$status]['totais']['total_tempo_usinagem'], $total_horas_usinagem_maquinas_dia);
@@ -1174,6 +1210,11 @@ class PedidosController extends Controller
                 $fichatecnicasitens = new Fichastecnicasitens();
                 $fichatecnicasitens= $fichatecnicasitens::with('tabelaMateriais')->where('fichatecnica_id', '=', $pedido->fichatecnica_id)->orderByRaw("CASE WHEN blank='' THEN 1 ELSE 0 END ASC")->orderBy('blank','ASC')->get();
 
+                $historicos_pedidos_datas = new HistoricosPedidos();
+                $historicos_pedidos_datas = $historicos_pedidos_datas->where('pedidos_id', '=', $pedido->id );
+                $historicos_pedidos_datas = $historicos_pedidos_datas->orderBy('created_at', 'desc')->limit(1)->get();
+                $dados_pedido_status[$status]['pedido'][$pedido->id]['data_alteracao_status'] = !empty($historicos_pedidos_datas[0]->created_at) ? \Carbon\Carbon::parse($historicos_pedidos_datas[0]->created_at)->format('d/m/Y') : null;
+
                 $tempo_fresa_total = '00:00:00';
 
                 foreach ($fichatecnicasitens as $key => $fichatecnicasitem) {
@@ -1328,6 +1369,7 @@ class PedidosController extends Controller
             }
 
 
+
         }
 
         $tela = 'followup-gerencial';
@@ -1413,11 +1455,15 @@ class PedidosController extends Controller
             $pedido->apontamento_inspecao = !empty($historicos_apontamentos[7]['data_apontamento']) ? $historicos_apontamentos[7]['data_apontamento'] : null;
             $pedido->apontamento_embalagem = !empty($historicos_apontamentos[8]['data_apontamento']) ? $historicos_apontamentos[8]['data_apontamento'] : null;
 
-
+            $historicos_pedidos_datas = new HistoricosPedidos();
+            $historicos_pedidos_datas = $historicos_pedidos_datas->where('pedidos_id', '=', $pedido->id );
+            $historicos_pedidos_datas = $historicos_pedidos_datas->orderBy('created_at', 'desc')->limit(1)->get();
+            $pedido->data_alteracao_status = !empty($historicos_pedidos_datas[0]->created_at) ? \Carbon\Carbon::parse($historicos_pedidos_datas[0]->created_at)->format('d/m/Y') : null;
 
             $historicos_pedidos = new HistoricosPedidos();
             $historicos_pedidos = $historicos_pedidos->whereIn('status_id', [9,10,11]);
             $historicos_pedidos = $historicos_pedidos->where('pedidos_id', '=', $pedido->id );
+
             if(!empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
                 $historicos_pedidos = $historicos_pedidos->whereBetween('created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')) . ' 00:00:00', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')). ' 23:59:59']);
             }

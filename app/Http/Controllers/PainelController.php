@@ -42,6 +42,8 @@ class PainelController extends Controller
                                 B.ep as ep_validar,
                                 A.os as os_validar,
                                 A.qtde,
+                                A.data_antecipacao,
+                                A.hora_antecipacao,
                                 (SELECT COUNT(id)
                                 FROM ficha_tecnica_itens X
                                 WHERE X.fichatecnica_id = A.fichatecnica_id
@@ -129,6 +131,8 @@ class PainelController extends Controller
                                                             B.ep as ep_validar,
                                                             A.os as os_validar,
                                                             A.qtde,
+                                                            A.data_antecipacao,
+                                                            A.hora_antecipacao,
                                                             (SELECT COUNT(id)
                                                             FROM ficha_tecnica_itens X
                                                             WHERE X.fichatecnica_id = A.fichatecnica_id

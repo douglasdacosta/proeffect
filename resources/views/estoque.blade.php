@@ -5,6 +5,7 @@
 <script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
 <script src="js/jquery.mask.js"></script>
 <script src="js/main_custom.js"></script>
+<script src="js/estoque.js"></script>
 <script src="DataTables/datatables.min.js"></script>
 <link  rel="stylesheet" src="DataTables/datatables.min.css"></link>
 <link rel="stylesheet" href="{{asset('css/main_style.css')}}" />
@@ -109,51 +110,93 @@
               </div>
               <div class="x_content">
                 <table id="table_estoque" class="table table-striped  text-center ">
+
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Fornecedor</th>
-                      <th>Lote</th>
-                      <th>Data</th>
-                      <th>Material</th>
-                      <th>Categoria</th>
-                      <th>Estoque comprado</th>
-                      <th>Estoque atual</th>
-                      <th>Pacote</th>
-                      <th>Estoque mínimo</th>
-                      <th>Alerta</th>
-                      <th>Previsão</th>
-                      <th>Etiqueta</th>
+                        <th data-sortable='true'>ID</th>
+                        <th data-sortable='true' >Fornecedor</th>
+                        <th data-sortable='true' >Lote</th>
+                        <th data-sortable='true' >Data</th>
+                        <th data-sortable='true' >Material</th>
+                        <th data-sortable='true' >Categoria</th>
+                        <th data-sortable='true' >Estoque comprado</th>
+                        <th data-sortable='true' >Estoque atual</th>
+                        <th data-sortable='true' >Estoque total</th>
+                        <th data-sortable='true' >Pacote</th>
+                        <th data-sortable='true' >Estoque mínimo</th>
+                        <th data-sortable='false' >Inventário <button type="button" class="btn btn-warning" id="btn_limpar_inventario" title="Limpar Inventário"><i class="fa fa-trash"></i></button></th>
+                        <th data-sortable='true' >Alerta</th>
+                        <th data-sortable='true' >Previsão</th>
+                        <th data-sortable='false' >Etiqueta</th>
                     </tr>
                   </thead>
                   <tbody>
-                  @if(isset($array_estoque))
-                        @foreach ($array_estoque as $item_estoque)
+                    @if(isset($array_estoque))
 
-                            <tr style="@if (isset($item_estoque['alerta_baixa_errada']) && $item_estoque['alerta_baixa_errada'] =='1') {{ ' background-color: rgb(233, 76, 76) '}}@else
-                            @if (isset($item_estoque['alerta_estoque_zerado']) && $item_estoque['alerta_estoque_zerado'] =='1') {{ ' background-color: yellow '}}@else @endif
-                            @endif">
-                                <th data-sortable='true' data-field="id" scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque['id'] )) }}>{{$item_estoque['id']}}</a></th>
-                                <td data-sortable='true' data-field="fornecedor" nowrap >{{$item_estoque['fornecedor']}}</td>
-                                <td data-sortable='true' data-field="lote">{{$item_estoque['lote']}}</td>
-                                <td data-sortable='true' data-field="data" >{{Carbon\Carbon::parse($item_estoque['data'])->format('d/m/Y')}}</td>
-                                <td data-sortable='true' data-field="material" nowrap>{{$item_estoque['material']}}</td>
-                                <td data-sortable='true' data-field="categoria" nowrap>{{$item_estoque['categoria']}}</td>
-                                <td data-sortable='true' data-field="estoque_comprado" >{{$item_estoque['estoque_comprado']}}</td>
-                                <td data-sortable='true' data-field="estoque_atual" >{{$item_estoque['estoque_atual']}}</td>
-                                <td data-sortable='true' data-field="pacote" >{{$item_estoque['pacote']}}</td>
-                                <td data-sortable='true' data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
-                                <td data-sortable='true' data-field="alerta" >@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
-                                <td data-sortable='true' data-field="previsao" title="{{$item_estoque['previsao_meses']}} meses">{{$item_estoque['previsao_meses'] }}</td>
-                                <th  scope="row">
-                                    <a href="#">
-                                        <span data-id="{{$item_estoque['id']}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>
-                                    </a>
-                            </th>
-                            </tr>
-                        @endforeach
-                    @endif
-                  </tbody>
+                            @foreach ($array_estoque as $item_estoque)
+
+                                <tr style="@if (isset($item_estoque['alerta_baixa_errada']) && $item_estoque['alerta_baixa_errada'] =='1') {{ ' background-color: rgb(233, 76, 76) '}}@else
+                                @if (isset($item_estoque['alerta_estoque_zerado']) && $item_estoque['alerta_estoque_zerado'] =='1') {{ ' background-color: yellow '}}@else @endif
+                                @endif">
+                                    <th data-field="id" scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque['id'] )) }}>{{$item_estoque['id']}}</a></th>
+                                    <td data-field="fornecedor" nowrap >{{$item_estoque['fornecedor']}}</td>
+                                    <td data-field="lote">{{$item_estoque['lote']}}</td>
+                                    <td data-field="data" >{{Carbon\Carbon::parse($item_estoque['data'])->format('d/m/Y')}}</td>
+                                    <td data-field="material" nowrap>{{$item_estoque['material']}}</td>
+                                    <td data-field="categoria" nowrap>{{$item_estoque['categoria']}}</td>
+                                    <td data-field="estoque_comprado" >{{$item_estoque['estoque_comprado']}}</td>
+                                    <td data-field="estoque_atual" >{{$item_estoque['estoque_atual']}}</td>
+                                    <td data-field="pacote" >{{ isset($estoque_material_somado[$item_estoque['material']]['estoque_total']) ? number_format($estoque_material_somado[$item_estoque['material']]['estoque_total'], 0, '', '.') : 0}}</td>
+                                    <td data-field="pacote" >{{$item_estoque['pacote']}}</td>
+                                    <td data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
+                                    <td>
+                                        <input type="checkbox" class="form-check-input inventarios" data-estoque="{{$item_estoque['id']}}" id="ck_inventario_{{$item_estoque['id']}}" name="ck_inventario_{{$item_estoque['id']}}"
+                                        @if(isset($item_estoque['inventario']) && $item_estoque['inventario'] == 1) checked="checked" @endif value='1' >
+                                    </td>
+                                    <td data-field="alerta" >@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
+                                    <td data-field="previsao" title="{{$item_estoque['previsao_meses']}} meses">{{$item_estoque['previsao_meses'] }}</td>
+                                    <th  scope="row">
+                                        <a href="#">
+                                            <span data-id="{{$item_estoque['id']}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>
+                                        </a>
+                                    </th>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                    <footer>
+                        <tr ><td colspan="14" ></td></tr>
+                        <tr ><td colspan="14" ></td></tr>
+                        <tr >
+                            
+                            <td colspan="14" class="text-left text-danger text-bold" > Finalizados sem estoque</td>
+                            
+                            
+                        </tr>
+                        @if(isset($array_estoque_finalizado))
+
+                            @foreach ($array_estoque_finalizado as $item_estoque)
+
+                                <tr >
+                                    <th data-field="id" scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque['id'] )) }}>{{$item_estoque['id']}}</a></th>
+                                    <td ></td>
+                                    <td ></td>
+                                    <td ></td>
+                                    <td data-field="material" nowrap>{{$item_estoque['material']}}</td>
+                                    <td data-field="categoria" nowrap>{{$item_estoque['categoria']}}</td>
+                                    <td ></td>
+                                    <td ></td>
+                                    <td ></td>
+                                    <td ></td>
+                                    <td data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
+                                    <td></td>
+                                    <td ></td>
+                                    <td ></td>
+                                    <th  scope="row"></th>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </footer>
                 </table>
               </div>
             </div>

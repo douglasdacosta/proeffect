@@ -15,7 +15,7 @@
 
 setTimeout(function () {
     location.reload();
-    }, 3000);
+    }, 10000);
 </script>
 @section('content')
 
@@ -25,7 +25,7 @@ setTimeout(function () {
             <h1>Painel de Embalagem</h1>
         </div>
 
-        @include('paineis.div_table')
+        @include('paineis.div_table_retirada')
     </div>
 
 @stop

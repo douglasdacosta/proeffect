@@ -80,6 +80,7 @@
                 <thead >
                     <tr>
                         <th scope="col">Lote</th>
+                        <th scope="col">Data</th>
                         <th scope="col">Material</th>
                         <th scope="col">Ação</th>
                     </tr>
@@ -89,6 +90,7 @@
                         @foreach ($estoque as $estoque)
                                     <tr style="padding-top: 10px">
                                         <td style="margin-top: 10px" scope="col">{{$estoque->lote}}</td>
+                                        <td style="margin-top: 10px" scope="col">{{\Carbon\Carbon::parse($estoque->data)->format('d/m/Y')}}</td>
                                         <td scope="col">{{$materiais[$estoque->material_id]['material']}}</td>
                                         <td scope="col">
                                             <button class="btn btn-primary baixar_estoque" data-id="{{$estoque->id}} " data-usuario="{{$usuario}}">Baixar</button>

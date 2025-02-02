@@ -88,7 +88,8 @@ class BaixaEstoqueController extends Controller
                                                     from
                                                         lote_estoque_baixados
                                                     where
-                                                        estoque_id = A.id) < (A.qtde_por_pacote+A.qtde_por_pacote_mo) "
+                                                        estoque_id = A.id) < (A.qtde_por_pacote+A.qtde_por_pacote_mo) 
+                                            Order By A.data DESC"
             ));
 
 

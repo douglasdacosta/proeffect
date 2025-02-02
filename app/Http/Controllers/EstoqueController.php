@@ -41,13 +41,16 @@ class EstoqueController extends Controller
         $condicao='';
         if ($lote) {
         	$where[] = " A.lote = '$lote' ";
+        	$where_sem_estoque[] = " A.lote = '$lote' ";
         }
 
         if (!empty($request->input('status'))){
             $status = $request->input('status');
             $where[] = "A.status='$status'";
+            $where_sem_estoque[] = "A.status='$status'";
         } else{
             $where[] = "A.status='A'";
+            $where_sem_estoque[] = "A.status='A'";
         }
 
         $data_inicio = !empty($request->input('data')) ? (DateHelpers::formatDate_dmY($request->input('data'))) : '';
@@ -56,23 +59,30 @@ class EstoqueController extends Controller
         if (!empty($data_inicio) && !empty($data_fim)){
 
             $where[] = "A.data between '".$data_inicio."' and '".$data_fim."'";
+            $where_sem_estoque[] = "A.data between '".$data_inicio."' and '".$data_fim."'";
         }
         if (empty($data_inicio) && !empty($data_fim)){
             $where[] = "A.data <= '$data_fim'";
+            $where_sem_estoque[] = "A.data <= '$data_fim'";
 
         }
         if (!empty($data_inicio) && empty($data_fim)){
             $where[] = "A.data >= '$data_inicio'" ;
+            $where_sem_estoque[] = "A.data >= '$data_inicio'";
         }
 
         if (!empty($request->input('material_id'))){
             $where[] = "A.material_id = " . $request->input('material_id');
+            $where_sem_estoque[] = "A.material_id = " . $request->input('material_id');
         }
 
         if (!empty($request->input('categoria_id'))){
             $categoria = $request->input('categoria_id');
             $where[] = "B.categoria_id = $categoria";
+            $where_sem_estoque[] = "B.categoria_id = $categoria";
         }
+
+        $where_sem_estoque[] = "A.status_estoque = 'F'";
 
         $status_estoque = "A.status_estoque = 'A'";
 
@@ -80,11 +90,14 @@ class EstoqueController extends Controller
             $status_estoque  = "A.status_estoque = 'F'";
         }
 
-
         $where[] = $status_estoque;
 
         if(count($where)) {
             $condicao = ' WHERE '.implode(' AND ', $where);
+        }
+
+        if(count($where_sem_estoque)) {
+            $condicao_sem_estoque = ' WHERE '.implode(' AND ', $where_sem_estoque);
         }
 
         $estoque = DB::select(DB::raw("SELECT
@@ -97,6 +110,7 @@ class EstoqueController extends Controller
                                             B.estoque_minimo,
                                             D.nome as categoria,
                                             A.lote,
+                                            A.inventario,
                                             C.nome_cliente as fornecedor,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                     count(1)
@@ -134,6 +148,7 @@ class EstoqueController extends Controller
 
         $estoque_atual_somado=$dados_estoque = [];
 
+        $material_id = [];
         foreach ($estoque as $key => $value) {
             $qtde_baixa = DB::select(DB::raw("SELECT
                                             count(1) as qtde_baixa
@@ -195,30 +210,108 @@ class EstoqueController extends Controller
                 $dados_estoque[$value->id]['previsao_meses'] = $previsao_meses;
             }
 
-        }
-        $array_estoque = [];
-        foreach($estoque as $key => $value) {
+            $material_id[] = $value->material_id;
 
+        }
+
+        $array_estoque = $array_soma_total_estoque =[];
+
+        foreach($estoque as $key => $value) {
+            
             $pacote = $value->qtde_por_pacote + $value->qtde_por_pacote_mo;
             $estoque_comprado = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo);
-
+            
             $array_estoque[$value->id]['id'] = $value->id;
             $array_estoque[$value->id]['fornecedor'] = implode(' ', array_slice(explode(' ', $value->fornecedor), 0, 1));
             $array_estoque[$value->id]['lote'] = $value->lote;
             $array_estoque[$value->id]['data'] = $value->data;
             $array_estoque[$value->id]['pacote'] = number_format($value->estoque_pacote_atual,0, '','.');
 
+            $array_estoque[$value->id]['inventario'] = $value->inventario;
             $array_estoque[$value->id]['categoria'] = $value->categoria;
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->id]['previsao_meses'];
             $array_estoque[$value->id]['estoque_comprado'] = number_format($estoque_comprado,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
-            $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
+            $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');            
+            $array_totais[$value->material][] = $value->estoque_atual;
             $array_estoque[$value->id]['alerta_baixa_errada'] = $value->alerta_baixa_errada;
             $array_estoque[$value->id]['alerta_estoque_zerado'] = ($value->estoque_atual == 0 && $value->estoque_minimo > 0) ? 1 : 0;
 
 
+        }
+
+        $estoque_material_somado = [];
+        foreach($estoque as $key => $value) {
+
+            $estoque_material_somado[$value->material]['estoque_total'] = array_sum($array_totais[$value->material]);
+
+        }
+
+        $estoque_finalizado = DB::select(DB::raw("SELECT
+                                            A.data,
+                                            A.id,
+                                            A.qtde_chapa_peca,
+                                            A.qtde_chapa_peca_mo,
+                                            A.qtde_por_pacote,
+                                            A.qtde_por_pacote_mo,
+                                            B.estoque_minimo,
+                                            D.nome as categoria,
+                                            A.lote,
+                                            A.inventario,
+                                            C.nome_cliente as fornecedor,
+                                            ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id) * (A.qtde_chapa_peca + A.qtde_chapa_peca_mo)) as estoque_atual,
+                                            ((A.qtde_por_pacote_mo) + (A.qtde_por_pacote)) - ((select
+                                                    count(1)
+                                                from
+                                                    lote_estoque_baixados X
+                                                where
+                                                    X.estoque_id = A.id)) as estoque_pacote_atual,
+                                            B.material,
+                                            A.material_id,
+                                            B.consumo_medio_mensal,
+                                            A.alerta_baixa_errada
+                                        FROM
+                                            estoque A
+                                        INNER JOIN
+                                            materiais B
+                                            ON B.id = A.material_id
+                                        INNER JOIN
+                                            pessoas C
+                                        ON
+                                            C.id = A.fornecedor_id
+                                        INNER JOIN
+                                            categorias_materiais D
+                                        ON
+                                            D.id = B.categoria_id
+                                        $condicao_sem_estoque
+                                        and A.material_id not in (".implode(',',$material_id).")
+                                        ORDER BY
+                                            A.data DESC
+                                    "));
+
+        
+        $array_estoque_finalizado = $array_material_verificacao= [];
+        foreach($estoque_finalizado as $key => $value) {
+
+            $pacote = $value->qtde_por_pacote + $value->qtde_por_pacote_mo;
+            $estoque_comprado = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo);
+
+            //se não existir o material no estoque, ele não entra no array
+            if(!in_array($value->material, $array_material_verificacao)) {
+                $array_material_verificacao[] = $value->material;
+
+                $array_estoque_finalizado[$value->id]['id'] = $value->id;
+                $array_estoque_finalizado[$value->id]['categoria'] = $value->categoria;
+                $array_estoque_finalizado[$value->id]['material'] = $value->material;
+                $array_estoque_finalizado[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');     
+            }
         }
 
         $tela = 'pesquisa';
@@ -226,6 +319,8 @@ class EstoqueController extends Controller
 				'tela' => $tela,
                 'nome_tela' => 'estoque',
 				'array_estoque'=> $array_estoque,
+				'array_estoque_finalizado'=> $array_estoque_finalizado,
+				'estoque_material_somado'=> $estoque_material_somado,
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
                 'CategoriasMateriais' => (new CategoriasMateriais)->get(),

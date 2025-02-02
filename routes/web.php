@@ -101,6 +101,8 @@ Route::match(['get', 'post'],'/tela-baixa-estoque', [App\Http\Controllers\BaixaE
 Route::match(['get', 'post'],'/baixar-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'baixarEstoque'])->name('baixar-estoque')->middleware('afterAuth:estoque');
 Route::match(['get', 'post'],'/altera-qtde-estoque', [App\Http\Controllers\BaixaEstoqueController::class, 'alterarEstoque'])->name('altera-qtde-estoque')->middleware('afterAuth:estoque');
 Route::match(['get', 'post'],'/relatorio-previsao-material', [App\Http\Controllers\RelatoriosController::class, 'relatorioPrevisaoMaterial'])->name('relatorio-previsao-material')->middleware('afterAuth:relatorio-previsao-material');
+Route::match(['post'],'/ajax-inventario', [App\Http\Controllers\AjaxController::class, 'ajaxInventario'])->name('ajax-Inventario');
+Route::match(['post'],'/ajax-limpar-inventario', [App\Http\Controllers\AjaxController::class, 'ajaxLimparInventario'])->name('ajax-limpar-inventario');
 
 Route::match(['get', 'post'],'/perfis', [App\Http\Controllers\PerfisController::class, 'index'])->name('perfis')->middleware('afterAuth:perfis');
 Route::match(['get', 'post'],'/alterar-perfis', [App\Http\Controllers\PerfisController::class, 'alterar'])->name('alterar-perfis')->middleware('afterAuth:perfis');

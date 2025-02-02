@@ -398,6 +398,20 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 </div>
             </div>
             <div class="form-group row">
+                <label for="data_antecipacao" class="col-sm-2 col-form-label">Data antecipação</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control mask_date" id="data_antecipacao" name="data_antecipacao"
+                        value="@if (isset($pedidos[0]->data_antecipacao)) {{ Carbon\Carbon::parse($pedidos[0]->data_antecipacao)->format('d/m/Y') }} @else {{ '' }} @endif">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="hora_antecipacao" class="col-sm-2 col-form-label">Hora retirada</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control mask_horas" id="hora_antecipacao" name="hora_antecipacao"
+                        value="{{$pedidos[0]->hora_antecipacao}}">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="status_id" class="col-sm-2 col-form-label">Status do pedido</label>
                 <div class="col-sm-4">
                     <select class="form-control" id="status_id" name="status_id">
@@ -650,6 +664,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <th scope="col">Qtde</th>
                                     <th scope="col">Obs</th>
                                     <th scope="col">Prioridade</th>
+                                    <th scope="col">Data status</th>
                                     <th scope="col">Usinagem</th>
                                     <th scope="col">Acabamento</th>
                                     <th scope="col">Montagem Torre</th>
@@ -677,6 +692,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <td>{{ $pedido->qtde }}</td>
                                         <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 2, '...') !!}</td>
                                         <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
+                                        <td>{{ $dado_pedido_status['pedido'][$pedido->id]['data_alteracao_status'] }}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                         </td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
@@ -692,6 +708,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     </tr>
                                 @endforeach
                                 <tr>
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
@@ -721,6 +738,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
+                                    <th scope="col"></th>
                                     <th scope="col">{{ $dado_pedido_status['maquinas_usinagens'] }}</th>
                                     <th scope="col">{{ $dado_pedido_status['pessoas_acabamento'] }}</th>
                                     <th scope="col">{{ $dado_pedido_status['pessoas_montagem_torre'] }}</th>
@@ -740,6 +758,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     <table class="table table-sm table-striped text-center" id="table_composicao">
                         <thead>
                             <tr style="background-color: #463a2a; color: #FFFFFF">
+                                <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
@@ -807,6 +826,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     <th scope="col" title="Observações">Obs</th>
                                     <th scope="col">Transporte</th>
                                     <th scope="col">Status</th>
+                                    <th scope="col">Data Status</th>
                                     <th scope="col">Usinagem</th>
                                     <th scope="col">Acabamento</th>
                                     <th scope="col">Montagem</th>
@@ -839,6 +859,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
                                         <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                         <td>{{ $pedido->tabelaStatus->nome }}</td>
+                                        <td>{{ $dado_pedido_status['pedido'][$pedido->id]['data_alteracao_status'] }}</td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                         </td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
@@ -850,6 +871,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                     </tr>
                                 @endforeach
                                 <tr>
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
@@ -877,6 +899,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 </tr>
                                 <tr>
                                     <th scope="col" colspan="2"></th>
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
@@ -1247,6 +1270,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col">$HM</th>
                                 <th scope="col">Transporte</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Data status</th>
                                 <th scope="col">Usinagem</th>
                                 <th scope="col">Acabamento</th>
                                 <th scope="col">Montagem</th>
@@ -1325,6 +1349,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                                     <td title="{{$pedido->tabelaTransportes->nome}}">{!! Str::words($pedido->tabelaTransportes->nome, 2, '...') !!}</td>
                                     <td>{{ $pedido->tabelaStatus->nome }} </td>
+                                    <td>{{ $dado_pedido_status['pedido'][$pedido->id]['data_alteracao_status'] }} </td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['usinagem']) }}
                                     </td>
                                     <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['acabamento']) }}
@@ -1350,6 +1375,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <th scope="col" style="background-color: #d9edf7">{{number_format($total_soma, 2, ',', '.') }}</th>
                                 <th scope="col" style="background-color: #d9edf7">{{ number_format($total_mo, 2, ',', '.') }}</th>
                                 <th scope="col" style="background-color: #d9edf7">{{number_format($total_mp, 2, ',', '.')}}</th>
+                                <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
@@ -1397,6 +1423,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 @endphp
                                 <th scope="col" style="background-color: #d9edf7">{{ number_format(($totalMO) * 100, 2, ',', '.') }}%</th>
                                 <th scope="col" style="background-color: #d9edf7">{{ number_format(($totalMP) * 100, 2, ',', '.') }}%</th>
+                                <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
