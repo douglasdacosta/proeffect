@@ -412,7 +412,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 <label for="hora_antecipacao" class="col-sm-2 col-form-label">Hora retirada</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control mask_horas" id="hora_antecipacao" name="hora_antecipacao"
-                        value="{{$pedidos[0]->hora_antecipacao}}">
+                        value="@if (isset($pedidos[0]->hora_antecipacao)) {{$pedidos[0]->hora_antecipacao}} @else {{''}} @endif">
                 </div>
             </div>
             <div class="form-group row">
