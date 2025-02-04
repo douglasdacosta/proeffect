@@ -25,7 +25,7 @@ setTimeout(function () {
             <h1>Painel de Acabamento</h1>
         </div>
 
-        @include('paineis.div_table')
+        @include('paineis.div_table_retirada')
     </div>
 
 @stop

@@ -25,7 +25,7 @@ setTimeout(function () {
             <h1>Painel de Montagem</h1>
         </div>
         <?php $montagem = true ?>
-        @include('paineis.div_table')
+        @include('paineis.div_table_retirada')
     </div>
 
 @stop

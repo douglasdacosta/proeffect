@@ -25,7 +25,7 @@ setTimeout(function () {
             <h1>Painel de Usinagem</h1>
         </div>
         <?php $usinagem = true ?>
-        @include('paineis.div_table')
+        @include('paineis.div_table_retirada')
     </div>
 
 @stop
