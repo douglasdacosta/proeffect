@@ -78,7 +78,7 @@ class HomeController extends Controller
             foreach ($dados['dados_pedido_status'] as $status) {
                 foreach ($status['classe'] as $pedido) {
                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
-                    $total_soma_dia = isset($total_soma) ? $total_soma + $total : $total;
+                    $total_soma_dia = isset($total_soma_dia) ? $total_soma_dia + $total : $total;
                     $qtde_vendas_dia++;
                 }
             }
@@ -106,7 +106,7 @@ class HomeController extends Controller
             foreach ($dados['dados_pedido_status'] as $status) {
                 foreach ($status['classe'] as $pedido) {
                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
-                    $total_soma_mes = isset($total_soma) ? $total_soma + $total : $total;
+                    $total_soma_mes = isset($total_soma_mes) ? $total_soma_mes + $total : $total;
                     $qtde_vendas_mes++;
                 }
             }
@@ -133,7 +133,7 @@ class HomeController extends Controller
             foreach ($dados['dados_pedido_status'] as $status) {
                 foreach ($status['classe'] as $pedido) {
                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
-                    $total_soma_entrega_dia = isset($total_soma) ? $total_soma + $total : $total;
+                    $total_soma_entrega_dia = isset($total_soma_entrega_dia) ? $total_soma_entrega_dia + $total : $total;
                     $qtde_vendas_entrega_dia++;
                 }
             }
@@ -160,7 +160,7 @@ class HomeController extends Controller
             foreach ($dados['dados_pedido_status'] as $status) {
                 foreach ($status['classe'] as $pedido) {
                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
-                    $total_soma_entrega_mes = isset($total_soma) ? $total_soma + $total : $total;
+                    $total_soma_entrega_mes = isset($total_soma_entrega_mes) ? $total_soma_entrega_mes + $total : $total;
                     $qtde_vendas_entrega_mes++;
                 }
             }
