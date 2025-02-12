@@ -1,0 +1,40 @@
+body {
+    overflow-y: auto;
+}
+
+.wrapper{
+    /* overflow-y: auto; */
+    min-height: 100%;
+    height:     100%;
+    padding-bottom: 15px;
+}
+
+
+.wrapper .content-wrapper {
+    overflow: auto;
+    height: 77%;
+    min-height: 77%;
+    overflow-y: auto;
+}
+
+/* .wrapper .content-wrapper .container-fluid {
+    height: 75%;
+} */
+
+.wrapper  .content-wrapper .content{
+    height: 85%;
+}
+
+ .wrapper  .content-wrapper .content .overflow-followup{
+    height: 95%;
+}
+
+.wrapper .content-wrapper .content .container-fluid {
+    height: 98%
+}
+
+.content-wrapper {
+    overflow: auto;
+    height: 90%;
+
+}

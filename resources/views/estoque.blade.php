@@ -7,8 +7,12 @@
 <script src="js/main_custom.js"></script>
 <script src="js/estoque.js"></script>
 <script src="DataTables/datatables.min.js"></script>
-<link  rel="stylesheet" src="DataTables/datatables.min.css"></link>
-<link rel="stylesheet" href="{{asset('css/main_style.css')}}" />
+@section('adminlte_css')
+    <link  rel="stylesheet" src="DataTables/datatables.min.css"></link>
+    <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
+    <link rel="stylesheet" href="{{asset('css/main_style.css')}}" />
+@stop
+
 @if(isset($tela) and $tela == 'pesquisa')
     @section('content_header')
     <div class="form-group row">
@@ -168,10 +172,10 @@
                         <tr ><td colspan="14" ></td></tr>
                         <tr ><td colspan="14" ></td></tr>
                         <tr >
-                            
+
                             <td colspan="14" class="text-left text-danger text-bold" > Finalizados sem estoque</td>
-                            
-                            
+
+
                         </tr>
                         @if(isset($array_estoque_finalizado))
 
@@ -268,7 +272,7 @@
             <div class="form-group row">
                 <label for="Material" class="col-sm-2 col-form-label">Matéria prima</label>
                 <div class="col-sm-6">
-                    <select class="form-control material_id_estoque" id="material_id" name="material_id">
+                    <select class="form-control material_id_estoque default-select2" id="material_id" name="material_id">
                         <option value=""></option>
                         @if (isset($materiais))
                             @foreach ($materiais as $material)

@@ -8,12 +8,14 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js?cache={{time()}}"></script>
-<script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
-<script src="js/main_custom.js?cache={{time()}}"></script>
-<script src="js/jquery.mask.js?cache={{time()}}"></script>
-<link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 
+
+
+@section('adminlte_css')
+    <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/followups.css') }}" />
+@stop
 @switch($tela)
 
     @case('pesquisar')
@@ -333,7 +335,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             <div class="form-group row">
                 <label for="clientes_id" class="col-sm-2 col-form-label">Cliente</label>
                 <div class="col-sm-4">
-                    <select class="form-control" id="clientes_id" name="clientes_id">
+                    <select class="form-control default-select2" id="clientes_id" name="clientes_id">
                         <option value=""></option>
                         @if (isset($clientes))
                             @foreach ($clientes as $clientes)
@@ -659,7 +661,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             @if (isset($dados_pedido_status))
                 @foreach ($dados_pedido_status as $key => $dado_pedido_status)
                     <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
-                    <div class="form-group row">
+                    <div class="form-group row overflow-followup">
                         <table class="table table-sm table-striped text-center" id="table_composicao">
                             <thead>
                                 <tr style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
@@ -814,7 +816,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             @if (isset($dados_pedido_status))
                 @foreach ($dados_pedido_status as $key => $dado_pedido_status)
                     <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
-                    <div class="form-group row" style="overflow-x:auto;  ">
+                    <div class="form-group row overflow-followup" style="overflow-x:auto;  ">
                         <table class="table table-sm table-striped text-center" id="table_composicao">
                             <thead style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
                                 <tr>
@@ -941,7 +943,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
         @section('content')
 
             <form id="filtro" action="followup-gerencial" method="get" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
-                <div class="form-group row">
+                <div class="form-group row ">
                     <div class="col-md-9 themed-grid-col row">
                         <div class="form-group row">
                             <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
@@ -1127,7 +1129,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
         @stop
         @section('content')
             @if (isset($dados_pedido_status))
-            <div class="form-group row" style="overflow-x:auto;  ">
+            <div class="form-group row overflow-followup" style="overflow-x:auto;  ">
                 <table class="table table-sm table-striped text-center" id="table_composicao">
                     <thead>
                         {{-- style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }} --}}
@@ -1148,7 +1150,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Apontamento</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Inspeção</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Embalar</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Expedição</th>
+                            {{-- <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Expedição</th> --}}
                             <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Entregue</th>
 
                         </tr>
@@ -1199,7 +1201,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         $totais_inspecao = (new PedidosController)->somarHoras($dado_pedido_status['pedido'][$pedido->id]['inspecao'], $totais_inspecao);
                                     @endphp
                                     <td style="background-color: {{ $palheta_cores[9] }}">{{ !empty($pedido->apontamento_embalagem) ? \Carbon\Carbon::parse($pedido->apontamento_embalagem)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->format('d/m/Y') : '' }}</td>
+                                    {{-- <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->format('d/m/Y') : '' }}</td> --}}
                                     <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->format('d/m/Y') : '' }}</td>
                                     </td>
                                 </tr>
@@ -1224,7 +1226,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th style="background-color: {{ $palheta_cores[8] }}"></th>
                             <th style="background-color: {{ $palheta_cores[8] }}">{{ PedidosController::formatarHoraMinuto($totais_inspecao) }}</th>
                             <th style="background-color: {{ $palheta_cores[9] }}"></th>
-                            <th style="background-color: {{ $palheta_cores[10] }}"></th>
+                            {{-- <th style="background-color: {{ $palheta_cores[10] }}"></th> --}}
                             <th style="background-color: {{ $palheta_cores[11] }}"></th>
                         </tr>
                     </tfoot>
@@ -1250,7 +1252,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                 $total_mo = $total_mp = $total_soma = 0.00;
                 @endphp
                 <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
-                <div class="form-group row" style="overflow-x:auto;  ">
+                <div class="form-group row overflow-followup" style="overflow-x:auto;  ">
                     <table class="table table-sm table-striped text-center" id="table_composicao">
                         <thead style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
                             <tr>
@@ -1459,7 +1461,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
         @stop
         @section('content')
             @if (isset($dados_pedido_status))
-            <div class="form-group row" style="overflow-x:auto;  ">
+            <div class="form-group row overflow-followup" style="overflow-x:auto;  ">
                 <table class="table table-sm table-striped text-center" id="table_composicao">
                     <thead>
                         <tr>
@@ -1480,7 +1482,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                             <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[9] }}">Embalar</th>
 
-                            <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[10] }}">Expedição</th>
+                            {{-- <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[10] }}">Expedição</th> --}}
 
                             <th scope="col" colspan="2" style="background-color: {{ $palheta_cores[11] }}">Entregue</th>
 
@@ -1506,8 +1508,8 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Dias Parados</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Apontamento</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Dias Parados</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Dias Parados</th>
+                            {{-- <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Apontamento</th> --}}
+                            {{-- <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Dias Parados</th> --}}
                             <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Apontamento</th>
                             <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Dias Parados</th>
                             <th scope="col" title="Alerta de dias">Tempo da produção</th>
@@ -1609,9 +1611,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         }
 
                                      @endphp
-                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->format('d/m/Y') : '' }}</td>
-                                    <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
-                                    @php
+                                    {{-- <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->format('d/m/Y') : '' }}</td> --}}
+                                    {{-- <td style="background-color: {{ $palheta_cores[10] }}">{{ !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td> --}}
+                                    {{-- @php
                                         $soma = !empty($pedido->apontamento_expedicao) ? \Carbon\Carbon::parse($pedido->apontamento_expedicao)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : 0;
                                         $dias_totais_expedicao += $soma;
                                         $tempo_producao += $soma;
@@ -1619,7 +1621,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             $proxima_data =$pedido->apontamento_expedicao;
                                         }
 
-                                     @endphp
+                                     @endphp --}}
                                     <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->format('d/m/Y') : '' }}</td>
                                     <td style="background-color: {{ $palheta_cores[11] }}">{{ !empty($pedido->apontamento_entregue) ? \Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()->diffInDays(\Carbon\Carbon::parse($proxima_data)->startOfDay()) : ''  }}</td>
                                     @php
@@ -1630,9 +1632,10 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             $proxima_data =$pedido->apontamento_entregue;
                                         }
 
+                                        $tempo_entrega =\Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()->diffInDays(\Carbon\Carbon::parse($pedido->data_entrega)->startOfDay()) * -1
                                      @endphp
                                     <td >{{ $tempo_producao }}</td>
-                                    <td> {{ \Carbon\Carbon::parse($pedido->data_entrega)->startOfDay()->diffInDays(\Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()) }}</td>
+                                    <td @if($tempo_entrega >= 0) style="color: green" @elseif ($tempo_entrega < 0) style="color: red" @endif > {{ $tempo_entrega }}</td>
                                     @php $dias_totais_producao += $tempo_producao; @endphp
                                     </td>
                                 </tr>
@@ -1658,8 +1661,8 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <th style="background-color: {{ $palheta_cores[8] }}">{{ number_format($dias_totais_inspecao/$contador, 2, '.','.') }}</th>
                             <th style="background-color: {{ $palheta_cores[9] }}"></th>
                             <th style="background-color: {{ $palheta_cores[9] }}">{{ number_format($dias_totais_embalagem/$contador, 2, '.','.') }}</th>
-                            <th style="background-color: {{ $palheta_cores[10] }}"></th>
-                            <th style="background-color: {{ $palheta_cores[10] }}">{{ number_format($dias_totais_expedicao/$contador, 2, '.','.') }}</th>
+                            {{-- <th style="background-color: {{ $palheta_cores[10] }}"></th> --}}
+                            {{-- <th style="background-color: {{ $palheta_cores[10] }}">{{ number_format($dias_totais_expedicao/$contador, 2, '.','.') }}</th> --}}
                             <th style="background-color: {{ $palheta_cores[11] }}"></th>
                             <th style="background-color: {{ $palheta_cores[11] }}">{{ number_format($dias_totais_entregue/$contador, 2, '.','.') }}</th>
                             <th>{{ number_format($dias_totais_producao/$contador, 2, '.','.') }}</th>
@@ -1750,3 +1753,5 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
     @break
 
 @endswitch
+
+

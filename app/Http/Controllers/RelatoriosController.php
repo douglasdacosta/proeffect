@@ -266,6 +266,7 @@ class RelatoriosController extends Controller
     }
 
     public function relatorioPrevisaoMaterial(Request $request) {
+
         $data_inicio = !empty($request->input('data')) ? $request->input('data') : '';
         $data_fim = !empty($request->input('data_fim')) ? $request->input('data_fim') : '';
         $status_id = !empty($request->input('status_id')) ? $request->input('status_id') : '';
@@ -574,7 +575,7 @@ class RelatoriosController extends Controller
                     'consumo_previsto' => $pedido['qtde_consumo'],
                     'valor_previsto' => number_format($pedido['valor_previsto'], 2, ',', '.'),
                     'diferenca' =>  round($diferenca, 2),
-                    'alerta' => $estoque_atual < $pedido['qtde_consumo'] || ($estoque_atual['estoque_atual']==0 && $pedido['qtde_consumo']==0) ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>',
+                    'alerta' => $estoque_atual['estoque_atual'] < $pedido['qtde_consumo'] || ($estoque_atual['estoque_atual']==0 && $pedido['qtde_consumo']==0) ? '<i class="text-danger fas fa-arrow-down"></i>' : '<i class="text-success fas fa-arrow-up"></i>',
                     'os' => $pedido['fichas']
                 ];
 

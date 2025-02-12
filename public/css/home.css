@@ -1,0 +1,45 @@
+ body{
+    overflow: auto;
+    background-color: #454d55 ;
+ }
+
+ .container {
+    margin-left: 0px;
+ }
+
+ .content-wrapper {
+    width: 100%;
+    margin: 1%;
+
+    background-color: #454d55;
+ }
+
+ .counter {
+    font-weight: bold;
+    color: #fff;
+ }
+
+ .vendas {
+    padding: 0px;
+ }
+
+ .texto-previsto {
+    font-size: 1.5em;
+ }
+
+ .card-body {
+    padding: 0px;
+ }
+
+ .icon {
+    height: 15px;
+ }
+
+ .inner {
+    padding-top: 3%
+ }
+
+ .previstos {
+    max-height: 87px;
+    overflow-x: auto;
+ }

@@ -53,6 +53,11 @@
 @stop
 
 @section('adminlte_js')
+    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="js/bootstrap.4.6.2.js"></script>
+    <script src="js/select2.min.js"></script>
+    <script src="js/main_custom.js?cache={{time()}}"></script>
+    <script src="js/jquery.mask.js"></script>
     @stack('js')
     @yield('js')
 @stop

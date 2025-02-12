@@ -224,7 +224,7 @@ class PedidosController extends Controller
                 $historico = "Data de entrega do pedido alterado de ".  DateHelpers::formatDate_ddmmYYYY(DateHelpers::formatDate_dmY($pedidos[0]->data_entrega)) . " para " . $request->input("data_entrega");
 
             }
-            
+
             if(!empty($request->input('status_id')) && $pedidos[0]->status_id != $request->input('status_id')) {
 
                 $this->historicosPedidos($request->input('id'), $request->input('status_id'));
@@ -390,7 +390,7 @@ class PedidosController extends Controller
             if ($request->input('id')) {
                 $pedidos = $pedidos::find($request->input('id'));
             }
- 
+
             $pedidos->os = $request->input('os');
             $pedidos->fichatecnica_id = $request->input('fichatecnica');
             $pedidos->qtde = $request->input('qtde');
@@ -988,11 +988,10 @@ class PedidosController extends Controller
     /**
     * Show the application dashboard.
     *
-    * @return \Illuminate\Contracts\Support\Renderable
+    * @return \Illuminate\Contracts\Support\Renderable OR json
     */
     public function followupgerencial(Request $request) {
 
-// dd($request->all());
         $status_id = $request->input('status_id');
         $filtrado = 0;
         $pedidos = DB::table('pedidos')
@@ -1128,6 +1127,10 @@ class PedidosController extends Controller
 
                 $pedidos_encontrados[] = $value->id;
             }
+        }
+
+        if($request->input('somente_dados')) {
+            return $pedidos_encontrados;
         }
 
         $request->merge(['tipo_consulta' => 'G']);

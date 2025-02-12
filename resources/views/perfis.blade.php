@@ -101,15 +101,29 @@
                 <input type="text" class="form-control" id="nome"  name="nome" value="@if (isset($perfis[0]->nome)){{$perfis[0]->nome}}@else{{''}}@endif">
                 </div>
             </div>
+
             <div class="form-group row">
-                <label for="tela" class="col-sm-2 col-form-label">Telas</label>
                 <div class="col-sm-6">
-                    @foreach ($telas as $tela)
-                        <div class="form-check row">
-                            <input class="form-check-input" name="telas[]" value="{{$tela->id}}" type="checkbox" @if($tela->checked){{'checked'}}@endif/>
-                            <label class="form-check-label" for="{{$tela->id}}">{{$tela->nome}}</label>
-                        </div>
-                    @endforeach
+                    <label for="tela" class="col-sm-2 col-form-label">Telas</label>
+                    <div class="col-sm-6">
+                        @foreach ($telas as $tela)
+                            <div class="form-check row">
+                                <input class="form-check-input" name="telas[]" value="{{$tela->id}}" type="checkbox" @if($tela->checked){{'checked'}}@endif/>
+                                <label class="form-check-label" for="{{$tela->id}}">{{$tela->nome}}</label>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <label for="dashboards" class="col-sm-2 col-form-label">Dashboasds</label>
+                    <div class="col-sm-6">
+                        @foreach ($dashboards as $dashboard)
+                            <div class="form-check row">
+                                <input class="form-check-input" name="dashboards[]" value="{{$dashboard->id}}" type="checkbox" @if($dashboard->checked){{'checked'}}@endif/>
+                                <label class="form-check-label" for="{{$dashboard->id}}">{{$dashboard->nome}}</label>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 

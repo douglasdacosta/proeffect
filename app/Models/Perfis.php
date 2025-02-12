@@ -16,4 +16,9 @@ class Perfis extends Model
     {
         return $this->belongsToMany(SubMenus::class, 'perfil_submenu', 'perfil_id', 'submenu_id');
     }
+
+    public function perfis_dashboards()
+    {
+        return $this->belongsToMany(Dashboards::class, 'perfis_dashboard', 'perfis_id', 'dashboard_id');
+    }
 }
