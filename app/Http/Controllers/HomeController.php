@@ -141,6 +141,7 @@ class HomeController extends Controller
             //Busca dados realisados mes
             $data = date('d/m/Y');
             $data1 = Carbon::createFromFormat('d/m/Y', $data)->startOfMonth()->format('d/m/Y'); //"01/08/2024";
+
             $data2 = $this->ultimoDiaUtil(date('d/m/Y')); //"05/08/2024";
             $tipo_consulta = 'R';
             $status_ids =['11'];
@@ -212,9 +213,9 @@ class HomeController extends Controller
 
             // 1º dia do mês anterior
             $data_1_mes_anterior = $data_hoje->copy()->subMonth()->startOfMonth()->format('d/m/Y');
-
             // Mesmo dia do mês anterior
-            $data_mes_anterior_no_dia_atual = $data_hoje->copy()->subMonth()->format('d/m/Y');
+            $data_mes_anterior_no_dia_atual = $data_hoje->copy()->subDay()->subMonth()->format('d/m/Y');
+
             $data = date('d/m/Y');
             $data1 = $data_1_mes_anterior;
             $data2 = $data_mes_anterior_no_dia_atual;
