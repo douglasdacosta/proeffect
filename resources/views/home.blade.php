@@ -5,6 +5,7 @@
 @section('adminlte_css')
 
     <link rel="stylesheet" href="{{ asset('css/home.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}" />
 
 @stop
 
@@ -19,8 +20,8 @@
                         <div class="info-box mb-3 fundo-escuro fundo-escuro">
                             <span class="info-box-icon bg-success elevation-1"><i class="fas fa-arrow-circle-up"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Vendas do Dia</span>
-                                <span class="info-box-number">{{$vendas['qtde_vendas_dia']}} OS / {{$vendas['vendas_dia']}}</span>
+                                <span class="info-box-text">Vendas do Dia - {{$vendas['qtde_vendas_dia']}} OS</span>
+                                <span class="info-box-number">{{$vendas['vendas_dia']}}</span>
                             </div>
                         </div>
                     </div>
@@ -28,8 +29,8 @@
                         <div class="info-box mb-3 fundo-escuro">
                             <span class="info-box-icon bg-success elevation-1"><i class="fas fa-arrow-circle-down"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Entregas do Dia</span>
-                                <span class="info-box-number">{{$vendas['qtde_entregas_dia']}} OS / {{$vendas['entregas_dia']}}</span>
+                                <span class="info-box-text">Entregas do Dia - {{$vendas['qtde_entregas_dia']}} OS</span>
+                                <span class="info-box-number">{{$vendas['entregas_dia']}}</span>
                             </div>
                         </div>
                     </div>
@@ -38,8 +39,8 @@
                         <div class="info-box mb-3 fundo-escuro">
                             <span class="info-box-icon bg-success elevation-1"><i class="fas fa-arrow-circle-up"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Vendas Mensal</span>
-                                <span class="info-box-number">{{$vendas['qtde_vendas_mes']}} OS / {{$vendas['vendas_mensal']}}</span>
+                                <span class="info-box-text">Vendas Mensal - {{$vendas['qtde_vendas_mes']}} OS</span>
+                                <span class="info-box-number">{{$vendas['vendas_mensal']}}</span>
                             </div>
                         </div>
                     </div>
@@ -47,8 +48,8 @@
                         <div class="info-box mb-3 fundo-escuro">
                             <span class="info-box-icon bg-success elevation-1"><i class="fas fa-arrow-circle-down"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Entregas Mensal</span>
-                                <span class="info-box-number">{{$vendas['qtde_entregas_mensal']}} OS / {{$vendas['entregas_mensal']}}</span>
+                                <span class="info-box-text">Entregas Mensal - {{$vendas['qtde_entregas_mensal']}} OS</span>
+                                <span class="info-box-number">{{$vendas['entregas_mensal']}}</span>
                             </div>
                         </div>
                     </div>

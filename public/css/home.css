@@ -43,3 +43,11 @@
     max-height: 87px;
     overflow-x: auto;
  }
+
+ .info-box .progress-description,
+ .info-box .info-box-text {
+   display: block;
+   overflow: auto;
+   text-overflow: initial;
+   white-space: nowrap;
+ }

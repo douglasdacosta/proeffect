@@ -236,7 +236,7 @@ class HomeController extends Controller
             foreach ($dados['dados_pedido_status'] as $status) {
                 foreach ($status['classe'] as $pedido) {
                     $total = $pedido->valor_unitario_adv * $pedido->qtde;
-                    $total_soma_entrega_mes_anterior = isset($total_soma) ? $total_soma + $total : $total;
+                    $total_soma_entrega_mes_anterior = isset($total_soma_entrega_mes_anterior) ? $total_soma_entrega_mes_anterior + $total : $total;
                 }
             }
 
@@ -296,7 +296,7 @@ class HomeController extends Controller
             'vendas' => [
                 'qtde_vendas_dia' => $qtde_vendas_dia,
                 'vendas_dia' => "R$ ". number_format($total_soma_dia, 2, ',', '.'),
-                'qtde_entregas_dia' => $total_soma_entrega_dia,
+                'qtde_entregas_dia' => $qtde_vendas_entrega_dia,
                 'entregas_dia' => "R$ ". number_format($total_soma_entrega_dia, 2, ',', '.'),
                 'qtde_vendas_mes' => $qtde_vendas_mes,
                 'vendas_mensal' => "R$ ". number_format($total_soma_mes, 2, ',', '.'),
