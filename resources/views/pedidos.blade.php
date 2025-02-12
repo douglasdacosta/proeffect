@@ -9,8 +9,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
 @section('title', 'Pro Effect')
 
-
-
 @section('adminlte_css')
     <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />

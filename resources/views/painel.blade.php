@@ -5,9 +5,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/jquery.mask.js"></script>
-<script src="js/main_custom.js"></script>
+
 <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 @section('content_header')
     <div class="form-group row">

@@ -4,10 +4,6 @@
 
 @section('title', 'Pro Effect')
 
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/jquery.mask.js"></script>
-<script src="js/main_custom.js"></script>
-
 @switch($tela)
     @case('maquinas')
         @section('content_header')

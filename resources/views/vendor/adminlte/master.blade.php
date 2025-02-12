@@ -83,6 +83,12 @@
     {{-- Base Scripts --}}
     @if(!config('adminlte.enabled_laravel_mix'))
         <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+
+        <script src="js/bootstrap.4.6.2.js"></script>
+        <script src="js/select2.min.js"></script>
+        <script src="js/main_custom.js?cache={{time()}}"></script>
+        <script src="js/jquery.mask.js"></script>
+
         <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
         <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>

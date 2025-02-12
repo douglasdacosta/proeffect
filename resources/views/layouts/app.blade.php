@@ -47,7 +47,8 @@
 }
         </style>
 
-<script src="{{asset('js/jquery_v3.5.1.js')}}"></script>
+    {{-- <script src="{{asset('js/jquery_v3.5.1.js')}}"></script> --}}
+    <script src="{{asset('js/jquery.min.js"')}}"></script>
     <script src="{{asset('js/bootstrap.4.6.2.js')}}"></script>
     <script src="{{asset('js/main_custom.js')}}"></script>
     <script src="{{asset('js/jquery.mask.js')}}"></script>

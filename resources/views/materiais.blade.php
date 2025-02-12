@@ -1,10 +1,6 @@
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-{{-- <script src="js/jquery_v3.1.1.js"></script> --}}
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/jquery.mask.js"></script>
-<script src="js/main_custom.js"></script>
 
 @if(isset($tela) and $tela == 'pesquisa')
     @section('content_header')

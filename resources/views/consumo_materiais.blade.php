@@ -2,9 +2,7 @@
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/jquery.mask.js"></script>
-<script src="js/main_custom.js"></script>
+
 <link rel="stylesheet" href="{{asset('css/main_style.css')}}" />
 @switch($tela)
     @case('pesquisar')

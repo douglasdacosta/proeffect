@@ -11,7 +11,7 @@
         font-size: 1.2em;
     }
 </style>
-<script src="../vendor/jquery/jquery.min.js"></script>
+
 <script src="js/baixa_estoque.js"></script>
 
 @section('content')
