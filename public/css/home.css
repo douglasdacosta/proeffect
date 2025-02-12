@@ -5,6 +5,7 @@
 
  .container {
     margin-left: 0px;
+    max-width: 96%;
  }
 
  .content-wrapper {
@@ -21,6 +22,7 @@
 
  .vendas {
     padding: 0px;
+    max-width: 100%;
  }
 
  .texto-previsto {
@@ -43,6 +45,7 @@
     max-height: 87px;
     overflow-x: auto;
  }
+
 
  .info-box .progress-description,
  .info-box .info-box-text {
