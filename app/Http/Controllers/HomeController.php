@@ -321,7 +321,7 @@ class HomeController extends Controller
             return 0;
         }
         $percentual = (($valorAtual - $valorAnterior) / $valorAnterior) * 100;
-        return number_format($percentual, 2);
+        return $percentual;
     }
 
     public function GeraRequestBuscaOsFollowup($data2, $tipo_consulta, $status_id) {
