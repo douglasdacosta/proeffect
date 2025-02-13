@@ -5,6 +5,7 @@
 
 @section('title', 'Pro Effect')
 <script src="../vendor/jquery/jquery.min.js"></script>
+<script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
 <script src="js/jquery.mask.js"></script>
 <script src="js/main_custom.js"></script><script src="js/fichatecnica.js"></script>
 
