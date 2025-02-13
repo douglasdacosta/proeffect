@@ -58,16 +58,21 @@ $(function ($) {
         }
     });
 
-    $('.default-select2').select2({
-        placeholder: "",
-        allowClear: false
-    });
+    if ($.fn.select2) {
+        $('.default-select2').select2({
+            placeholder: "",
+            allowClear: false
+        });
 
+        // Foca automaticamente no campo de pesquisa ao clicar no select
+        $('#default-select2').on('select2:open', function() {
+            document.querySelector('.select2-search__field').focus();
+        });
 
-// Foca automaticamente no campo de pesquisa ao clicar no select
-    $('#default-select2').on('select2:open', function() {
-        document.querySelector('.select2-search__field').focus();
-    });
+    } else {
+        console.error("Select2 não está carregado!");
+    }
+
 
 
     var behavior = function (val) {
