@@ -31,7 +31,7 @@ class HomeController extends Controller
     {
 
         $data_atraso=$data_30=$data_60=date('d/m/Y');
-        $qtde_vendas_dia=$total_soma_dia=$total_soma_entrega_dia=0;
+        $qtde_vendas_dia=$total_soma_dia=$total_soma_entrega_dia=$qtde_vendas_entrega_dia=0;
         $total_soma_entrega_dia=$qtde_vendas_mes=$total_soma_mes=$qtde_vendas_entrega_mes=$total_soma_entrega_mes=0;
         $qtqe_os_atrasada=$total_soma_entrega_mes_anterior=$percentual_comparativo=0;
         $array_material_alerta_30=$array_material_alerta_60=[];
@@ -290,7 +290,11 @@ class HomeController extends Controller
         }
 
 
-
+        $data_atraso=$data_30=$data_60=date('d/m/Y');
+        $qtde_vendas_dia=$total_soma_dia=$total_soma_entrega_dia=$qtde_vendas_entrega_dia=0;
+        $total_soma_entrega_dia=$qtde_vendas_mes=$total_soma_mes=$qtde_vendas_entrega_mes=$total_soma_entrega_mes=0;
+        $qtqe_os_atrasada=$total_soma_entrega_mes_anterior=$percentual_comparativo=0;
+        $array_material_alerta_30=$array_material_alerta_60=[];
         // dd($percentual_comparativo);
         $dados = [
             'perfis_dashboards' => $perfis_dashboards,
