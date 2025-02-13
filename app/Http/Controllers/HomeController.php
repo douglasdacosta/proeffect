@@ -219,9 +219,9 @@ class HomeController extends Controller
             $data = date('d/m/Y');
             $data1 = $data_1_mes_anterior;
             $data2 = $data_mes_anterior_no_dia_atual;
-            $tipo_consulta = 'R';
-            $status_ids =['11'];
-            $request = $this->GeraRequestBuscaOsRealizado($data1, $data2, $tipo_consulta, $status_ids);
+            $tipo_consulta = 'G';
+            $status_ids =["1","2","3","4","5","6","7","8","9","10"];
+            $request = $this->GeraRequestBuscaOs($data1, $data2, $tipo_consulta, $status_ids);
 
             $pedidos = new PedidosController();
             $array_pedidos = $pedidos->followupgerencial($request);
@@ -306,7 +306,7 @@ class HomeController extends Controller
             ],
             'os_atraso' => $qtqe_os_atrasada,
             'data_atraso' => $data_atraso,
-            'comparativo_valor' => 'R$ '. number_format($total_soma_entrega_mes_anterior, 2, ',', '.'),
+            'comparativo_valor' => 'R$ '. number_format($total_soma_entrega_mes_anterior-$total_soma_entrega_mes, 2, ',', '.'),
             'comparativo_percentual' => number_format($percentual_comparativo, 0, ',', '.'),
             'array_material_alerta_30' => $array_material_alerta_30,
             'array_material_alerta_60' => $array_material_alerta_60,
