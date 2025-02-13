@@ -1,7 +1,9 @@
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../js/jquery.mask.js"></script>
+<script src="../js/main_custom.js"></script>
 @section('content_header')
     <h1 class="m-0 text-dark">Configuração da conta</h1>
 @stop
