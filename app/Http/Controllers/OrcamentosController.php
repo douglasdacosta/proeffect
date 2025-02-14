@@ -101,7 +101,7 @@ class OrcamentosController extends Controller
 
         foreach ($fichatecnicasitens as $key => $fichatecnicasitem) {
             $tempo_usinagem = $fichatecnicasitem->tempo_usinagem;
-            $tempo_usinagem = $pedidos->multiplyTimeByInteger($tempo_usinagem,$fichatecnicasitem->qtde_blank);
+            $tempo_usinagem = $pedidos->multiplyTimeByInteger($tempo_usinagem,$fichatecnicasitem->qtde_blank);            
             $tempo_fresa_total = $pedidos::somarHoras($tempo_fresa_total, $tempo_usinagem);
         }
 

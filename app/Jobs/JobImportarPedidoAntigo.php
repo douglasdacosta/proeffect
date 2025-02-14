@@ -37,6 +37,7 @@ class JobImportarPedidoAntigo implements ShouldQueue
      */
     public function handle()
     {
+        return true;;
         info("Dentro do job instance JobImportarPedidoAntigo");
         $dados_pedidos = [];
         $id = DB::transaction(function () {
