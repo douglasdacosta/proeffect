@@ -3,7 +3,6 @@
 <script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
 <script src="js/jquery.mask.js"></script>
 <script src="js/main_custom.js"></script>
-<script src="js/fichatecnica.js"></script>
 
 <style type="text/css">
     .container_default {
