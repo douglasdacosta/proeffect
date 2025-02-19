@@ -10,7 +10,7 @@
  }
 
  .wrapper .content-wrapper {
-    overflow: auto;
+    /* overflow: auto; */
     /* height: 77%; */
     /* min-height: 77%; */
     /* overflow-y: auto; */
