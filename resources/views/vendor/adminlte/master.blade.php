@@ -86,8 +86,8 @@
 
         <script src="js/bootstrap.4.6.2.js"></script>
         <script src="js/select2.min.js"></script>
-        <script src="js/main_custom.js?cache={{time()}}"></script>
-        <script src="js/jquery.mask.js"></script>
+        {{-- <script src="js/main_custom.js?cache={{time()}}"></script> --}}
+        {{-- <script src="js/jquery.mask.js"></script> --}}
 
         <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
