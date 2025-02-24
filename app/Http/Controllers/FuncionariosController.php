@@ -53,7 +53,7 @@ class FuncionariosController extends Controller
         $tela = 'pesquisa';
     	$data = array(
 				'tela' => $tela,
-                'nome_tela' => 'funcionarios',
+                'nome_tela' => 'colaboradores',
 				'funcionarios'=> $funcionarios,
 				'request' => $request,
                 'perfis' => (new Perfis())->get(),
@@ -83,7 +83,7 @@ class FuncionariosController extends Controller
         $tela = 'incluir';
     	$data = array(
 				'tela' => $tela,
-                'nome_tela' => 'funcionarios',
+                'nome_tela' => 'colaboradores',
 				'request' => $request,
                 'perfis' => (new Perfis())->get(),
 				'rotaIncluir' => 'incluir-funcionarios',
@@ -116,7 +116,7 @@ class FuncionariosController extends Controller
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,
-                'nome_tela' => 'funcionarios',
+                'nome_tela' => 'colaboradores',
 				'funcionarios'=> $funcionario,
 				'request' => $request,
                 'perfis' => (new Perfis())->get(),

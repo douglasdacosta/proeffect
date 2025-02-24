@@ -7,6 +7,7 @@ use App\Models\Funcionarios;
 use App\Models\Pedidos;
 use App\Models\Perfis;
 use App\Models\PerfisDashboards;
+use App\Models\Tarefas;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -51,6 +52,10 @@ class HomeController extends Controller
         $perfis_dashboards = new PerfisDashboards();
         $perfis_dashboards = $perfis_dashboards->where('perfis_id', '=', $perfis->id)->get()->pluck('dashboard_id')->toArray();
 
+        $tarefas = new Tarefas();
+        $tarefas = $tarefas->where('funcionario_id', '=', \Auth::user()->id);
+        $tarefas = $tarefas->where('data_hora_lido', '=', null);
+        $tarefas = $tarefas->where('status', '=', 'A')->get();
 
         //se tiver permissão de vendas ou comparativo (o comparativo presisa do valor de vendas)
         if(in_array('1', $perfis_dashboards) || in_array('3', $perfis_dashboards) ){
@@ -311,7 +316,8 @@ class HomeController extends Controller
             'array_material_alerta_30' => $array_material_alerta_30,
             'array_material_alerta_60' => $array_material_alerta_60,
             'data_30' => $data_30,
-            'data_60' => $data_60
+            'data_60' => $data_60,
+            'tarefas' => $tarefas
             ];
 
         return view('home', $dados);

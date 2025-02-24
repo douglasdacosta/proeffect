@@ -9,6 +9,9 @@
 
 @stop
 
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="js/funcoes.js"></script>
+
 @section('content')
 
     <div class="container dark-mode">
@@ -184,10 +187,17 @@
                     <div class="card-body p-0 previstos">
                         <div class="table-responsive">
                             <table class="table m-0">
+
                                 <tbody>
-                                    <tr>
-                                        <td><i class="fas fa-caret-right text-danger"></i>Desabilitado!</td>
-                                    </tr>
+                                    @if($tarefas)
+                                        @foreach ($tarefas as $tarefa)                                            
+                                            <tr id="tarefa_{{$tarefa->id}}">
+                                                <td><i class="fas fa-caret-right text-danger"></i> {{' Data da tarefa: ' . \Carbon\Carbon::parse($tarefa->data_hora)->format('d/m/Y')}}</td>
+                                                <td title="{{ $tarefa->mensagem }}"> {{' Tarefa: ' . substr($tarefa->mensagem, 0, 50) . '...' }}</td>
+                                                <td class="marcar_lido text-center" style="cursor: pointer;" data-id="{{$tarefa->id}}" > {{ 'Marcar como lida ' }} <i class="far fa-check-circle text-success"></i> </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
 
                                 </tbody>
                             </table>

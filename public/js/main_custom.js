@@ -48,6 +48,7 @@ $(function ($) {
     $('.mask_horas').mask('00:00:00', {reverse: true});
     $('.mask_valor').mask("###0,00", {reverse: true});
     $('.mask_date').mask('00/00/0000');
+    $('.mask_date_time').mask('00/00/0000 00:00:00');
     $('.kg').mask("###.###.###.##0.000", {reverse: true});
 
     $(document).on('change', '#calc-type', function(){
