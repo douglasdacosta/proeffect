@@ -93,7 +93,7 @@
                                         <i class="far fa-check-circle text-success" 
                                         title="{{ \Carbon\Carbon::parse($tarefa->data_hora_lido)->format('d/m/Y H:i:s') }}"></i>
                                     @else
-                                        {{''}}
+                                    <i class="far fa-check-circle text-danger" ></i>
                                     @endif
                                 </td>
                                 <td>@if ($tarefa->finalizado == 0)
