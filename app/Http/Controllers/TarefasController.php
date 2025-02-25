@@ -27,10 +27,12 @@ class TarefasController extends Controller
     public function index(Request $request)
     {
         $tarefas = new Tarefas();
-        $tarefas = $tarefas->select('tarefas.*', 'funcionarios.nome as funcionario');
+        $tarefas = $tarefas->select('tarefas.*', 'funcionarios.nome as funcionario', 'funcionarios_criador.nome as criador');
         $tarefas = $tarefas->join('funcionarios', 'funcionarios.id', '=', 'tarefas.funcionario_id');
+        $tarefas = $tarefas->join('funcionarios AS funcionarios_criador', 'funcionarios_criador.id', '=', 'tarefas.funcionario_criador_id');
         $tarefas = $tarefas->where('tarefas.status', '=', 'A');
-        $tarefas = $tarefas->orderBy('tarefas.data_hora', 'desc');
+        $tarefas = $tarefas->orderBy('tarefas.finalizado', 'asc');
+        $tarefas = $tarefas->orderBy('tarefas.data_atividade', 'asc');
 
 
         if (!empty($request->input('id'))) {
@@ -55,6 +57,7 @@ class TarefasController extends Controller
         $funcionarios = $funcionarios->where('status', '=', 'A')->get();
 
         $tarefas = $tarefas->get();
+
         $tela = 'pesquisa';
         $data = array(
             'tela' => $tela,
@@ -111,11 +114,11 @@ class TarefasController extends Controller
     {
 
         $tarefas = new Tarefas();
-        $tarefas = $tarefas->select('tarefas.*', 'funcionarios.nome as funcionario');
+        $tarefas = $tarefas->select('tarefas.*', 'funcionarios.nome as funcionario', 'funcionarios_criador.nome as criador');
         $tarefas = $tarefas->join('funcionarios', 'funcionarios.id', '=', 'tarefas.funcionario_id');
+        $tarefas = $tarefas->join('funcionarios AS funcionarios_criador', 'funcionarios_criador.id', '=', 'tarefas.funcionario_criador_id');
         $tarefas = $tarefas->where('tarefas.status', '=', 'A');
-        $tarefas = $tarefas->where('tarefas.id', '=', $request->input('id'));
-        $tarefas = $tarefas->orderBy('tarefas.data_hora', 'desc');
+        $tarefas = $tarefas->where('tarefas.id', '=', $request->input('id'));        
         $tarefas = $tarefas->get();
 
 
@@ -154,9 +157,17 @@ class TarefasController extends Controller
         } 
 
         $tarefas->data_hora = !empty($request->input('data_hora')) ? DateHelpers::formatDate_dmY($request->input('data_hora')) : date('Y-m-d H:i:s');
+        $tarefas->data_atividade = !empty($request->input('data_atividade')) ? DateHelpers::formatDate_dmY($request->input('data_atividade')) : date('Y-m-d H:i:s');
         $tarefas->funcionario_id = $request->input('funcionario');
         $tarefas->funcionario_criador_id = \Auth::user()->id;
-        
+        if($tarefas->finalizado == null && $request->input('status_atividade') == 1){ 
+            $tarefas->finalizado = date('Y-m-d H:i:s');
+        } 
+
+        if($request->input('status_atividade') == 0 ){
+            $tarefas->finalizado = null;
+        } 
+      
         $tarefas->mensagem = $request->input('mensagem');
         $tarefas->status = $request->input('status');
         $tarefas->save();

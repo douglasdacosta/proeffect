@@ -70,8 +70,12 @@
                     <tr>
                       <th>ID</th>
                       <th>Data</th>
-                      <th>Coaborador</th>
+                      <th>Data atividade</th>
+                      <th>Colaborador</th>
+                      <th>Criador</th>
+                      <th>Mensagem</th>
                       <th>Mensagem lida</th>
+                      <th>Finalizada</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -81,12 +85,21 @@
                             <tr>
                                 <th scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $tarefa->id )) }}>{{$tarefa->id}}</a></th>
                                 <td>{{ \Carbon\Carbon::parse($tarefa->data)->format('d/m/Y') }}</td>
+                                <td>@if($tarefa->data_atividade) {{ \Carbon\Carbon::parse($tarefa->data_atividade)->format('d/m/Y') }} @else {{''}} @endif</td>
                                 <td>{{$tarefa->funcionario}}</td>
+                                <td>{{$tarefa->criador}}</td>
+                                <td title="{{$tarefa->mensagem}}">{{ substr($tarefa->mensagem, 0, 25) . '...' }}</td>
                                 <td>@if (!empty($tarefa->data_hora_lido))
                                         <i class="far fa-check-circle text-success" 
                                         title="{{ \Carbon\Carbon::parse($tarefa->data_hora_lido)->format('d/m/Y H:i:s') }}"></i>
                                     @else
                                         {{''}}
+                                    @endif
+                                </td>
+                                <td>@if ($tarefa->finalizado == 0)
+                                        <span class="badge badge-danger">Não</span>
+                                    @else
+                                        <span class="badge badge-success">Sim</span>
                                     @endif
                                 </td>
                                 <td>@if ($tarefa->status == 'A')
@@ -144,8 +157,16 @@
             <div class="form-group row">
                 <label  class="col-sm-2 col-form-label">Data</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control mask_date_time" id="data_hora" name="data_hora"
+                    <input type="text" class="form-control mask_date" required id="data_hora" name="data_hora"
                         value="@if (isset($tarefas[0]->data_hora)) {{ Carbon\Carbon::parse($tarefas[0]->data_hora)->format('d/m/Y H:i:s') }} @else {{ date('d/m/Y H:i:s') }} @endif">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label  class="col-sm-2 col-form-label">Data atividade</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control mask_date" required id="data_atividade" name="data_atividade" 
+                        value="@if (isset($tarefas[0]->data_atividade)) {{ Carbon\Carbon::parse($tarefas[0]->data_atividade)->format('d/m/Y H:i:s') }} @else {{ date('d/m/Y H:i:s') }} @endif">
+
                 </div>
             </div>
             <div class="form-group row">
@@ -161,6 +182,16 @@
                     <textarea class="form-control" id="mensagem" name="mensagem" rows="6">@if (isset($tarefas[0]->mensagem)){{$tarefas[0]->mensagem}}@else{{''}}@endif</textarea>
                 </div>
             </div>
+            <div class="form-group row">
+                <label for="status" class="col-sm-2 col-form-label">Status atividade</label>
+                <div class="col-sm-4">
+                    <select class="form-control col-md-4" id="status_atividade" name="status_atividade">
+                        <option value="0" @if (empty($tarefas[0]->finalizado)) {{ ' selected '}}@else @endif>Pendente</option>
+                        <option value="1" @if (!empty($tarefas[0]->finalizado)) {{ ' selected '}}@else @endif>Finalizado</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label"></label>
                 <select class="form-control col-md-1" id="status" name="status">

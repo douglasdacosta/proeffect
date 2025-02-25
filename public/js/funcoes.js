@@ -13,7 +13,9 @@ $(function ($) {
             },
             success: function (data) {
                 alert('Tarefa marcada como lida');
-                $('#tarefa_' + tarefa).remove();
+                $('#tarefa_' + tarefa ).removeClass('marcar_lido');
+                $('#tarefa_' + tarefa + ' span' ).text('Tarefa lida ');
+                $('#tarefa_' + tarefa +' i').removeClass('text-danger').addClass('text-success');
 
             },
             error: function (data, textStatus, errorThrown) {

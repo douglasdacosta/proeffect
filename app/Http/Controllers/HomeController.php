@@ -52,11 +52,19 @@ class HomeController extends Controller
         $perfis_dashboards = new PerfisDashboards();
         $perfis_dashboards = $perfis_dashboards->where('perfis_id', '=', $perfis->id)->get()->pluck('dashboard_id')->toArray();
 
-        $tarefas = new Tarefas();
-        $tarefas = $tarefas->where('funcionario_id', '=', \Auth::user()->id);
-        $tarefas = $tarefas->where('data_hora_lido', '=', null);
-        $tarefas = $tarefas->where('status', '=', 'A')->get();
 
+        $tarefas = Tarefas::select('tarefas.*', 'funcionarios.nome as funcionario', 'funcionarios_criador.nome as criador')
+                            ->join('funcionarios', 'funcionarios.id', '=', 'tarefas.funcionario_id')
+                            ->join('funcionarios AS funcionarios_criador', 'funcionarios_criador.id', '=', 'tarefas.funcionario_criador_id')
+                            ->where(function ($query) {
+                                $query->where('funcionario_id', \Auth::user()->id)
+                                    ->orWhere('funcionario_criador_id', \Auth::user()->id);
+                            })
+                            ->where('tarefas.status', '=', 'A')
+                            ->whereNull('tarefas.finalizado')
+                            ->orderBy('tarefas.data_hora', 'desc')
+                            ->get();
+    
         //se tiver permissão de vendas ou comparativo (o comparativo presisa do valor de vendas)
         if(in_array('1', $perfis_dashboards) || in_array('3', $perfis_dashboards) ){
 
