@@ -192,7 +192,11 @@
                                     @if($tarefas)
                                         @foreach ($tarefas as $tarefa)                                            
                                             <tr>
-                                                <td><i class="fas fa-caret-right text-danger"></i> {{' Data: ' . \Carbon\Carbon::parse($tarefa->data_hora)->format('d/m/Y')}}</td>
+                                                <td>
+                                                    <a href={{ URL::route('alterar-tarefas', array('id' => $tarefa->id )) }}>
+                                                            <i class="fas fa-caret-right text-danger"></i> {{' Data: ' . \Carbon\Carbon::parse($tarefa->data_hora)->format('d/m/Y')}}
+                                                    </a>
+                                                </td>
                                                 <td><i class="fas fa-caret-right text-danger"></i> {{' Data da atividade: ' . \Carbon\Carbon::parse($tarefa->data_atividade)->format('d/m/Y')}}</td>
                                                 <td>{{' Criador: ' . $tarefa->criador}}</td>
                                                 <td title="{{ $tarefa->mensagem }}"> {{' Tarefa: ' . substr($tarefa->mensagem, 0, 50) . '...' }}</td>
