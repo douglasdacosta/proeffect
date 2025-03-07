@@ -5,7 +5,6 @@
 @section('adminlte_css')
 
     <link rel="stylesheet" href="{{ asset('css/home.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/home.css') }}" />
 
 @stop
 
@@ -18,7 +17,7 @@
         @if(in_array('1', $perfis_dashboards))
             <div class="right_col" role="main">
 
-                <div class="form-group row col-md-12 vendas">
+                <div class="form-group row col-md-10 vendas">
                     <div class="col-6 col-sm-6 col-md-3 ">
                         <div class="info-box mb-3 fundo-escuro fundo-escuro">
                             <span class="info-box-icon bg-success elevation-1"><i class="fas fa-arrow-circle-up"></i></span>
@@ -68,7 +67,7 @@
                     <div class="card-body">
                         <div class="row">
                             @if(in_array('2', $perfis_dashboards))
-                                <div class="col-sm-6 col-6">
+                                <div class="col-sm-3">
                                     <!-- small card -->
                                     <div class="small-box bg-danger text-center">
                                         <div class="inner">
@@ -82,9 +81,23 @@
                                         </a>
                                     </div>
                                 </div>
+                                <div class="col-sm-3">
+                                    <!-- small card -->
+                                    <div class="small-box bg-danger text-center">
+                                        <div class="inner">
+                                            <h4>Você tem <span class="counter">{{ $os_atraso_expedicao }}</span> OS em atraso na expedição</h4>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-chart-pie"></i>
+                                        </div>
+                                        <a href="/followup?os=&ep=&tipo_consulta=F&data_entrega=&data_entrega_fim={{$data_atraso}}&status_id[]=1&status_id[]=2&status_id[]=3&status_id[]=4&status_id[]=5&status_id[]=6&status_id[]=7&status_id[]=8&status_id[]=9&status_id[]=10" class="small-box-footer">
+                                            Ver mais <i class="fas fa-arrow-circle-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             @endif
                             @if(in_array('3', $perfis_dashboards))
-                                <div class="col-sm-6 col-6">
+                                <div class="col-sm-6">
                                     <div class="description-block ">
                                         @if ($comparativo_percentual < 0)
                                             <span class="description-percentage text-danger text-bold">
@@ -184,13 +197,13 @@
                         </h4>
                     </div>
                     <!-- /.card-header -->
-                    <div class="card-body p-0 previstos">
+                    <div class="card-body p-0 tarefas">
                         <div class="table-responsive">
                             <table class="table m-0">
 
                                 <tbody>
                                     @if($tarefas)
-                                        @foreach ($tarefas as $tarefa)                                            
+                                        @foreach ($tarefas as $tarefa)
                                             <tr>
                                                 <td>
                                                     <a href={{ URL::route('alterar-tarefas', array('id' => $tarefa->id )) }}>

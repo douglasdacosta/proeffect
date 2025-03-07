@@ -112,6 +112,7 @@ class EstoqueController extends Controller
                                             A.lote,
                                             A.inventario,
                                             C.nome_cliente as fornecedor,
+                                            E.nome_cliente as loja,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                     count(1)
                                                 from
@@ -141,6 +142,10 @@ class EstoqueController extends Controller
                                             categorias_materiais D
                                         ON
                                             D.id = B.categoria_id
+                                        LEFT JOIN
+                                            pessoas E
+                                        ON
+                                            E.id = A.loja_id
                                         $condicao
                                         ORDER BY
                                             A.data DESC
@@ -217,12 +222,14 @@ class EstoqueController extends Controller
         $array_estoque = $array_soma_total_estoque =[];
 
         foreach($estoque as $key => $value) {
-            
+
             $pacote = $value->qtde_por_pacote + $value->qtde_por_pacote_mo;
             $estoque_comprado = ($value->qtde_chapa_peca * $value->qtde_por_pacote) + ($value->qtde_chapa_peca_mo * $value->qtde_por_pacote_mo);
-            
+
             $array_estoque[$value->id]['id'] = $value->id;
             $array_estoque[$value->id]['fornecedor'] = implode(' ', array_slice(explode(' ', $value->fornecedor), 0, 1));
+            $array_estoque[$value->id]['loja'] = implode(' ', array_slice(explode(' ', $value->loja), 0, 1));
+            $array_estoque[$value->id]['loja'] = implode(' ', array_slice(explode(' ', $value->loja), 0, 1));
             $array_estoque[$value->id]['lote'] = $value->lote;
             $array_estoque[$value->id]['data'] = $value->data;
             $array_estoque[$value->id]['pacote'] = number_format($value->estoque_pacote_atual,0, '','.');
@@ -234,7 +241,7 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->id]['previsao_meses'];
             $array_estoque[$value->id]['estoque_comprado'] = number_format($estoque_comprado,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
-            $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');            
+            $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
             $array_totais[$value->material][] = $value->estoque_atual;
             $array_estoque[$value->id]['alerta_baixa_errada'] = $value->alerta_baixa_errada;
             $array_estoque[$value->id]['alerta_estoque_zerado'] = ($value->estoque_atual == 0 && $value->estoque_minimo > 0) ? 1 : 0;
@@ -261,6 +268,7 @@ class EstoqueController extends Controller
                                             A.lote,
                                             A.inventario,
                                             C.nome_cliente as fornecedor,
+                                            E.nome_cliente as loja,
                                             ((A.qtde_chapa_peca_mo * A.qtde_por_pacote_mo) + (A.qtde_chapa_peca * A.qtde_por_pacote)) - ((select
                                                     count(1)
                                                 from
@@ -290,13 +298,17 @@ class EstoqueController extends Controller
                                             categorias_materiais D
                                         ON
                                             D.id = B.categoria_id
+                                        LEFT JOIN
+                                            pessoas E
+                                        ON
+                                            E.id = A.loja_id
                                         $condicao_sem_estoque
                                         and A.material_id not in (".implode(',',$material_id).")
                                         ORDER BY
                                             A.data DESC
                                     "));
 
-        
+
         $array_estoque_finalizado = $array_material_verificacao= [];
         foreach($estoque_finalizado as $key => $value) {
 
@@ -310,7 +322,7 @@ class EstoqueController extends Controller
                 $array_estoque_finalizado[$value->id]['id'] = $value->id;
                 $array_estoque_finalizado[$value->id]['categoria'] = $value->categoria;
                 $array_estoque_finalizado[$value->id]['material'] = $value->material;
-                $array_estoque_finalizado[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');     
+                $array_estoque_finalizado[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
             }
         }
 
@@ -323,6 +335,7 @@ class EstoqueController extends Controller
 				'estoque_material_somado'=> $estoque_material_somado,
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
+                'lojas' => $this->getLojas(),
                 'CategoriasMateriais' => (new CategoriasMateriais)->get(),
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
@@ -385,6 +398,7 @@ class EstoqueController extends Controller
 				'request' => $request,
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
+                'lojas' => $this->getLojas(),
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
 			);
@@ -426,6 +440,7 @@ class EstoqueController extends Controller
                 'historicosMateriais' =>$historicosMateriais,
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
+                'lojas' => $this->getLojas(),
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
@@ -453,6 +468,7 @@ class EstoqueController extends Controller
             $estoque->data = DateHelpers::formatDate_dmY($request->input('data'));
             $estoque->nota_fiscal = $request->input('nota_fiscal');
             $estoque->fornecedor_id = $request->input('fornecedor_id');
+            $estoque->loja_id = $request->input('loja_id');
             $estoque->lote = $request->input('lote');
             $estoque->valor_unitario = trim($valor_unitario) != '' ? DateHelpers::formatFloatValue($valor_unitario): null;
             $estoque->valor = trim($request->input('valor')) != '' ? DateHelpers::formatFloatValue($request->input('valor')): null;
@@ -515,6 +531,15 @@ class EstoqueController extends Controller
             $fornecedores = $fornecedores->toArray();
         }
         return $fornecedores;
+    }
+
+    public function getLojas($array = false){
+        $lojas = new Pessoas();
+        $lojas = $lojas->where('loja','=', '1')->get();
+        if($array) {
+            $lojas = $lojas->toArray();
+        }
+        return $lojas;
     }
 
     function geraRandomico(){

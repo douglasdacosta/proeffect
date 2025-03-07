@@ -26,6 +26,13 @@ class TarefasController extends Controller
      */
     public function index(Request $request)
     {
+
+        $user = \Auth::user();
+        $users = new Funcionarios();
+        $users = $users->where('id', '=', $user->id)->first();
+        $perfil = $users->perfil;
+
+
         $tarefas = new Tarefas();
         $tarefas = $tarefas->select('tarefas.*', 'funcionarios.nome as funcionario', 'funcionarios_criador.nome as criador');
         $tarefas = $tarefas->join('funcionarios', 'funcionarios.id', '=', 'tarefas.funcionario_id');
@@ -38,9 +45,23 @@ class TarefasController extends Controller
         if (!empty($request->input('id'))) {
             $tarefas = $tarefas->where('tarefas.id', '=', $request->input('id'));
         }
-        
+
         if (!empty($request->input('funcionario'))) {
-            $tarefas = $tarefas->where('tarefas.funcionario_id', '=', $request->input('funcionario'));
+            $tarefas = $tarefas->where(function ($query) use ($request) {
+                $query->where('funcionario_id', $request->input('funcionario'))
+                    ->orWhere('funcionario_criador_id', $request->input('funcionario'));
+            });
+        } else {
+            $tarefas = $tarefas->where(function ($query) use ($user) {
+                $query->where('funcionario_id', $user->id)
+                    ->orWhere('funcionario_criador_id', $user->id);
+            });
+        }
+
+        if (!empty($request->input('status_atividade'))) {
+            $tarefas = $tarefas->whereNotNull('tarefas.finalizado');
+        } else {
+            $tarefas = $tarefas->whereNull('tarefas.finalizado');
         }
 
         if (!empty($request->input('status'))) {
@@ -64,6 +85,8 @@ class TarefasController extends Controller
             'nome_tela' => 'tarefas',
             'tarefas' => $tarefas,
             'funcionarios' => $funcionarios,
+            'usuario' => $user->id,
+            'perfil' => $perfil,
             'request' => $request,
             'rotaIncluir' => 'incluir-tarefas',
             'rotaAlterar' => 'alterar-tarefas'
@@ -87,7 +110,7 @@ class TarefasController extends Controller
 
             return redirect()->route('tarefas', ['id' => $tarefas_id]);
 
-        }        
+        }
 
         $funcionarios = new Funcionarios();
         $funcionarios = $funcionarios->where('status', '=', 'A')->get();
@@ -118,7 +141,7 @@ class TarefasController extends Controller
         $tarefas = $tarefas->join('funcionarios', 'funcionarios.id', '=', 'tarefas.funcionario_id');
         $tarefas = $tarefas->join('funcionarios AS funcionarios_criador', 'funcionarios_criador.id', '=', 'tarefas.funcionario_criador_id');
         $tarefas = $tarefas->where('tarefas.status', '=', 'A');
-        $tarefas = $tarefas->where('tarefas.id', '=', $request->input('id'));        
+        $tarefas = $tarefas->where('tarefas.id', '=', $request->input('id'));
         $tarefas = $tarefas->get();
 
 
@@ -130,7 +153,7 @@ class TarefasController extends Controller
             return redirect()->route('tarefas', ['id' => $tarefas_id]);
 
         }
-        
+
         $funcionarios = new Funcionarios();
         $funcionarios = $funcionarios->where('status', '=', 'A')->get();
 
@@ -154,20 +177,20 @@ class TarefasController extends Controller
 
         if ($request->input('id')) {
             $tarefas = $tarefas::find($request->input('id'));
-        } 
+        }
 
         $tarefas->data_hora = !empty($request->input('data_hora')) ? DateHelpers::formatDate_dmY($request->input('data_hora')) : date('Y-m-d H:i:s');
         $tarefas->data_atividade = !empty($request->input('data_atividade')) ? DateHelpers::formatDate_dmY($request->input('data_atividade')) : date('Y-m-d H:i:s');
         $tarefas->funcionario_id = $request->input('funcionario');
         $tarefas->funcionario_criador_id = \Auth::user()->id;
-        if($tarefas->finalizado == null && $request->input('status_atividade') == 1){ 
+        if($tarefas->finalizado == null && $request->input('status_atividade') == 1){
             $tarefas->finalizado = date('Y-m-d H:i:s');
-        } 
+        }
 
         if($request->input('status_atividade') == 0 ){
             $tarefas->finalizado = null;
-        } 
-      
+        }
+
         $tarefas->mensagem = $request->input('mensagem');
         $tarefas->status = $request->input('status');
         $tarefas->save();

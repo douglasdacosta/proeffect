@@ -3,15 +3,11 @@
     background-color: #454d55 ;
  }
 
- .container {
-    margin-left: 0px;
-    max-width: 96%;
- }
+
+
 
  .content-wrapper {
-    width: 100%;
-    margin: 0.5%;
-
+    margin-top: 5px;
     background-color: #454d55;
  }
 
@@ -43,6 +39,11 @@
 
  .previstos {
     max-height: 87px;
+    overflow-x: auto;
+ }
+
+ .tarefas {
+    max-height: 170px;
     overflow-x: auto;
  }
 

@@ -116,6 +116,7 @@ class PainelController extends Controller
                             WHERE
                                 A.status_id = $status
                             ORDER BY
+                                A.data_antecipacao,
                                 C.created_at desc,
                                 A.os, B.ep ASC
                             limit $limit"
@@ -211,6 +212,7 @@ class PainelController extends Controller
                                                             -- AND A.os =15493
                                                             -- and B.ep ='EP4177'
                                                          ORDER BY
+                                                            A.data_antecipacao desc,
                                                             CASE WHEN D.nome IS NOT NULL THEN 0 ELSE 1 END ASC,
                                                             A.data_entrega,
                                                             A.os,

@@ -188,6 +188,13 @@
                 </select>
             </div>
             <div class="form-group row">
+                <label for="loja" class="col-sm-2 col-form-label">Loja</label>
+                <select class="form-control col-sm-1 custom-select" id="loja" name="loja">
+                    <option value="0" @if ((isset($pessoas[0]->loja) && $pessoas[0]->loja == 0)){{"selected='selected'"}}@else{{''}}@endif>Não</option>
+                    <option value="1"@if ((isset($pessoas[0]->loja) && $pessoas[0]->loja == 1)){{"selected='selected'"}}@else{{''}}@endif>Sim</option>
+                </select>
+            </div>
+            <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label"></label>
                 <select class="form-control col-md-1" id="status" name="status">
                     <option value="A" @if (isset($pessoas[0]->status) && $pessoas[0]->status == 'A'){{ ' selected '}}@else @endif>Ativo</option>

@@ -49,6 +49,12 @@ class FuncionariosController extends Controller
         	$funcionarios = $funcionarios->where('nome_contato', 'like', '%'.$request->input('nome_contato').'%');
         }
 
+        if (!empty($request->input('status'))){
+            $funcionarios = $funcionarios->where('status', '=', $request->input('status'));
+        } else {
+            $funcionarios = $funcionarios->where('status', '=', 'A');
+        }
+
         $funcionarios = $funcionarios->get();
         $tela = 'pesquisa';
     	$data = array(

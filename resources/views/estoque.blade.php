@@ -318,6 +318,22 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="loja_id" class="col-sm-2 col-form-label">Loja</label>
+                <div class="col-sm-6">
+                    <select class="form-control" id="loja_id" name="loja_id">
+                        <option value=""></option>
+                        @if (isset($lojas))
+                            @foreach ($lojas as $loja)
+                                <option
+                                @if(isset($estoque[0]->loja_id) &&  $loja->id == $estoque[0]->loja_id) selected="selected" @else {{''}}@endif
+                                value="{{ $loja->id }}">{{ $loja->id . ' - ' . $loja->nome_cliente }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="lote_manual" class="col-sm-2 col-form-label  text-center">Lote manual</label>
                 <div class="col-sm-2">
                     <input type="checkbox" class="form-control form-check-input" id="lote_manual" name="lote_manual" value="1">

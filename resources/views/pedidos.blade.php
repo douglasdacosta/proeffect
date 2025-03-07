@@ -11,7 +11,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
 @section('adminlte_css')
     <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />    
+    <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 @stop
 <script src="../vendor/jquery/jquery.min.js?cache={{time()}}"></script>
 <script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
@@ -788,6 +788,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             <tr style="">
                                 <th scope="col" colspan="2">Total geral</th>
                                 <th scope="col">&nbsp;</th>
+                                <th scope="col">&nbsp;</th>
                                 <th scope="col">
                                     {{ !empty($totalGeral['totalGeralusinagens']) ? $totalGeral['totalGeralusinagens'] . ' dias' : '0' }}
                                 </th>
@@ -1320,7 +1321,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                                         $total = $pedido->valor_unitario_adv * $pedido->qtde;
                                         $total_soma = isset($total_soma) ? $total_soma + $total : $total;
-
+                                        $total_soma_geral = isset($total_soma_geral) ? $total_soma_geral + $total : $total;
                                         $valor_mo = $mo * $pedido->qtde;
                                         $valor_mp = $mp * $pedido->qtde;
 
@@ -1460,6 +1461,50 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                     <hr class="my-4">
                 @endforeach
+                <table>
+                    <thead style="background-color: {{ $palheta_cores[8] }}">
+                        <tr>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 65px;"> </th>
+                            <th style="padding-left: 35px;"></th>
+                            <th style="padding-left: 0px;">Total</th>
+                            <th style="padding-left: 65px;"></th>
+                            <th style="padding-left: 65px;"></th>
+                            <th style="padding-left: 65px;"></th>
+                            <th style="padding-left: 65px;"></th>
+                            <th style="padding-left: 65px;"></th>
+                            <th style="padding-left: 65px;"></th>
+                            <th style="padding-left: 65px;"></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">{{ number_format($total_soma_geral, 2, ',', '.') }}</th>
+                            <th scope="col">&nbsp;</th>
+                            <th scope="col">&nbsp;</th>
+                        </tr>
+                    </tbody>
+                </table>
             @endif
         @stop
     @break
@@ -1549,12 +1594,6 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
 
                                     $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
                                     $hoje = date('Y-m-d');
-                                    $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
-                                    if ($dias_alerta < 6) {
-                                        $class_dias_alerta = 'text-danger';
-                                    } else {
-                                        $class_dias_alerta = 'text-primary';
-                                    }
 
                                 @endphp
                                 <tr>
@@ -1644,10 +1683,18 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                             $proxima_data =$pedido->apontamento_entregue;
                                         }
 
-                                        $tempo_entrega =\Carbon\Carbon::parse($pedido->apontamento_entregue)->startOfDay()->diffInDays(\Carbon\Carbon::parse($pedido->data_entrega)->startOfDay()) * -1
+                                        $tempo_entrega = \Carbon\Carbon::parse($pedido->apontamento_entregue)
+                                                            ->startOfDay()
+                                                            ->diffInDays(\Carbon\Carbon::parse($pedido->data_entrega)->startOfDay(), false);
+                                        if ($tempo_entrega < 0) {
+                                            $class_dias_alerta = 'text-danger';
+                                        } else {
+                                            $class_dias_alerta = 'text-primary';
+                                        }
+
                                      @endphp
                                     <td >{{ $tempo_producao }}</td>
-                                    <td @if($tempo_entrega >= 0) style="color: green" @elseif ($tempo_entrega < 0) style="color: red" @endif > {{ $tempo_entrega }}</td>
+                                    <td class="{{$class_dias_alerta}}"> {{ $tempo_entrega }}</td>
                                     @php $dias_totais_producao += $tempo_producao; @endphp
                                     </td>
                                 </tr>

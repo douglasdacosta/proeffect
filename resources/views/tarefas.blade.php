@@ -22,7 +22,7 @@
 
         <form id="filtro" action="tarefas" method="get" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
             <div class="form-group row">
-                <label for="id" class="col-sm-1 col-form-label">Código</label>
+                <label for="id" class="col-sm-2 col-form-label">Código</label>
                 <div class="col-sm-2">
                     <input type="text" id="id" name="id" class="form-control col-md-7 col-xs-12" value="@if (isset($request) && $request->input('id') != ''){{$request->input('id')}}@else @endif">
                 </div>
@@ -36,11 +36,34 @@
                         <option value="" @if (isset($request) && $request->input('funcionario') == 0){{ ' selected '}}@else @endif></option>
                         @if (isset($funcionarios))
                             @foreach ($funcionarios as $funcionario)
+
+                                @if ($perfil != 1 && $funcionario->id != $usuario)
+                                    @continue
+                                @endif
+
                                 <option value="{{$funcionario->id}}" @if (isset($request) && $request->input('funcionario') == $funcionario->id){{ ' selected '}}@else @endif>{{$funcionario->nome}}</option>
+
+                                    @if (isset($request) && $request->input('funcionario') == $funcionario->id)
+                                        {{ ' selected '}}
+                                    @elseif (isset($usuario) && $usuario == $funcionario->id)
+                                        {{ ' selected '}}
+                                    @else
+                                        {{ '' }}
+                                    @endif>{{$funcionario->nome }}</option>
                             @endforeach
                         @endif
                     </select>
                 </div>
+            </div>
+
+            <div class="form-group row">
+                    <label for="status" class="col-sm-2 col-form-label">Status atividade</label>
+                    <div class="col-sm-4">
+                        <select class="form-control col-md-4" id="status_atividade" name="status_atividade">
+                            <option value="0" @if (empty($tarefas[0]->finalizado)) {{ ' selected '}}@else @endif>Não</option>
+                            <option value="1" @if (!empty($tarefas[0]->finalizado)) {{ ' selected '}}@else @endif>Sim</option>
+                        </select>
+                    </div>
 
                 <label for="status" class="col-sm-1 col-form-label"></label>
                 <select class="form-control col-md-1" id="status" name="status">
@@ -90,7 +113,7 @@
                                 <td>{{$tarefa->criador}}</td>
                                 <td title="{{$tarefa->mensagem}}">{{ substr($tarefa->mensagem, 0, 25) . '...' }}</td>
                                 <td>@if (!empty($tarefa->data_hora_lido))
-                                        <i class="far fa-check-circle text-success" 
+                                        <i class="far fa-check-circle text-success"
                                         title="{{ \Carbon\Carbon::parse($tarefa->data_hora_lido)->format('d/m/Y H:i:s') }}"></i>
                                     @else
                                     <i class="far fa-check-circle text-danger" ></i>
@@ -153,7 +176,7 @@
                     </select>
                 </div>
             </div>
-            
+
             <div class="form-group row">
                 <label  class="col-sm-2 col-form-label">Data</label>
                 <div class="col-sm-2">
@@ -164,7 +187,7 @@
             <div class="form-group row">
                 <label  class="col-sm-2 col-form-label">Data atividade</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control mask_date" required id="data_atividade" name="data_atividade" 
+                    <input type="text" class="form-control mask_date" required id="data_atividade" name="data_atividade"
                         value="@if (isset($tarefas[0]->data_atividade)) {{ Carbon\Carbon::parse($tarefas[0]->data_atividade)->format('d/m/Y H:i:s') }} @else {{ date('d/m/Y H:i:s') }} @endif">
 
                 </div>

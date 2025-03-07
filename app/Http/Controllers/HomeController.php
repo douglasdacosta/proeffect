@@ -64,7 +64,7 @@ class HomeController extends Controller
                             ->whereNull('tarefas.finalizado')
                             ->orderBy('tarefas.data_hora', 'desc')
                             ->get();
-    
+
         //se tiver permissão de vendas ou comparativo (o comparativo presisa do valor de vendas)
         if(in_array('1', $perfis_dashboards) || in_array('3', $perfis_dashboards) ){
 
@@ -198,17 +198,22 @@ class HomeController extends Controller
             ]);
             $dados = $pedidos->followupDetalhes ($request);
             $dados = $dados->getData();
-            $qtqe_os_atrasada =0;
+            $qtqe_os_atrasada =$qtqe_os_atrasada_expedicao=0;
             foreach ($dados['dados_pedido_status'] as $pedidos) {
+
                 foreach ($pedidos['classe'] as $pedido) {
 
                     $entrega = Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
                     $hoje = date('Y-m-d');
                     $dias_alerta = Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+                    if($dias_alerta <= 0) {
+                        if($pedido->status_id == 9) {
+                            $qtqe_os_atrasada_expedicao++;
+                        } else {
+                            $qtqe_os_atrasada++;
 
+                        }
 
-                    if($dias_alerta < 0) {
-                        $qtqe_os_atrasada++;
                     }
                 }
             }
@@ -318,6 +323,7 @@ class HomeController extends Controller
                 'entregas_mensal' => "R$ ". number_format($total_soma_entrega_mes, 2, ',', '.'),
             ],
             'os_atraso' => $qtqe_os_atrasada,
+            'os_atraso_expedicao' => $qtqe_os_atrasada_expedicao,
             'data_atraso' => $data_atraso,
             'comparativo_valor' => 'R$ '. number_format($total_soma_entrega_mes-$total_soma_entrega_mes_anterior, 2, ',', '.'),
             'comparativo_percentual' => number_format($percentual_comparativo, 0, ',', '.'),
