@@ -5,10 +5,10 @@ use App\Http\Controllers\PedidosController;
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js?cache={{time()}}"></script>
-<script src="js/bootstrap.4.6.2.js?cache={{time()}}"></script>
-<script src="js/main_custom.js?cache={{time()}}"></script>
-<script src="js/jquery.mask.js?cache={{time()}}"></script>
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="js/bootstrap.4.6.2.js"></script>
+<script src="js/main_custom.js"></script>
+<script src="js/jquery.mask.js"></script>
 <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 <script src="DataTables/datatables.min.js"></script>
 <link  rel="stylesheet" src="DataTables/datatables.min.css"></link>

@@ -12,6 +12,21 @@
                         <input type="text" class="form-control mask_date regra_data_fim" id="data_fim" name="data_fim" value="{{$request->input('data_fim', '')}}"
                             placeholder="DD/MM/AAAA">
                     </div>
+                    <label for="loja" class="col-sm-2 col-form-label text-right campo_loja">Loja</label>
+                    <div class="col-sm-3 campo_loja">
+                        <select class="form-control" id="loja" name="loja">
+                            <option value=""></option>
+                            @if (isset($lojas))
+                                @foreach ($lojas as $loja)
+                                    <option
+                                    @if(!empty($request->input('loja')) &&  $loja->id == $request->input('loja')) selected="selected" @else {{''}}@endif
+                                    value="{{ $loja->id }}">{{ $loja->id . ' - ' . $loja->nome_cliente }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+
                 </div>
                 <div class="form-group row col-sm-12">
                     <label for="lote" class="col-sm-2 col-form-label text-right tipo_consulta ">Tipo de consulta</label>
@@ -27,6 +42,7 @@
                             </option>
                         </select>
                     </div>
+                    
                     <label for="categorias" class="col-sm-1 col-form-label text-right campo_categorias">Categorias</label>
                     <div class="col-sm-2">
                         <select class="form-control col-sm-10 campo_categorias" id="campo_categorias" name="categorias">

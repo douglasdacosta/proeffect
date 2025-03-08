@@ -256,6 +256,11 @@ class EstoqueController extends Controller
 
         }
 
+        $condicao_material = "";
+        if(!empty($material_id)) {
+            $condicao_material = " and A.material_id not in (".implode(',',$material_id) . ")";
+        }
+
         $estoque_finalizado = DB::select(DB::raw("SELECT
                                             A.data,
                                             A.id,
@@ -303,7 +308,7 @@ class EstoqueController extends Controller
                                         ON
                                             E.id = A.loja_id
                                         $condicao_sem_estoque
-                                        and A.material_id not in (".implode(',',$material_id).")
+                                        $condicao_material
                                         ORDER BY
                                             A.data DESC
                                     "));

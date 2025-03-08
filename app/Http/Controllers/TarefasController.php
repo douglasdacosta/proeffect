@@ -73,10 +73,7 @@ class TarefasController extends Controller
         if ($request->input('mensagem') != '') {
             $tarefas = $tarefas->where('mensagem', 'like', '%' . $request->input('mensagem') . '%');
         }
-
-        $funcionarios = new Funcionarios();
-        $funcionarios = $funcionarios->where('status', '=', 'A')->get();
-
+        
         $tarefas = $tarefas->get();
 
         $tela = 'pesquisa';
@@ -84,7 +81,7 @@ class TarefasController extends Controller
             'tela' => $tela,
             'nome_tela' => 'tarefas',
             'tarefas' => $tarefas,
-            'funcionarios' => $funcionarios,
+            'funcionarios' => $this->getFuncionarios(),
             'usuario' => $user->id,
             'perfil' => $perfil,
             'request' => $request,
@@ -112,15 +109,12 @@ class TarefasController extends Controller
 
         }
 
-        $funcionarios = new Funcionarios();
-        $funcionarios = $funcionarios->where('status', '=', 'A')->get();
-
         $tela = 'incluir';
         $data = array(
             'tela' => $tela,
             'nome_tela' => 'tarefas',
             'request' => $request,
-            'funcionarios' => $funcionarios,
+            'funcionarios' => $this->getFuncionarios(),
             'rotaIncluir' => 'incluir-tarefas',
             'rotaAlterar' => 'alterar-tarefas'
         );
@@ -154,15 +148,12 @@ class TarefasController extends Controller
 
         }
 
-        $funcionarios = new Funcionarios();
-        $funcionarios = $funcionarios->where('status', '=', 'A')->get();
-
         $tela = 'alterar';
         $data = array(
             'tela' => $tela,
             'nome_tela' => 'tarefas',
             'tarefas' => $tarefas,
-            'funcionarios' => $funcionarios,
+            'funcionarios' => $this->getFuncionarios(),
             'request' => $request,
             'rotaIncluir' => 'incluir-tarefas',
             'rotaAlterar' => 'alterar-tarefas'
@@ -197,6 +188,14 @@ class TarefasController extends Controller
 
         return $tarefas->id;
 
+    }
+
+    function getFuncionarios() {
+
+        $funcionarios = new Funcionarios();
+        $funcionarios = $funcionarios->where('status', '=', 'A')->orderBy('nome', 'asc')->get();
+
+        return $funcionarios;
     }
 
     public function marcarTarefaLida(Request $request)

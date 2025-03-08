@@ -12,6 +12,7 @@ use App\Providers\DateHelpers;
 use DateTime;
 
 use App\Http\Controllers\CalculadoraPlacasController;
+use App\Http\Controllers\EstoqueController;
 use App\Models\CategoriasMateriais;
 use App\Models\HistoricosPedidos;
 
@@ -56,6 +57,11 @@ class RelatoriosController extends Controller
 
         if(!empty($request->input('ep'))) {
             $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $request->input('ep'));
+            $filtrado++;
+        }
+        
+        if(!empty($request->input('loja'))) {
+            $pedidos = $pedidos->where('pessoas.loja', '=', $request->input('loja'));
             $filtrado++;
         }
 
@@ -139,13 +145,15 @@ class RelatoriosController extends Controller
                 }
             }
         }
-
+        
+        
         $tela = 'pesquisar';
     	$data = array(
 				'tela' => $tela,
                 'nome_tela' => 'consumo de materiais',
                 'arr_status' => $arr_status,
                 'request' => $request,
+                'lojas' => (new EstoqueController())->getLojas(),
                 'AllStatus' => (new PedidosController)->getAllStatus(),
 				'rotaIncluir' => '',
 				'rotaAlterar' => 'consumo-materiais-detalhes'
@@ -279,7 +287,7 @@ class RelatoriosController extends Controller
                 'tela' => $tela,
                 'nome_tela' => 'previsão de materiais',
                 'materiais' => [],
-
+                'lojas' => (new EstoqueController())->getLojas(),
                 'request' => $request,
                 'status' => (new PedidosController)->getAllStatus(),
                 'CategoriasMateriais' => (new CategoriasMateriais)->get(),
@@ -363,7 +371,15 @@ class RelatoriosController extends Controller
                 $condicao = ' WHERE '.implode(' AND ', $where);
             }
 
-            $retorno = $this->buscaPorDatasCategorias($data_inicio, $data_fim, $categoria);
+            $loja = '';
+            if(!empty($request->input('loja'))) {
+                $loja = $request->input('loja');                
+            }
+
+            $retorno = $this->buscaPorDatasCategorias($data_inicio, $data_fim, $categoria, $loja);
+
+
+
             $totalizadores = $retorno['totalizadores'];
             $array_materiais = $retorno['array_materiais'];
 
@@ -455,12 +471,12 @@ class RelatoriosController extends Controller
             }, []);
         }
 
-
         $data = array(
             'tela' => $tela,
             'nome_tela' => 'previsão de materiais',
             'materiais' => $array_materiais,
             'request' => $request,
+            'lojas' => (new EstoqueController())->getLojas(),
             'status' => (new PedidosController)->getAllStatus(),
             'CategoriasMateriais' => (new CategoriasMateriais)->get(),
             'rotaIncluir' => '',
@@ -472,26 +488,31 @@ class RelatoriosController extends Controller
     }
 
 
-    public function buscaPorDatasCategorias($data_inicio, $data_fim, $categoria){
+    public function buscaPorDatasCategorias($data_inicio, $data_fim, $categoria, $loja = ''){
 
         $totalizadores = [];
         $array_materiais=$arr_pedidos= [];
 
-        $materiais = $this->buscaMaterialPorCateroria($categoria);
-
-        $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria);
+        $materiais = $this->buscaMaterialPorCateroria($categoria, $loja);
+        // dd($materiais );
+        $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria, $loja);
         $estoque_na_data = $this->somaAgrupa($estoque_na_data);
 
         $entrada_estoque_no_periodo = $this->getEntradaEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
         $entrada_estoque_no_periodo = $this->somaAgrupa($entrada_estoque_no_periodo);
-
+        
         $consumido_no_periodo = $this->getConsumoEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
         $consumido_no_periodo = $this->somaAgrupa($consumido_no_periodo);
+        // dd($estoque_na_data );
 
         foreach ($materiais as $material) {
 
             ##Estoque atual
+            
             $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
+            info($key);
+            info($estoque_na_data);
+            info($material->id);
             $estoque_atual = $key !== false ? $estoque_na_data[$key]['estoque'] : 0;
             $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]['material_id']) ? $estoque_na_data[$key]['valor'] : 0;
             $estoque_atual_ids = $key !== false && !empty($estoque_na_data[$key]['estoqueIds']) ? $estoque_na_data[$key]['estoqueIds'] : [];
@@ -533,6 +554,7 @@ class RelatoriosController extends Controller
                 ];
         }
 
+        // dd($array_materiais);
         //cria totalizadores dos campos
         foreach ($array_materiais as $key => $material) {
 
@@ -852,11 +874,14 @@ class RelatoriosController extends Controller
      * @param mixed $data_final
      * @return array
      */
-    public function getEstoqueByDataCategoria($data_inicial, $categoria) {
+    public function getEstoqueByDataCategoria($data_inicial, $categoria, $loja = '') {
 
-        $filtro_categoria = '';
+        $filtro_categoria = $filtro_loja = '';
         if(!empty($categoria)) {
             $filtro_categoria = "AND B.categoria_id = $categoria";
+        }
+        if(!empty($loja)) {
+            $filtro_loja = " AND A.loja_id = $loja ";
         }
 
         $resultados =  DB::select(DB::raw("SELECT
@@ -879,7 +904,8 @@ class RelatoriosController extends Controller
                                                         lote_estoque_baixados X
                                                     where
                                                         X.estoque_id = A.id
-                                                        AND X.data_baixa <= '$data_inicial 23:59:59') * (A.qtde_chapa_peca)) as estoque
+                                                        AND X.data_baixa <= '$data_inicial 23:59:59') * (A.qtde_chapa_peca)) as estoque,
+                                                    A.loja_id
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -892,7 +918,8 @@ class RelatoriosController extends Controller
                                         WHERE
                                             A.status = 'A'
                                             AND A.data <= '$data_inicial'
-                                            $filtro_categoria"
+                                            $filtro_categoria
+                                            $filtro_loja"
                                         ));
 
                                         $arrayResultados = json_decode(json_encode($resultados), true);
@@ -923,8 +950,16 @@ class RelatoriosController extends Controller
                                 "));
     }
 
-    public function buscaMaterialPorCateroria($categoria) {
-            $valorMaterial = new Materiais();
+    public function buscaMaterialPorCateroria($categoria, $loja) {
+            $valorMaterial = new Materiais();            
+            $valorMaterial = $valorMaterial->distinct();
+            $valorMaterial = $valorMaterial->select('materiais.*');
+            $valorMaterial = $valorMaterial->leftjoin('estoque', 'estoque.material_id', '=', 'materiais.id');
+
+            if($loja != '') {
+                $valorMaterial = $valorMaterial->where('estoque.loja_id', '=', $loja);
+            }
+            
 
             if(!empty($categoria)) {
 
