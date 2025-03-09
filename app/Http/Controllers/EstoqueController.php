@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HistoricosEstoque;
 use App\Models\HistoricosMateriais;
+use App\Models\LoteEstoqueBaixados;
 use App\Models\Materiais;
 use App\Models\MateriaisHistoricosValores;
 use Illuminate\Http\Request;
@@ -341,7 +342,7 @@ class EstoqueController extends Controller
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
                 'lojas' => $this->getLojas(),
-                'CategoriasMateriais' => (new CategoriasMateriais)->get(),
+                'CategoriasMateriais' => (new CategoriasMateriais)->orderBy('nome')->get(),
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
@@ -424,6 +425,19 @@ class EstoqueController extends Controller
 
         $estoque= $estoque->where('id', '=', $request->input('id'))->get();
 
+        $qtde_por_pacote = !empty($estoque[0]->qtde_por_pacote) ? $estoque[0]->qtde_por_pacote : 0;
+        $qtde_por_pacote_mo = !empty($estoque[0]->qtde_por_pacote_mo) ? $estoque[0]->qtde_por_pacote_mo : 0;
+        
+        
+        $total_pacote_no_lote = $qtde_por_pacote + $qtde_por_pacote_mo;
+        
+        $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
+
+        $pacotesbaixados = $LoteEstoqueBaixados->where('estoque_id', '=', $request->input('id'))->count();
+
+        // dd($pacotesbaixados, $total_pacote_no_lote);
+        $pacotes_restantes =  $total_pacote_no_lote-$pacotesbaixados;
+
 		$metodo = $request->method();
 		if ($metodo == 'POST') {
 
@@ -446,6 +460,7 @@ class EstoqueController extends Controller
                 'materiais' => (new OrcamentosController())->getAllMateriais(),
                 'fornecedores' => $this->getFornecedores(),
                 'lojas' => $this->getLojas(),
+                'pacotes_restantes' => $pacotes_restantes,
 				'request' => $request,
 				'rotaIncluir' => 'incluir-estoque',
 				'rotaAlterar' => 'alterar-estoque'
@@ -531,7 +546,7 @@ class EstoqueController extends Controller
 
     public function getFornecedores($array = false){
         $fornecedores = new Pessoas();
-        $fornecedores = $fornecedores->where('fornecedor','=', '1')->get();
+        $fornecedores = $fornecedores->where('fornecedor','=', '1')->orderBy('nome_cliente', 'asc')->get();
         if($array) {
             $fornecedores = $fornecedores->toArray();
         }
@@ -540,7 +555,7 @@ class EstoqueController extends Controller
 
     public function getLojas($array = false){
         $lojas = new Pessoas();
-        $lojas = $lojas->where('loja','=', '1')->get();
+        $lojas = $lojas->where('loja','=', '1')->orderBy('nome_cliente', 'asc')->get();
         if($array) {
             $lojas = $lojas->toArray();
         }

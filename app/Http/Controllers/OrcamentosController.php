@@ -69,7 +69,7 @@ class OrcamentosController extends Controller
      */
     public function incluir(Request $request)
     {
-
+        return view('estoque');
     }
 
      /**
@@ -157,6 +157,8 @@ class OrcamentosController extends Controller
 
 
         });
+
+        return $request->input('id');
     }
 
 /**
@@ -179,11 +181,11 @@ class OrcamentosController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getAllMateriais() {
         $Materiais = new Materiais();
-        return $Materiais->where('status', '=', 'A')->get();
+        return $Materiais->where('status', '=', 'A')->orderBy('material')->get();
 
     }
 }

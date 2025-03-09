@@ -186,46 +186,79 @@ class BaixaEstoqueController extends Controller
     }
 
     public function alterarEstoque(Request $request) {
-        try{
+        
 
-            $id = DB::transaction(function () use ($request) {
+        try {
+            $retorno = DB::transaction(function () use ($request) {
                 $qtde = $request->input('qtde');
-
                 $name = auth()->user()->name;
-                if($request->input('acao_estoque') == 'adicionar') {
-                    $historico = "Devolução de $qtde de pacotes para estoque - por $name";
-                } else {
-                    $historico = "Retirada de $qtde de pacotes do estoque - por $name";
+                
+                $processados = 0;
+                for ($i = 0; $i < $qtde; $i++) {
+
+                    if ($request->input('acao_estoque') == 'adicionar') {
+                        $registro = LoteEstoqueBaixados::where('estoque_id', $request->input('id'))
+                            ->orderBy('id')
+                            ->first();
+
+                        if ($registro) {
+
+                            $processados++;
+                            $registro->delete();
+                        }
+                    } else {
+                        $processados++;
+                        $LoteEstoqueBaixados = new LoteEstoqueBaixados();
+                        $LoteEstoqueBaixados->estoque_id = $request->input('id');
+                        $LoteEstoqueBaixados->data_baixa = now();
+                        $LoteEstoqueBaixados->save();
+                    }
                 }
 
+                if ($request->input('acao_estoque') == 'adicionar') {
+                    if($processados ==0)   {
+                        $historico = "Nenhum pacote disponível para devolução - por $name";
+                        return [ 'erro'=>true, 'msg' => 'Nenhum pacote disponível para devolução'];
+                    } else {
+
+                        $historico = "Devolução de $processados de pacotes para estoque - por $name";
+                    }
+                } else {
+                    $historico = "Retirada de $processados de pacotes do estoque - por $name";
+                }
+                
                 $historico_estoque = new HistoricosEstoque();
                 $historico_estoque->estoque_id = $request->input('id');
                 $historico_estoque->historico = $historico;
                 $historico_estoque->status = 'A';
                 $historico_estoque->save();
-
-                for ($i=0; $i < $qtde; $i++) {
-                    if($request->input('acao_estoque') == 'adicionar') {
-                        $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
-                        $LoteEstoqueBaixados->where('estoque_id', '=', $request->input('id'))->orderBy('id')->first()->delete();
-                    } else {
-                        $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
-                        $LoteEstoqueBaixados->estoque_id=$request->input('id');
-                        $LoteEstoqueBaixados->data_baixa = now();
-                        $LoteEstoqueBaixados->save();
-                    }
-                }
+        
+                return ['erro' => false];
             });
+        
+            
+            if($retorno['erro'] == true) {
+                return response()->json(['error' => $retorno['msg']], 500);
+            }
 
-            return true;
 
+            $estoque = new  Estoque();
+            $estoque = $estoque->where('id', '=', $request->input('id'))->get();
+
+            $qtde_por_pacote = !empty($estoque[0]->qtde_por_pacote) ? $estoque[0]->qtde_por_pacote : 0;
+            $qtde_por_pacote_mo = !empty($estoque[0]->qtde_por_pacote_mo) ? $estoque[0]->qtde_por_pacote_mo : 0;            
+            $total_pacote_no_lote = $qtde_por_pacote + $qtde_por_pacote_mo;
+
+            $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
+            $pacotesbaixados = $LoteEstoqueBaixados->where('estoque_id', '=', $request->input('id'))->count();
+            $pacotes_restantes =  $total_pacote_no_lote-$pacotesbaixados;
+
+            return response()->json(['success' => true, 'pacotes_restantes' => $pacotes_restantes] , 200);
+        
         } catch (\Exception $e) {
-            info('erro para Baixar -> '.$e);
-            return false;
+            info('Erro para Baixar -> ' . $e->getMessage());
+            return response()->json(['error' => 'Ocorreu um erro ao processar a transação'], 500);
         }
-
-
-
-
+        
     }
 }

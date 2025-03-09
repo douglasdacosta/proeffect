@@ -589,9 +589,33 @@ $(function ($) {
     });
 
     $(document).on('click', '#salva_estoque', function (e) {
-        acao_estoque = $('#acao_estoque').val();
-        id = $('#id').val();
         qtde_alteracao_estoque = $('#qtde_alteracao_estoque').val();
+        pacotes_restantes = $('#pacotes_restantes').val();
+
+        
+        acao_estoque = $('#acao_estoque').val();
+
+        if(acao_estoque == 'remover') {
+            if(parseInt(qtde_alteracao_estoque) > parseInt(pacotes_restantes))  {
+                alert('Quantidade de pacotes disponíveis de ' + pacotes_restantes + ' pacotes. Baixa não liberada!');
+                return false;
+            }            
+        } else {
+            qtde_por_pacote = $('#qtde_por_pacote').val();
+            qtde_por_pacote_mo = $('#qtde_por_pacote_mo').val();
+
+            qtde_liberado_incluir = parseInt(qtde_por_pacote) + parseInt(qtde_por_pacote_mo) - parseInt(pacotes_restantes);
+
+            if(parseInt(qtde_alteracao_estoque) > parseInt(qtde_liberado_incluir))  {
+                alert('Limite disponível para inclusão é de ' + qtde_liberado_incluir + ' pacotes. Inclusão não liberada!');
+                return false;
+            }
+
+        }
+
+
+
+        id = $('#id').val();
 
         $.ajax({
             type: "POST",
@@ -603,16 +627,21 @@ $(function ($) {
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
-                abreAlertSuccess(data, false);
-                $('.overlay').hide();
+                
+                console.log(data);
+                dados = data;
+                $('#pacotes_restantes').val(dados.pacotes_restantes);
+                alert('Estoque salvo!');
+
             },
             error: function (data, textStatus, errorThrown) {
-                abreAlertSuccess(data, true);
-                $('.overlay').hide();
+                
+                dados = JSON.parse(data.responseText);
+                alert('Erro ao salvar estoque! ' + dados.error);
             },
 
         });
-        alert('estoque salvo');
+        
     });
 
 

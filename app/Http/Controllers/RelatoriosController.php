@@ -290,7 +290,7 @@ class RelatoriosController extends Controller
                 'lojas' => (new EstoqueController())->getLojas(),
                 'request' => $request,
                 'status' => (new PedidosController)->getAllStatus(),
-                'CategoriasMateriais' => (new CategoriasMateriais)->get(),
+                'CategoriasMateriais' => (new CategoriasMateriais)->orderBy('nome')->get(),
                 'rotaIncluir' => '',
                 'rotaAlterar' => '',
                 'totalizadores' => [],
@@ -478,7 +478,7 @@ class RelatoriosController extends Controller
             'request' => $request,
             'lojas' => (new EstoqueController())->getLojas(),
             'status' => (new PedidosController)->getAllStatus(),
-            'CategoriasMateriais' => (new CategoriasMateriais)->get(),
+            'CategoriasMateriais' => (new CategoriasMateriais)->orderBy('nome')->get(),
             'rotaIncluir' => '',
             'rotaAlterar' => '',
             'totalizadores' => $totalizadores,
@@ -497,7 +497,7 @@ class RelatoriosController extends Controller
         // dd($materiais );
         $estoque_na_data = $this->getEstoqueByDataCategoria($data_inicio, $categoria, $loja);
         $estoque_na_data = $this->somaAgrupa($estoque_na_data);
-
+        // dd($estoque_na_data);
         $entrada_estoque_no_periodo = $this->getEntradaEstoquePorDataCategoria($data_inicio, $data_fim, $categoria);
         $entrada_estoque_no_periodo = $this->somaAgrupa($entrada_estoque_no_periodo);
         
@@ -510,9 +510,9 @@ class RelatoriosController extends Controller
             ##Estoque atual
             
             $key = array_search($material->id, array_column($estoque_na_data, 'material_id'));
-            info($key);
-            info($estoque_na_data);
-            info($material->id);
+            // info($key);
+            // info($estoque_na_data);
+            // info($material->id);
             $estoque_atual = $key !== false ? $estoque_na_data[$key]['estoque'] : 0;
             $valor_estoque_atual = $key !== false && !empty($estoque_na_data[$key]['material_id']) ? $estoque_na_data[$key]['valor'] : 0;
             $estoque_atual_ids = $key !== false && !empty($estoque_na_data[$key]['estoqueIds']) ? $estoque_na_data[$key]['estoqueIds'] : [];
@@ -529,6 +529,18 @@ class RelatoriosController extends Controller
             $valor_consumido = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['valor'] : 0;
             $peso_material = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['peso_material'] : 0;
             $consumido_ids = $key !== false && !empty($consumido_no_periodo[$key]['estoqueIds']) ? $consumido_no_periodo[$key]['estoqueIds'] : [];
+            
+            if($material->id == 43) {
+                info($material->id);
+                info($key);
+                info($consumido_ids);    
+                info($entradas_ids);    
+                info($estoque_atual_ids);    
+
+
+                info(' --------- ');
+            }
+            
 
             $os =  [];
             if($this->busca_os) {

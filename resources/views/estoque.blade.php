@@ -442,7 +442,13 @@
                 </div>
             </div>
             @if($tela == 'alterar')
-                <div class="form-group row">
+            <div class="form-group row">
+                <label for="status" class="col-sm-2 col-form-label">Pacotes restantes</label>
+                <div class="col-sm-2">
+                    <input type="text" pattern="[0-9]+$" class="form-control sonumeros col-sm-6 bg-warning" id="pacotes_restantes" name="pacotes_restantes" value="{{ isset($pacotes_restantes) ? $pacotes_restantes : 0 }}">
+                </div>
+            </div>
+            <div class="form-group row">
                     <label for="status" class="col-sm-2 col-form-label">Baixa/Devolução </label>
                     <div class="col-sm-2">
                         <input type="text" pattern="[0-9]+$" class="form-control sonumeros col-sm-6" id="qtde_alteracao_estoque" name="qtde_alteracao_estoque" value="">
