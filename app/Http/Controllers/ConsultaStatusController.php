@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pessoas;
+use Illuminate\Http\Request;
 
 class ConsultaStatusController extends Controller
 {
@@ -22,8 +23,19 @@ class ConsultaStatusController extends Controller
         13 => 'Pedido Cancelado'
     ];
 
-    public function consultarStatus($hash)
+    public function consultarStatus($hash, $token)
     {
+        // Validar o token de integração
+        $tokenValido = env('TOKEN_INTEGRACAO_CONSULTA');
+        info($token);
+        info($tokenValido);
+        if (!$token || $token !== $tokenValido) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token de integração inválido'
+            ], 401);
+        }
+
         try {
             $pessoa = Pessoas::where('hash_consulta', $hash)->firstOrFail();
             $pedidos = $pessoa->pedidos()

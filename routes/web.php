@@ -118,6 +118,4 @@ Route::match(['get', 'post'],'/categorias-materiais', [App\Http\Controllers\Cate
 Route::match(['get', 'post'],'/alterar-categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'alterar'])->name('alterar-categorias-materiais')->middleware('afterAuth:categorias-materiais');
 Route::match(['get', 'post'],'/incluir-categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'incluir'])->name('incluir-categorias-materiais')->middleware('afterAuth:categorias-materiais');
 
-Route::get('/consulta-status/{hash}', [ConsultaStatusController::class, 'consultarStatus'])
-    ->name('consulta-status')
-    ->middleware('throttle:60,1');
+Route::get('/consulta-status/{hash}/{token}', [ConsultaStatusController::class, 'consultarStatus'])->name('consulta-status');
