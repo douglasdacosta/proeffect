@@ -184,6 +184,16 @@ use App\Http\Controllers\PedidosController;
 
 
                                         @foreach ($materiais as $material)
+                                            @php 
+                                                if($request->input('tipo_consulta') == 'V'&& $material['valor_entradas'] == 0){
+                                                    continue;
+                                                }
+                                                
+                                                if($request->input('tipo_consulta') == 'C' && $material['valor_consumido'] == 0){
+                                                    continue;
+                                                }
+
+                                            @endphp
 
                                             <tr>
                                                 <td data-sortable='true' >{{ $material['material'] }}</td>
