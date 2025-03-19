@@ -209,6 +209,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                         <th>Data entrega</th>
                                         <th>Data antecipação</th>
                                         <th>Hora retirada</th>
+                                        <th>WhatsApp</th>
                                         <th>Alerta dias</th>
                                         <th>OS</th>
                                         <th>MP</th>
@@ -262,6 +263,20 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                 <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                                 <td style="@if(!empty($pedido->data_antecipacao)) {{'background-color: red; font-weight: bold'}} @endif ">{{ empty($pedido->data_antecipacao) ? '' : Carbon\Carbon::parse($pedido->data_antecipacao)->format('d/m/Y') }}</td>
                                                 <td style="@if(!empty($pedido->hora_antecipacao)) {{'background-color: red; font-weight: bold'}} @endif ">{{ $pedido->hora_antecipacao }}</td>
+                                                @php 
+                                                    $telefone = preg_replace("/[^0-9]/", "", $pedido->telefone);
+
+                                                    $hash_codigo_cliente = md5($pedido->id_pessoa); 
+
+                                                    $link = 'https://wa.me/55'.$telefone.'?text=Ola, '. $pedido->nome_cliente . 
+                                                     '. Acesse o link para detalhes do status do seu pedido. https://'. env('URL_LINK_STATUS', 'https://eplax.com.br') .'/' . $hash_codigo_cliente . '/';
+                                                     
+                                                    // $link_whatsapp = "https://web.whatsapp.com/send?phone=55$telefone&text=$mensagem";
+
+                                                @endphp
+
+                                                
+                                                <td class="text-center text-success"> <a class="text-center text-success" target="_blank" href="{{$link}}"><i class="fab fa-whatsapp"></i></a></td>
                                                 <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                                 <th scope="row" title="Imprimir ordem de serviço">
                                                     <a target="_blank"

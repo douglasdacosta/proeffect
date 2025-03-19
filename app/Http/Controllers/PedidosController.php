@@ -65,6 +65,8 @@ class PedidosController extends Controller
             ->select('pedidos.*',
             'ficha_tecnica.ep',
             'pessoas.nome_cliente',
+            'pessoas.id as id_pessoa',
+            'pessoas.telefone',
             'status.nome' ,
             'status.id as id_status'
             )
