@@ -151,7 +151,11 @@ class PessoasController extends Controller
         $pessoas->status = $request->input('status');
         $pessoas->save();
 
-        return $pessoas->id;
+        $id = $pessoas->id;
+
+        $pessoas = $pessoas->update(['hash_consulta' => md5($id)]);
+
+        return $id;
 
 }
 }

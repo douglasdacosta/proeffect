@@ -18,6 +18,7 @@ class Pedidos extends Model
         return $this->HasOne(Status::class, 'id', 'status_id');
     }
 
+
     public function tabelaFichastecnicas(): HasOne
     {
         return $this->HasOne(Fichastecnicas::class, 'id', 'fichatecnica_id');

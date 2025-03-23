@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ConsultaStatusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,3 +117,5 @@ Route::match(['post'],'/marcar-tarefa-lida', [App\Http\Controllers\TarefasContro
 Route::match(['get', 'post'],'/categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'index'])->name('categorias-materiais')->middleware('afterAuth:categorias-materiais');
 Route::match(['get', 'post'],'/alterar-categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'alterar'])->name('alterar-categorias-materiais')->middleware('afterAuth:categorias-materiais');
 Route::match(['get', 'post'],'/incluir-categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'incluir'])->name('incluir-categorias-materiais')->middleware('afterAuth:categorias-materiais');
+
+Route::get('/consulta-status/{hash}/{token}', [ConsultaStatusController::class, 'consultarStatus'])->name('consulta-status');
