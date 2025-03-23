@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HistoricosPedidos;
+use App\Models\Pedidos;
 use App\Models\Pessoas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ConsultaStatusController extends Controller
 {
@@ -27,8 +30,8 @@ class ConsultaStatusController extends Controller
     {
         // Validar o token de integração
         $tokenValido = env('TOKEN_INTEGRACAO_CONSULTA');
-        info($token);
-        info($tokenValido);
+        
+        
         if (!$token || $token !== $tokenValido) {
             return response()->json([
                 'success' => false,
@@ -37,12 +40,25 @@ class ConsultaStatusController extends Controller
         }
 
         try {
-            $pessoa = Pessoas::where('hash_consulta', $hash)->firstOrFail();
-            $pedidos = $pessoa->pedidos()
-                ->with('tabelaFichastecnicas')
-                ->get();
-
-            if ($pedidos->isEmpty()) {
+            $dias_entregue = env('DIAS_ENTREGUE', 10);
+            $pedidos  = DB::select(DB::raw(
+                "SELECT distinct
+                    pedidos.id as id,
+                    pedidos.status_id as status_id ,
+                    ficha_tecnica.ep as ep    
+                from pedidos
+                inner join pessoas on pessoas.id = pedidos.pessoas_id
+                inner join ficha_tecnica on ficha_tecnica.id = pedidos.fichatecnica_id
+                inner join historicos_pedidos on historicos_pedidos.pedidos_id = pedidos.id
+                WHERE
+                    pessoas.hash_consulta = '$hash'
+                    AND 
+                        (
+                            (pedidos.status_id = 11 and (DATEDIFF(CURRENT_DATE, historicos_pedidos.created_at) <= $dias_entregue))
+                            or (pedidos.status_id < 11)
+                        )"
+            ));            
+            if (!$pedidos) {
                 return response()->json([
                     'success' => true,
                     'data' => [
@@ -51,18 +67,18 @@ class ConsultaStatusController extends Controller
                 ]);
             }
 
-            $pedidosFormatados = $pedidos->map(function($pedido) {
+            $pedidosFormatados = collect($pedidos)->map(function($pedido) {
                 $status = [];
-                foreach (self::STATUS_PEDIDOS as $id => $descricao) {
+                foreach (self::STATUS_PEDIDOS as $id => $descricao) {                  
                     $status[$id] = [
                         'descricao' => $descricao,
                         'atual' => ($pedido->status_id == $id)
                     ];
                 }
-
+    
                 return [
                     'codigo' => $pedido->id,
-                    'ep' => $pedido->tabelaFichastecnicas ? $pedido->tabelaFichastecnicas->ep : null,
+                    'ep' => $pedido->ep,
                     'status' => $status
                 ];
             });
@@ -75,6 +91,7 @@ class ConsultaStatusController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            info($e);
             return response()->json([
                 'success' => false,
                 'message' => 'Hash inválido ou não encontrado'
