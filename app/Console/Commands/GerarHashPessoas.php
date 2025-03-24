@@ -33,7 +33,7 @@ class GerarHashPessoas extends Command
         $count = 0;
 
         foreach ($pessoas as $pessoa) {
-            $hash = md5($pessoa->documento);
+            $hash = md5($pessoa->id);
             $pessoa->update(['hash_consulta' => $hash]);
             $count++;
         }

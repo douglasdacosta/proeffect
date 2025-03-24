@@ -3,7 +3,8 @@ use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\AjaxOrcamentosController;
 use App\Providers\DateHelpers;
 
-$palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 => '#c1d9d0', 10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071'];
+$palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 => 
+'#c1d9d0', 10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583', 15 => '#f7c41f', 16 => '#898b75', 17 => '#c1d9d0'];
 ?>
 @extends('adminlte::page')
 
