@@ -24,7 +24,8 @@ class PainelController extends Controller
             '5' => 'A.P – Assunto Pessoal',
             '6' => 'P.M – Problema na máquina',
             '7' => 'E.P - Esperando próxima produção',
-            '8' => 'F.M - Faltando Material'
+            '8' => 'F.M - Faltando Material',
+            '9' => 'HH - Chapelona'
         ];
     }
     private function busca_dados_pedidos($status, $limit = 11, $concluidos ){

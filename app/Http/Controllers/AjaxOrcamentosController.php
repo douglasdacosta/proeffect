@@ -29,7 +29,7 @@ class AjaxOrcamentosController extends Controller
             $orcamento->save();
             return true;
         }catch(\Throwable $th){
-            \Log::info(print_r($th->getMessage(), true));
+            info(print_r($th->getMessage(), true));
             return false;
         }
     }

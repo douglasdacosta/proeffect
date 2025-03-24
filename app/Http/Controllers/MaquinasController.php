@@ -529,6 +529,7 @@ class MaquinasController extends Controller
             $producaoMaquinas->qtdeServico = $resultado['qtdeServico'];
             $producaoMaquinas->data = $data_atual;
             $producaoMaquinas->hora = $hora_atual;
+
             $producaoMaquinas->save();
 
             return response('sucesso', 200);
@@ -618,6 +619,20 @@ class MaquinasController extends Controller
         $maquinas->pessoas_inspecao = $request->input('pessoas_inspecao');
         $maquinas->horas_dia = $request->input('horas_dia');
         $maquinas->prazo_entrega = $request->input('prazo_entrega');
+        // {{-- prazo_usinagem --}}
+        // {{-- prazo_acabamento --}}
+        // {{-- prazo_montagem --}}
+        // {{-- prazo_inspecao --}}
+        // {{-- prazo_embalar --}}
+        // {{-- prazo_expedicao --}}
+
+        $maquinas->prazo_usinagem = $request->input('prazo_usinagem');
+        $maquinas->prazo_acabamento = $request->input('prazo_acabamento');
+        $maquinas->prazo_montagem = $request->input('prazo_montagem');
+        $maquinas->prazo_inspecao = $request->input('prazo_inspecao');
+        $maquinas->prazo_embalar = $request->input('prazo_embalar');
+        $maquinas->prazo_expedicao = $request->input('prazo_expedicao');
+
         $maquinas->save();
 
         return $maquinas->id;

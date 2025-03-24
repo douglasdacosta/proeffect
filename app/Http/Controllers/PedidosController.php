@@ -65,6 +65,7 @@ class PedidosController extends Controller
             ->select('pedidos.*',
             'ficha_tecnica.ep',
             'pessoas.nome_cliente',
+            'pessoas.whatsapp_status as whatsapp_status',
             'pessoas.id as id_pessoa',
             'pessoas.telefone',
             'status.nome' ,
@@ -565,6 +566,8 @@ class PedidosController extends Controller
                 $pedidos_encontrados[] = $value->id;
             }
         }
+
+        
         $tela = 'pesquisa-followup';
         $nome_tela = 'followup tempos';
         $data = array(
@@ -573,6 +576,7 @@ class PedidosController extends Controller
             'pedidos_encontrados' => $pedidos_encontrados,
             'pedidos' => $pedidos,
             'request' => $request,
+            'maquinas' => $this->getMaquinas(),
             'status' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
             'rotaAlterar' => 'alterar-pedidos'
@@ -715,6 +719,21 @@ class PedidosController extends Controller
             $tela = 'followup-detalhes-geral';
             $nome_da_tela ='followup geral';
         }
+        $maquinas = $this->getMaquinas();
+        $dias_alerta_maquinas = [
+            'usinagem' => $maquinas[0]->prazo_usinagem + $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'acabamento' => $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'montagem' => $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'inspeção' => $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'embalar' => $maquinas[0]->prazo_embalar ,             
+            'usinagem_original' => $maquinas[0]->prazo_usinagem ,
+            'acabamento_original' => $maquinas[0]->prazo_acabamento ,
+            'montagem_original' => $maquinas[0]->prazo_montagem ,
+            'inspeção_original' => $maquinas[0]->prazo_inspecao ,
+            'embalar_original' => $maquinas[0]->prazo_embalar,
+            
+
+        ];
 
         $data = array(
             'tela' => $tela,
@@ -723,6 +742,7 @@ class PedidosController extends Controller
             'totalGeral' => $totalGeral,
             'request' => $request,
             'status' => $this->getAllStatus(),
+            'maquinas' => $dias_alerta_maquinas,
             'rotaIncluir' => 'incluir-pedidos',
             'rotaAlterar' => 'alterar-pedidos'
         );
@@ -2021,5 +2041,9 @@ class PedidosController extends Controller
        return $percentual;
     }
 
+    static function getMaquinas() {
+        $maquinas = Maquinas::all();
+        return $maquinas;
+    }
 }
 

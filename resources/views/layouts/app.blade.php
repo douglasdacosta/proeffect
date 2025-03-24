@@ -90,12 +90,16 @@
 
             $("#select_etapa_manutencao").change(function () {
                 var statusAtual = $("#atualStatus").val();
+                $('#motivo_pausas option[value="9"]').hide(); //remove a opção HC - Chapelona
                 if($("#select_etapa_manutencao").val() == 1 && statusAtual == 4) {
                     $('#div_numero_maquina').show();
                 } else {
                     $('#div_numero_maquina').hide();
                 }
                 if($("#select_etapa_manutencao").val() == 2) {
+                    if(statusAtual == 4) {
+                        $('#motivo_pausas option[value="9"]').show();
+                    }
                     $('#motivo_pausas').show();
                 } else {
                     $('#motivo_pausas, #quantidade').hide();

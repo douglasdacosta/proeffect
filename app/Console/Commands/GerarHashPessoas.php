@@ -39,5 +39,7 @@ class GerarHashPessoas extends Command
         }
 
         $this->info("Hashes gerados com sucesso! Total: {$count} pessoas atualizadas.");
+
+        return 1;
     }
 }

@@ -119,3 +119,6 @@ Route::match(['get', 'post'],'/alterar-categorias-materiais', [App\Http\Controll
 Route::match(['get', 'post'],'/incluir-categorias-materiais', [App\Http\Controllers\CategoriasMateriaisController::class, 'incluir'])->name('incluir-categorias-materiais')->middleware('afterAuth:categorias-materiais');
 
 Route::get('/consulta-status/{hash}/{token}', [ConsultaStatusController::class, 'consultarStatus'])->name('consulta-status');
+Route::match(['post'],'/ajax-faturado', [App\Http\Controllers\AjaxController::class, 'ajaxFaturado'])->name('ajax-Faturado');
+Route::match(['post'],'/ajax-whatsapp-status', [App\Http\Controllers\AjaxController::class, 'ajaxWhatsappStatus'])->name('ajax-whatsapp-status');
+

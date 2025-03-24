@@ -71,6 +71,44 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label for="prazo_usinagem" class="col-sm-3 col-form-label">Prazo usinagem (dias)</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control " id="prazo_usinagem"  name="prazo_usinagem" value="@if (isset($maquinas[0]->prazo_usinagem)){{$maquinas[0]->prazo_usinagem}}@else{{''}}@endif">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="prazo_acabamento" class="col-sm-3 col-form-label">Prazo acabamento (dias)</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control " id="prazo_acabamento"  name="prazo_acabamento" value="@if (isset($maquinas[0]->prazo_acabamento)){{$maquinas[0]->prazo_acabamento}}@else{{''}}@endif">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="prazo_montagem" class="col-sm-3 col-form-label">Prazo montagem (dias)</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control " id="prazo_montagem"  name="prazo_montagem" value="@if (isset($maquinas[0]->prazo_montagem)){{$maquinas[0]->prazo_montagem}}@else{{''}}@endif">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="prazo_inspecao" class="col-sm-3 col-form-label">Prazo inspecao (dias)</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control " id="prazo_inspecao"  name="prazo_inspecao" value="@if (isset($maquinas[0]->prazo_inspecao)){{$maquinas[0]->prazo_inspecao}}@else{{''}}@endif">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="prazo_embalar" class="col-sm-3 col-form-label">Prazo embalar (dias)</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control " id="prazo_embalar"  name="prazo_embalar" value="@if (isset($maquinas[0]->prazo_embalar)){{$maquinas[0]->prazo_embalar}}@else{{''}}@endif">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="prazo_expedicao" class="col-sm-3 col-form-label">Prazo expedicao (dias)</label>
+                    <div class="col-sm-1">
+                    <input type="text" class="form-control " id="prazo_expedicao"  name="prazo_expedicao" value="@if (isset($maquinas[0]->prazo_expedicao)){{$maquinas[0]->prazo_expedicao}}@else{{''}}@endif">
+                    </div>
+                </div>
+                
+
+                <div class="form-group row">
                     <div class="col-sm-5">
                     </div>
                     <div class="col-sm-5">
