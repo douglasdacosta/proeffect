@@ -251,7 +251,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     $telefone = preg_replace("/[^0-9]/", "", $pedido->telefone);
                                                     $hash_codigo_cliente = md5($pedido->id_pessoa);
                                                     $link = 'https://wa.me/55'.$telefone.'?text=Olá, '. $pedido->nome_cliente . 
-                                                    '. Acesse o link para detalhes do status do seu pedido. https://'. env('URL_LINK_STATUS', 'eplax.com.br') .'/' . $hash_codigo_cliente . '/';
+                                                    '. Acesse o link para detalhes do status do seu pedido. https://'. env('URL_LINK_STATUS', 'eplax.com.br') .'/consultar-pedido/' . $hash_codigo_cliente . '/';
                                                 @endphp
                                                 <td class="text-center"> 
                                                     <i style="@if($pedido->whatsapp_status==1) color:green @else color:red @endif" data-link="{{ $link }}" data-id_pessoa="{{ $pedido->id_pessoa }}" data-whatsapp_status="{{ $pedido->whatsapp_status }}" class="fab fa-whatsapp whatsapp_status"></i>
