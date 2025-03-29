@@ -49,20 +49,21 @@
                                             
                                             $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo)->format('Y-m-d');
                                             
-                                            $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->diffInWeekdays( $data_minima, false);      
+
+                                            $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $data_minima, false);      
                                             
                                             $original = $maquinas[$status . '_original'];
                                             if($dias_alertaDepartamento < $maquinas[$status . '_original']/2){
                                                 $dias_alerta_departamento = 'text-danger';
                                             }
-                                            if('EP4601' == $pedido->tabelaFichastecnicas->ep){
+                                            if('EP4439' == $pedido->tabelaFichastecnicas->ep){
                                                 info($maquinas);
                                                 info('dias prazo '. $dias_prazo);
                                                 info('data minima '. $data_minima);
-                                                info('dias alerta '. $dias_alertaDepartamento);
+                                                info(' dias_alertaDepartamento '. $dias_alertaDepartamento);
                                                 info('original '. $original);
                                                 info('hoje '. $hoje);
-                                                info('data entrega '. $pedido->data_entrega);
+                                                info('data entrga '. $pedido->data_entrega);
                                                 info('status '. $status);
 
                                             }

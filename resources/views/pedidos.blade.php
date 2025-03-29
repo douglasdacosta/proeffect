@@ -228,7 +228,9 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                         @endif
                                                     </select>
                                                 </td>
-                                                <td title="Marca como faturado" style="cursor:pointer; @if($pedido->faturado==1) color:green @else color:red @endif"> <i data-pedido="{{ $pedido->id }}" data-status_faturado="{{ $pedido->faturado }}" class="fas fa-dollar-sign faturados"></i></td>
+                                                <td title="Marca como faturado"> 
+                                                    <i style="cursor: pointer;@if($pedido->faturado==1) color:green @else color:red @endif" data-pedido="{{ $pedido->id }}" data-status_faturado="{{ $pedido->faturado }}" class="fas fa-dollar-sign faturados"></i>
+                                                </td>
                                                 <?php
                                                 $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
                                                 $hoje = date('Y-m-d');
@@ -254,7 +256,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                     '. Acesse o link para detalhes do status do seu pedido. https://'. env('URL_LINK_STATUS', 'eplax.com.br') .'/consultar-pedido/' . $hash_codigo_cliente . '/';
                                                 @endphp
                                                 <td class="text-center"> 
-                                                    <i style="@if($pedido->whatsapp_status==1) color:green @else color:red @endif" data-link="{{ $link }}" data-id_pessoa="{{ $pedido->id_pessoa }}" data-whatsapp_status="{{ $pedido->whatsapp_status }}" class="fab fa-whatsapp whatsapp_status"></i>
+                                                    <i style="cursor:pointer; @if($pedido->whatsapp_status==1) color:green @else color:red @endif" data-link="{{ $link }}" data-id_pessoa="{{ $pedido->id_pessoa }}" data-whatsapp_status="{{ $pedido->whatsapp_status }}" class="fab fa-whatsapp whatsapp_status"></i>
                                                 </td>
                                                 <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                                 <th scope="row" title="Imprimir ordem de serviço">
