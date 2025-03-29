@@ -45,7 +45,7 @@
                                         
                                         if(!empty($maquinas[$status])) {
                                             
-                                            $dias_prazo  = $maquinas[$status];
+                                            $dias_prazo  = $maquinas[$status."_original"];
                                             
                                             $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo)->format('Y-m-d');
                                             
@@ -53,19 +53,19 @@
                                             $hojeCarbon = \Carbon\Carbon::createFromDate( $hoje);
                                             $dataMinimaCarbon = \Carbon\Carbon::createFromDate($data_minima);
 
-                                            $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $data_minima, false);      
+                                            $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $data_minima, true);      
                                             
                                             if ($dataMinimaCarbon->gt($hojeCarbon)) {
-                                                $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $pedido->data_entrega, false); 
+                                                $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $pedido->data_entrega, true); 
+                                                $dias_alertaDepartamento = $dias_alertaDepartamento - $dias_prazo -1;
                                             }
-                                            
 
                                             
                                             $original = $maquinas[$status . '_original'];
                                             if($dias_alertaDepartamento < $maquinas[$status . '_original']/2){
                                                 $dias_alerta_departamento = 'text-danger';
                                             }
-                                            if('EP4439' == $pedido->tabelaFichastecnicas->ep){
+                                            if('EP3710' == $pedido->tabelaFichastecnicas->ep){
                                                 info($maquinas);
                                                 info('dias prazo '. $dias_prazo);
                                                 info('data minima '. $data_minima);
