@@ -56,7 +56,6 @@
                                             $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $data_minima, false);      
                                             
                                             if ($dataMinimaCarbon->gt($hojeCarbon)) {
-                                                $data_minima = $hojeCarbon->format('Y-m-d');
                                                 $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $pedido->data_entrega, false); 
                                             }
                                             
