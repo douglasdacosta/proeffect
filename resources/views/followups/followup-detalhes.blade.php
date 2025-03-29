@@ -50,8 +50,8 @@
                                             $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo)->format('Y-m-d');
                                             
                                             // Cria objetos Carbon a partir das strings (formato: dia/mês/ano)
-                                            $hojeCarbon = Carbon::createFromFormat('d/m/Y', $hoje);
-                                            $dataMinimaCarbon = Carbon::createFromFormat('d/m/Y', $data_minima);
+                                            $hojeCarbon = \Carbon\Carbon::createFromFormat('d/m/Y', $hoje);
+                                            $dataMinimaCarbon = \Carbon\Carbon::createFromFormat('d/m/Y', $data_minima);
 
                                             // Comparação usando Carbon
                                             if ($dataMinimaCarbon->gt($hojeCarbon)) {
