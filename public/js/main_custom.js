@@ -751,7 +751,7 @@ $(function ($) {
 
             $.each(Status_pedido, function(i,j) {
 
-                if(j.value == 11 || j.value == 12 || j.value == 13) {
+                if(j.value >= 11) {
                     j.checked = false;
                 } else {
                     j.checked = true;
@@ -770,7 +770,7 @@ $(function ($) {
             Status_pedido = $('.status_pedido');
             $.each(Status_pedido, function(i,j) {
 
-                if(j.value == 11 || j.value == 12 || j.value == 13) {
+                if(j.value >= 11 ) {
                     j.checked = false;
                 } else {
                     j.checked = true;
