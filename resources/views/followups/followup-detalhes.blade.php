@@ -49,13 +49,14 @@
                                             
                                             $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo)->format('Y-m-d');
                                             
-                                            $hojeCarbon = \Carbon\Carbon::createFromFormat('d/m/Y', $hoje);
-                                            $dataMinimaCarbon = \Carbon\Carbon::createFromFormat('d/m/Y', $data_minima);
+
+                                            $hojeCarbon = \Carbon\Carbon::createFromDate( $hoje);
+                                            $dataMinimaCarbon = \Carbon\Carbon::createFromDate($data_minima);
 
                                             if ($dataMinimaCarbon->gt($hojeCarbon)) {
                                                 $data_minima = $hojeCarbon->format('Y-m-d');
                                             }
-                                           
+                                            
 
                                             $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $data_minima, false);      
                                             
