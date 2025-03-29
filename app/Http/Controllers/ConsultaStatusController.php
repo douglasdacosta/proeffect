@@ -44,8 +44,10 @@ class ConsultaStatusController extends Controller
             $pedidos  = DB::select(DB::raw(
                 "SELECT distinct
                     pedidos.id as id,
+                    pedidos.os as os,
                     pedidos.status_id as status_id ,
-                    ficha_tecnica.ep as ep    
+                    ficha_tecnica.ep as ep,
+                    pedidos.qtde as quantidade
                 from pedidos
                 inner join pessoas on pessoas.id = pedidos.pessoas_id
                 inner join ficha_tecnica on ficha_tecnica.id = pedidos.fichatecnica_id
@@ -77,8 +79,9 @@ class ConsultaStatusController extends Controller
                 }
     
                 return [
-                    'codigo' => $pedido->id,
+                    'codigo' => $pedido->os,
                     'ep' => $pedido->ep,
+                    'quantidade' => $pedido->quantidade,
                     'status' => $status
                 ];
             });
