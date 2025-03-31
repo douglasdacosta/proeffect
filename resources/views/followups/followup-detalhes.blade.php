@@ -51,7 +51,7 @@
                                             $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo-$original)->format('Y-m-d');
 
                                             $diasSobrando = \Carbon\Carbon::createFromDate($hoje)->diffInWeekdays($data_minima, false); 
-                                            if($diasSobrando > 0 ) {
+                                            if($diasSobrando >= 0 ) {
                                                 $diasSobrando = $diasSobrando-1;
                                             }
                                             if($diasSobrando < $maquinas[$status . '_original']/2){
