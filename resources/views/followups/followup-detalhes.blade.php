@@ -59,19 +59,9 @@
                                             }
 
                                             if('EP3811' == $pedido->tabelaFichastecnicas->ep){
-
                                                 info($maquinas);
-                                                info('dias diasSobrando '. $diasSobrando);
-                                                // info('$dias ultrapassados '. $dias);
-                                                // info('$dias Perdidos '. $diasPerdidos);
-                                                // info('dias prazo '. $dias_prazo);
+                                                info('dias diasSobrando '. $diasSobrando);                                                
                                                 info('data minima '. $data_minima);
-                                                // info(' dias_alertaDepartamento '. $dias_alertaDepartamento);
-                                                // info('original '. $original);
-                                                // info('hoje '. $hoje);
-                                                // info('data entrga '. $pedido->data_entrega);
-                                                // info('status '. $status);
-
                                             }
                                         }
 
