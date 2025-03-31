@@ -36,7 +36,7 @@
                                 @foreach ($dado_pedido_status['classe'] as $pedido)
                                     <?php
                                         $hoje = date('Y-m-d');
-                                        $dias_alertaDepartamento = 0;
+                                        $dias_alertaDepartamento = $dias = $diasSobrando=  0;
                                         $dias_alerta_departamento = 'text-primary';
                                         $original = 0;
                                         $data_minima = '';
@@ -45,35 +45,32 @@
                                         
                                         if(!empty($maquinas[$status])) {
                                             
-                                            $dias_prazo  = $maquinas[$status."_original"];
-                                            
-                                            $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo)->format('Y-m-d');
-                                            
-
-                                            $hojeCarbon = \Carbon\Carbon::createFromDate( $hoje);
-                                            $dataMinimaCarbon = \Carbon\Carbon::createFromDate($data_minima);
-
-                                            $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $data_minima, true);      
-                                            
-                                            if ($dataMinimaCarbon->gt($hojeCarbon)) {
-                                                $dias_alertaDepartamento = \Carbon\Carbon::createFromDate($hoje)->addDay()->diffInWeekdays( $pedido->data_entrega, true); 
-                                                $dias_alertaDepartamento = $dias_alertaDepartamento - $dias_prazo -1;
-                                            }
-
-                                            
+                                            $dias_prazo  = $maquinas[$status];
                                             $original = $maquinas[$status . '_original'];
-                                            if($dias_alertaDepartamento < $maquinas[$status . '_original']/2){
+
+                                            $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo-$original)->format('Y-m-d');
+
+                                            $diasSobrando = \Carbon\Carbon::createFromDate($hoje)->diffInWeekdays($data_minima, false); 
+                                            if($diasSobrando > 0 ) {
+                                                $diasSobrando = $diasSobrando-1;
+                                            }
+                                            if($diasSobrando < $maquinas[$status . '_original']/2){
                                                 $dias_alerta_departamento = 'text-danger';
                                             }
-                                            if('EP3710' == $pedido->tabelaFichastecnicas->ep){
+
+                                            if('EP3811' == $pedido->tabelaFichastecnicas->ep){
+
                                                 info($maquinas);
-                                                info('dias prazo '. $dias_prazo);
+                                                info('dias diasSobrando '. $diasSobrando);
+                                                // info('$dias ultrapassados '. $dias);
+                                                // info('$dias Perdidos '. $diasPerdidos);
+                                                // info('dias prazo '. $dias_prazo);
                                                 info('data minima '. $data_minima);
-                                                info(' dias_alertaDepartamento '. $dias_alertaDepartamento);
-                                                info('original '. $original);
-                                                info('hoje '. $hoje);
-                                                info('data entrga '. $pedido->data_entrega);
-                                                info('status '. $status);
+                                                // info(' dias_alertaDepartamento '. $dias_alertaDepartamento);
+                                                // info('original '. $original);
+                                                // info('hoje '. $hoje);
+                                                // info('data entrga '. $pedido->data_entrega);
+                                                // info('status '. $status);
 
                                             }
                                         }
@@ -105,7 +102,7 @@
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) }}
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
-                                        <td class="{{ $dias_alerta_departamento }}">{{ abs($dias_alertaDepartamento) }}</td>
+                                        <td class="{{ $dias_alerta_departamento }}">{{ ($diasSobrando) }}</td>
                                         <td class="{{ $class_dias_alerta }}">{{ abs($dias_alerta) }}</td>
                                     </tr>
                                 @endforeach
