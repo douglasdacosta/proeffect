@@ -47,7 +47,8 @@ class ConsultaStatusController extends Controller
                     pedidos.os as os,
                     pedidos.status_id as status_id ,
                     ficha_tecnica.ep as ep,
-                    pedidos.qtde as quantidade
+                    pedidos.qtde as quantidade,
+                    pedidos.data_entrega as data_entrega
                 from pedidos
                 inner join pessoas on pessoas.id = pedidos.pessoas_id
                 inner join ficha_tecnica on ficha_tecnica.id = pedidos.fichatecnica_id
@@ -82,6 +83,7 @@ class ConsultaStatusController extends Controller
                     'codigo' => $pedido->os,
                     'ep' => $pedido->ep,
                     'quantidade' => $pedido->quantidade,
+                    'data_entrega' => $pedido->data_entrega,
                     'status' => $status
                 ];
             });
