@@ -118,7 +118,6 @@ class PedidosController extends Controller
         }
 
         if($status_id) {
-            info($status_id);
             $pedidos =$pedidos->whereIn('status_id', $status_id);
         }
 
@@ -719,21 +718,8 @@ class PedidosController extends Controller
             $tela = 'followup-detalhes-geral';
             $nome_da_tela ='followup geral';
         }
-        $maquinas = $this->getMaquinas();
-        $dias_alerta_maquinas = [
-            'usinagem' => $maquinas[0]->prazo_usinagem + $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
-            'acabamento' => $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
-            'montagem' => $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
-            'inspeção' => $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
-            'embalar' => $maquinas[0]->prazo_embalar ,             
-            'usinagem_original' => $maquinas[0]->prazo_usinagem ,
-            'acabamento_original' => $maquinas[0]->prazo_acabamento ,
-            'montagem_original' => $maquinas[0]->prazo_montagem ,
-            'inspeção_original' => $maquinas[0]->prazo_inspecao ,
-            'embalar_original' => $maquinas[0]->prazo_embalar,
-            
 
-        ];
+        $dias_alerta_maquinas = $this->getMaquinas();
 
         $data = array(
             'tela' => $tela,
@@ -1404,12 +1390,15 @@ class PedidosController extends Controller
             $nome_da_tela ='followup geral';
         }
 
+        $dias_alerta_maquinas = $this->getMaquinas();
+        
         $data = array(
             'tela' => $tela,
             'nome_tela' => $nome_da_tela,
             'dados_pedido_status' => $dados_pedido_status,
             'totalGeral' => $totalGeral,
             'request' => $request,
+            'maquinas' => $dias_alerta_maquinas,
             'status' => $this->getAllStatus(),
             'rotaIncluir' => 'incluir-pedidos',
             'rotaAlterar' => 'alterar-pedidos'
@@ -2042,8 +2031,45 @@ class PedidosController extends Controller
     }
 
     static function getMaquinas() {
+        
         $maquinas = Maquinas::all();
-        return $maquinas;
+        
+        return [
+            'usinagem' => $maquinas[0]->prazo_usinagem + $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'acabamento' => $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'montagem' => $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'inspeção' => $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
+            'embalar' => $maquinas[0]->prazo_embalar ,           
+            'expedição' => 0,
+            'usinagem_original' => $maquinas[0]->prazo_usinagem ,
+            'acabamento_original' => $maquinas[0]->prazo_acabamento ,
+            'montagem_original' => $maquinas[0]->prazo_montagem ,
+            'inspeção_original' => $maquinas[0]->prazo_inspecao ,
+            'embalar_original' => $maquinas[0]->prazo_embalar,
+            'expedição_original' => 0,
+        ];
+        
     }
+
+    static function calculaDiasSobrando($maquinas, $status, $pedido){
+        
+        $hoje = date('Y-m-d');
+        $dias_alerta_departamento = 'text-primary';
+        $dias_prazo  = $maquinas[$status];
+        $original = $maquinas[$status . '_original'];
+
+        $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo-$original)->format('Y-m-d');
+
+        $diasSobrando = \Carbon\Carbon::createFromDate($hoje)->diffInWeekdays($data_minima, false); 
+        if($diasSobrando >= 0 ) {
+            $diasSobrando = $diasSobrando-1;
+        }
+        if($diasSobrando < $maquinas[$status . '_original']/2){
+            $dias_alerta_departamento = 'text-danger';
+        }      
+
+        return ['dias_alerta_departamento' => $dias_alerta_departamento, 'diasSobrando' => $diasSobrando];
+    }
+
 }
 

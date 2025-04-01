@@ -36,33 +36,16 @@
                                 @foreach ($dado_pedido_status['classe'] as $pedido)
                                     <?php
                                         $hoje = date('Y-m-d');
-                                        $dias_alertaDepartamento = $dias = $diasSobrando=  0;
+                                        $diasSobrando=  0;
                                         $dias_alerta_departamento = 'text-primary';
-                                        $original = 0;
-                                        $data_minima = '';
                                         $status = strtolower($key);
-                                        
                                         
                                         if(!empty($maquinas[$status])) {
                                             
-                                            $dias_prazo  = $maquinas[$status];
-                                            $original = $maquinas[$status . '_original'];
+                                            $retorno = PedidosController::calculaDiasSobrando($maquinas, $status, $pedido);
+                                            $dias_alerta_departamento = $retorno['dias_alerta_departamento'];
+                                            $diasSobrando = $retorno['diasSobrando'];
 
-                                            $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo-$original)->format('Y-m-d');
-
-                                            $diasSobrando = \Carbon\Carbon::createFromDate($hoje)->diffInWeekdays($data_minima, false); 
-                                            if($diasSobrando >= 0 ) {
-                                                $diasSobrando = $diasSobrando-1;
-                                            }
-                                            if($diasSobrando < $maquinas[$status . '_original']/2){
-                                                $dias_alerta_departamento = 'text-danger';
-                                            }
-
-                                            if('EP3811' == $pedido->tabelaFichastecnicas->ep){
-                                                info($maquinas);
-                                                info('dias diasSobrando '. $diasSobrando);                                                
-                                                info('data minima '. $data_minima);
-                                            }
                                         }
 
                                         $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');

@@ -89,7 +89,8 @@ class PainelController extends Controller
                                 E.nome as colaborador,
                                 C.created_at,
                                 C.select_tipo_manutencao as select_tipo_manutencao,
-                                A.status_id
+                                A.status_id,
+                                I.nome as prioridade
                             FROM
                                 pedidos A
                             INNER JOIN
@@ -114,6 +115,10 @@ class PainelController extends Controller
                                 status H
                             on
                                 H.id=A.status_id
+                            LEFT JOIN
+                                prioridades I
+                            ON
+                                I.id=A.prioridade_id
                             WHERE
                                 A.status_id = $status
                             ORDER BY
@@ -179,7 +184,8 @@ class PainelController extends Controller
                                                             E.nome as colaborador,
                                                             C.select_tipo_manutencao as select_tipo_manutencao,
                                                             A.status_id,
-                                                            C.created_at
+                                                            C.created_at,
+                                                            I.nome as prioridade
                                                         FROM
                                                             pedidos A
                                                         INNER JOIN
@@ -208,6 +214,10 @@ class PainelController extends Controller
                                                             status H
                                                         on
                                                             H.id=A.status_id
+                                                        LEFT JOIN
+                                                            prioridades I
+                                                        ON
+                                                            I.id=A.prioridade_id
                                                         WHERE
                                                             A.status_id = $status
                                                             -- AND A.os =15493
@@ -229,6 +239,12 @@ class PainelController extends Controller
             $qdte_blank = 0;
             $conjuntos = array();
 
+            $pedidosController = new PedidosController();            
+            $maquinas = $pedidosController->getMaquinas();
+            $retorno = $pedidosController->calculaDiasSobrando($maquinas, strtolower($pedidos[$key]->nome), $pedido);            
+            
+            $pedidos[$key]->dias_alerta_departamento = $retorno['dias_alerta_departamento'];
+            $pedidos[$key]->diasSobrando = $retorno['diasSobrando'];
 
             if ($pedidos[$key]->alerta < 6) {
                 $pedidos[$key]->class_dias_alerta = 'text-danger';
@@ -458,8 +474,8 @@ class PainelController extends Controller
 
     private function carrega_dados($status_pendente, $status_concluido){
 
+        
         $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 3, true);
-
         $pedidosPendentes = $this->busca_dados_pedidos($status_pendente, 50, false);
 
         return  [
@@ -471,7 +487,6 @@ class PainelController extends Controller
     public function paineisUsinagem(){
 
         $data = $this->carrega_dados(4,5);
-
         return view('paineis.painel_usinagem', $data);
     }
 

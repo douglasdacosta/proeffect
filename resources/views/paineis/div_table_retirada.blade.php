@@ -43,8 +43,10 @@ toggleBackgroundByClass('retirada');
                 <th scope="col">Qtde</th>
                 <th scope="col">Blanks</th>
                 <th scope="col">Conj.</th>
+                <th scope="col">Prioridade</th>
                 <th scope="col">Entrega</th>
                 <th scope="col">Retirada</th>
+                <th scope="col">Alerta Depart</th>
                 <th scope="col">Alerta</th>
                 <th scope="col">Etapa</th>
                 @if(isset($usinagem) && $usinagem == true)
@@ -60,14 +62,19 @@ toggleBackgroundByClass('retirada');
         </thead>
         <tbody>
             @foreach ($pedidosCompletos as $pedido)
+            @php 
+            // dd($pedido);
+            @endphp
                     <tr>
                         <td scope="col">{{$pedido->ep}}</td>
                         <td scope="col">{{$pedido->os}}</td>
                         <td scope="col">{{$pedido->qtde}}</td>
                         <td scope="col">{{$pedido->blanks}}</td>
                         <td scope="col">{{$pedido->conjuntos}}</td>
+                        <td scope="col">{{$pedido->prioridade}}</td>
                         <td scope="col">@if($pedido->data_entrega !='') {{Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y')}} @else {{''}} @endif</td>
                         <td scope="col">{{ $pedido->hora_antecipacao }}</td>
+                        <td scope="col" class="{{ $pedido->dias_alerta_departamento}}">{{ $pedido->diasSobrando }}</td>
                         <td scope="col"class="{{ $pedido->class_dias_alerta }}">{{ $pedido->alerta }}</td>
                         <td scope="col">Finalizado</td>
                         @if(isset($usinagem) && $usinagem == true)
@@ -94,8 +101,10 @@ toggleBackgroundByClass('retirada');
                 <th scope="col">Qtde</th>
                 <th scope="col">Blanks</th>
                 <th scope="col">Conj.</th>
+                <th scope="col">Prioridade</th>
                 <th scope="col">Entrega</th>
                 <th scope="col">Retirada</th>
+                <th scope="col">Alerta Depart</th>
                 <th scope="col">Alerta</th>
                 <th scope="col">Etapa</th>
                 @if(isset($usinagem) && $usinagem == true)
@@ -117,7 +126,7 @@ toggleBackgroundByClass('retirada');
                         <td scope="col">{{$pedido->qtde}}</td>
                         <td scope="col">{{$pedido->blanks}}</td>
                         <td scope="col">{{$pedido->conjuntos}}</td>
-
+                        <td scope="col">{{$pedido->prioridade}}</td>
                         <td scope="col" @if(!empty($pedido->hora_antecipacao))  class='retirada' @else {{ '' }} @endif >
                             @if($pedido->data_entrega !='')
                                 @if(!empty($pedido->hora_antecipacao))
@@ -131,6 +140,7 @@ toggleBackgroundByClass('retirada');
                             @endif</td>
 
                         <td scope="col" @if(!empty($pedido->hora_antecipacao))  class='retirada' @else {{ '' }} @endif >{{ $pedido->hora_antecipacao }}</td>
+                        <td scope="col" class="{{ $pedido->dias_alerta_departamento}}">{{ $pedido->diasSobrando }}</td>
                         <td scope="col" class="{{ $pedido->class_dias_alerta }}">{{ $pedido->alerta }}</td>
                         <td scope="col">{{$pedido->etapa}}</td>
                         @if(isset($usinagem) && $usinagem == true)

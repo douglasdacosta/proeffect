@@ -47,6 +47,7 @@ use App\Providers\DateHelpers;
                                     <th scope="col">Acabamento</th>
                                     <th scope="col">Montagem</th>
                                     <th scope="col">Inspeção</th>
+                                    <th scope="col">Alerta departamento</th>
                                     <th scope="col" title="Alerta de dias">Alerta</th>
                                 </tr>
                             </thead>
@@ -57,6 +58,21 @@ use App\Providers\DateHelpers;
                                         $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
                                         $hoje = date('Y-m-d');
                                         $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
+
+                                        $diasSobrando=0;
+                                        $dias_alerta_departamento = 'text-primary';
+                                        $status = strtolower($key);
+                                        
+                                        if(!empty($maquinas[$status])) {
+                                            
+                                            $retorno = PedidosController::calculaDiasSobrando($maquinas, $status, $pedido);
+                                            $dias_alerta_departamento = $retorno['dias_alerta_departamento'];
+                                            $diasSobrando = $retorno['diasSobrando'];
+
+                                        }
+
+                                        
+                                        
                                         if ($dias_alerta < 6) {
                                             $class_dias_alerta = 'text-danger';
                                         } else {
@@ -130,6 +146,7 @@ use App\Providers\DateHelpers;
                                         </td>
                                         <td>{{ PedidosController::formatarHoraMinuto($dado_pedido_status['pedido'][$pedido->id]['inspecao']) }}
                                         </td>
+                                        <td class="{{ $dias_alerta_departamento }}">{{ ($diasSobrando) }}</td>
                                         <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                     </tr>
                                 @endforeach
