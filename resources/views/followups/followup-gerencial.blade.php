@@ -114,7 +114,7 @@ use App\Providers\DateHelpers;
                                         <td>@if(!empty($pedido->tabelaPrioridades->nome)){{ $pedido->tabelaPrioridades->nome }}@else{{''}}@endif</td>
                                         <td title="{{ $pedido->observacao }}">{!! Str::words($pedido->observacao, 1, '...') !!}</td>
                                         <td>{{ number_format($pedido->valor_unitario_adv, 2, ',', '.')  }}</td> <!--valor_unitário-->
-                                        <td style="background-color: #d9edf7">{{ number_format($total, 2, ',', '.');  }}</td> <!--total-->
+                                        <td style="background-color: #d9edf7">{{ number_format($total, 2, ',', '.')  }}</td> <!--total-->
                                         <td style="background-color: #d9edf7">{{ number_format($valor_mo, 2, ',', '.')  }}</td> <!--total mo-->
                                         <td style="background-color: #d9edf7">{{ number_format($valor_mp, 2, ',', '.')  }}</td> <!--total mp-->
                                         <td style="background-color: #f3f2b6">{{ number_format(($mp), 2, ',', '.')  }}</td> <!--mp-->
