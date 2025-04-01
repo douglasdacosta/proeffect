@@ -73,17 +73,11 @@ class ConsultaStatusController extends Controller
             $pedidosFormatados = collect($pedidos)->map(function($pedido) {
                 $status = [];
                 foreach (self::STATUS_PEDIDOS as $id => $descricao) {                  
-                    if($id == 8) {
-                        $status[$id-1] = [
-                            'descricao' => self::STATUS_PEDIDOS[7],
-                            'atual' => ($pedido->status_id == $id)
-                        ];
-                    } else {
+
                         $status[$id] = [
                             'descricao' => $descricao,
                             'atual' => ($pedido->status_id == $id)
                         ];
-                    }
                 }
     
                 return [
