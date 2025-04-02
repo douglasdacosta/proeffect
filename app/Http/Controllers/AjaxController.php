@@ -81,7 +81,7 @@ class AjaxController extends Controller
             $pessoas = Pessoas::find($request->input('id'));
 
             // se faturado for igual a true, então o valor de inventário é 1
-            $pessoas->whatsapp_status = ($request->input('whatsapp_status') == '1' ? 0 : 1);
+            $pessoas->whatsapp_status = (!empty($request->input('whatsapp_status')) && $request->input('whatsapp_status') == '1' ? 0 : 1);
             $pessoas->save();
             return true;
         }catch(\Throwable $th){

@@ -39,12 +39,63 @@ $(function ($) {
 
     });
 
-    $(document).on('click', '.whatsapp_status', function (elemento) {
-        var id_pessoa = $(this).data('id_pessoa');
-        var whatsapp_status = $(this).data('whatsapp_status');
-        var link = $(this).data('link');
-        var el = $(this);
+    $(document).on('click', '#copiar_link', function () { 
+
+        texto = $('#texto_link').text()
+
+        navigator.clipboard.writeText(texto).then(() => {
+            abreAlertSuccess('Texto copiado para área de trênsferencia', false);
+        }).catch(err => {
+            console.error("Erro ao copiar: ", err);
+        })
+    })
+
+    $(document).on('click', '.whatsapp_status', function (e) {
         
+        let whatsapp_status =  Number($(this).attr('data-whatsapp_status'));
+        $('#input_id_pessoa').val($(this).data('id_pessoa'));
+        $('#input_whatsapp_status').val(whatsapp_status);
+
+        $('#input_link_envio').val($(this).data('link'));
+        $('#texto_link').text($(this).data('link_eplax'));
+        
+        if (whatsapp_status === 1) {
+            var id_pessoa = $('#input_id_pessoa').val();
+            var el = $('.icone_' + id_pessoa);
+
+            $.ajax({
+                type: "POST",
+                url: '/ajax-whatsapp-status',
+                data: {
+                    'id': id_pessoa,
+                    'whatsapp_status': whatsapp_status,
+                    '_token': $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function (data) {
+
+                    abreAlertSuccess('WhatsApp atualizado', false);        
+                    el.attr('style', 'color: red !important; cursor: pointer;');
+                    el.attr('data-whatsapp_status', 0).data('whatsapp_status', 0);                  
+                },
+                error: function (data, textStatus, errorThrown) {
+
+                    $('.overlay').hide();
+                },
+
+            });
+        } else {
+            $('#modal_whatsapp').modal('show');    
+        }
+        
+
+    });
+
+
+    $(document).on('click', '#enviar_link', function (elemento) {
+        var id_pessoa = $('#input_id_pessoa').val();
+        var whatsapp_status = $('#input_whatsapp_status').val();
+        var link = $('#input_link_envio').val();
+        var el = $('.icone_' + id_pessoa);
         $.ajax({
             type: "POST",
             url: '/ajax-whatsapp-status',
@@ -55,18 +106,11 @@ $(function ($) {
             },
             success: function (data) {
 
-                abreAlertSuccess('WhatsApp atualizado', false);        
-                       
-                whatsapp_status = el.attr('data-whatsapp_status');
-                if(whatsapp_status == 1) {
-                    el.attr('style', 'color: red !important;');
-                    el.attr('data-whatsapp_status',0);
-                } else {
-                    el.attr('style', 'color: green !important;');
-                    el.attr('data-whatsapp_status',1);
-                    //open a new table os browser with the whatsapp link
-                    window.open(link, '_blank');
-                 }
+                abreAlertSuccess('WhatsApp atualizado', false);                                        
+                el.attr('style', 'color: green !important; cursor: pointer;');
+                el.attr('data-whatsapp_status',1);
+                window.open(link, '_blank');
+                
                 
 
             },

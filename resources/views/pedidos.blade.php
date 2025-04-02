@@ -45,6 +45,28 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
             </div>
         @stop
         @section('content')
+            <div id='modal_whatsapp' class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 100%">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id='texto_status_caixas'>Envio de mensagem para WhatsApp</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">                            
+                            <p id="texto_link"></p> <i class="fas fa-copy text-info" style="cursor: pointer" id="copiar_link"></i>
+                            <input type="hidden" name="input_link_envio" id="input_link_envio" value=""/>
+                            <input type="hidden" name="id_pessoa" id="input_id_pessoa" value=""/>
+                            <input type="hidden" name="whatsapp_status" id="input_whatsapp_status" value=""/>
+                        </div>
+                        <div class="modal-footer">
+                            <a class="btn btn-success" id="enviar_link" data-dismiss="modal">Enviar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div id='modal_funcionarios' class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" style="width: 700px">
@@ -252,11 +274,17 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                 @php 
                                                     $telefone = preg_replace("/[^0-9]/", "", $pedido->telefone);
                                                     $hash_codigo_cliente = md5($pedido->id_pessoa);
-                                                    $link = 'https://wa.me/55'.$telefone.'?text=Olá, '. $pedido->nome_cliente . 
-                                                    '. Acesse o link para detalhes do status do seu pedido. https://'. env('URL_LINK_STATUS', 'eplax.com.br') .'/consultar-pedido/' . $hash_codigo_cliente . '/consulta/';
+                                                    $link_eplax = 'https://' . 
+                                                                env('URL_LINK_STATUS', 'eplax.com.br') . 
+                                                                '/consultar-pedido/' . $hash_codigo_cliente . '/consulta/';
+
+                                                    $mensagem = 'Olá, ' . $pedido->nome_cliente . 
+                                                                '. Acesse o link para detalhes do status do seu pedido: ' . $link_eplax;
+
+                                                    $link = 'https://wa.me/55' . $telefone . '?text=' . urlencode($mensagem);
                                                 @endphp
                                                 <td class="text-center"> 
-                                                    <i style="cursor:pointer; @if($pedido->whatsapp_status==1) color:green @else color:red @endif" data-link="{{ $link }}" data-id_pessoa="{{ $pedido->id_pessoa }}" data-whatsapp_status="{{ $pedido->whatsapp_status }}" class="fab fa-whatsapp whatsapp_status"></i>
+                                                    <i style="cursor:pointer; @if($pedido->whatsapp_status==1) color:green @else color:red @endif" data-link="{{ $link }}" data-link_eplax="{{ $link_eplax }}"  data-id_pessoa="{{ $pedido->id_pessoa }}" data-whatsapp_status="{{ $pedido->whatsapp_status }}" class="fab fa-whatsapp whatsapp_status {{ 'icone_'.$pedido->id_pessoa }}"></i>
                                                 </td>
                                                 <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
                                                 <th scope="row" title="Imprimir ordem de serviço">
