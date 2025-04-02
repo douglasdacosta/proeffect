@@ -43,11 +43,23 @@ $(function ($) {
 
         texto = $('#texto_link').text()
 
-        navigator.clipboard.writeText(texto).then(() => {
+        const textarea = document.createElement("textarea");
+        textarea.value = texto;
+        textarea.style.position = 'fixed';  // evita scroll ao focar
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
             abreAlertSuccess('Texto copiado para área de trênsferencia', false);
-        }).catch(err => {
-            console.error("Erro ao copiar: ", err);
-        })
+        } catch (err) {
+            abreAlertSuccess('Falha ao copiar para área de trênsferencia', true);
+        }
+
+        document.body.removeChild(textarea);
+
+
     })
 
     $(document).on('click', '.whatsapp_status', function (e) {
