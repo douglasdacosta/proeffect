@@ -55,7 +55,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                             </button>
                         </div>
                         <div class="modal-body">                            
-                            <p id="texto_link"></p> <i class="fas fa-copy text-info" style="cursor: pointer" id="copiar_link"></i>
+                            <p id="texto_link"></p>
                             <input type="hidden" name="input_link_envio" id="input_link_envio" value=""/>
                             <input type="hidden" name="id_pessoa" id="input_id_pessoa" value=""/>
                             <input type="hidden" name="whatsapp_status" id="input_whatsapp_status" value=""/>

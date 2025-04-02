@@ -1,4 +1,31 @@
+function copiarTexto() {    
+    const texto = document.getElementById("texto_link").innerText;
 
+    if (!texto) {
+        alert("⚠️ O texto está vazio!");
+        return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = texto;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+
+    document.body.appendChild(textarea);
+    
+    textarea.select();
+    
+
+    try {
+        const sucesso = document.execCommand('copy');
+        abreAlertSuccess('Texto copiado para área de trênsferencia', false)
+    } catch (err) {
+        abreAlertSuccess('Falha ao copiar para área de trênsferencia', true)
+    }
+
+    document.body.removeChild(textarea);
+}
 
 $(function ($) {
 
@@ -41,25 +68,35 @@ $(function ($) {
 
     $(document).on('click', '#copiar_link', function () { 
 
-        texto = $('#texto_link').text()
+        const texto = document.getElementById("texto_link").innerText;
 
         const textarea = document.createElement("textarea");
         textarea.value = texto;
-        textarea.style.position = 'fixed';  // evita scroll ao focar
+        textarea.style.position = 'fixed';
+        textarea.style.top = 0;
+        textarea.style.left = 0;
+        textarea.style.opacity = 0;
+
         document.body.appendChild(textarea);
+
         textarea.focus();
         textarea.select();
 
-        try {
-            document.execCommand('copy');
-            // abreAlertSuccess('Texto copiado para área de trênsferencia', false);
-        } catch (err) {
-            // abreAlertSuccess('Falha ao copiar para área de trênsferencia', true);
-        }
+        // Executa o copy depois de um pequeno delay
+        setTimeout(() => {
+            try {
+                const sucesso = document.execCommand('copy');
+                alert(sucesso ? '✅ Copiado!' : '❌ Falhou ao copiar.');
+            } catch (err) {
+                alert('❌ Erro ao copiar: ' + err);
+            }
 
-        document.body.removeChild(textarea);
+            
+        }, 50); 
 
-
+        setTimeout(() => {
+            document.body.removeChild(textarea);
+        }, 150);
     })
 
     $(document).on('click', '.whatsapp_status', function (e) {
@@ -71,36 +108,44 @@ $(function ($) {
         $('#input_link_envio').val($(this).data('link'));
         $('#texto_link').text($(this).data('link_eplax'));
         
-        if (whatsapp_status === 1) {
-            var id_pessoa = $('#input_id_pessoa').val();
-            var el = $('.icone_' + id_pessoa);
-
-            $.ajax({
-                type: "POST",
-                url: '/ajax-whatsapp-status',
-                data: {
-                    'id': id_pessoa,
-                    'whatsapp_status': whatsapp_status,
-                    '_token': $('meta[name="csrf-token"]').attr('content'),
-                },
-                success: function (data) {
-
-                    abreAlertSuccess('WhatsApp atualizado', false);        
-                    el.attr('style', 'color: red !important; cursor: pointer;');
-                    el.attr('data-whatsapp_status', 0).data('whatsapp_status', 0);                  
-                },
-                error: function (data, textStatus, errorThrown) {
-
-                    $('.overlay').hide();
-                },
-
-            });
-        } else {
-            $('#modal_whatsapp').modal('show');    
+        if (whatsapp_status === 0 || whatsapp_status == '' ) {
+            copiarTexto()
         }
-        
 
+        setTimeout(() => {        
+            
+            if (whatsapp_status === 1) {
+                var id_pessoa = $('#input_id_pessoa').val();
+                var el = $('.icone_' + id_pessoa);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/ajax-whatsapp-status',
+                    data: {
+                        'id': id_pessoa,
+                        'whatsapp_status': whatsapp_status,
+                        '_token': $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function (data) {
+
+                        abreAlertSuccess('WhatsApp atualizado', false);        
+                        el.attr('style', 'color: red !important; cursor: pointer;');
+                        el.attr('data-whatsapp_status', 0).data('whatsapp_status', 0);                  
+                    },
+                    error: function (data, textStatus, errorThrown) {
+
+                        $('.overlay').hide();
+                    },
+
+                });
+            } else {
+                $('#modal_whatsapp').modal('show');    
+            }
+        }, 50); 
+       
     });
+
+    https://eplax.com.br/consultar-pedido/140f6969d5213fd0ece03148e62e461e/consulta/
 
 
     $(document).on('click', '#enviar_link', function (elemento) {
