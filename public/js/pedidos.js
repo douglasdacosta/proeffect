@@ -52,9 +52,9 @@ $(function ($) {
 
         try {
             document.execCommand('copy');
-            abreAlertSuccess('Texto copiado para área de trênsferencia', false);
+            // abreAlertSuccess('Texto copiado para área de trênsferencia', false);
         } catch (err) {
-            abreAlertSuccess('Falha ao copiar para área de trênsferencia', true);
+            // abreAlertSuccess('Falha ao copiar para área de trênsferencia', true);
         }
 
         document.body.removeChild(textarea);
