@@ -74,10 +74,58 @@ class ConsultaStatusController extends Controller
                 $status = [];
                 foreach (self::STATUS_PEDIDOS as $id => $descricao) {                  
 
-                        $status[$id] = [
-                            'descricao' => $descricao,
+                    if ($id <= 3 ) {
+                        $atual = (!empty($status[1]['atual']) && $status[1]['atual'] == true) ? true : ($pedido->status_id == $id);
+                        $status[1] = [
+                            'descricao' => 'Pedido',
+                            'atual' => $atual
+                        ];
+                    } 
+                    if ($id == 4) {
+
+                        $status[2] = [
+                            'descricao' => 'Usinagem',
                             'atual' => ($pedido->status_id == $id)
                         ];
+                    } 
+                
+                    if ($id == 5) {
+
+                        $status[3] = [
+                            'descricao' => 'Acabamento',
+                            'atual' => ($pedido->status_id == $id)
+                        ];
+                    }
+                    
+                    if ($id == 6) {
+
+                        $status[4] = [
+                            'descricao' => 'Montagem',
+                            'atual' => ($pedido->status_id == $id)
+                        ];
+                    } 
+                    if ($id == 7 || $id == 8) {
+
+                        $status[5] = [
+                            'descricao' => 'Inspeção',
+                            'atual' => ($pedido->status_id == $id)
+                        ];
+                    } 
+                    if ($id == 9) {
+
+                        $status[6] = [
+                            'descricao' => 'Expedição',
+                            'atual' => ($pedido->status_id == $id)
+                        ];
+                    } 
+                    if ($id >= 10) {
+                    $atual = (!empty($status[7]['atual']) && $status[7]['atual'] == true) ? true : ($pedido->status_id == $id);
+
+                        $status[7] = [
+                            'descricao' => 'Entregue',
+                            'atual' => $atual
+                        ];
+                    }
                 }
     
                 return [
