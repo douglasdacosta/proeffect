@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
         try {
             $schedule->command('command:importarPedido')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '20:00');
             $schedule->command('command:ImportarPedidoAntigo')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '22:00');
+            $schedule->command('pessoas:gerar-hash')->everyFiveMinutes()->withoutOverlapping()->between('8:00', '22:00');
         } catch (\Exception $th) {
             info($th);
         }

@@ -206,8 +206,8 @@ class EstoqueController extends Controller
             }
 
             $value->consumo_medio_mensal = $value->consumo_medio_mensal == 0 ? 1 : $value->consumo_medio_mensal;
-
-            $previsao_meses = ($dados_estoque[$value->material_id]['estoque']  - $value->estoque_minimo) / $value->consumo_medio_mensal;
+            $dados_estoque[$value->material_id]['consumo_medio_mensal'] =  $value->consumo_medio_mensal;
+            $previsao_meses = ($dados_estoque[$value->material_id]['estoque']) / $value->consumo_medio_mensal;
             if($previsao_meses <= 0) {
                 $dados_estoque[$value->id]['previsao_meses'] = 0;
             } else {
@@ -240,6 +240,7 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['material'] = $value->material;
             $array_estoque[$value->id]['alerta'] = $dados_estoque[$value->material_id]['alerta'];
             $array_estoque[$value->id]['previsao_meses'] = $dados_estoque[$value->id]['previsao_meses'];
+            $array_estoque[$value->id]['consumo_medio_mensal'] = $dados_estoque[$value->material_id]['consumo_medio_mensal'];
             $array_estoque[$value->id]['estoque_comprado'] = number_format($estoque_comprado,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
             $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');

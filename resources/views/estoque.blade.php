@@ -151,7 +151,22 @@
                                     <td data-field="categoria" nowrap>{{$item_estoque['categoria']}}</td>
                                     <td data-field="estoque_comprado" >{{$item_estoque['estoque_comprado']}}</td>
                                     <td data-field="estoque_atual" >{{$item_estoque['estoque_atual']}}</td>
-                                    <td data-field="pacote" >{{ isset($estoque_material_somado[$item_estoque['material']]['estoque_total']) ? number_format($estoque_material_somado[$item_estoque['material']]['estoque_total'], 0, '', '.') : 0}}</td>
+                                    @php
+
+                                     $estoque_total_float = isset($estoque_material_somado[$item_estoque['material']]['estoque_total']) ? $estoque_material_somado[$item_estoque['material']]['estoque_total'] : 0;
+                                     $estoque_total = isset($estoque_material_somado[$item_estoque['material']]['estoque_total']) ? number_format($estoque_material_somado[$item_estoque['material']]['estoque_total'], 0, '', '.') : 0;
+                                     $consumo_medio_mensal = $item_estoque['consumo_medio_mensal'];
+
+                                     $previsao_meses = $estoque_total_float/$consumo_medio_mensal;
+
+                                     if($previsao_meses <= 0) {
+                                        $previsao_meses = 0;
+                                    } else {
+                                        $previsao_meses = round($previsao_meses, 1);
+                                    }
+                                     
+                                    @endphp
+                                    <td data-field="pacote" >{{ $estoque_total }}</td>
                                     <td data-field="pacote" >{{$item_estoque['pacote']}}</td>
                                     <td data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
                                     <td>
@@ -159,7 +174,7 @@
                                         @if(isset($item_estoque['inventario']) && $item_estoque['inventario'] == 1) checked="checked" @endif value='1' >
                                     </td>
                                     <td data-field="alerta" >@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
-                                    <td data-field="previsao" title="{{$item_estoque['previsao_meses']}} meses">{{$item_estoque['previsao_meses'] }}</td>
+                                    <td data-field="previsao" title="{{$previsao_meses}} meses">{{ $previsao_meses }}</td>
                                     <th  scope="row">
                                         <a href="#">
                                             <span data-id="{{$item_estoque['id']}}" style="cursor:pointer;" class="fa fa-print adiciona_fila_impressao"></span>

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class ConsultaStatusController extends Controller
 {
+    
     const STATUS_PEDIDOS = [
         1 => 'Imprimir',
         2 => 'Em Preparação',
@@ -28,6 +29,8 @@ class ConsultaStatusController extends Controller
 
     public function consultarStatus($hash, $token)
     {
+
+        info('aqui');
         // Validar o token de integração
         $tokenValido = env('TOKEN_INTEGRACAO_CONSULTA');
         
@@ -48,7 +51,8 @@ class ConsultaStatusController extends Controller
                     pedidos.status_id as status_id ,
                     ficha_tecnica.ep as ep,
                     pedidos.qtde as quantidade,
-                    pedidos.data_entrega as data_entrega
+                    pedidos.data_entrega as data_entrega,
+                    pessoas.nome_cliente as nome_cliente
                 from pedidos
                 inner join pessoas on pessoas.id = pedidos.pessoas_id
                 inner join ficha_tecnica on ficha_tecnica.id = pedidos.fichatecnica_id
@@ -59,8 +63,10 @@ class ConsultaStatusController extends Controller
                         (
                             (pedidos.status_id = 11 and (DATEDIFF(CURRENT_DATE, historicos_pedidos.created_at) <= $dias_entregue))
                             or (pedidos.status_id < 11)
-                        )"
-            ));            
+                        )
+                ORDER BY pedidos.data_entrega asc"
+            ));         
+            info($pedidos);   
             if (!$pedidos) {
                 return response()->json([
                     'success' => true,
@@ -106,9 +112,10 @@ class ConsultaStatusController extends Controller
                     } 
                     if ($id == 7 || $id == 8) {
 
+                        $atual = (!empty($status[5]['atual']) && $status[5]['atual'] == true) ? true : ($pedido->status_id == $id);
                         $status[5] = [
                             'descricao' => 'Inspeção',
-                            'atual' => ($pedido->status_id == $id)
+                            'atual' => $atual
                         ];
                     } 
                     if ($id == 9) {
@@ -133,6 +140,7 @@ class ConsultaStatusController extends Controller
                     'ep' => $pedido->ep,
                     'quantidade' => $pedido->quantidade,
                     'data_entrega' => $pedido->data_entrega,
+                    'nome_cliente' => $pedido->nome_cliente,
                     'status' => $status
                 ];
             });
