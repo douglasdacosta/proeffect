@@ -11,6 +11,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\ImportarPedido::class,
         Commands\ImportarPedidoAntigo::class,
+        Commands\GerarHashPessoas::class,
+        Commands\AtualisarMateriais::class,
     ];
     /**
      * Define the application's command schedule.
@@ -25,6 +27,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('command:importarPedido')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '20:00');
             $schedule->command('command:ImportarPedidoAntigo')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '22:00');
             $schedule->command('pessoas:gerar-hash')->everyFiveMinutes()->withoutOverlapping()->between('8:00', '22:00');
+            $schedule->command('configuracoes:atualisar-materiais')->cron('0 0 1 * *')->withoutOverlapping(); // minuto hora dia-do-mês mês dia-da-semana
         } catch (\Exception $th) {
             info($th);
         }

@@ -70,9 +70,7 @@ $(function ($) {
             document.querySelector('.select2-search__field').focus();
         });
 
-    } else {
-        console.error("Select2 não está carregado!");
-    }
+    } 
 
 
 

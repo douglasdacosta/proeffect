@@ -186,10 +186,43 @@ class MateriaisController extends Controller
                 $historicos->save();
             }
 
-        return $materiais->id;
-    });
+            return $materiais->id;
+        });
 
-    return $id;
+        return $id;
 
-}
+    }
+
+
+    public function atualizaConsumoMedioMensal($material_id, $consumo_medio) {
+
+        $materiais = new Materiais();
+        $materiais = $materiais->where('id', '=', $material_id)->get();
+
+        if($materiais->isEmpty()) {
+            return response()->json(['error' => true, 'mensagem' => 'Material não encontrado'], 404);
+        }
+
+        $material = $materiais[0];
+        $material->consumo_medio_mensal = $consumo_medio;
+        $material->save();
+
+        return response()->json(['error' => false, 'mensagem' => 'Consumo médio mensal atualizado com sucesso']);
+    }
+
+        public function atualizaEstoqueMinimo($material_id, $estoque_minimo) {
+
+        $materiais = new Materiais();
+        $materiais = $materiais->where('id', '=', $material_id)->get();
+
+        if($materiais->isEmpty()) {
+            return response()->json(['error' => true, 'mensagem' => 'Material não encontrado'], 404);
+        }
+
+        $material = $materiais[0];
+        $material->estoque_minimo = $estoque_minimo;
+        $material->save();
+
+        return response()->json(['error' => false, 'mensagem' => 'Estoque mínimo atualizado com sucesso']);
+    }
 }

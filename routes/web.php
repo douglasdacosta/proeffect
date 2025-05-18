@@ -122,3 +122,6 @@ Route::get('/consulta-status/{hash}/{token}', [ConsultaStatusController::class, 
 Route::match(['post'],'/ajax-faturado', [App\Http\Controllers\AjaxController::class, 'ajaxFaturado'])->name('ajax-Faturado');
 Route::match(['post'],'/ajax-whatsapp-status', [App\Http\Controllers\AjaxController::class, 'ajaxWhatsappStatus'])->name('ajax-whatsapp-status');
 
+Route::match(['get', 'post'],'/configuracoes', [App\Http\Controllers\ConfiguracoesController::class, 'index'])->name('configuracoes')->middleware('afterAuth:configuracoes');
+Route::match(['get', 'post'],'/alterar-configuracoes', [App\Http\Controllers\ConfiguracoesController::class, 'alterar'])->name('alterar-configuracoes')->middleware('afterAuth:configuracoes');
+Route::match(['get', 'post'],'/incluir-configuracoes', [App\Http\Controllers\ConfiguracoesController::class, 'incluir'])->name('incluir-configuracoes')->middleware('afterAuth:configuracoes');

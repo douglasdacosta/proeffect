@@ -530,18 +530,6 @@ class RelatoriosController extends Controller
             $peso_material = $key !== false  && !empty($consumido_no_periodo[$key]['material_id']) ? $consumido_no_periodo[$key]['peso_material'] : 0;
             $consumido_ids = $key !== false && !empty($consumido_no_periodo[$key]['estoqueIds']) ? $consumido_no_periodo[$key]['estoqueIds'] : [];
             
-            if($material->id == 43) {
-                info($material->id);
-                info($key);
-                info($consumido_ids);    
-                info($entradas_ids);    
-                info($estoque_atual_ids);    
-
-
-                info(' --------- ');
-            }
-            
-
             $os =  [];
             if($this->busca_os) {
                 $os =  [
@@ -1167,4 +1155,26 @@ class RelatoriosController extends Controller
             ]
             ];
     }
+
+    public function GeraRelatorioPrevisaoMaterial($data, $data_fim) {
+        $request = Request::create('/followup-gerencial', 'GET', [
+                    "data" => "$data",
+                    "data_fim" => "$data_fim",
+                    "loja" => null,
+                    "tipo_consulta" => "C",
+                    "categorias" => null,
+                    "status_id" =>  ["1", "2", "3", "4"]
+                ]
+        );
+
+        $relatorios = new RelatoriosController();
+        $dados = $relatorios->relatorioPrevisaoMaterial($request);
+        $dados = $dados->getData();
+
+        return $dados;
+    }
+
+    
 }
+
+
