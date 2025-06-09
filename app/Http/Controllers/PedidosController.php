@@ -1266,11 +1266,13 @@ class PedidosController extends Controller
                         $tmp = $fichatecnicasitem->tempo_usinagem;
                         $val_chapa = $fichatecnicasitem->tabelaMateriais->valor;
                         $qtde_CH = $blank_por_chapa;
+                       
                         $qtde_ = $fichatecnicasitem->qtde_blank;
-
+                        $MP = '';
                         if($blank != '') {
 
                             if(!empty($val_chapa) && !empty($qtde_CH)){
+
                                 $MP = $val_chapa/$qtde_CH*$qtde_;
 
                                 $tempo = $this->multiplyTimeByInteger($tmp,  $qtde_);
@@ -1286,8 +1288,15 @@ class PedidosController extends Controller
                             $MP = $val_chapa*$qtde_CH;
                             $MO = 0;
                         }
+                        
+                        try{
+                            $Total_mp = $Total_mp + (($MP !='') ? $MP : 0);
+                        } catch(\Exception $e){
+                            dd($pedido);                           
+                        }
+                            
 
-                        $Total_mp = $Total_mp + (($MP !='') ? $MP : 0);
+                        
 
 
                     $Total_ci = $Total_mp + $Total_mo;
