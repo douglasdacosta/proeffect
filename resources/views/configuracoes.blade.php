@@ -17,7 +17,7 @@
         @section('content')
         <form id="alterar_configuracoes" action="alterar-configuracoes" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="" method="post">
                 @csrf <!--{{ csrf_field() }}-->
-                <input type="hidden" id="id" name="id"  value="@if (isset($configuracoes[0]->id)){{$configuracoes[0]->id}}@else{{''}}@endif">                
+                <input type="hidden" id="id" name="id"  value="@if (isset($configuracoes[0]->id)){{$configuracoes[0]->id}}@else{{''}}@endif">
                 <div class="form-group row">
                     <label for="consumo_medio_mensal" class="col-sm-3 col-form-label text-right" title='Tempo de cálculo de consumo médio mensal em meses'>Consumo médio mensal (meses)</label>
                     <div class="col-sm-1">
@@ -31,10 +31,17 @@
                         <div class="col-sm-1">
                             <input type="text" class="form-control" id="categorias_{{$categoria->id}}"  name="categoria_{{$categoria->id}}" value="{{ $configuracoes['categoria_'.$categoria->id] }}">
                         </div>
-                        
+
                     </div>
                 @endforeach
-                
+
+                <div class="form-group row">
+                    <label for="consumo_medio_mensal" class="col-sm-3 col-form-label text-right" title='Tempo de cálculo de consumo médio mensal em meses'>Consumo médio mensal (meses)</label>
+                    <div class="col-sm-1">
+                        <input type="text" class="form-control" id="percentual_usinagem_acabamento"  name="percentual_usinagem_acabamento" value="@if (isset($configuracoes['percentual_usinagem_acabamento'])){{$configuracoes['percentual_usinagem_acabamento']}}@else{{''}}@endif">
+                    </div>
+                </div>
+
                 <input type="hidden" id="tipo_atualizacao" name="tipo_atualizacao"  value="0">
 
                 <div class="form-group row">

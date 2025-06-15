@@ -106,8 +106,6 @@
                     <input type="text" class="form-control " id="prazo_expedicao"  name="prazo_expedicao" value="@if (isset($maquinas[0]->prazo_expedicao)){{$maquinas[0]->prazo_expedicao}}@else{{''}}@endif">
                     </div>
                 </div>
-                
-
                 <div class="form-group row">
                     <div class="col-sm-5">
                     </div>
