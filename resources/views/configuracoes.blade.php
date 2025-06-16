@@ -36,7 +36,7 @@
                 @endforeach
 
                 <div class="form-group row">
-                    <label for="consumo_medio_mensal" class="col-sm-3 col-form-label text-right" title='Tempo de cálculo de consumo médio mensal em meses'>Consumo médio mensal (meses)</label>
+                    <label for="percentual_usinagem_acabamento" class="col-sm-3 col-form-label text-right" title='Percentual de acabamento baseado no tempo de usinagem'>Percentual de usinagem no acabamento(%)</label>
                     <div class="col-sm-1">
                         <input type="text" class="form-control" id="percentual_usinagem_acabamento"  name="percentual_usinagem_acabamento" value="@if (isset($configuracoes['percentual_usinagem_acabamento'])){{$configuracoes['percentual_usinagem_acabamento']}}@else{{''}}@endif">
                     </div>
