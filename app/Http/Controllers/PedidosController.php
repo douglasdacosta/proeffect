@@ -566,7 +566,7 @@ class PedidosController extends Controller
             }
         }
 
-        
+
         $tela = 'pesquisa-followup';
         $nome_tela = 'followup tempos';
         $data = array(
@@ -1266,7 +1266,7 @@ class PedidosController extends Controller
                         $tmp = $fichatecnicasitem->tempo_usinagem;
                         $val_chapa = $fichatecnicasitem->tabelaMateriais->valor;
                         $qtde_CH = $blank_por_chapa;
-                       
+
                         $qtde_ = $fichatecnicasitem->qtde_blank;
                         $MP = '';
                         if($blank != '') {
@@ -1288,15 +1288,15 @@ class PedidosController extends Controller
                             $MP = $val_chapa*$qtde_CH;
                             $MO = 0;
                         }
-                        
+
                         try{
                             $Total_mp = $Total_mp + (($MP !='') ? $MP : 0);
                         } catch(\Exception $e){
-                            dd($pedido);                           
+                            dd($pedido);
                         }
-                            
 
-                        
+
+
 
 
                     $Total_ci = $Total_mp + $Total_mo;
@@ -1400,7 +1400,7 @@ class PedidosController extends Controller
         }
 
         $dias_alerta_maquinas = $this->getMaquinas();
-        
+
         $data = array(
             'tela' => $tela,
             'nome_tela' => $nome_da_tela,
@@ -2040,15 +2040,15 @@ class PedidosController extends Controller
     }
 
     static function getMaquinas() {
-        
+
         $maquinas = Maquinas::all();
-        
+
         return [
             'usinagem' => $maquinas[0]->prazo_usinagem + $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
             'acabamento' => $maquinas[0]->prazo_acabamento + $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
             'montagem' => $maquinas[0]->prazo_montagem + $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
             'inspeção' => $maquinas[0]->prazo_inspecao + $maquinas[0]->prazo_embalar ,
-            'embalar' => $maquinas[0]->prazo_embalar ,           
+            'embalar' => $maquinas[0]->prazo_embalar ,
             'expedição' => 0,
             'usinagem_original' => $maquinas[0]->prazo_usinagem ,
             'acabamento_original' => $maquinas[0]->prazo_acabamento ,
@@ -2057,11 +2057,11 @@ class PedidosController extends Controller
             'embalar_original' => $maquinas[0]->prazo_embalar,
             'expedição_original' => 0,
         ];
-        
+
     }
 
     static function calculaDiasSobrando($maquinas, $status, $pedido){
-        
+
         $hoje = date('Y-m-d');
         $dias_alerta_departamento = 'text-primary';
         $dias_prazo  = $maquinas[$status];
@@ -2069,13 +2069,13 @@ class PedidosController extends Controller
 
         $data_minima = \Carbon\Carbon::createFromDate($pedido->data_entrega)->subWeekdays($dias_prazo-$original)->format('Y-m-d');
 
-        $diasSobrando = \Carbon\Carbon::createFromDate($hoje)->diffInWeekdays($data_minima, false); 
+        $diasSobrando = \Carbon\Carbon::createFromDate($hoje)->diffInWeekdays($data_minima, false);
         if($diasSobrando >= 0 ) {
             $diasSobrando = $diasSobrando-1;
         }
         if($diasSobrando < $maquinas[$status . '_original']/2){
             $dias_alerta_departamento = 'text-danger';
-        }      
+        }
 
         return ['dias_alerta_departamento' => $dias_alerta_departamento, 'diasSobrando' => $diasSobrando];
     }

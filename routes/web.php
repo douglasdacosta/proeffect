@@ -125,3 +125,7 @@ Route::match(['post'],'/ajax-whatsapp-status', [App\Http\Controllers\AjaxControl
 Route::match(['get', 'post'],'/configuracoes', [App\Http\Controllers\ConfiguracoesController::class, 'index'])->name('configuracoes')->middleware('afterAuth:configuracoes');
 Route::match(['get', 'post'],'/alterar-configuracoes', [App\Http\Controllers\ConfiguracoesController::class, 'alterar'])->name('alterar-configuracoes')->middleware('afterAuth:configuracoes');
 Route::match(['get', 'post'],'/incluir-configuracoes', [App\Http\Controllers\ConfiguracoesController::class, 'incluir'])->name('incluir-configuracoes')->middleware('afterAuth:configuracoes');
+
+Route::match(['get', 'post'],'/atualizacao_tempo', [App\Http\Controllers\AtualizacaoTemposController::class, 'index'])->name('atualizacao_tempo')->middleware('afterAuth:configuracoes');
+Route::match(['get', 'post'],'/alterar-atualizacao_tempo', [App\Http\Controllers\AtualizacaoTemposController::class, 'alterar'])->name('alterar-atualizacao_tempo')->middleware('afterAuth:configuracoes');
+Route::match(['get', 'post'],'/incluir-atualizacao_tempo', [App\Http\Controllers\AtualizacaoTemposController::class, 'incluir'])->name('incluir-atualizacao_tempo')->middleware('afterAuth:configuracoes');
