@@ -41,7 +41,7 @@
                   @if(isset($pedidos))
                         @foreach ($pedidos as $pedido)
                             <tr>
-                            <td scope="row">{{'EP' . $pedido->ep}}</td>
+                            <td scope="row">{{$pedido->ep}}</td>
                               <td>{{$pedido->os}}</td>
                               <td>{{$pedido->qtde}}</td>
                               <td>{{$pedido->tempo_inspecao}}</td>
