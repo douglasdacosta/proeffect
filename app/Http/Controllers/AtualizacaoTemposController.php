@@ -66,7 +66,7 @@ class AtualizacaoTemposController extends Controller
                             SELECT created_at FROM historicos_etapas
                             WHERE pedidos_id = '.$pedido->id.' AND status_id = 7 AND etapas_pedidos_id = 1
                             ORDER BY created_at asc LIMIT 1
-                        )) as tempo_montagem,
+                        )) as tempo_inspecao,
                         (
                         (
                             SELECT created_at FROM historicos_etapas
@@ -77,16 +77,16 @@ class AtualizacaoTemposController extends Controller
                             SELECT created_at FROM historicos_etapas
                             WHERE pedidos_id = '.$pedido->id.' AND status_id = 6 AND etapas_pedidos_id = 1
                             ORDER BY created_at asc LIMIT 1
-                        )) as tempo_acabamento;
+                        )) as tempo_montagem;
             '));
 
             $tempo_montagem = $retorno_tempo[0]->tempo_montagem/$pedido->qtde;
             $pedido->tempo_somado_montagem = !empty($tempo_montagem) ? $tempo_montagem : '0';
             $pedido->tempo_somado_montagem = $this->formatSeconds($pedido->tempo_somado_montagem);
 
-            $tempo_acabamento = $retorno_tempo[0]->tempo_acabamento/$pedido->qtde;
-            $pedido->tempo_somado_acabamento = !empty($tempo_acabamento) ? $tempo_acabamento : '0';
-            $pedido->tempo_somado_acabamento = $this->formatSeconds($pedido->tempo_somado_acabamento);
+            $tempo_inspecao = $retorno_tempo[0]->tempo_inspecao/$pedido->qtde;
+            $pedido->tempo_somado_inspecao = !empty($tempo_inspecao) ? $tempo_inspecao : '0';
+            $pedido->tempo_somado_inspecao = $this->formatSeconds($pedido->tempo_somado_inspecao);
         }
 
         $tela = 'pesquisa';

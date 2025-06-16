@@ -30,10 +30,10 @@
                       <th>EP</th>
                       <th>OS</th>
                       <th>Qtde</th>
-                      <th>Tmp Acabamento</th>
                       <th>Tmp Montagem</th>
-                      <th>Tmp Acabamento calc</th>
+                      <th>Tmp Inspeção</th>
                       <th>Tmp Montagem calc</th>
+                      <th>Tmp Inspeção calc</th>
                       <th>Ação</th>
                     </tr>
                   </thead>
@@ -44,10 +44,10 @@
                             <td scope="row">{{$pedido->ep}}</td>
                               <td>{{$pedido->os}}</td>
                               <td>{{$pedido->qtde}}</td>
-                              <td>{{$pedido->tempo_inspecao}}</td>
                               <td>{{$pedido->tempo_montagem}}</td>
-                              <td>{{$pedido->tempo_somado_acabamento}}</td>
+                              <td>{{$pedido->tempo_inspecao}}</td>
                               <td>{{$pedido->tempo_somado_montagem}}</td>
+                              <td>{{$pedido->tempo_somado_inspecao}}</td>
                               <td>
                                 <a class="btn btn-success btn-sm">APLICAR</a>
                             </tr>
