@@ -106,8 +106,18 @@ class AjaxController extends Controller
             $status_id = 7; // Inspeção
         }
 
+        $pedidos = $this->consultarResponsaveis($id, $status_id, $torre);
 
-        $pedidos = DB::table('pedidos')
+        if($pedidos->count() > 0){
+            return response()->json($pedidos);
+        }else{
+            return response()->json([]);
+        }
+    }
+
+    public function consultarResponsaveis($id, $status_id, $torre = false)
+    {
+        $historicos = DB::table('pedidos')
             ->distinct()
             ->select(
                 'funcionarios.id',
@@ -124,14 +134,11 @@ class AjaxController extends Controller
             ->orderby('historicos_etapas.created_at');
 
         if($torre) {
-            $pedidos = $pedidos->where('historicos_etapas.select_tipo_manutencao', '=', 'T');
+            $historicos = $historicos->where('historicos_etapas.select_tipo_manutencao', '=', 'T');
         }
-        $pedidos = $pedidos->get();
-        if($pedidos->count() > 0){
-            return response()->json($pedidos);
-        }else{
-            return response()->json([]);
-        }
+        $historicos = $historicos->get();
+
+        return $historicos;
     }
 
     function ajaxAplicaValoresFichatecnica(){

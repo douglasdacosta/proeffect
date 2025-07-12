@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fichastecnicas;
 use Illuminate\Http\Request;
 use App\Models\Status;
 use App\Providers\DateHelpers;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\AjaxController;
+use DateTime;
 
 class AtualizacaoTemposController extends Controller
 {
@@ -93,76 +94,45 @@ class AtualizacaoTemposController extends Controller
 
             $pedidos = $pedidos->where('pedidos.status', '=', 'A');
             $pedidos = $pedidos->get();
-            // dd($pedidos);
             foreach ($pedidos as $pedido) {
 
 
+                $ajaxController = new AjaxController();
+                $status_id = $request->input('departamento');
+                $torre = false;
+                if($status_id =='MA' ) {
+                    $status_id = 6; // Montagem
+                } elseif($status_id == 'MT') {
+                    $status_id = 6; // Montagem
+                    $torre = true; // Montagem Torre
+                } elseif($status_id == 'I') {
+                    $status_id = 7; // Inspeção
+                }
+                $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $status_id, $torre);
+                $array = [];
+                foreach ($retorno_tempo as $tempo) {
+                    $array[] = [
+                        $tempo->etapa => $tempo->data,
+                    ];
+                }
+                $array = $this->organizarIntervalos($array);
+                $pedido->tempo_somado = $this->calcularTempoTotal($array);
 
-                $retorno_tempo = DB::select(DB::raw("
-                    SELECT
-                        SEC_TO_TIME(TIMESTAMPDIFF(SECOND,
-                            (
-                                SELECT created_at
-                                FROM historicos_etapas
-                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 7 AND etapas_pedidos_id = 1
-                                ORDER BY created_at ASC LIMIT 1
-                            ),
-                            (
-                                SELECT created_at
-                                FROM historicos_etapas
-                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 7 AND etapas_pedidos_id = 4
-                                ORDER BY created_at DESC LIMIT 1
-                            )
-                        )) AS tempo_inspecao,
-
-                        SEC_TO_TIME(TIMESTAMPDIFF(SECOND,
-                            (
-                                SELECT created_at
-                                FROM historicos_etapas
-                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 6 AND etapas_pedidos_id = 1
-                                ORDER BY created_at ASC LIMIT 1
-                            ),
-                            (
-                                SELECT created_at
-                                FROM historicos_etapas
-                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 6 AND etapas_pedidos_id = 4
-                                ORDER BY created_at DESC LIMIT 1
-                            )
-                        )) AS tempo_montagem;
-                "));
+                $pedido->tempo_default = '00:00:00';
 
                 if($request->input('departamento') == 'MA') {
 
-
                     $pedido->tempo_default = $pedido->pedido_tempo_montagem;
-                    $pedido->tempo = !empty($retorno_tempo[0]->tempo_montagem) ? $retorno_tempo[0]->tempo_montagem : '00:00:00';
-                    $pedido->tempo = $this->converteTempoParaInteiro($pedido->tempo);
-                    $tempo_montagem = $pedido->tempo/$pedido->qtde;
-
-
-                    $pedido->tempo_somado = !empty($tempo_montagem) ? $tempo_montagem : '0';
-                    $pedido->tempo_somado = $this->formatSeconds($pedido->tempo_somado);
 
                 } elseif($request->input('departamento') == 'MT') {
 
                     $pedido->tempo_default = $pedido->pedido_tempo_montagem_torre;
 
-                    $pedido->tempo = !empty($retorno_tempo[0]->tempo_montagem_torre) ? $retorno_tempo[0]->tempo_montagem_torre : '00:00:00';
-                    $pedido->tempo = $this->converteTempoParaInteiro($pedido->tempo);
-                    $tempo_montagem = $pedido->tempo/$pedido->qtde;
-                    $pedido->tempo_somado = !empty($tempo_montagem) ? $tempo_montagem : '0';
-                    $pedido->tempo_somado = $this->formatSeconds($pedido->tempo_somado);
-
                 } else {
+
                     $pedido->tempo_default = $pedido->pedido_tempo_inspecao;
 
-                    $pedido->tempo = !empty($retorno_tempo[0]->tempo_inspecao) ? $retorno_tempo[0]->tempo_inspecao : '00:00:00';
-                    $pedido->tempo = $this->converteTempoParaInteiro($pedido->tempo);
-                    $tempo_inspecao = $pedido->tempo/$pedido->qtde;
-                    $pedido->tempo_somado = !empty($tempo_inspecao) ? $tempo_inspecao : '0';
-                    $pedido->tempo_somado = $this->formatSeconds($pedido->tempo_somado);
-
-                }
+                 }
 
 
 
@@ -188,6 +158,58 @@ class AtualizacaoTemposController extends Controller
 			);
 
         return view('atualizacao_tempo', $data);
+    }
+
+    function organizarIntervalos(array $eventos): array
+    {
+        $inicios = [];
+        $terminos = [];
+
+        // Separa os inícios e términos
+        foreach ($eventos as $evento) {
+            if (isset($evento['Início'])) {
+                $inicios[] = $evento['Início'];
+            } elseif (isset($evento['Término'])) {
+                $terminos[] = $evento['Término'];
+            }
+        }
+
+        $resultado = [];
+        $quantidade = min(count($inicios), count($terminos));
+
+        // Intercala os pares mantendo a estrutura original
+        for ($i = 0; $i < $quantidade; $i++) {
+            $resultado[] = ['Início' => $inicios[$i]];
+            $resultado[] = ['Término' => $terminos[$i]];
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * Calcula o tempo total a partir de um array de eventos.
+     *
+     * @param array $eventos
+     * @return string
+     */
+    public function calcularTempoTotal(array $eventos): string
+    {
+        $totalSegundos = 0;
+
+        for ($i = 0; $i < count($eventos) - 1; $i += 2) {
+            if (isset($eventos[$i]['Início']) && isset($eventos[$i + 1]['Término'])) {
+                $inicio = new DateTime($eventos[$i]['Início']);
+                $fim = new DateTime($eventos[$i + 1]['Término']);
+
+                $diff = $fim->getTimestamp() - $inicio->getTimestamp();
+
+                if ($diff > 0) {
+                    $totalSegundos += $diff;
+                }
+            }
+        }
+
+        return gmdate('H:i:s', $totalSegundos);
     }
 
      /**
