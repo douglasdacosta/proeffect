@@ -63,13 +63,13 @@ class AtualizacaoTemposController extends Controller
             }
 
             if(!empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
-                $pedidos = $pedidos->whereBetween('created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59']);
+                $pedidos = $pedidos->whereBetween('historicos_etapas.created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59']);
             }
             if(!empty($request->input('data_apontamento')) && empty($request->input('data_apontamento_fim') )) {
-                $pedidos = $pedidos->where('created_at', '>=', DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01');
+                $pedidos = $pedidos->where('historicos_etapas.created_at', '>=', DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01');
             }
             if(empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
-                $pedidos = $pedidos->where('created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59');
+                $pedidos = $pedidos->where('historicos_etapas.created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59');
             }
 
             if(!empty($request->input('responsavel'))) {
