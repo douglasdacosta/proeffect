@@ -70,7 +70,7 @@ $(function ($) {
             document.querySelector('.select2-search__field').focus();
         });
 
-    } 
+    }
 
 
 
@@ -590,14 +590,14 @@ $(function ($) {
         qtde_alteracao_estoque = $('#qtde_alteracao_estoque').val();
         pacotes_restantes = $('#pacotes_restantes').val();
 
-        
+
         acao_estoque = $('#acao_estoque').val();
 
         if(acao_estoque == 'remover') {
             if(parseInt(qtde_alteracao_estoque) > parseInt(pacotes_restantes))  {
                 alert('Quantidade de pacotes disponíveis de ' + pacotes_restantes + ' pacotes. Baixa não liberada!');
                 return false;
-            }            
+            }
         } else {
             qtde_por_pacote = $('#qtde_por_pacote').val();
             qtde_por_pacote_mo = $('#qtde_por_pacote_mo').val();
@@ -625,7 +625,7 @@ $(function ($) {
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
-                
+
                 console.log(data);
                 dados = data;
                 $('#pacotes_restantes').val(dados.pacotes_restantes);
@@ -633,13 +633,13 @@ $(function ($) {
 
             },
             error: function (data, textStatus, errorThrown) {
-                
+
                 dados = JSON.parse(data.responseText);
                 alert('Erro ao salvar estoque! ' + dados.error);
             },
 
         });
-        
+
     });
 
 
@@ -799,7 +799,91 @@ $(function ($) {
 
     $('.tipo_consulta_followup').change();
 
+    function convertDataHora(dataOriginal){
+        const data = new Date(dataOriginal);
 
+        const dia = String(data.getDate()).padStart(2, '0');
+        const mes = String(data.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+        const ano = data.getFullYear();
+        const hora = String(data.getHours()).padStart(2, '0');
+        const minuto = String(data.getMinutes()).padStart(2, '0');
+        const segundo = String(data.getSeconds()).padStart(2, '0');
+
+        const dataFormatada = `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
+
+        return dataFormatada;
+    }
+
+    $(document).on('click', '.ver-detalhes', function() {
+        id = $(this).data('id');
+        status_id = $(this).data('status_id');
+
+
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/ajax-busca-responsveis',
+            data: {
+                'id': id,
+                'status_id': status_id,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+
+                $('#tabela_responsaveis tbody').empty();
+                $.each(data, function(i, item) {
+                    var tr = $('<tr>');
+                    data_hora = convertDataHora(item.data)
+                    tr.append($('<td>').text(item.responsavel));
+                    tr.append($('<td>').text(item.etapa));
+                    tr.append($('<td class="text-nowrap">').text(data_hora));
+                    $('#tabela_responsaveis tbody').append(tr);
+                });
+                $('#modal_detalhes').modal('show');
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                dados = JSON.parse(data.responseText);
+                alert('Erro ao buscar os responsáveis! ' + dados.error);
+            },
+
+        });
+    });
+
+    $(document).on('click', '.aplicar-valores', function() {
+        id = $(this).data('id');
+        tempo_aplicar = $(this).data('tempo_aplicar');
+        ep = $(this).data('ep');
+        status_id = $(this).data('status_id');
+
+        if(!confirm('Você deseja realmente aplicar os valores?')) {
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/ajax-aplica-valores-fichatecnica',
+            data: {
+                'id': id,
+                'tempo_aplicar': tempo_aplicar,
+                'ep': ep,
+                'status_id': status_id,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                // recarrega a tela
+                location.reload();
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                dados = JSON.parse(data.responseText);
+                alert('Erro ao salvar os dados! ' + dados.error);
+            },
+
+        });
+
+
+
+    });
 
 }); //FIM DO BLOCO DE JQUERY READY
 
@@ -819,6 +903,8 @@ function createPopupWin(pageURL, pageTitle,popupWinWidth, popupWinHeight) {
         + ', height=' + popupWinHeight + ', top='
         + top + ', left=' + left);
 }
+
+
 
 function abreAlertSuccess(texto, erro) {
     if(erro) {

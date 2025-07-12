@@ -129,3 +129,6 @@ Route::match(['get', 'post'],'/incluir-configuracoes', [App\Http\Controllers\Con
 Route::match(['get', 'post'],'/atualizacao_tempo', [App\Http\Controllers\AtualizacaoTemposController::class, 'index'])->name('atualizacao_tempo')->middleware('afterAuth:configuracoes');
 Route::match(['get', 'post'],'/alterar-atualizacao_tempo', [App\Http\Controllers\AtualizacaoTemposController::class, 'alterar'])->name('alterar-atualizacao_tempo')->middleware('afterAuth:configuracoes');
 Route::match(['get', 'post'],'/incluir-atualizacao_tempo', [App\Http\Controllers\AtualizacaoTemposController::class, 'incluir'])->name('incluir-atualizacao_tempo')->middleware('afterAuth:configuracoes');
+
+Route::match(['post'],'/ajax-busca-responsveis', [App\Http\Controllers\AjaxController::class, 'ajaxBuscaResponsveis'])->name('ajax-busca-responsveis');
+Route::match(['post'],'/ajax-aplica-valores-fichatecnica', [App\Http\Controllers\AjaxController::class, 'ajaxAplicaValoresFichatecnica'])->name('ajax-aplica-valores-fichatecnica');

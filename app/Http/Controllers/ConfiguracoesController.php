@@ -222,11 +222,11 @@ class ConfiguracoesController extends Controller
                     $tempo_acabamento_em_segundos = ($tempo_usinagem * $tempo_percentual/100);
 
                     $fichat->tempo_acabamento = gmdate('H:i:s', $tempo_acabamento_em_segundos);
-                    info('Antes ------');
+                    // info('Antes ------');
 
-                    info($fichat->tempo_usinagem);
-                    info($fichat->tempo_acabamento);
-                    info('após ------');
+                    // info($fichat->tempo_usinagem);
+                    // info($fichat->tempo_acabamento);
+                    // info('após ------');
 
                     $fichat->save();
                 }

@@ -22,6 +22,7 @@ use App\Http\Controllers\MaquinasController;
 use App\Http\Controllers\ContatosController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ConsumoMateriaisController;
+use App\Models\Configuracoes;
 use App\Models\Maquinas;
 use DateTime;
 
@@ -633,6 +634,18 @@ class PedidosController extends Controller
         $total_horas_pessoas_pessoas_montagem_torres_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_montagem_torres);
         $total_horas_pessoas_inspecao_dia = $this->multiplyTimeByInteger($horas_dia, $pessoas_inspecao);
         $totalGeral = [];
+
+        $configuracoes = new Configuracoes();
+        $configuracoes= $configuracoes->first();
+        $configuracoes = json_decode($configuracoes->dados, true);
+
+        foreach ($configuracoes as $key => $tempo_percentual) {
+
+            if($key == 'percentual_usinagem_acabamento') {
+                $pecentual_usinagem = $tempo_percentual;
+            }
+        }
+
         foreach ($dados_pedido_status as $status => $pedidos) {
 
 
@@ -642,6 +655,9 @@ class PedidosController extends Controller
 
                 $total_tempo_usinagem = $this->somarHoras($total_tempo_usinagem , $pedido->tabelaFichastecnicas->tempo_usinagem);
                 $total_tempo_usinagem = $MaquinasController->multiplicarHoras($total_tempo_usinagem,$pedido->qtde);
+
+                $total_tempo_usinagem = $this->somaPercentual($total_tempo_usinagem, $pecentual_usinagem);
+
                 $dados_pedido_status[$status]['pedido'][$pedido->id]['usinagem'] = $total_tempo_usinagem;
 
                 $total_tempo_acabamento = $this->somarHoras($total_tempo_acabamento , $pedido->tabelaFichastecnicas->tempo_acabamento);
@@ -2080,5 +2096,14 @@ class PedidosController extends Controller
         return ['dias_alerta_departamento' => $dias_alerta_departamento, 'diasSobrando' => $diasSobrando];
     }
 
+
+    public function somaPercentual($total_tempo_usinagem, $percentual_usinagem)
+    {
+        list($h, $m, $s) = explode(':', $total_tempo_usinagem);
+        $tempo_total_segundos = ($h * 3600) + ($m * 60) + $s;
+        $tempo_percentual_segundos = $tempo_total_segundos + round($tempo_total_segundos * ($percentual_usinagem / 100));
+        $tempo_formatado = gmdate('H:i:s', $tempo_percentual_segundos);
+        return $tempo_formatado;
+    }
 }
 

@@ -36,13 +36,13 @@
                     </select>
                 </div>
         </div>
-        <div class="form-group row">
-            <div class="col-sm-5">
-                <button type="submit" class="btn btn-primary">Pesquisar</button>
+            <div class="form-group row">
+                <div class="col-sm-5">
+                    <button type="submit" class="btn btn-primary">Pesquisar</button>
+                </div>
+                <div class="col-sm-5">
+                </div>
             </div>
-            <div class="col-sm-5">
-            </div>
-        </div>
         </form>
         <div class="form-group">
             <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>

@@ -28,72 +28,160 @@ class AtualizacaoTemposController extends Controller
     public function index(Request $request)
     {
 
-        $status_id = $request->input('status_id');
-        $filtrado = 0;
-        $pedidos = DB::table('pedidos')
-            ->distinct()
-            ->join('status', 'pedidos.status_id', '=', 'status.id')
-            ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
-            ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->orderby('status_id', 'desc')
-            ->orderby('data_entrega');
-        $pedidos->select('pedidos.*',
-            'ficha_tecnica.ep as ep',
-            'ficha_tecnica.tempo_montagem as tempo_montagem',
-            'ficha_tecnica.tempo_inspecao as tempo_inspecao',
-            'status.id as id_status');
+        if(!empty($request->input('departamento'))) {
+            $status_id = $request->input('status_id');
 
-        $pedidos = $pedidos->orderBy('ficha_tecnica.ep', 'asc');
+            if($request->input('departamento') =='MA' ) {
+                $status_id = 6; // Montagem
+            } elseif($request->input('departamento') == 'MT') {
+                $status_id = 6; // Montagem
+            } elseif($request->input('departamento') == 'I') {
+                $status_id = 7; // Inspeção
+            }
 
-        $pedidos->whereBetween('data_gerado', [
-            \Carbon\Carbon::now()->sub('6 months')->format('Y-m-d'),
-            \Carbon\Carbon::now()->format('Y-m-d'),
-        ]);
 
-        $pedidos = $pedidos->where('pedidos.status', '=', 'A');
-        $pedidos = $pedidos->get();
+            $pedidos = DB::table('pedidos')
+                ->distinct()
+                ->join('status', 'pedidos.status_id', '=', 'status.id')
+                ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
+                ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
+                ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+                ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
+                ->orderby('status_id', 'desc')
+                ->orderby('data_entrega');
 
-        foreach ($pedidos as $pedido) {
+                if(!empty($status_id)) {
+                    $pedidos = $pedidos->where('historicos_etapas.status_id', '=', $status_id);
+                }
 
-            $retorno_tempo = DB::select(DB::raw('
-                select (
-                        (
-                            SELECT created_at FROM historicos_etapas
-                            WHERE pedidos_id = '.$pedido->id.' AND status_id = 7 AND etapas_pedidos_id = 4
-                            ORDER BY created_at desc LIMIT 1
-                        )-
-                        (
-                            SELECT created_at FROM historicos_etapas
-                            WHERE pedidos_id = '.$pedido->id.' AND status_id = 7 AND etapas_pedidos_id = 1
-                            ORDER BY created_at asc LIMIT 1
-                        )) as tempo_inspecao,
-                        (
-                        (
-                            SELECT created_at FROM historicos_etapas
-                            WHERE pedidos_id = '.$pedido->id.' AND status_id = 6 AND etapas_pedidos_id = 4
-                            ORDER BY created_at desc LIMIT 1
-                        )-
-                        (
-                            SELECT created_at FROM historicos_etapas
-                            WHERE pedidos_id = '.$pedido->id.' AND status_id = 6 AND etapas_pedidos_id = 1
-                            ORDER BY created_at asc LIMIT 1
-                        )) as tempo_montagem;
-            '));
+            if(!empty($request->input('os'))) {
+                $pedidos = $pedidos->where('pedidos.os', '=', $request->input('os'));
+            }
 
-            $tempo_montagem = $retorno_tempo[0]->tempo_montagem/$pedido->qtde;
-            $pedido->tempo_somado_montagem = !empty($tempo_montagem) ? $tempo_montagem : '0';
-            $pedido->tempo_somado_montagem = $this->formatSeconds($pedido->tempo_somado_montagem);
+            if(!empty($request->input('ep'))) {
+                $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $request->input('ep'));
+            }
 
-            $tempo_inspecao = $retorno_tempo[0]->tempo_inspecao/$pedido->qtde;
-            $pedido->tempo_somado_inspecao = !empty($tempo_inspecao) ? $tempo_inspecao : '0';
-            $pedido->tempo_somado_inspecao = $this->formatSeconds($pedido->tempo_somado_inspecao);
+            if(!empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
+                $pedidos = $pedidos->whereBetween('created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59']);
+            }
+            if(!empty($request->input('data_apontamento')) && empty($request->input('data_apontamento_fim') )) {
+                $pedidos = $pedidos->where('created_at', '>=', DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01');
+            }
+            if(empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
+                $pedidos = $pedidos->where('created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59');
+            }
+
+            if(!empty($request->input('responsavel'))) {
+                $pedidos = $pedidos->where('funcionarios.nome', 'like', '%'.$request->input('responsavel').'%');
+            }
+
+            $pedidos->select('pedidos.*',
+                'ficha_tecnica.ep as ep',
+                'ficha_tecnica.tempo_montagem as pedido_tempo_montagem',
+                'ficha_tecnica.tempo_montagem_torre as pedido_tempo_montagem_torre',
+                'ficha_tecnica.tempo_inspecao as pedido_tempo_inspecao',
+                'status.id as id_status');
+
+
+            $pedidos = $pedidos->orderBy('ficha_tecnica.ep', 'asc');
+
+            $pedidos->whereBetween('data_gerado', [
+                \Carbon\Carbon::now()->sub('6 months')->format('Y-m-d'),
+                \Carbon\Carbon::now()->format('Y-m-d'),
+            ]);
+
+            $pedidos = $pedidos->where('pedidos.status', '=', 'A');
+            $pedidos = $pedidos->get();
+            // dd($pedidos);
+            foreach ($pedidos as $pedido) {
+
+
+
+                $retorno_tempo = DB::select(DB::raw("
+                    SELECT
+                        SEC_TO_TIME(TIMESTAMPDIFF(SECOND,
+                            (
+                                SELECT created_at
+                                FROM historicos_etapas
+                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 7 AND etapas_pedidos_id = 1
+                                ORDER BY created_at ASC LIMIT 1
+                            ),
+                            (
+                                SELECT created_at
+                                FROM historicos_etapas
+                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 7 AND etapas_pedidos_id = 4
+                                ORDER BY created_at DESC LIMIT 1
+                            )
+                        )) AS tempo_inspecao,
+
+                        SEC_TO_TIME(TIMESTAMPDIFF(SECOND,
+                            (
+                                SELECT created_at
+                                FROM historicos_etapas
+                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 6 AND etapas_pedidos_id = 1
+                                ORDER BY created_at ASC LIMIT 1
+                            ),
+                            (
+                                SELECT created_at
+                                FROM historicos_etapas
+                                WHERE pedidos_id = ". $pedido->id ." AND status_id = 6 AND etapas_pedidos_id = 4
+                                ORDER BY created_at DESC LIMIT 1
+                            )
+                        )) AS tempo_montagem;
+                "));
+
+                if($request->input('departamento') == 'MA') {
+
+
+                    $pedido->tempo_default = $pedido->pedido_tempo_montagem;
+                    $pedido->tempo = !empty($retorno_tempo[0]->tempo_montagem) ? $retorno_tempo[0]->tempo_montagem : '00:00:00';
+                    $pedido->tempo = $this->converteTempoParaInteiro($pedido->tempo);
+                    $tempo_montagem = $pedido->tempo/$pedido->qtde;
+
+
+                    $pedido->tempo_somado = !empty($tempo_montagem) ? $tempo_montagem : '0';
+                    $pedido->tempo_somado = $this->formatSeconds($pedido->tempo_somado);
+
+                } elseif($request->input('departamento') == 'MT') {
+
+                    $pedido->tempo_default = $pedido->pedido_tempo_montagem_torre;
+
+                    $pedido->tempo = !empty($retorno_tempo[0]->tempo_montagem_torre) ? $retorno_tempo[0]->tempo_montagem_torre : '00:00:00';
+                    $pedido->tempo = $this->converteTempoParaInteiro($pedido->tempo);
+                    $tempo_montagem = $pedido->tempo/$pedido->qtde;
+                    $pedido->tempo_somado = !empty($tempo_montagem) ? $tempo_montagem : '0';
+                    $pedido->tempo_somado = $this->formatSeconds($pedido->tempo_somado);
+
+                } else {
+                    $pedido->tempo_default = $pedido->pedido_tempo_inspecao;
+
+                    $pedido->tempo = !empty($retorno_tempo[0]->tempo_inspecao) ? $retorno_tempo[0]->tempo_inspecao : '00:00:00';
+                    $pedido->tempo = $this->converteTempoParaInteiro($pedido->tempo);
+                    $tempo_inspecao = $pedido->tempo/$pedido->qtde;
+                    $pedido->tempo_somado = !empty($tempo_inspecao) ? $tempo_inspecao : '0';
+                    $pedido->tempo_somado = $this->formatSeconds($pedido->tempo_somado);
+
+                }
+
+
+
+            }
+        } else {
+            $pedidos = [];
         }
+
+
+        $status = new Status();
+        $status = $status->where('status', '=', 'A')->get();
+
 
         $tela = 'pesquisa';
     	$data = array(
 				'tela' => $tela,
                 'nome_tela' => 'Atualização de Tempos',
 				'pedidos'=> $pedidos,
+                'status' => $status,
 				'request' => $request,
 				'rotaIncluir' => 'incluir-atualizacao_tempo',
 				'rotaAlterar' => 'alterar-atualizacao_tempo'
@@ -185,4 +273,18 @@ class AtualizacaoTemposController extends Controller
 
         return sprintf("%02d:%02d:%02d", $horas, $minutos, $segundos_restantes);
     }
+
+    /**
+     * Converte o formato HH:MM:SS para um inteiro de segundos.
+     *
+     * @param string $tempo
+     * @return int
+     */
+    function converteTempoParaInteiro($tempo)
+    {
+        $partes = explode(':', $tempo);
+        return ($partes[0] * 3600) + ($partes[1] * 60) + $partes[2];
+    }
+
+
 }
