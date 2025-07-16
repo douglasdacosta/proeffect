@@ -3,7 +3,7 @@ use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\AjaxOrcamentosController;
 use App\Providers\DateHelpers;
 
-$palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 => 
+$palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 =>
 '#c1d9d0', 10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583', 15 => '#f7c41f', 16 => '#898b75', 17 => '#c1d9d0'];
 ?>
 @extends('adminlte::page')
@@ -54,7 +54,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">                            
+                        <div class="modal-body">
                             <p id="texto_link"></p>
                             <input type="hidden" name="input_link_envio" id="input_link_envio" value=""/>
                             <input type="hidden" name="id_pessoa" id="input_id_pessoa" value=""/>
@@ -66,7 +66,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                     </div>
                 </div>
             </div>
-            
+
             <div id='modal_funcionarios' class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" style="width: 700px">
@@ -250,7 +250,7 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                         @endif
                                                     </select>
                                                 </td>
-                                                <td title="Marca como faturado"> 
+                                                <td title="Marca como faturado">
                                                     <i style="cursor: pointer;@if($pedido->faturado==1) color:green @else color:red @endif" data-pedido="{{ $pedido->id }}" data-status_faturado="{{ $pedido->faturado }}" class="fas fa-dollar-sign faturados"></i>
                                                 </td>
                                                 <?php
@@ -271,19 +271,19 @@ $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5'
                                                 <td>{{ Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                                 <td style="@if(!empty($pedido->data_antecipacao)) background-color: red; font-weight: bold @endif">{{ empty($pedido->data_antecipacao) ? '' : Carbon\Carbon::parse($pedido->data_antecipacao)->format('d/m/Y') }}</td>
                                                 <td style="@if(!empty($pedido->hora_antecipacao)) background-color: red; font-weight: bold @endif">{{ $pedido->hora_antecipacao }}</td>
-                                                @php 
+                                                @php
                                                     $telefone = preg_replace("/[^0-9]/", "", $pedido->telefone);
                                                     $hash_codigo_cliente = md5($pedido->id_pessoa);
-                                                    $link_eplax = 'https://' . 
-                                                                env('URL_LINK_STATUS', 'eplax.com.br') . 
-                                                                '/consultar-pedido/' . $hash_codigo_cliente . '/consulta/';
+                                                    $link_eplax = 'https://' .
+                                                                env('URL_LINK_STATUS', 'eplax.com.br') .
+                                                                '/consultar-pedido/' . $hash_codigo_cliente;
 
-                                                    $mensagem = 'Olá, ' . $pedido->nome_cliente . 
+                                                    $mensagem = 'Olá, ' . $pedido->nome_cliente .
                                                                 '. Acesse o link para detalhes do status do seu pedido: ' . $link_eplax;
 
                                                     $link = 'https://wa.me/55' . $telefone . '?text=' . urlencode($mensagem);
                                                 @endphp
-                                                <td class="text-center"> 
+                                                <td class="text-center">
                                                     <i style="cursor:pointer; @if($pedido->whatsapp_status==1) color:green @else color:red @endif" data-link="{{ $link }}" data-link_eplax="{{ $link_eplax }}"  data-id_pessoa="{{ $pedido->id_pessoa }}" data-whatsapp_status="{{ $pedido->whatsapp_status }}" class="fab fa-whatsapp whatsapp_status {{ 'icone_'.$pedido->id_pessoa }}"></i>
                                                 </td>
                                                 <td class="{{ $class_dias_alerta }}">{{ $dias_alerta }}</td>
