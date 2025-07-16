@@ -1,4 +1,4 @@
-function copiarTexto() {    
+function copiarTexto() {
     const texto = document.getElementById("texto_link").innerText;
 
     if (!texto) {
@@ -13,9 +13,9 @@ function copiarTexto() {
     textarea.style.left = '-9999px';
 
     document.body.appendChild(textarea);
-    
+
     textarea.select();
-    
+
 
     try {
         const sucesso = document.execCommand('copy');
@@ -33,7 +33,7 @@ $(function ($) {
         var pedido = $(this).data('pedido');
         var status_faturado = $(this).data('status_faturado');
         var el = $(this);
-        
+
         $.ajax({
             type: "POST",
             url: '/ajax-faturado',
@@ -44,8 +44,8 @@ $(function ($) {
             },
             success: function (data) {
 
-                abreAlertSuccess('Pedido atualizado', false);        
-                       
+                abreAlertSuccess('Pedido atualizado', false);
+
                 status_faturado = el.attr('data-status_faturado');
                 if(status_faturado == 1) {
                     el.attr('style', 'color: #red !important;');
@@ -54,7 +54,7 @@ $(function ($) {
                     el.attr('style', 'color: green !important;');
                     el.attr('data-status_faturado',1);
                  }
-                
+
 
             },
             error: function (data, textStatus, errorThrown) {
@@ -66,7 +66,7 @@ $(function ($) {
 
     });
 
-    $(document).on('click', '#copiar_link', function () { 
+    $(document).on('click', '#copiar_link', function () {
 
         const texto = document.getElementById("texto_link").innerText;
 
@@ -91,8 +91,8 @@ $(function ($) {
                 alert('❌ Erro ao copiar: ' + err);
             }
 
-            
-        }, 50); 
+
+        }, 50);
 
         setTimeout(() => {
             document.body.removeChild(textarea);
@@ -100,20 +100,20 @@ $(function ($) {
     })
 
     $(document).on('click', '.whatsapp_status', function (e) {
-        
+
         let whatsapp_status =  Number($(this).attr('data-whatsapp_status'));
         $('#input_id_pessoa').val($(this).data('id_pessoa'));
         $('#input_whatsapp_status').val(whatsapp_status);
 
         $('#input_link_envio').val($(this).data('link'));
         $('#texto_link').text($(this).data('link_eplax'));
-        
+
         if (whatsapp_status === 0 || whatsapp_status == '' ) {
             copiarTexto()
         }
 
-        setTimeout(() => {        
-            
+        setTimeout(() => {
+
             if (whatsapp_status === 1) {
                 var id_pessoa = $('#input_id_pessoa').val();
                 var el = $('.icone_' + id_pessoa);
@@ -128,9 +128,9 @@ $(function ($) {
                     },
                     success: function (data) {
 
-                        abreAlertSuccess('WhatsApp atualizado', false);        
+                        abreAlertSuccess('WhatsApp atualizado', false);
                         el.attr('style', 'color: red !important; cursor: pointer;');
-                        el.attr('data-whatsapp_status', 0).data('whatsapp_status', 0);                  
+                        el.attr('data-whatsapp_status', 0).data('whatsapp_status', 0);
                     },
                     error: function (data, textStatus, errorThrown) {
 
@@ -139,13 +139,13 @@ $(function ($) {
 
                 });
             } else {
-                $('#modal_whatsapp').modal('show');    
+                $('#modal_whatsapp').modal('show');
             }
-        }, 50); 
-       
+        }, 50);
+
     });
 
-    https://eplax.com.br/consultar-pedido/140f6969d5213fd0ece03148e62e461e/consulta/
+    // https://eplax.com.br/consultar-pedido/140f6969d5213fd0ece03148e62e461e/consulta/
 
 
     $(document).on('click', '#enviar_link', function (elemento) {
@@ -163,12 +163,12 @@ $(function ($) {
             },
             success: function (data) {
 
-                abreAlertSuccess('WhatsApp atualizado', false);                                        
+                abreAlertSuccess('WhatsApp atualizado', false);
                 el.attr('style', 'color: green !important; cursor: pointer;');
                 el.attr('data-whatsapp_status',1);
                 window.open(link, '_blank');
-                
-                
+
+
 
             },
             error: function (data, textStatus, errorThrown) {
