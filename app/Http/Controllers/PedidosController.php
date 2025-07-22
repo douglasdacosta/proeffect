@@ -641,7 +641,7 @@ class PedidosController extends Controller
 
         foreach ($configuracoes as $key => $tempo_percentual) {
 
-            if($key == 'percentual_usinagem_acabamento') {
+            if($key == 'percentual_usinagem_followup') {
                 $pecentual_usinagem = $tempo_percentual;
             }
         }

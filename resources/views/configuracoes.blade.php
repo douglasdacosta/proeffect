@@ -42,6 +42,13 @@
                     </div>
                 </div>
 
+                <div class="form-group row">
+                    <label for="percentual_usinagem_acabamento" class="col-sm-3 col-form-label text-right" title='Percentual de acabamento baseado no tempo de usinagem'>Percentual de usinagem no FollowUp(%)</label>
+                    <div class="col-sm-1">
+                        <input type="text" class="form-control" id="percentual_usinagem_followup"  name="percentual_usinagem_followup" value="@if (isset($configuracoes['percentual_usinagem_followup'])){{$configuracoes['percentual_usinagem_followup']}}@else{{''}}@endif">
+                    </div>
+                </div>
+
                 <input type="hidden" id="tipo_atualizacao" name="tipo_atualizacao"  value="0">
 
                 <div class="form-group row">
