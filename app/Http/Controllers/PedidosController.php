@@ -2102,7 +2102,14 @@ class PedidosController extends Controller
         list($h, $m, $s) = explode(':', $total_tempo_usinagem);
         $tempo_total_segundos = ($h * 3600) + ($m * 60) + $s;
         $tempo_percentual_segundos = $tempo_total_segundos + round($tempo_total_segundos * ($percentual_usinagem / 100));
-        $tempo_formatado = gmdate('H:i:s', $tempo_percentual_segundos);
+
+        // Calcula horas, minutos e segundos manualmente
+        $horas = floor($tempo_percentual_segundos / 3600);
+        $minutos = floor(($tempo_percentual_segundos % 3600) / 60);
+        $segundos = $tempo_percentual_segundos % 60;
+
+        // Formata com dois dígitos
+        $tempo_formatado = sprintf('%02d:%02d:%02d', $horas, $minutos, $segundos);
         return $tempo_formatado;
     }
 }
