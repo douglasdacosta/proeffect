@@ -2072,6 +2072,14 @@ class PedidosController extends Controller
             'inspeção_original' => $maquinas[0]->prazo_inspecao ,
             'embalar_original' => $maquinas[0]->prazo_embalar,
             'expedição_original' => 0,
+            'imprimir' => 0,
+            'em preparacao' => 0,
+            'aguardando material' => 0,
+            'estoque' => 0,
+            'entregue' => 0,
+            'Alteração de Projeto' => 0,
+            'Pedido Cancelado' => 0,
+            'Pedido Bloqueado' => 0
         ];
 
     }

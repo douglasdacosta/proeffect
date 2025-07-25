@@ -39,23 +39,27 @@
                                         $diasSobrando=  0;
                                         $dias_alerta_departamento = 'text-primary';
                                         $status = strtolower($key);
-                                        
-                                        if(!empty($maquinas[$status])) {
-                                            
-                                            $retorno = PedidosController::calculaDiasSobrando($maquinas, $status, $pedido);
-                                            $dias_alerta_departamento = $retorno['dias_alerta_departamento'];
-                                            $diasSobrando = $retorno['diasSobrando'];
-
-                                        }
 
                                         $entrega = \Carbon\Carbon::createFromDate($pedido->data_entrega)->format('Y-m-d');
-                                        
+
                                         $dias_alerta = \Carbon\Carbon::createFromDate($hoje)->diffInDays($entrega, false);
                                         if ($dias_alerta < 6) {
                                             $class_dias_alerta = 'text-danger';
                                         } else {
                                             $class_dias_alerta = 'text-primary';
                                         }
+                                        $dias_alerta_departamento = $class_dias_alerta;
+                                        $diasSobrando = $dias_alerta;
+
+                                        if(!empty($maquinas[$status])) {
+
+                                            $retorno = PedidosController::calculaDiasSobrando($maquinas, $status, $pedido);
+                                            $dias_alerta_departamento = $retorno['dias_alerta_departamento'];
+                                            $diasSobrando = $retorno['diasSobrando'];
+
+                                        }
+
+
                                     ?>
                                     <tr @if($pedido->faturado == 1) style="background-color: #3fe964" @endif>
                                         <td>{{ $pedido->os }}
