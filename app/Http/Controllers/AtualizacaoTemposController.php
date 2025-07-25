@@ -8,6 +8,8 @@ use App\Providers\DateHelpers;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AjaxController;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 
 class AtualizacaoTemposController extends Controller
 {
@@ -88,7 +90,7 @@ class AtualizacaoTemposController extends Controller
             $pedidos = $pedidos->orderBy('ficha_tecnica.ep', 'asc');
 
             $pedidos->whereBetween('data_gerado', [
-                \Carbon\Carbon::now()->sub('6 months')->format('Y-m-d'),
+                \Carbon\Carbon::now()->sub('10 months')->format('Y-m-d'),
                 \Carbon\Carbon::now()->format('Y-m-d'),
             ]);
 
@@ -162,55 +164,119 @@ class AtualizacaoTemposController extends Controller
 
     function organizarIntervalos(array $eventos): array
     {
-        $inicios = [];
-        $terminos = [];
+        $resultado = [];
+        $buffer = [];
 
-        // Separa os inícios e términos
         foreach ($eventos as $evento) {
             if (isset($evento['Início'])) {
-                $inicios[] = $evento['Início'];
+                if (!empty($buffer)) {
+                    $resultado = array_merge($resultado, $buffer);
+                    $buffer = [];
+                }
+                $buffer[] = ['Início' => $evento['Início']];
+            } elseif (isset($evento['Pausa'])) {
+                $buffer[] = ['Pausa' => $evento['Pausa']];
+            } elseif (isset($evento['Continuar'])) {
+                $buffer[] = ['Continuar' => $evento['Continuar']];
             } elseif (isset($evento['Término'])) {
-                $terminos[] = $evento['Término'];
+                $buffer[] = ['Término' => $evento['Término']];
+                // Finaliza o intervalo após término
+                $resultado = array_merge($resultado, $buffer);
+                $buffer = [];
             }
         }
 
-        $resultado = [];
-        $quantidade = min(count($inicios), count($terminos));
-
-        // Intercala os pares mantendo a estrutura original
-        for ($i = 0; $i < $quantidade; $i++) {
-            $resultado[] = ['Início' => $inicios[$i]];
-            $resultado[] = ['Término' => $terminos[$i]];
+        // Caso sobre algum buffer não finalizado
+        if (!empty($buffer)) {
+            $resultado = array_merge($resultado, $buffer);
         }
 
         return $resultado;
     }
 
+
     /**
-     * Calcula o tempo total a partir de um array de eventos.
-     *
-     * @param array $eventos
-     * @return string
-     */
-    public function calcularTempoTotal(array $eventos): string
-    {
-        $totalSegundos = 0;
+ * Calcula o tempo total "ativo" considerando os eventos:
+ * Início -> (Pausa <-> Continuar)* -> Término
+ *
+ * - Soma somente os períodos em que estava "rodando" (não pausado).
+ * - Ignora durações negativas.
+ * - Se houver um Início sem Término e você quiser contar até "agora",
+ *   passe $agora. Caso contrário, o trecho será ignorado.
+ *
+ * @param array $eventos  Array de eventos cronológicos.
+ * @param DateTimeInterface|null $agora Opcional: momento atual para sessões abertas.
+ * @return string Tempo total em H:i:s
+ */
+public function calcularTempoTotal(array $eventos, ?DateTimeInterface $agora = null): string
+{
+    $totalSegundos = 0;
 
-        for ($i = 0; $i < count($eventos) - 1; $i += 2) {
-            if (isset($eventos[$i]['Início']) && isset($eventos[$i + 1]['Término'])) {
-                $inicio = new DateTime($eventos[$i]['Início']);
-                $fim = new DateTime($eventos[$i + 1]['Término']);
+    $rodando = false;   // existe uma sessão aberta (entre Início e Término)?
+    $pausado = false;   // sessão atual está pausada?
+    $inicioAtivo = null; // timestamp do início do trecho ativo atual
 
-                $diff = $fim->getTimestamp() - $inicio->getTimestamp();
+    $agora = $agora ?? null; // só usa se precisar
 
+    foreach ($eventos as $evento) {
+        if (isset($evento['Início'])) {
+            // Se já estava rodando e sem término, fechamos a sessão anterior (melhor ignorar/validar)
+            if ($rodando && !$pausado && $inicioAtivo !== null) {
+                // não somamos nada aqui porque não houve Término, a não ser que queira até "agora"
+                if ($agora instanceof DateTimeInterface) {
+                    $totalSegundos += max(0, $agora->getTimestamp() - $inicioAtivo->getTimestamp());
+                }
+            }
+
+            $rodando = true;
+            $pausado = false;
+            $inicioAtivo = new DateTimeImmutable($evento['Início']);
+
+        } elseif (isset($evento['Pausa'])) {
+            // Só faz sentido pausar se está rodando e não está pausado
+            if ($rodando && !$pausado && $inicioAtivo !== null) {
+                $pausa = new DateTimeImmutable($evento['Pausa']);
+                $diff = $pausa->getTimestamp() - $inicioAtivo->getTimestamp();
                 if ($diff > 0) {
                     $totalSegundos += $diff;
                 }
+                $pausado = true;
+                $inicioAtivo = null;
+            }
+
+        } elseif (isset($evento['Continuar'])) {
+            // Só continua se está rodando e está pausado
+            if ($rodando && $pausado) {
+                $inicioAtivo = new DateTimeImmutable($evento['Continuar']);
+                $pausado = false;
+            }
+
+        } elseif (isset($evento['Término'])) {
+            if ($rodando) {
+                // Se não está pausado, fechar o último trecho ativo
+                if (!$pausado && $inicioAtivo !== null) {
+                    $fim = new DateTimeImmutable($evento['Término']);
+                    $diff = $fim->getTimestamp() - $inicioAtivo->getTimestamp();
+                    if ($diff > 0) {
+                        $totalSegundos += $diff;
+                    }
+                }
+                // encerra a sessão
+                $rodando = false;
+                $pausado = false;
+                $inicioAtivo = null;
             }
         }
-
-        return gmdate('H:i:s', $totalSegundos);
     }
+
+    // Se terminar o loop ainda rodando e não pausado, decidir se conta até "agora"
+    if ($rodando && !$pausado && $inicioAtivo !== null && $agora instanceof DateTimeInterface) {
+        $totalSegundos += max(0, $agora->getTimestamp() - $inicioAtivo->getTimestamp());
+    }
+
+    return gmdate('H:i:s', $totalSegundos);
+}
+
 
      /**
      * Show the application dashboard.

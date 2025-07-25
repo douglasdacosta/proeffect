@@ -220,13 +220,13 @@ class ConfiguracoesController extends Controller
                     //calculo de tempo, acabamento  70% do tempo de usinagem
 
                     $tempo_acabamento_em_segundos = ($tempo_usinagem * $tempo_percentual/100);
+                    $tempo_acabamento_em_segundos = floor($tempo_acabamento_em_segundos); // Remove casas decimais
 
-                    $fichat->tempo_acabamento = gmdate('H:i:s', $tempo_acabamento_em_segundos);
-                    // info('Antes ------');
+                    $horas = floor($tempo_acabamento_em_segundos / 3600);
+                    $minutos = floor(($tempo_acabamento_em_segundos % 3600) / 60);
+                    $segundos_restantes = $tempo_acabamento_em_segundos % 60;
 
-                    // info($fichat->tempo_usinagem);
-                    // info($fichat->tempo_acabamento);
-                    // info('após ------');
+                    $fichat->tempo_acabamento = sprintf("%02d:%02d:%02d", $horas, $minutos, $segundos_restantes);
 
                     $fichat->save();
                 }
