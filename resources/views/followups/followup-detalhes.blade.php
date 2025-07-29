@@ -48,8 +48,12 @@
                                         } else {
                                             $class_dias_alerta = 'text-primary';
                                         }
-                                        $dias_alerta_departamento = $class_dias_alerta;
-                                        $diasSobrando = $dias_alerta;
+                                        $dias_alerta_departamento = 'text-primary';
+                                        $diasSobrando = 0;
+
+                                        if($status == 'imprimir' || $status == 'em preparação' || $status == 'aguardando material') {
+                                            $status = 'usinagem';
+                                        }
 
                                         if(!empty($maquinas[$status])) {
 

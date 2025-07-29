@@ -815,9 +815,10 @@ $(function ($) {
     }
 
     $(document).on('click', '.ver-detalhes', function() {
-        id = $(this).data('id');
-        status_id = $(this).data('status_id');
-
+        var id = $(this).data('id');
+        var status_id = $(this).data('status_id');
+        $('#texto_ep').text($(this).data('ep'));
+        $('#texto_os').text($(this).data('os'));
 
         $.ajax({
             type: "POST",
@@ -833,9 +834,38 @@ $(function ($) {
                 $.each(data, function(i, item) {
                     var tr = $('<tr>');
                     data_hora = convertDataHora(item.data)
-                    tr.append($('<td>').text(item.responsavel));
-                    tr.append($('<td>').text(item.etapa));
-                    tr.append($('<td class="text-nowrap">').text(data_hora));
+
+                    array_funcionarios = $('#array_funcionarios').val();
+                    array_funcionarios = JSON.parse(array_funcionarios);
+                    var tr = $('<tr>');
+
+                    // Cria o elemento select com as opções array_funcionarios
+                    select = $('<select class="form-control" name="responsavel" readonly disabled required>');
+                    select.append($('<option value="">Selecione</option>'));
+                    $.each(array_funcionarios, function(i, funcionario_item) {
+                        $selected = "";
+                        if(funcionario_item == item.responsavel) {
+                            $selected = "selected='selected'";
+                        }
+
+                        select.append($('<option value="'+funcionario_item+'" '+$selected+'>'+funcionario_item+'</option>'));
+                    });
+                    tr.append($('<td>').append(select));
+
+                    // Cria o elemento select com as opções de etapas
+                    select = $('<select class="form-control" name="etapa" readonly disabled required>');
+                    select.append($('<option value="">Selecione</option>'));
+                    select.append($('<option value="1" '+ (item.etapa == 'Início' ? "selected='selected'" : "") +'>Início</option>'));
+                    select.append($('<option value="2" '+ (item.etapa == 'Pausa' ? "selected='selected'" : "") +'>Pausa</option>'));
+                    select.append($('<option value="3" '+ (item.etapa == 'Continuar' ? "selected='selected'" : "") +'>Continuar</option>'));
+                    select.append($('<option value="4" '+ (item.etapa == 'Término' ? "selected='selected'" : "") +'>Término</option>'));
+
+                    tr.append($('<td>').append(select));
+                    tr.append($('<td class="text-nowrap">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-8" name="data_hora" value="'+data_hora+'" required>')));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-edit alterar-linha-valores text-primary" style="cursor:pointer;" data-id="'+id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+status_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+status_id+'"></i></td>'));
+
                     $('#tabela_responsaveis tbody').append(tr);
                 });
                 $('#modal_detalhes').modal('show');
@@ -847,6 +877,93 @@ $(function ($) {
             },
 
         });
+    });
+
+    $(document).on('click', '.salva-linha-valores', function() {
+        id = $(this).data('id');
+        status_id = $(this).data('status_id');
+        historico_id = $(this).data('historico_id');
+
+        responsavel = $(this).closest('tr').find('select[name="responsavel"]').val();
+        etapa = $(this).closest('tr').find('select[name="etapa"]').val();
+        data_hora = $(this).closest('tr').find('input[name="data_hora"]').val();
+
+        if(responsavel == '' || etapa == '' || data_hora == '') {
+            alert('Preencha todos os campos!');
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/ajax-salva-novo-apontamento',
+            data: {
+                'id': id,
+                'historico_id': historico_id,
+                'responsavel': responsavel,
+                'status_id': status_id,
+                'etapa': etapa,
+                'data_hora': data_hora,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                abreAlertSuccess(data, false);
+                location.reload();
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                dados = JSON.parse(data.responseText);
+                alert('Erro ao salvar os dados! ' + dados.error);
+            },
+
+        });
+    });
+
+    $(document).on('click', '.alterar-linha-valores', function() {
+
+        //habilita os campos para edição (re tira readonly e disabled)
+        $(this).closest('tr').find('select[name="responsavel"]').attr('disabled', false);
+        $(this).closest('tr').find('select[name="responsavel"]').removeAttr('readonly');
+        $(this).closest('tr').find('select[name="etapa"]').attr('disabled', false);
+        $(this).closest('tr').find('select[name="etapa"]').removeAttr('readonly');
+        $(this).closest('tr').find('input[name="data_hora"]').attr('disabled', false);
+        $(this).closest('tr').find('input[name="data_hora"]').removeAttr('readonly');
+
+    });
+
+    $(document).on('click', '.nova-linha-valores', function() {
+        id = $(this).data('id');
+        status_id = $(this).data('status_id');
+
+
+        array_funcionarios = $('#array_funcionarios').val();
+        array_funcionarios = JSON.parse(array_funcionarios);
+        var tr = $('<tr>');
+
+        // Cria o elemento select com as opções array_funcionarios
+        select = $('<select class="form-control" name="responsavel" required>');
+        select.append($('<option value="">Selecione</option>'));
+        $.each(array_funcionarios, function(i, item) {
+            select.append($('<option value="'+item+'">'+item+'</option>'));
+        });
+        tr.append($('<td>').append(select));
+
+        // Cria o elemento select com as opções de etapas
+        select = $('<select class="form-control" name="etapa" required>');
+        select.append($('<option value="">Selecione</option>'));
+        select.append($('<option value="1">Início</option>'));
+        select.append($('<option value="2">Pausa</option>'));
+        select.append($('<option value="3">Continuar</option>'));
+        select.append($('<option value="4">Término</option>'));
+
+        tr.append($('<td>').append(select));
+
+        tr.append($('<td><input type="text" class="form-control date_time col-sm-8" name="data_hora" required></td>'));
+        tr.append($('<td class="text-nowrap">'));
+        tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="" data-status_id="'+status_id+'"></i></td>'));
+        $('#tabela_responsaveis tbody').append(tr);
+
+        $('.date_time').mask('00/00/0000 00:00:00');
+
     });
 
     $(document).on('click', '.aplicar-valores', function() {

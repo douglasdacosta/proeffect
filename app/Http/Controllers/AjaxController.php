@@ -123,6 +123,7 @@ class AjaxController extends Controller
                 'funcionarios.id',
                 'funcionarios.nome as responsavel',
                 'historicos_etapas.created_at as data',
+                'historicos_etapas.id as historico_id',
                 'historicos_etapas.select_tipo_manutencao as tipo_manutencao',
                 'etapas_pedidos.nome as etapa'
             )
@@ -168,6 +169,72 @@ class AjaxController extends Controller
             return response()->json(['success' => 'Valores aplicados com sucesso.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao aplicar valores: ' . $e->getMessage()], 500);
+        }
+    }
+
+    function ajaxSalvaNovoApontamento(Request $request){
+        $id = $request->input('id');
+        $responsavel = $request->input('responsavel');
+        $etapa = $request->input('etapa');
+        $data_hora = $request->input('data_hora');
+        //converte data_hora "16/01/2025+12:26:04" para o formato correto "2025-01-16 12:26:04"
+
+        $data_hora = \DateTime::createFromFormat('d/m/Y H:i:s', $data_hora);
+        $data_hora = $data_hora ? $data_hora->format('Y-m-d H:i:s') : null;
+
+        if(empty($id) || empty($responsavel) || empty($etapa  ) || empty($data_hora)) {
+            return response()->json(['error' => 'Dados incompletos para salvar novo apontamento.'], 400);
+        }
+
+        $funcionario = DB::table('funcionarios')
+            ->where('nome', $responsavel)
+            ->first();
+
+        $status_id = request()->input('status_id');
+        $select_tipo_manutencao = null;
+        if($status_id =='MA' ) {
+            $status_id = '6'; // Montagem
+            $select_tipo_manutencao = 'A';
+        } elseif($status_id == 'MT') {
+            $status_id = '6'; // Montagem
+            $select_tipo_manutencao = 'T'; // Montagem Torre
+        } elseif($status_id == 'I') {
+            $status_id = '7'; // Inspeção
+            $select_tipo_manutencao = 'I';
+        }
+
+        try {
+            if($request->has('historico_id') && !empty($request->input('historico_id'))) {
+                // Atualiza o histórico existente
+                DB::table('historicos_etapas')
+                    ->where('id', $request->input('historico_id'))
+                    ->update([
+                        'pedidos_id' => $id,
+                        'status_id' => $status_id,
+                        'etapas_pedidos_id' => $etapa,
+                        'etapas_alteracao_id'=> 1,
+                        'funcionarios_id' => $funcionario->id,
+                        'created_at' => $data_hora,
+                        'updated_at' => $data_hora,
+                        'select_tipo_manutencao' => $select_tipo_manutencao,
+                    ]);
+                return response()->json(['success' => 'Apontamento atualizado com sucesso.']);
+            }
+
+            DB::table('historicos_etapas')->insert([
+                'pedidos_id' => $id,
+                'status_id' => $status_id,
+                'etapas_pedidos_id' => $etapa,
+                'etapas_alteracao_id'=> 1,
+                'funcionarios_id' => $funcionario->id,
+                'created_at' => $data_hora,
+                'updated_at' => $data_hora,
+                'select_tipo_manutencao' => $select_tipo_manutencao,
+            ]);
+
+            return response()->json(['success' => 'Novo apontamento salvo com sucesso.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao salvar novo apontamento: ' . $e->getMessage()], 500);
         }
     }
 

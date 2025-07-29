@@ -7,6 +7,7 @@ use App\Models\Status;
 use App\Providers\DateHelpers;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AjaxController;
+use App\Models\Funcionarios;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -76,7 +77,7 @@ class AtualizacaoTemposController extends Controller
             }
 
             if(!empty($request->input('responsavel'))) {
-                $pedidos = $pedidos->where('funcionarios.nome', 'like', '%'.$request->input('responsavel').'%');
+                $pedidos = $pedidos->where('funcionarios.nome', 'like', '%'.strtolower($request->input('responsavel')).'%');
             }
 
             $pedidos->select('pedidos.*',
@@ -144,6 +145,11 @@ class AtualizacaoTemposController extends Controller
         }
 
 
+        $funcionarios = new Funcionarios();
+        $funcionarios = $funcionarios->where(column: 'perfil', operator: '=', value: '5');
+
+        $funcionarios = $funcionarios->get();
+
         $status = new Status();
         $status = $status->where('status', '=', 'A')->get();
 
@@ -154,6 +160,7 @@ class AtualizacaoTemposController extends Controller
                 'nome_tela' => 'Atualização de Tempos',
 				'pedidos'=> $pedidos,
                 'status' => $status,
+                'funcionarios' => $funcionarios,
 				'request' => $request,
 				'rotaIncluir' => 'incluir-atualizacao_tempo',
 				'rotaAlterar' => 'alterar-atualizacao_tempo'

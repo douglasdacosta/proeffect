@@ -1,12 +1,17 @@
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
+@section('adminlte_css')
+    <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
+    <link rel="stylesheet" href="{{asset('css/main_style.css')}}" />
+
+@stop
 
 <script src="../vendor/jquery/jquery.min.js"></script>
 <script src="js/jquery.mask.js"></script>
+<script src="js/main_custom.js"></script>
 <script src="js/bootstrap.4.6.2.js"></script>
 <script src="js/select2.min.js"></script>
-<script src="js/main_custom.js"></script>
 
 @if(isset($tela) and $tela == 'pesquisa')
     @section('content_header')
@@ -20,7 +25,7 @@
             <div class="modal-dialog modal-xl modal-dialog-centered modal-80w" role="document" >
                 <div class="modal-content">
                     <div class="modal-header">
-                    <h5 class="modal-title" id='texto_status_caixas'>Detalhes de lançamentos</h5>
+                    <h5 class="modal-title" id='texto_status_caixas'>Detalhes de lançamentos <span id="texto_ep"></span> OS <span id="texto_os"></span></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -34,6 +39,9 @@
                                             <th>Responsável</th>
                                             <th>Status</th>
                                             <th>Data e hora</th>
+                                            <th>Editar linha</th>
+                                            <th>Adicionar</th>
+                                            <th>Salvar</th>
                                         </tr>
                                     </thead>
                                     <tbody id="detalhes_lancamentos">
@@ -63,12 +71,23 @@
                         <input type="text" id="os" name="os" class="form-control col-md-7 col-xs-12"
                             value="@if (isset($request) && $request->input('os') != '') {{ $request->input('os') }}@else @endif">
                     </div>
-                    <label for="responsavel" class="col-sm-2 col-form-label">Responsável</label>
-                    <div class="col-sm-3">
-                        <input type="text" id="responsavel" name="responsavel" class="form-control col-md-7 col-xs-12"
-                            value="@if (isset($request) && $request->input('responsavel') != '') {{ $request->input('responsavel') }}@else @endif">
-                    </div>
+                    <label for="responsavel" class="col-sm-1 col-form-label">Responsável</label>
+                    <select class="form-control col-sm-2 default-select2" id="responsavel" name="responsavel">
+                        <option value="">Selecione</option>
+                        <div class="col-sm-3">
+                            @foreach ($funcionarios as $funcionario)
+                                @php $array_funcionarios[] = $funcionario->nome; @endphp
+                                @if (isset($request) && $request->input('responsavel') == $funcionario->id)
+                                    <option value="{{ $funcionario->nome }}" selected>{{ $funcionario->nome }}</option>
+                                @else
+                                    <option value="{{ $funcionario->nome }}">{{ $funcionario->nome }}</option>
+                                @endif
+                            @endforeach
+                        </div>
+                    </select>
                 </div>
+                <input type="hidden" name="array_funcionarios" id="array_funcionarios" value="{{ json_encode($array_funcionarios) }}">
+
                     <div class="form-group row">
                         <label for="data_apontamento" class="col-sm-2 col-form-label text-right">Data apontamento: de</label>
                         <div class="col-sm-2">
@@ -144,7 +163,7 @@
                             <td>{{$pedido->tempo_default}}</td>
                             <td>{{$pedido->tempo_somado}}</td>
                             <td>
-                                <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-status_id="{{$request->input('departamento')}}" >Detalhes</a>
+                                <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-ep="{{$pedido->ep}}" data-os="{{$pedido->os}}" data-status_id="{{$request->input('departamento')}}" >Detalhes</a>
                             </td>
                             <td>
                                 <a class="btn btn-success btn-sm aplicar-valores" data-ep='{{$pedido->ep}}' data-status_id="{{$request->input('departamento')}}" data-tempo_aplicar='{{$pedido->tempo_somado}}'>APLICAR</a>
