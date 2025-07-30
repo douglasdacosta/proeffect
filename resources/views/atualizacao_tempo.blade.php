@@ -1,3 +1,7 @@
+<?php
+    use \App\Http\Controllers\AtualizacaoTemposController;
+?>
+
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
@@ -42,6 +46,7 @@
                                             <th>Editar linha</th>
                                             <th>Adicionar</th>
                                             <th>Salvar</th>
+
                                         </tr>
                                     </thead>
                                     <tbody id="detalhes_lancamentos">
@@ -147,8 +152,9 @@
                       <th>EP</th>
                       <th>OS</th>
                       <th>Qtde</th>
-                      <th>Tempo</th>
-                      <th>Tempo calculado</th>
+                      <th>Tempo cadastro</th>
+                      <th>Tempo total apontamento</th>
+                      <th>Tempo peça apontamento</th>
                       <th>Detalhes</th>
                       <th>Ação</th>
                     </tr>
@@ -161,6 +167,13 @@
                             <td>{{$pedido->os}}</td>
                             <td>{{$pedido->qtde}}</td>
                             <td>{{$pedido->tempo_default}}</td>
+                                @php
+                                    $AtualizacaoTempoController = new AtualizacaoTemposController();
+                                    $segundos = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado) * $pedido->qtde;
+                                    $tempoTotalApontamento = $AtualizacaoTempoController->formatSeconds($segundos);
+                                    $tempoTotalApontamento = empty($tempoTotalApontamento) ? '00:00:00' : $tempoTotalApontamento;
+                                @endphp
+                            <td>{{$tempoTotalApontamento}}</td>
                             <td>{{$pedido->tempo_somado}}</td>
                             <td>
                                 <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-ep="{{$pedido->ep}}" data-os="{{$pedido->os}}" data-status_id="{{$request->input('departamento')}}" >Detalhes</a>
