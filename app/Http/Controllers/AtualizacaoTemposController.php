@@ -7,6 +7,7 @@ use App\Models\Status;
 use App\Providers\DateHelpers;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AjaxController;
+use App\Http\Controllers\PedidosController;
 use App\Models\Funcionarios;
 use DateTime;
 use DateTimeImmutable;
@@ -95,30 +96,62 @@ class AtualizacaoTemposController extends Controller
                 \Carbon\Carbon::now()->format('Y-m-d'),
             ]);
 
+            $pedidosController = new PedidosController();
+            $maquinas = $pedidosController::getMaquinas();
+
             $pedidos = $pedidos->where('pedidos.status', '=', 'A');
             $pedidos = $pedidos->get();
             foreach ($pedidos as $pedido) {
-
 
                 $ajaxController = new AjaxController();
                 $status_id = $request->input('departamento');
                 $torre = false;
                 if($status_id =='MA' ) {
                     $status_id = 6; // Montagem
+                    $status = 'montagem';
+                    $pedido->departamento = 'Montagem Agulha';
                 } elseif($status_id == 'MT') {
                     $status_id = 6; // Montagem
                     $torre = true; // Montagem Torre
+                    $status = 'montagem';
+                    $pedido->departamento = 'Montagem Torre';
                 } elseif($status_id == 'I') {
                     $status_id = 7; // Inspeção
+                    $status = 'inspeção';
+                    $pedido->departamento = 'Inspeção';
                 }
+                $alerta = $pedidosController->calculaDiasSobrando($maquinas, $status, $pedido);
+                $pedido->alerta_class = $alerta['dias_alerta_departamento'];
+                $pedido->alerta_valor = $alerta['diasSobrando'];
+
                 $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $status_id, $torre);
-                $array = [];
+                $array =$colaborador= [];
                 foreach ($retorno_tempo as $tempo) {
                     $array[] = [
                         $tempo->etapa => $tempo->data,
                     ];
+                    $colaborador[] = $tempo->responsavel;
                 }
+
+                $colaborador = array_unique($colaborador); // remove duplicados
+                // concatena com ','
+                $pedido->colaborador = implode(', ', $colaborador);
                 $array = $this->organizarIntervalos($array);
+                $pedido->data_inicio = '';
+                $pedido->data_fim = '';
+                foreach ($array as $key => $value) {
+                    if (isset($value['Início']) && empty($pedido->data_inicio)) {
+                        $inicio = DateHelpers::formatDate_ddmmYYYYHHIISS($value['Início']);
+                        $pedido->data_inicio = $inicio;
+                    }
+
+                    if (isset($value['Término'])) {
+                        $termino = DateHelpers::formatDate_ddmmYYYYHHIISS   ($value['Término']);
+                        $pedido->data_fim = $termino;
+                    }
+
+                }
+
                 $pedido->tempo_somado = $this->calcularTempoTotal($array);
 
                 $pedido->tempo_default = '00:00:00';

@@ -26,6 +26,15 @@ class DateHelpers
     }
 
     /**
+     * CONVERTE DATAHORA PARA O FORMATO 10/10/2024 10:30:00
+     * @param mixed $value
+     * @return string
+     */
+    public static function formatDate_ddmmYYYYHHIISS($value) {
+	    return Carbon::parse(str_replace('-', '/', $value))->format('d/m/Y H:i:s');
+    }
+
+    /**
      * Converte de 1.200,00 para 1200.00 para salvas no Bancod e dados
      * @param mixed $value
      * @return string

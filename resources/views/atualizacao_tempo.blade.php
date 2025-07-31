@@ -152,9 +152,14 @@
                       <th>EP</th>
                       <th>OS</th>
                       <th>Qtde</th>
-                      <th>Tempo cadastro</th>
-                      <th>Tempo total apontamento</th>
-                      <th>Tempo peça apontamento</th>
+                      <th>Data início</th>
+                      <th>Data término</th>
+                      <th>Colaborador</th>
+                      <th>Departamento</th>
+                      <th>Tempo cadastrado</th>
+                      <th>Tempo total Apont.</th>
+                      <th>Tempo peça Apont.</th>
+                      <th>Alerta</th>
                       <th>Detalhes</th>
                       <th>Ação</th>
                     </tr>
@@ -166,15 +171,25 @@
                             <td scope="row">{{$pedido->ep}}</td>
                             <td>{{$pedido->os}}</td>
                             <td>{{$pedido->qtde}}</td>
+                            <td>{{$pedido->data_inicio}}</td>
+                            <td>{{$pedido->data_fim}}</td>
+                            {{-- //somente exibe 25 caracteres --}}
+                            <td title="{{$pedido->colaborador}}">{{ Str::limit($pedido->colaborador, 20) }}</td>
+                            <td>{{$pedido->departamento}}</td>
                             <td>{{$pedido->tempo_default}}</td>
                                 @php
+
                                     $AtualizacaoTempoController = new AtualizacaoTemposController();
-                                    $segundos = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado) * $pedido->qtde;
-                                    $tempoTotalApontamento = $AtualizacaoTempoController->formatSeconds($segundos);
-                                    $tempoTotalApontamento = empty($tempoTotalApontamento) ? '00:00:00' : $tempoTotalApontamento;
+                                    $segundos_somado = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado) / $pedido->qtde;
+                                    $tempo_somado = $AtualizacaoTempoController->formatSeconds($segundos_somado);
+
+                                    $tempoTotalApontamento = $pedido->tempo_somado;
+
+                                    $pedido->tempo_somado = $tempo_somado
                                 @endphp
                             <td>{{$tempoTotalApontamento}}</td>
                             <td>{{$pedido->tempo_somado}}</td>
+                            <td class="{{$pedido->alerta_class}}">{{ $pedido->alerta_valor }}</td>
                             <td>
                                 <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-ep="{{$pedido->ep}}" data-os="{{$pedido->os}}" data-status_id="{{$request->input('departamento')}}" >Detalhes</a>
                             </td>

@@ -125,6 +125,18 @@ class AjaxController extends Controller
                 'historicos_etapas.created_at as data',
                 'historicos_etapas.id as historico_id',
                 'historicos_etapas.select_tipo_manutencao as tipo_manutencao',
+                DB::raw("
+                    CASE
+                        WHEN historicos_etapas.select_motivo_pausas = '1' THEN 'F.P – Faltando Peças'
+                        WHEN historicos_etapas.select_motivo_pausas = '2' THEN 'P.P – Problema na produção'
+                        WHEN historicos_etapas.select_motivo_pausas = '3' THEN 'P – Pausado'
+                        WHEN historicos_etapas.select_motivo_pausas = '4' THEN 'P.R – Protótipo'
+                        WHEN historicos_etapas.select_motivo_pausas = '5' THEN 'A.P – Assunto Pessoal'
+                        WHEN historicos_etapas.select_motivo_pausas = '6' THEN 'P.M – Problema na máquina'
+                        WHEN historicos_etapas.select_motivo_pausas = '7' THEN 'E.P - Esperando próxima produção'
+                        WHEN historicos_etapas.select_motivo_pausas = '8' THEN 'F.M - Faltando Material'
+                    END AS motivo_pausa
+                "),
                 'etapas_pedidos.nome as etapa'
             )
             ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')

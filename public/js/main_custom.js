@@ -844,7 +844,7 @@ $(function ($) {
                     select.append($('<option value="">Selecione</option>'));
                     $.each(array_funcionarios, function(i, funcionario_item) {
                         $selected = "";
-                        if(funcionario_item == item.responsavel) {
+                        if(funcionario_item.toString() == item.responsavel.toString()) {
                             $selected = "selected='selected'";
                         }
 
@@ -856,7 +856,7 @@ $(function ($) {
                     select = $('<select class="form-control" name="etapa" readonly disabled required>');
                     select.append($('<option value="">Selecione</option>'));
                     select.append($('<option value="1" '+ (item.etapa == 'Início' ? "selected='selected'" : "") +'>Início</option>'));
-                    select.append($('<option value="2" '+ (item.etapa == 'Pausa' ? "selected='selected'" : "") +'>Pausa</option>'));
+                    select.append($('<option value="2" '+ (item.etapa == 'Pausa' ? "selected='selected'" : "") +'>Pausa - '+ item.motivo_pausa +'</option>'));
                     select.append($('<option value="3" '+ (item.etapa == 'Continuar' ? "selected='selected'" : "") +'>Continuar</option>'));
                     select.append($('<option value="4" '+ (item.etapa == 'Término' ? "selected='selected'" : "") +'>Término</option>'));
 
