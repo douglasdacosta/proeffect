@@ -106,7 +106,7 @@ class AjaxController extends Controller
             $status_id = 7; // Inspeção
         }
 
-        $pedidos = $this->consultarResponsaveis($id, $status_id, $torre);
+        $pedidos = $this->consultarResponsaveis($id, $status_id, $torre, $request->input('responsavel'));
 
         if($pedidos->count() > 0){
             return response()->json($pedidos);
@@ -115,7 +115,7 @@ class AjaxController extends Controller
         }
     }
 
-    public function consultarResponsaveis($id, $status_id, $torre = false)
+    public function consultarResponsaveis($id, $status_id, $torre = false, $responsavel = null)
     {
         $historicos = DB::table('pedidos')
             ->distinct()
@@ -124,6 +124,7 @@ class AjaxController extends Controller
                 'funcionarios.nome as responsavel',
                 'historicos_etapas.created_at as data',
                 'historicos_etapas.id as historico_id',
+                'status.nome as departamento',
                 'historicos_etapas.select_tipo_manutencao as tipo_manutencao',
                 DB::raw("
                     CASE
@@ -137,18 +138,37 @@ class AjaxController extends Controller
                         WHEN historicos_etapas.select_motivo_pausas = '8' THEN 'F.M - Faltando Material'
                     END AS motivo_pausa
                 "),
-                'etapas_pedidos.nome as etapa'
+                'historicos_etapas.select_motivo_pausas as motivo_pausa_id',
+                'etapas_pedidos.nome as etapa',
+                'status.id as departamento_id',
             )
             ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+            ->join('status', 'status.id', '=', 'historicos_etapas.status_id')
             ->join('etapas_pedidos', 'etapas_pedidos.id', '=', 'historicos_etapas.etapas_pedidos_id')
             ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
-            ->where('pedidos.id', '=', $id)
-            ->where('historicos_etapas.status_id', '=', $status_id)
-            ->orderby('historicos_etapas.created_at');
+            ->where('pedidos.id', '=', $id);
 
-        if($torre) {
-            $historicos = $historicos->where('historicos_etapas.select_tipo_manutencao', '=', 'T');
+        if ($responsavel) {
+            $historicos->where('funcionarios.nome', '=', $responsavel);
         }
+
+        if (is_array($status_id)) {
+            $historicos->whereIn('historicos_etapas.status_id', $status_id);
+        } else {
+            $historicos->where('historicos_etapas.status_id', '=', $status_id);
+        }
+
+        $historicos->orderBy('historicos_etapas.created_at');
+
+        if(!is_array($status_id)){
+            if($torre) {
+                $historicos = $historicos->where('historicos_etapas.select_tipo_manutencao', '=', 'T');
+            } else {
+                $historicos = $historicos->whereNull('historicos_etapas.select_tipo_manutencao');
+            }
+        }
+
+
         $historicos = $historicos->get();
 
         return $historicos;
@@ -189,6 +209,8 @@ class AjaxController extends Controller
         $responsavel = $request->input('responsavel');
         $etapa = $request->input('etapa');
         $data_hora = $request->input('data_hora');
+        $motivo_pausa = $request->input('motivo_pausa');
+
         //converte data_hora "16/01/2025+12:26:04" para o formato correto "2025-01-16 12:26:04"
 
         $data_hora = \DateTime::createFromFormat('d/m/Y H:i:s', $data_hora);
@@ -228,6 +250,7 @@ class AjaxController extends Controller
                         'funcionarios_id' => $funcionario->id,
                         'created_at' => $data_hora,
                         'updated_at' => $data_hora,
+                        'select_motivo_pausas' => $motivo_pausa,
                         'select_tipo_manutencao' => $select_tipo_manutencao,
                     ]);
                 return response()->json(['success' => 'Apontamento atualizado com sucesso.']);
@@ -250,4 +273,21 @@ class AjaxController extends Controller
         }
     }
 
+    function ajaxExcluiNovoApontamento(Request $request){
+        $historico_id = $request->input('historico_id');
+
+        if(empty($historico_id)) {
+            return response()->json(['error' => 'Dados incompletos para excluir apontamento.'], 400);
+        }
+
+        try {
+            DB::table('historicos_etapas')
+                ->where('id', $historico_id)
+                ->delete();
+
+            return response()->json(['success' => 'Apontamento excluído com sucesso.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao excluir apontamento: ' . $e->getMessage()], 500);
+        }
+    }
 }

@@ -133,3 +133,4 @@ Route::match(['get', 'post'],'/incluir-atualizacao_tempo', [App\Http\Controllers
 Route::match(['post'],'/ajax-busca-responsveis', [App\Http\Controllers\AjaxController::class, 'ajaxBuscaResponsveis'])->name('ajax-busca-responsveis');
 Route::match(['post'],'/ajax-aplica-valores-fichatecnica', [App\Http\Controllers\AjaxController::class, 'ajaxAplicaValoresFichatecnica'])->name('ajax-aplica-valores-fichatecnica');
 Route::match(['post'],'/ajax-salva-novo-apontamento', [App\Http\Controllers\AjaxController::class, 'ajaxSalvaNovoApontamento'])->name('ajax-salva-novo-apontamento');
+Route::match(['post'],'/ajax-exclui-novo-apontamento', [App\Http\Controllers\AjaxController::class, 'ajaxExcluiNovoApontamento'])->name('ajax-exclui-novo-apontamento');

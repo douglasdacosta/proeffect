@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php
     use \App\Http\Controllers\AtualizacaoTemposController;
 ?>
@@ -42,9 +43,11 @@
                                         <tr>
                                             <th>Responsável</th>
                                             <th>Status</th>
+                                            <th>Detalhes</th>
                                             <th>Data e hora</th>
                                             <th>Editar linha</th>
                                             <th>Adicionar</th>
+                                            <th>Excluir</th>
                                             <th>Salvar</th>
 
                                         </tr>
@@ -79,16 +82,14 @@
                     <label for="responsavel" class="col-sm-1 col-form-label">Responsável</label>
                     <select class="form-control col-sm-2 default-select2" id="responsavel" name="responsavel">
                         <option value="">Selecione</option>
-                        <div class="col-sm-3">
                             @foreach ($funcionarios as $funcionario)
                                 @php $array_funcionarios[] = $funcionario->nome; @endphp
-                                @if (isset($request) && $request->input('responsavel') == $funcionario->id)
+                                @if (isset($request) && $request->input('responsavel') == $funcionario->nome)
                                     <option value="{{ $funcionario->nome }}" selected>{{ $funcionario->nome }}</option>
                                 @else
                                     <option value="{{ $funcionario->nome }}">{{ $funcionario->nome }}</option>
                                 @endif
                             @endforeach
-                        </div>
                     </select>
                 </div>
                 <input type="hidden" name="array_funcionarios" id="array_funcionarios" value="{{ json_encode($array_funcionarios) }}">
@@ -97,12 +98,12 @@
                         <label for="data_apontamento" class="col-sm-2 col-form-label text-right">Data apontamento: de</label>
                         <div class="col-sm-2">
                             <input type="text" class="form-control mask_date" id="data_apontamento" name="data_apontamento"
-                                placeholder="DD/MM/AAAA">
+                                placeholder="DD/MM/AAAA" value="@if (isset($request) && $request->input('data_apontamento') != '') {{ $request->input('data_apontamento') }}@else @endif">
                         </div>
                         <label for="data_apontamento_fim" class=" col-form-label text-right">até</label>
                         <div class="col-sm-2">
                             <input type="text" class="form-control mask_date" id="data_apontamento_fim" name="data_apontamento_fim"
-                                placeholder="DD/MM/AAAA">
+                                placeholder="DD/MM/AAAA" value="@if (isset($request) && $request->input('data_apontamento_fim') != '') {{ $request->input('data_apontamento_fim') }}@else @endif">
                         </div>
 
 
@@ -139,7 +140,7 @@
 
 
         <div class="form-group">
-          <label class="control-label col-md-3 col-sm-3 col-xs-12" for=""></label>
+
           <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_panel">
               <div class="x_title">
@@ -189,9 +190,9 @@
                                 @endphp
                             <td>{{$tempoTotalApontamento}}</td>
                             <td>{{$pedido->tempo_somado}}</td>
-                            <td class="{{$pedido->alerta_class}}">{{ $pedido->alerta_valor }}</td>
+                            <td ></td>
                             <td>
-                                <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-ep="{{$pedido->ep}}" data-os="{{$pedido->os}}" data-status_id="{{$request->input('departamento')}}" >Detalhes</a>
+                                <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-ep="{{$pedido->ep}}" data-os="{{$pedido->os}}" data-responsavel="{{$request->input('responsavel')}}" data-status_id="{{$request->input('departamento')}}" >Detalhes</a>
                             </td>
                             <td>
                                 <a class="btn btn-success btn-sm aplicar-valores" data-ep='{{$pedido->ep}}' data-status_id="{{$request->input('departamento')}}" data-tempo_aplicar='{{$pedido->tempo_somado}}'>APLICAR</a>

@@ -817,15 +817,20 @@ $(function ($) {
     $(document).on('click', '.ver-detalhes', function() {
         var id = $(this).data('id');
         var status_id = $(this).data('status_id');
+        var responsavel = $(this).data('responsavel');
         $('#texto_ep').text($(this).data('ep'));
         $('#texto_os').text($(this).data('os'));
 
+        if(status_id == undefined || status_id == '') {
+            status_id = [6,7];
+        }
         $.ajax({
             type: "POST",
             url: baseUrl + '/ajax-busca-responsveis',
             data: {
                 'id': id,
                 'status_id': status_id,
+                'responsavel' : responsavel,
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
@@ -853,18 +858,32 @@ $(function ($) {
                     tr.append($('<td>').append(select));
 
                     // Cria o elemento select com as opções de etapas
-                    select = $('<select class="form-control" name="etapa" readonly disabled required>');
+                    select = $('<select class="form-control etapa" name="etapa" readonly disabled required>');
                     select.append($('<option value="">Selecione</option>'));
                     select.append($('<option value="1" '+ (item.etapa == 'Início' ? "selected='selected'" : "") +'>Início</option>'));
-                    select.append($('<option value="2" '+ (item.etapa == 'Pausa' ? "selected='selected'" : "") +'>Pausa - '+ item.motivo_pausa +'</option>'));
+                    select.append($('<option value="2" '+ (item.etapa == 'Pausa' ? "selected='selected'" : "") +'>Pausa</option>'));
                     select.append($('<option value="3" '+ (item.etapa == 'Continuar' ? "selected='selected'" : "") +'>Continuar</option>'));
                     select.append($('<option value="4" '+ (item.etapa == 'Término' ? "selected='selected'" : "") +'>Término</option>'));
 
                     tr.append($('<td>').append(select));
+                    select ='';
+                    select = $('<select style="display: '+ (item.etapa == 'Pausa' ? 'block' : 'none') +';" class="form-control" name="motivo_pausa" readonly disabled="disabled" required>');
+                    select.append($('<option  value="" '+ (item.motivo_pausa_id == '' ? "selected='selected'" : "") +'></option>'));
+                    select.append($('<option  value="1" '+ (item.motivo_pausa_id == '1' ? "selected='selected'" : "") +'>F.P – Faltando Peças</option>'));
+                    select.append($('<option value="2" '+ (item.motivo_pausa_id == '2' ? "selected='selected'" : "") +'>P.P – Problema na produção</option>'));
+                    select.append($('<option value="3" '+ (item.motivo_pausa_id == '3' ? "selected='selected'" : "") +'>P – Pausado</option>'));
+                    select.append($('<option value="4" '+ (item.motivo_pausa_id == '4' ? "selected='selected'" : "") +'>P.R – Protótipo</option>'));
+                    select.append($('<option value="5" '+ (item.motivo_pausa_id == '5' ? "selected='selected'" : "") +'>A.P – Assunto Pessoal</option>'));
+                    select.append($('<option value="6" '+ (item.motivo_pausa_id == '6' ? "selected='selected'" : "") +'>P.M – Problema na máquina</option>'));
+                    select.append($('<option value="7" '+ (item.motivo_pausa_id == '7' ? "selected='selected'" : "") +'>E.P - Esperando próxima produção</option>'));
+                    select.append($('<option value="8" '+ (item.motivo_pausa_id == '8' ? "selected='selected'" : "") +'>F.M - Faltando Material</option>'));
+
+                    tr.append($('<td>').append(select));
                     tr.append($('<td class="text-nowrap">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-8" name="data_hora" value="'+data_hora+'" required>')));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-edit alterar-linha-valores text-primary" style="cursor:pointer;" data-id="'+id+'"></i></td>'));
-                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+status_id+'"></i></td>'));
-                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+status_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-trash excluir-linha-valores text-danger" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
 
                     $('#tabela_responsaveis tbody').append(tr);
                 });
@@ -879,6 +898,15 @@ $(function ($) {
         });
     });
 
+    $(document).on('change', '.etapa', function() {
+        console.log($(this).val());
+        if ($(this).val() == '2') {
+            $(this).closest('tr').find('select[name="motivo_pausa"]').show();
+        } else {
+            $(this).closest('tr').find('select[name="motivo_pausa"]').hide();
+        }
+    });
+
     $(document).on('click', '.salva-linha-valores', function() {
         id = $(this).data('id');
         status_id = $(this).data('status_id');
@@ -887,6 +915,7 @@ $(function ($) {
         responsavel = $(this).closest('tr').find('select[name="responsavel"]').val();
         etapa = $(this).closest('tr').find('select[name="etapa"]').val();
         data_hora = $(this).closest('tr').find('input[name="data_hora"]').val();
+        motivo_pausa = $(this).closest('tr').find('select[name="motivo_pausa"]').val();
 
         if(responsavel == '' || etapa == '' || data_hora == '') {
             alert('Preencha todos os campos!');
@@ -903,6 +932,7 @@ $(function ($) {
                 'status_id': status_id,
                 'etapa': etapa,
                 'data_hora': data_hora,
+                'motivo_pausa': motivo_pausa,
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
@@ -925,6 +955,8 @@ $(function ($) {
         $(this).closest('tr').find('select[name="responsavel"]').removeAttr('readonly');
         $(this).closest('tr').find('select[name="etapa"]').attr('disabled', false);
         $(this).closest('tr').find('select[name="etapa"]').removeAttr('readonly');
+        $(this).closest('tr').find('select[name="motivo_pausa"]').attr('disabled', false);
+        $(this).closest('tr').find('select[name="motivo_pausa"]').removeAttr('readonly');
         $(this).closest('tr').find('input[name="data_hora"]').attr('disabled', false);
         $(this).closest('tr').find('input[name="data_hora"]').removeAttr('readonly');
 
@@ -948,7 +980,7 @@ $(function ($) {
         tr.append($('<td>').append(select));
 
         // Cria o elemento select com as opções de etapas
-        select = $('<select class="form-control" name="etapa" required>');
+        select = $('<select class="form-control etapa" name="etapa" required>');
         select.append($('<option value="">Selecione</option>'));
         select.append($('<option value="1">Início</option>'));
         select.append($('<option value="2">Pausa</option>'));
@@ -957,14 +989,58 @@ $(function ($) {
 
         tr.append($('<td>').append(select));
 
+        select = $('<select class="form-control" name="motivo_pausa" required>');
+        select.append($('<option value=""></option>'));
+        select.append($('<option value="1">F.P – Faltando Peças</option>'));
+        select.append($('<option value="2">P.P – Problema na produção</option>'));
+        select.append($('<option value="3">P – Pausado</option>'));
+        select.append($('<option value="4">P.R – Protótipo</option>'));
+        select.append($('<option value="5">A.P – Assunto Pessoal</option>'));
+        select.append($('<option value="6">P.M – Problema na máquina</option>'));
+        select.append($('<option value="7">E.P - Esperando próxima produção</option>'));
+        select.append($('<option value="8">F.M - Faltando Material</option>'));
+        tr.append($('<td>').append(select));
+
         tr.append($('<td><input type="text" class="form-control date_time col-sm-8" name="data_hora" required></td>'));
         tr.append($('<td class="text-nowrap">'));
+        tr.append($('<td class="text-nowrap">'));
+        tr.append($('<td class="text-nowrap">'));
         tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="" data-status_id="'+status_id+'"></i></td>'));
+
         $('#tabela_responsaveis tbody').append(tr);
 
         $('.date_time').mask('00/00/0000 00:00:00');
 
     });
+
+    $(document).on('click', '.excluir-linha-valores', function() {
+
+        historico_id = $(this).data('historico_id');
+        const botao = $(this); // salva o botão clicado
+        if(!confirm('Você deseja realmente excluir este apontamento?')) {
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/ajax-exclui-novo-apontamento',
+            data: {
+                'historico_id': historico_id,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                abreAlertSuccess(data, false);
+                botao.closest('tr').remove();
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                dados = JSON.parse(data.responseText);
+                alert('Erro ao excluir os dados! ' + dados.error);
+            },
+
+        });
+    });
+
 
     $(document).on('click', '.aplicar-valores', function() {
         id = $(this).data('id');
