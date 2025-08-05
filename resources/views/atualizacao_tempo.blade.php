@@ -256,8 +256,8 @@
 @endphp
 
                       <th></th><th></th><th></th><th></th><th></th><th></th><th></th>
-                      <th>{{$dias_default_total}} dias</th>
-                      <th>{{$dias_total_apontamento}} dias</th>
+                      <th>{{$dias_default_total}}</th>
+                      <th>{{$dias_total_apontamento}}</th>
                       <th>{{''}}</th>
                       <th></th>
                       <th></th>
