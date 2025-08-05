@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <?php
     use \App\Http\Controllers\AtualizacaoTemposController;
+    use \App\Http\Controllers\MaquinasController;
+    use \App\Http\Controllers\PedidosController;
+    use \App\Models\Maquinas;
+
 ?>
 
 @extends('adminlte::page')
@@ -167,6 +171,11 @@
                   </thead>
                   <tbody>
                   @if(isset($pedidos))
+                        @php
+                            $tempo_somado_total = 0;
+                            $tempo_default_total = 0;
+                            $tempoTotalApontamentoSomado = 0;
+                        @endphp
                         @foreach ($pedidos as $pedido)
                             <tr>
                             <td scope="row">{{$pedido->ep}}</td>
@@ -193,7 +202,7 @@
                                     $tempo_somado = $AtualizacaoTempoController->formatSeconds($segundos_somado);
 
                                     $tempoTotalApontamento = $pedido->tempo_somado;
-
+                                    $tempoTotalApontamentoSomado += $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado);
                                     $pedido->tempo_somado = $tempo_somado
                                 @endphp
                             <td>{{$tempoTotalApontamento}}</td>
@@ -202,7 +211,9 @@
                                 @php
                                     $AtualizacaoTempoController = new AtualizacaoTemposController();
                                     $tempo_default = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_default);
+                                    $tempo_default_total += $tempo_default;
                                     $tempo_somado = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado);
+                                    $tempo_somado_total += $segundos_somado;
                                 @endphp
                                 @if($tempo_somado < $tempo_default)
                                     <i class="text-success fas fa-arrow-up"></i>
@@ -220,6 +231,39 @@
                         @endforeach
                     @endif
                   </tbody>
+                  <tfoot>
+                    <tr>
+                      <th></th><th></th><th></th><th></th><th></th><th></th><th></th>
+                      <th>{{$AtualizacaoTempoController->formatSeconds($tempo_default_total)}}</th>
+                      <th>{{$AtualizacaoTempoController->formatSeconds($tempoTotalApontamentoSomado)}}</th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                    <tr>
+@php
+                $PedidosController = new PedidosController();
+
+                $Maquinas = new Maquinas();
+                $maquinas = $Maquinas->get();
+                $horas_dia =$maquinas[0]->horas_dia;
+                // $horas_dia = $AtualizacaoTempoController->converteTempoParaInteiro('00:'.$horas_dia);
+                $tempo_default_total = $AtualizacaoTempoController->formatSeconds($tempo_default_total);
+                $dias_default_total = $PedidosController->divideHoursAndReturnWorkDays($tempo_default_total, $horas_dia);
+
+                $tempoTotalApontamentoSomado = $AtualizacaoTempoController->formatSeconds($tempoTotalApontamentoSomado);
+                $dias_total_apontamento = $PedidosController->divideHoursAndReturnWorkDays($tempoTotalApontamentoSomado, $horas_dia);
+@endphp
+
+                      <th></th><th></th><th></th><th></th><th></th><th></th><th></th>
+                      <th>{{$dias_default_total}} dias</th>
+                      <th>{{$dias_total_apontamento}} dias</th>
+                      <th>{{''}}</th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                    </tr>
                 </table>
               </div>
             </div>
