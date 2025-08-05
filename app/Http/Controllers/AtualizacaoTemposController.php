@@ -49,7 +49,6 @@ class AtualizacaoTemposController extends Controller
         }
 
         $pedidos = DB::table('pedidos')
-            ->distinct()
             ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
             ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
             ->join('status', 'historicos_etapas.status_id', '=', 'status.id')
@@ -58,26 +57,19 @@ class AtualizacaoTemposController extends Controller
             ->orderby('pedidos.status_id', 'desc')
             ->orderby('data_entrega');
 
-        $pedidos = $pedidos->select('pedidos.*',
+        $pedidos = $pedidos->select('pedidos.id as id',
+            'pedidos.os as os',
+            'pedidos.data_entrega as data_entrega',
+            'pedidos.status_id as status_id',
+            'pedidos.qtde as qtde',
             'ficha_tecnica.ep as ep',
             'ficha_tecnica.tempo_montagem as pedido_tempo_montagem',
             'ficha_tecnica.tempo_montagem_torre as pedido_tempo_montagem_torre',
             'ficha_tecnica.tempo_inspecao as pedido_tempo_inspecao',
             'status.id as id_status',
             'status.nome as departamento',
-            DB::raw("
-                    CASE
-                        WHEN historicos_etapas.select_motivo_pausas = '1' THEN 'F.P – Faltando Peças'
-                        WHEN historicos_etapas.select_motivo_pausas = '2' THEN 'P.P – Problema na produção'
-                        WHEN historicos_etapas.select_motivo_pausas = '3' THEN 'P – Pausado'
-                        WHEN historicos_etapas.select_motivo_pausas = '4' THEN 'P.R – Protótipo'
-                        WHEN historicos_etapas.select_motivo_pausas = '5' THEN 'A.P – Assunto Pessoal'
-                        WHEN historicos_etapas.select_motivo_pausas = '6' THEN 'P.M – Problema na máquina'
-                        WHEN historicos_etapas.select_motivo_pausas = '7' THEN 'E.P - Esperando próxima produção'
-                        WHEN historicos_etapas.select_motivo_pausas = '8' THEN 'F.M - Faltando Material'
-                    END AS motivo_pausa
-                "),
-        );
+            'historicos_etapas.select_tipo_manutencao as select_tipo_manutencao',
+        )->distinct();
 
         if(is_array($status_id)){
             $pedidos = $pedidos->whereIn('historicos_etapas.status_id', $status_id);
@@ -114,6 +106,23 @@ class AtualizacaoTemposController extends Controller
         $pedidos = $pedidos->get();
 
         foreach ($pedidos as $pedido) {
+
+            $pedidos_aux = DB::table('pedidos')
+                ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+                ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
+                ->where('pedidos_id', $pedido->id)
+                ->select('funcionarios.nome as responsavel')
+                ->distinct();
+
+            if(is_array($status_id)){
+                $pedidos_aux = $pedidos_aux->whereIn('historicos_etapas.status_id', $status_id);
+            } else {
+                $pedidos_aux = $pedidos_aux->where('historicos_etapas.status_id', '=', $status_id);
+            }
+            $pedidos_aux = $pedidos_aux->get(); // executa a consulta e retorna os resultados
+
+            $quantidade = $pedidos_aux->count(); // conta os resultados retornados
+            $pedido->quantidade_responsavel = $quantidade;
 
             $ajaxController = new AjaxController();
             $status_id = $request->input('departamento');

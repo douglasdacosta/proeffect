@@ -170,13 +170,21 @@
                         @foreach ($pedidos as $pedido)
                             <tr>
                             <td scope="row">{{$pedido->ep}}</td>
-                            <td>{{$pedido->os}}</td>
+                            <td>{{$pedido->os . ' ' .$pedido->select_tipo_manutencao}}</td>
                             <td>{{$pedido->qtde}}</td>
                             <td>{{$pedido->data_inicio}}</td>
                             <td>{{$pedido->data_fim}}</td>
                             {{-- //somente exibe 25 caracteres --}}
-                            <td title="{{$pedido->colaborador}}">{{ Str::limit($pedido->colaborador, 20) }}</td>
-                            <td>{{$pedido->departamento}}</td>
+                            <td title="{{$pedido->colaborador}}"
+                                @if($pedido->quantidade_responsavel > 1) class="bg-warning" @endif
+                            >{{ Str::limit($pedido->colaborador, 20) }}</td>
+                            @if($pedido->id_status == 6 && $pedido->select_tipo_manutencao == 'T')
+                                <td>{{$pedido->departamento . ' - Torre' }}</td>
+                            @elseif($pedido->id_status == 6 && ($pedido->select_tipo_manutencao == 'A' || empty($pedido->select_tipo_manutencao)))
+                                <td>{{$pedido->departamento . ' - Agulha' }}</td>
+                            @else
+                                <td>{{$pedido->departamento}}</td>
+                            @endif
                             <td>{{$pedido->tempo_default}}</td>
                                 @php
 
@@ -190,7 +198,18 @@
                                 @endphp
                             <td>{{$tempoTotalApontamento}}</td>
                             <td>{{$pedido->tempo_somado}}</td>
-                            <td ></td>
+                            <td >
+                                @php
+                                    $AtualizacaoTempoController = new AtualizacaoTemposController();
+                                    $tempo_default = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_default);
+                                    $tempo_somado = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado);
+                                @endphp
+                                @if($tempo_somado < $tempo_default)
+                                    <i class="text-success fas fa-arrow-up"></i>
+                                @else
+                                    <i class="text-danger fas fa-arrow-down"></i>
+                                @endif
+                            </td>
                             <td>
                                 <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-ep="{{$pedido->ep}}" data-os="{{$pedido->os}}" data-responsavel="{{$request->input('responsavel')}}" data-status_id="{{$request->input('departamento')}}" >Detalhes</a>
                             </td>
