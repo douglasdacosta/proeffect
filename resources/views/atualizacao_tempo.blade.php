@@ -248,7 +248,6 @@
                 $Maquinas = new Maquinas();
                 $maquinas = $Maquinas->get();
                 $horas_dia =$maquinas[0]->horas_dia;
-                // $horas_dia = $AtualizacaoTempoController->converteTempoParaInteiro('00:'.$horas_dia);
                 $tempo_default_total = $AtualizacaoTempoController->formatSeconds($tempo_default_total);
                 $dias_default_total = $PedidosController->divideHoursAndReturnWorkDays($tempo_default_total, $horas_dia);
 
