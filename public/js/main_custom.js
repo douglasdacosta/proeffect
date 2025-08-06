@@ -287,6 +287,16 @@ $(function ($) {
 
     }
 
+    let radioMarcado = null;
+
+    $('input[type=radio][name=departamento]').on('click', function () {
+        if (radioMarcado === this) {
+            this.checked = false;
+            radioMarcado = null;
+        } else {
+            radioMarcado = this;
+        }
+    });
 
     $(document).on('click', '#adicionar_montador', function (e) {
         salva_montadores = [];
