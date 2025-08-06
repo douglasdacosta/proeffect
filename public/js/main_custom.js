@@ -846,6 +846,7 @@ $(function ($) {
         var id = $(this).data('id');
         var status_id = $(this).data('status_id');
         var responsavel = $(this).data('responsavel');
+        var tipo_manutencao = $(this).data('tipo_manutencao');
         $('#texto_ep').text($(this).data('ep'));
         $('#texto_os').text($(this).data('os'));
 
@@ -859,6 +860,7 @@ $(function ($) {
                 'id': id,
                 'status_id': status_id,
                 'responsavel' : responsavel,
+                'tipo_manutencao': tipo_manutencao,
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
@@ -908,9 +910,9 @@ $(function ($) {
                     tr.append($('<td>').append(select));
                     tr.append($('<td class="text-nowrap">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-12" name="data_hora" value="'+data_hora+'" required>')));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-edit alterar-linha-valores text-primary" style="cursor:pointer;" data-id="'+id+'"></i></td>'));
-                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+item.departamento_id+'"  data-tipo_manutencao="'+tipo_manutencao+'"></i></td>'));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-trash excluir-linha-valores text-danger" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
-                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'" data-tipo_manutencao="'+tipo_manutencao+'"></i></td>'));
 
                     $('#tabela_responsaveis tbody').append(tr);
                 });
@@ -938,6 +940,7 @@ $(function ($) {
         id = $(this).data('id');
         status_id = $(this).data('status_id');
         historico_id = $(this).data('historico_id');
+        tipo_manutencao = $(this).data('tipo_manutencao');
 
         responsavel = $(this).closest('tr').find('select[name="responsavel"]').val();
         etapa = $(this).closest('tr').find('select[name="etapa"]').val();
@@ -960,6 +963,7 @@ $(function ($) {
                 'etapa': etapa,
                 'data_hora': data_hora,
                 'motivo_pausa': motivo_pausa,
+                'tipo_manutencao': tipo_manutencao,
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
@@ -992,6 +996,7 @@ $(function ($) {
     $(document).on('click', '.nova-linha-valores', function() {
         id = $(this).data('id');
         status_id = $(this).data('status_id');
+        tipo_manutencao = $(this).data('tipo_manutencao');
 
 
         array_funcionarios = $('#array_funcionarios').val();
@@ -1032,7 +1037,7 @@ $(function ($) {
         tr.append($('<td class="text-nowrap">'));
         tr.append($('<td class="text-nowrap">'));
         tr.append($('<td class="text-nowrap">'));
-        tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="" data-status_id="'+status_id+'"></i></td>'));
+        tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="" data-status_id="'+status_id+'" data-tipo_manutencao="'+tipo_manutencao+'"></i></td>'));
 
         $('#tabela_responsaveis tbody').append(tr);
 
@@ -1115,6 +1120,7 @@ $(function ($) {
         var id = $(that).data('id');
         var status_id = $(that).data('status_id');
         var responsavel = $(that).data('responsavel');
+        var tipo_manutencao = $(that).data('tipo_manutencao');
         $('#texto_ep').text($(that).data('ep'));
         $('#texto_os').text($(that).data('os'));
 
@@ -1128,6 +1134,7 @@ $(function ($) {
                 'id': id,
                 'status_id': status_id,
                 'responsavel' : responsavel,
+                'tipo_manutencao': tipo_manutencao,
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
@@ -1177,9 +1184,9 @@ $(function ($) {
                     tr.append($('<td class="col-sm-2">').append(select));
                     tr.append($('<td class="text-nowrap col-sm-8">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-12" name="data_hora" value="'+data_hora+'" required>')));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-edit alterar-linha-valores text-primary" style="cursor:pointer;" data-id="'+id+'"></i></td>'));
-                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+item.departamento_id+'" data-tipo_manutencao="'+item.tipo_manutencao+'"></i></td>'));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-trash excluir-linha-valores text-danger" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
-                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'" data-tipo_manutencao="'+item.tipo_manutencao+'"></i></td>'));
 
                     $('#tabela_responsaveis tbody').append(tr);
                 });

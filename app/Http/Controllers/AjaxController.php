@@ -96,7 +96,8 @@ class AjaxController extends Controller
     function ajaxBuscaResponsveis(Request $request){
         $id = $request->input('id');
         $status_id = $request->input('status_id');
-        $torre = $tipo_manutencao = false;
+        $tipo_manutencao = $request->input('tipo_manutencao');
+        $torre = false;
         if($status_id =='MA' ) {
             $status_id = 6; // Montagem
             $tipo_manutencao = 'A';
@@ -119,6 +120,7 @@ class AjaxController extends Controller
 
     public function consultarResponsaveis($id, $status_id, $torre = false, $responsavel = null, $tipo_manutencao = false)
     {
+
         $historicos = DB::table('pedidos')
             ->distinct()
             ->select(
@@ -164,6 +166,7 @@ class AjaxController extends Controller
         }
 
         $historicos->orderBy('historicos_etapas.created_at');
+
         $historicos = $historicos->get();
 
         return $historicos;
@@ -174,6 +177,7 @@ class AjaxController extends Controller
         $tempo_aplicar = request()->input('tempo_aplicar');
         $ep = request()->input('ep');
         $status_id = request()->input('status_id');
+
 
         if(empty($ep) || empty($tempo_aplicar) || empty($status_id)) {
             return response()->json(['error' => 'Dados incompletos para aplicar valores.'], 400);
@@ -205,6 +209,7 @@ class AjaxController extends Controller
         $etapa = $request->input('etapa');
         $data_hora = $request->input('data_hora');
         $motivo_pausa = $request->input('motivo_pausa');
+        $tipo_manutencao = request()->input('tipo_manutencao');
 
         //converte data_hora "16/01/2025+12:26:04" para o formato correto "2025-01-16 12:26:04"
 
@@ -220,16 +225,12 @@ class AjaxController extends Controller
             ->first();
 
         $status_id = request()->input('status_id');
-        $select_tipo_manutencao = null;
         if($status_id =='MA' ) {
             $status_id = '6'; // Montagem
-            $select_tipo_manutencao = 'A';
         } elseif($status_id == 'MT') {
             $status_id = '6'; // Montagem
-            $select_tipo_manutencao = 'T'; // Montagem Torre
         } elseif($status_id == 'I') {
             $status_id = '7'; // Inspeção
-            $select_tipo_manutencao = 'I';
         }
 
         try {
@@ -246,7 +247,6 @@ class AjaxController extends Controller
                         'created_at' => $data_hora,
                         'updated_at' => $data_hora,
                         'select_motivo_pausas' => $motivo_pausa,
-                        'select_tipo_manutencao' => $select_tipo_manutencao,
                     ]);
                 return response()->json(['success' => 'Apontamento atualizado com sucesso.']);
             }
@@ -259,7 +259,7 @@ class AjaxController extends Controller
                 'funcionarios_id' => $funcionario->id,
                 'created_at' => $data_hora,
                 'updated_at' => $data_hora,
-                'select_tipo_manutencao' => $select_tipo_manutencao,
+                'select_tipo_manutencao' => $tipo_manutencao,
             ]);
 
             return response()->json(['success' => 'Novo apontamento salvo com sucesso.']);

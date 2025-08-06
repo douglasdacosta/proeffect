@@ -229,7 +229,13 @@
                                 @endif
                             </td>
                             <td>
-                                <a class="btn btn-info btn-sm ver-detalhes" data-id="{{$pedido->id}}" data-ep="{{$pedido->ep}}" data-os="{{$pedido->os}}" data-responsavel="{{$request->input('responsavel')}}" data-status_id="{{$pedido->id_status}}" >Detalhes</a>
+                                <a class="btn btn-info btn-sm ver-detalhes"
+                                data-id="{{$pedido->id}}"
+                                data-ep="{{$pedido->ep}}"
+                                data-os="{{$pedido->os}}"
+                                data-responsavel="{{$request->input('responsavel')}}"
+                                data-status_id="{{$pedido->id_status}}"
+                                data-tipo_manutencao="{{$pedido->select_tipo_manutencao}}">Detalhes</a>
                             </td>
                             <td>
                                 <a class="btn btn-success btn-sm aplicar-valores" data-ep='{{$pedido->ep}}' data-status_id="{{$request->input('departamento')}}" data-tempo_aplicar='{{$pedido->tempo_somado}}'>APLICAR</a>

@@ -145,7 +145,7 @@ class AtualizacaoTemposController extends Controller
                     $responsavel = $request->input('responsavel');
                 }
 
-                $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $pedido->id_status, $torre, $responsavel, $tipo_manutencao);
+                $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $pedido->id_status, $torre, $responsavel, $pedido->select_tipo_manutencao);
 
                 $pedido->colaborador = '';
 
