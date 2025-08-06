@@ -34,183 +34,178 @@ class AtualizacaoTemposController extends Controller
     {
 
 
-        $status_id = $request->input('status_id');
-
-        if($request->input('departamento') =='MA' ) {
-            $status_id = 6; // Montagem
-        } elseif($request->input('departamento') == 'MT') {
-            $status_id = 6; // Montagem
-        } elseif($request->input('departamento') == 'I') {
-            $status_id = 7; // Inspeção
-        }
-
-        if(empty($status_id)) {
-            $status_id = [6,7];
-        }
-
-        $pedidos = DB::table('pedidos')
-            ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
-            ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
-            ->join('status', 'historicos_etapas.status_id', '=', 'status.id')
-            ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
-            ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
-            ->orderby('pedidos.status_id', 'desc')
-            ->orderby('data_entrega');
-
-        $pedidos = $pedidos->select('pedidos.id as id',
-            'pedidos.os as os',
-            'pedidos.data_entrega as data_entrega',
-            'pedidos.status_id as status_id',
-            'pedidos.qtde as qtde',
-            'ficha_tecnica.ep as ep',
-            'ficha_tecnica.tempo_montagem as pedido_tempo_montagem',
-            'ficha_tecnica.tempo_montagem_torre as pedido_tempo_montagem_torre',
-            'ficha_tecnica.tempo_inspecao as pedido_tempo_inspecao',
-            'status.id as id_status',
-            'status.nome as departamento',
-            'historicos_etapas.select_tipo_manutencao as select_tipo_manutencao',
-        )->distinct();
-
-        if(is_array($status_id)){
-            $pedidos = $pedidos->whereIn('historicos_etapas.status_id', $status_id);
+        if(empty($request->input('data_apontamento')) && empty($request->input('data_apontamento_fim'))) {
+            $pedidos = [];
         } else {
-            $pedidos = $pedidos->where('historicos_etapas.status_id', '=', $status_id);
-        }
 
-        if(!empty($request->input('os'))) {
-            $pedidos = $pedidos->where('pedidos.os', '=', $request->input('os'));
-        }
+            $departamento = $request->input('departamento');
+                $torre = $tipo_manutencao= false;
+                if($departamento =='MA' ) {
+                    $status_id = 6; // Montagem
+                    $status = 'montagem';
+                    $tipo_manutencao = 'A';
+                } elseif($departamento == 'MT') {
+                    $status_id = 6; // Montagem
+                    $torre = true; // Montagem Torre
+                    $status = 'montagem';
+                    $tipo_manutencao = 'T';
+                } elseif($departamento == 'I') {
+                    $status_id = 7; // Inspeção
+                    $status = 'inspeção';
+                }
 
-        if(!empty($request->input('ep'))) {
-            $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $request->input('ep'));
-        }
+                if(empty($status_id)) {
+                    $status_id = [6,7];
+                }
 
-        if(!empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
-            $pedidos = $pedidos->whereBetween('historicos_etapas.created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59']);
-        }
-        if(!empty($request->input('data_apontamento')) && empty($request->input('data_apontamento_fim') )) {
-            $pedidos = $pedidos->where('historicos_etapas.created_at', '>=', DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01');
-        }
-        if(empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
-            $pedidos = $pedidos->where('historicos_etapas.created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59');
-        }
-
-        if(!empty($request->input('responsavel'))) {
-            $pedidos = $pedidos->where('funcionarios.nome', 'like', '%'.strtolower($request->input('responsavel')).'%');
-        }
-
-        $pedidos = $pedidos->orderBy('ficha_tecnica.ep', 'asc');
-
-        $pedidos = $pedidos->where('pedidos.status', '=', 'A');
-
-        $pedidos = $pedidos->get();
-
-        foreach ($pedidos as $pedido) {
-
-            $pedidos_aux = DB::table('pedidos')
+            $pedidos = DB::table('pedidos')
                 ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
                 ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
-                ->where('pedidos_id', $pedido->id)
-                ->select('funcionarios.nome as responsavel')
-                ->distinct();
+                ->join('status', 'historicos_etapas.status_id', '=', 'status.id')
+                ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
+                ->join('pessoas', 'pessoas.id', '=', 'pedidos.pessoas_id')
+                ->orderby('pedidos.status_id', 'desc')
+                ->orderby('data_entrega');
+
+            $pedidos = $pedidos->select('pedidos.id as id',
+                'pedidos.os as os',
+                'pedidos.data_entrega as data_entrega',
+                'pedidos.status_id as status_id',
+                'pedidos.qtde as qtde',
+                'ficha_tecnica.ep as ep',
+                'ficha_tecnica.tempo_montagem as pedido_tempo_montagem',
+                'ficha_tecnica.tempo_montagem_torre as pedido_tempo_montagem_torre',
+                'ficha_tecnica.tempo_inspecao as pedido_tempo_inspecao',
+                'status.id as id_status',
+                'status.nome as departamento',
+                'historicos_etapas.select_tipo_manutencao as select_tipo_manutencao',
+            )->distinct();
 
             if(is_array($status_id)){
-                $pedidos_aux = $pedidos_aux->whereIn('historicos_etapas.status_id', $status_id);
+                $pedidos = $pedidos->whereIn('historicos_etapas.status_id', $status_id);
             } else {
-                $pedidos_aux = $pedidos_aux->where('historicos_etapas.status_id', '=', $status_id);
-            }
-            $pedidos_aux = $pedidos_aux->get(); // executa a consulta e retorna os resultados
-
-            $quantidade = $pedidos_aux->count(); // conta os resultados retornados
-            $pedido->quantidade_responsavel = $quantidade;
-
-            $ajaxController = new AjaxController();
-            $status_id = $request->input('departamento');
-            $torre = false;
-            if($status_id =='MA' ) {
-                $status_id = 6; // Montagem
-                $status = 'montagem';
-            } elseif($status_id == 'MT') {
-                $status_id = 6; // Montagem
-                $torre = true; // Montagem Torre
-                $status = 'montagem';
-            } elseif($status_id == 'I') {
-                $status_id = 7; // Inspeção
-                $status = 'inspeção';
+                $pedidos = $pedidos->where('historicos_etapas.status_id', '=', $status_id);
+                if($status_id == 6) {
+                    $pedidos = $pedidos->where('historicos_etapas.select_tipo_manutencao', '=', $tipo_manutencao);
+                }
             }
 
-            if(empty($status_id)) {
-                $status_id = [6,7];
+            if(!empty($request->input('os'))) {
+                $pedidos = $pedidos->where('pedidos.os', '=', $request->input('os'));
             }
 
-            $responsavel = null;
+            if(!empty($request->input('ep'))) {
+                $pedidos = $pedidos->where('ficha_tecnica.ep', '=', $request->input('ep'));
+            }
+
+            if(!empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
+                $pedidos = $pedidos->whereBetween('historicos_etapas.created_at', [DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59']);
+            }
+            if(!empty($request->input('data_apontamento')) && empty($request->input('data_apontamento_fim') )) {
+                $pedidos = $pedidos->where('historicos_etapas.created_at', '>=', DateHelpers::formatDate_dmY($request->input('data_apontamento')).' 00:00:01');
+            }
+            if(empty($request->input('data_apontamento')) && !empty($request->input('data_apontamento_fim') )) {
+                $pedidos = $pedidos->where('historicos_etapas.created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_apontamento_fim')).' 23:59:59');
+            }
+
             if(!empty($request->input('responsavel'))) {
-                $responsavel = $request->input('responsavel');
+                $pedidos = $pedidos->where('funcionarios.nome', 'like', '%'.strtolower($request->input('responsavel')).'%');
             }
 
-            $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $status_id, $torre, $responsavel);
+            $pedidos = $pedidos->orderBy('ficha_tecnica.ep', 'asc');
 
-            $pedido->colaborador = '';
+            $pedidos = $pedidos->where('pedidos.status', '=', 'A');
 
-            $array =$colaborador= [];
-            foreach ($retorno_tempo as $tempo) {
-                $array[] = [
-                    $tempo->etapa => $tempo->data,
-                ];
-                $colaborador[] = $tempo->responsavel;
+            $pedidos = $pedidos->get();
+
+            foreach ($pedidos as $pedido) {
+
+                $pedidos_aux = DB::table('historicos_etapas')
+                    ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
+                    ->where('historicos_etapas.pedidos_id', $pedido->id)
+                    ->select('funcionarios.nome as responsavel')
+                    ->distinct();
+
+                if(is_array($status_id)){
+                    $pedidos_aux = $pedidos_aux->whereIn('historicos_etapas.status_id', $status_id);
+                } else {
+                    $pedidos_aux = $pedidos_aux->where('historicos_etapas.status_id', '=', $status_id);
+                    if($status_id == 6) {
+                        $pedidos_aux = $pedidos_aux->where('historicos_etapas.select_tipo_manutencao', '=', $tipo_manutencao);
+                    }
+                }
+
+                $pedidos_aux = $pedidos_aux->get(); // executa a consulta e retorna os resultados
+                $quantidade = $pedidos_aux->count(); // conta os resultados retornados
+                $pedido->quantidade_responsavel = $quantidade;
+                $ajaxController = new AjaxController();
+
+                $responsavel = null;
+                if(!empty($request->input('responsavel'))) {
+                    $responsavel = $request->input('responsavel');
+                }
+
+                $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $status_id, $torre, $responsavel, $tipo_manutencao);
+
+                $pedido->colaborador = '';
+
+                $array =$colaborador= [];
+                foreach ($retorno_tempo as $tempo) {
+                    $array[] = [
+                        $tempo->etapa => $tempo->data,
+                    ];
+                    $colaborador[] = $tempo->responsavel;
+                }
+
+                $colaborador = array_unique($colaborador);
+                $pedido->colaborador = implode(', ', $colaborador);
+                $array = $this->organizarIntervalos($array);
+                $pedido->data_inicio = '';
+                $pedido->data_fim = '';
+                foreach ($array as $key => $value) {
+                    if (isset($value['Início']) && empty($pedido->data_inicio)) {
+                        $inicio = DateHelpers::formatDate_ddmmYYYYHHIISS($value['Início']);
+                        $pedido->data_inicio = $inicio;
+                    }
+
+                    if (isset($value['Término'])) {
+                        $termino = DateHelpers::formatDate_ddmmYYYYHHIISS   ($value['Término']);
+                        $pedido->data_fim = $termino;
+                    }
+
+                }
+
+                $pedido->tempo_somado = $this->calcularTempoTotal($array);
+
+                $pedido->tempo_default = '00:00:00';
+
+                if($request->input('departamento') == 'MA') {
+
+                    $pedido->tempo_default = $pedido->pedido_tempo_montagem;
+
+                } elseif($request->input('departamento') == 'MT') {
+
+                    $pedido->tempo_default = $pedido->pedido_tempo_montagem_torre;
+
+                } else {
+
+                    $pedido->tempo_default = $pedido->pedido_tempo_inspecao;
+
+                    }
+
+
+
             }
-
-            $colaborador = array_unique($colaborador); // remove duplicados
-            // concatena com ','
-            $pedido->colaborador = implode(', ', $colaborador);
-            $array = $this->organizarIntervalos($array);
-            $pedido->data_inicio = '';
-            $pedido->data_fim = '';
-            foreach ($array as $key => $value) {
-                if (isset($value['Início']) && empty($pedido->data_inicio)) {
-                    $inicio = DateHelpers::formatDate_ddmmYYYYHHIISS($value['Início']);
-                    $pedido->data_inicio = $inicio;
-                }
-
-                if (isset($value['Término'])) {
-                    $termino = DateHelpers::formatDate_ddmmYYYYHHIISS   ($value['Término']);
-                    $pedido->data_fim = $termino;
-                }
-
-            }
-
-            $pedido->tempo_somado = $this->calcularTempoTotal($array);
-
-            $pedido->tempo_default = '00:00:00';
-
-            if($request->input('departamento') == 'MA') {
-
-                $pedido->tempo_default = $pedido->pedido_tempo_montagem;
-
-            } elseif($request->input('departamento') == 'MT') {
-
-                $pedido->tempo_default = $pedido->pedido_tempo_montagem_torre;
-
-            } else {
-
-                $pedido->tempo_default = $pedido->pedido_tempo_inspecao;
-
-                }
-
-
-
         }
-
 
 
         $funcionarios = new Funcionarios();
-        $funcionarios = $funcionarios->where(column: 'perfil', operator: '=', value: '5');
+        $funcionarios = $funcionarios->where(column: 'perfil', operator: '=', value: '5')->orderBy('nome', 'asc');
 
         $funcionarios = $funcionarios->get();
 
         $status = new Status();
         $status = $status->where('status', '=', 'A')->get();
-
 
         $tela = 'pesquisa';
     	$data = array(

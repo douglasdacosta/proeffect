@@ -249,6 +249,21 @@ $(function ($) {
             updateSortIcons();
         });
 
+        let table_atualizacao_tempo = new DataTable('#table_atualizacao_tempo', {
+            responsive: true,
+            "paging": false,
+            "info": false,
+            "lengthChange": false,
+            "pageLength": 15000,
+            "language": {
+                "search": "Pesquisar:",
+                "emptyTable": "Nenhum dado encontrado"
+            }
+        });
+        table_atualizacao_tempo.on('order.dt', function() {
+            updateSortIcons();
+        });
+
 
         function updateSortIcons() {
 
@@ -858,7 +873,7 @@ $(function ($) {
                     tr.append($('<td>').append(select));
 
                     // Cria o elemento select com as opções de etapas
-                    select = $('<select class="form-control etapa" name="etapa" readonly disabled required>');
+                    select = $('<select class="form-control etapa  col-sm-12" name="etapa" readonly disabled required>');
                     select.append($('<option value="">Selecione</option>'));
                     select.append($('<option value="1" '+ (item.etapa == 'Início' ? "selected='selected'" : "") +'>Início</option>'));
                     select.append($('<option value="2" '+ (item.etapa == 'Pausa' ? "selected='selected'" : "") +'>Pausa</option>'));
@@ -866,7 +881,6 @@ $(function ($) {
                     select.append($('<option value="4" '+ (item.etapa == 'Término' ? "selected='selected'" : "") +'>Término</option>'));
 
                     tr.append($('<td>').append(select));
-                    select ='';
                     select = $('<select style="display: '+ (item.etapa == 'Pausa' ? 'block' : 'none') +';" class="form-control" name="motivo_pausa" readonly disabled="disabled" required>');
                     select.append($('<option  value="" '+ (item.motivo_pausa_id == '' ? "selected='selected'" : "") +'></option>'));
                     select.append($('<option  value="1" '+ (item.motivo_pausa_id == '1' ? "selected='selected'" : "") +'>F.P – Faltando Peças</option>'));
@@ -879,7 +893,7 @@ $(function ($) {
                     select.append($('<option value="8" '+ (item.motivo_pausa_id == '8' ? "selected='selected'" : "") +'>F.M - Faltando Material</option>'));
 
                     tr.append($('<td>').append(select));
-                    tr.append($('<td class="text-nowrap">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-8" name="data_hora" value="'+data_hora+'" required>')));
+                    tr.append($('<td class="text-nowrap">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-12" name="data_hora" value="'+data_hora+'" required>')));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-edit alterar-linha-valores text-primary" style="cursor:pointer;" data-id="'+id+'"></i></td>'));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
                     tr.append($('<td class="text-nowrap"><i class="fa fa-trash excluir-linha-valores text-danger" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
@@ -980,7 +994,7 @@ $(function ($) {
         tr.append($('<td>').append(select));
 
         // Cria o elemento select com as opções de etapas
-        select = $('<select class="form-control etapa" name="etapa" required>');
+        select = $('<select class="form-control etapa  col-sm-12" name="etapa" required>');
         select.append($('<option value="">Selecione</option>'));
         select.append($('<option value="1">Início</option>'));
         select.append($('<option value="2">Pausa</option>'));
@@ -1001,7 +1015,7 @@ $(function ($) {
         select.append($('<option value="8">F.M - Faltando Material</option>'));
         tr.append($('<td>').append(select));
 
-        tr.append($('<td><input type="text" class="form-control date_time col-sm-8" name="data_hora" required></td>'));
+        tr.append($('<td><input type="text" class="form-control date_time col-sm-12" name="data_hora" required></td>'));
         tr.append($('<td class="text-nowrap">'));
         tr.append($('<td class="text-nowrap">'));
         tr.append($('<td class="text-nowrap">'));

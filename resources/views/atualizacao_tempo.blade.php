@@ -11,6 +11,7 @@
 
 @section('title', 'Pro Effect')
 @section('adminlte_css')
+    <link  rel="stylesheet" src="DataTables/datatables.min.css"></link>
     <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
     <link rel="stylesheet" href="{{asset('css/main_style.css')}}" />
 
@@ -21,6 +22,8 @@
 <script src="js/main_custom.js"></script>
 <script src="js/bootstrap.4.6.2.js"></script>
 <script src="js/select2.min.js"></script>
+<script src="DataTables/datatables.min.js"></script>
+
 
 @if(isset($tela) and $tela == 'pesquisa')
     @section('content_header')
@@ -85,15 +88,15 @@
                     </div>
                     <label for="responsavel" class="col-sm-1 col-form-label">Responsável</label>
                     <select class="form-control col-sm-2 default-select2" id="responsavel" name="responsavel">
-                        <option value="">Selecione</option>
-                            @foreach ($funcionarios as $funcionario)
-                                @php $array_funcionarios[] = $funcionario->nome; @endphp
-                                @if (isset($request) && $request->input('responsavel') == $funcionario->nome)
-                                    <option value="{{ $funcionario->nome }}" selected>{{ $funcionario->nome }}</option>
-                                @else
-                                    <option value="{{ $funcionario->nome }}">{{ $funcionario->nome }}</option>
-                                @endif
-                            @endforeach
+                        <option value=" ">Selecione</option>
+                        @foreach ($funcionarios as $funcionario)
+                            @php $array_funcionarios[] = $funcionario->nome; @endphp
+                            @if (isset($request) && $request->input('responsavel') == $funcionario->nome)
+                                <option value="{{ $funcionario->nome }}" selected>{{ $funcionario->nome }}</option>
+                            @else
+                                <option value="{{ $funcionario->nome }}">{{ $funcionario->nome }}</option>
+                            @endif
+                        @endforeach
                     </select>
                 </div>
                 <input type="hidden" name="array_funcionarios" id="array_funcionarios" value="{{ json_encode($array_funcionarios) }}">
@@ -151,53 +154,58 @@
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
-                <table class="table table-striped text-center">
+                <table id="table_atualizacao_tempo" class="table table-striped text-center">
                   <thead>
                     <tr>
-                      <th>EP</th>
-                      <th>OS</th>
-                      <th>Qtde</th>
-                      <th>Data início</th>
-                      <th>Data término</th>
-                      <th>Colaborador</th>
-                      <th>Departamento</th>
-                      <th>Tempo cadastrado</th>
-                      <th>Tempo total Apont.</th>
-                      <th>Tempo peça Apont.</th>
-                      <th>Alerta</th>
-                      <th>Detalhes</th>
-                      <th>Ação</th>
+                      <th data-sortable='true'>EP</th>
+                      <th data-sortable='true'>OS</th>
+                      <th data-sortable='true'>Qtde</th>
+                      <th data-sortable='true'>Data início</th>
+                      <th data-sortable='true'>Data término</th>
+                      <th data-sortable='true'>Colaborador</th>
+                      <th data-sortable='true'>Departamento</th>
+                      <th data-sortable='true'>Tempo cadastrado</th>
+                      <th data-sortable='true'>Tempo total Apont.</th>
+                      <th data-sortable='true'>Tempo peça Apont.</th>
+                      <th data-sortable='true'>Alerta</th>
+                      <th >Detalhes</th>
+                      <th >Ação</th>
                     </tr>
                   </thead>
                   <tbody>
+                    @php
+                        $tempo_somado_total = 0;
+                        $tempo_default_total = 0;
+                        $tempoTotalApontamentoSomado = 0;
+                        $AtualizacaoTempoController = new AtualizacaoTemposController();
+                    @endphp
                   @if(isset($pedidos))
-                        @php
-                            $tempo_somado_total = 0;
-                            $tempo_default_total = 0;
-                            $tempoTotalApontamentoSomado = 0;
-                        @endphp
+
                         @foreach ($pedidos as $pedido)
+                            @if($pedido->quantidade_responsavel==0)
+                                @continue
+                            @endif
                             <tr>
-                            <td scope="row">{{$pedido->ep}}</td>
-                            <td>{{$pedido->os . ' ' .$pedido->select_tipo_manutencao}}</td>
-                            <td>{{$pedido->qtde}}</td>
-                            <td>{{$pedido->data_inicio}}</td>
-                            <td>{{$pedido->data_fim}}</td>
+                            <td data-field="ep" scope="row">{{$pedido->ep}}</td>
+                            <td data-field="os">{{$pedido->os}}</td>
+                            <td data-field="qtde">{{$pedido->qtde}}</td>
+                            <td data-field="data_inicio">{{$pedido->data_inicio}}</td>
+                            <td data-field="data_fim">{{$pedido->data_fim}}</td>
                             {{-- //somente exibe 25 caracteres --}}
-                            <td title="{{$pedido->colaborador}}"
+                            <td data-field="colaborador" title="{{$pedido->colaborador}}"
                                 @if($pedido->quantidade_responsavel > 1) class="bg-warning" @endif
                             >{{ Str::limit($pedido->colaborador, 20) }}</td>
                             @if($pedido->id_status == 6 && $pedido->select_tipo_manutencao == 'T')
-                                <td>{{$pedido->departamento . ' - Torre' }}</td>
+                                <td data-field="departamento">{{$pedido->departamento . ' - Torre' }}</td>
                             @elseif($pedido->id_status == 6 && ($pedido->select_tipo_manutencao == 'A' || empty($pedido->select_tipo_manutencao)))
-                                <td>{{$pedido->departamento . ' - Agulha' }}</td>
+                                <td data-field="departamento">{{$pedido->departamento . ' - Agulha' }}</td>
                             @else
-                                <td>{{$pedido->departamento}}</td>
+                                <td data-field="departamento">{{$pedido->departamento}}</td>
                             @endif
-                            <td>{{$pedido->tempo_default}}</td>
+                            <td data-field="tempo_default">{{$pedido->tempo_default}}</td>
                                 @php
 
-                                    $AtualizacaoTempoController = new AtualizacaoTemposController();
+
                                     $segundos_somado = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado) / $pedido->qtde;
                                     $tempo_somado = $AtualizacaoTempoController->formatSeconds($segundos_somado);
 
@@ -205,11 +213,10 @@
                                     $tempoTotalApontamentoSomado += $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado);
                                     $pedido->tempo_somado = $tempo_somado
                                 @endphp
-                            <td>{{$tempoTotalApontamento}}</td>
-                            <td>{{$pedido->tempo_somado}}</td>
+                            <td data-field="tempo_total_apontamento">{{$tempoTotalApontamento}}</td>
+                            <td data-field="tempo_somado">{{$pedido->tempo_somado}}</td>
                             <td >
                                 @php
-                                    $AtualizacaoTempoController = new AtualizacaoTemposController();
                                     $tempo_default = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_default);
                                     $tempo_default_total += $tempo_default;
                                     $tempo_somado = $AtualizacaoTempoController->converteTempoParaInteiro($pedido->tempo_somado);

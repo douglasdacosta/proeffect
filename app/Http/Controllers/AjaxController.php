@@ -96,17 +96,19 @@ class AjaxController extends Controller
     function ajaxBuscaResponsveis(Request $request){
         $id = $request->input('id');
         $status_id = $request->input('status_id');
-        $torre = false;
+        $torre = $tipo_manutencao = false;
         if($status_id =='MA' ) {
             $status_id = 6; // Montagem
+            $tipo_manutencao = 'A';
         } elseif($status_id == 'MT') {
             $status_id = 6; // Montagem
             $torre = true; // Montagem Torre
+            $tipo_manutencao = 'T'; // Montagem Torre
         } elseif($status_id == 'I') {
             $status_id = 7; // Inspeção
         }
 
-        $pedidos = $this->consultarResponsaveis($id, $status_id, $torre, $request->input('responsavel'));
+        $pedidos = $this->consultarResponsaveis($id, $status_id, $torre, $request->input('responsavel'), $tipo_manutencao);
 
         if($pedidos->count() > 0){
             return response()->json($pedidos);
@@ -115,7 +117,7 @@ class AjaxController extends Controller
         }
     }
 
-    public function consultarResponsaveis($id, $status_id, $torre = false, $responsavel = null)
+    public function consultarResponsaveis($id, $status_id, $torre = false, $responsavel = null, $tipo_manutencao = false)
     {
         $historicos = DB::table('pedidos')
             ->distinct()
@@ -156,19 +158,12 @@ class AjaxController extends Controller
             $historicos->whereIn('historicos_etapas.status_id', $status_id);
         } else {
             $historicos->where('historicos_etapas.status_id', '=', $status_id);
-        }
-
-        $historicos->orderBy('historicos_etapas.created_at');
-
-        if(!is_array($status_id)){
-            if($torre) {
-                $historicos = $historicos->where('historicos_etapas.select_tipo_manutencao', '=', 'T');
-            } else {
-                $historicos = $historicos->whereNull('historicos_etapas.select_tipo_manutencao');
+            if($status_id == 6){
+                $historicos = $historicos->where('historicos_etapas.select_tipo_manutencao', '=', $tipo_manutencao);
             }
         }
 
-
+        $historicos->orderBy('historicos_etapas.created_at');
         $historicos = $historicos->get();
 
         return $historicos;
