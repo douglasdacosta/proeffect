@@ -58,8 +58,8 @@ class AtualizacaoTemposController extends Controller
                     $status_id = [6,7];
                 }
 
-            $pedidos = DB::table('pedidos')
-                ->join('historicos_etapas', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+            $pedidos = DB::table('historicos_etapas')
+                ->join('pedidos', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
                 ->join('funcionarios', 'funcionarios.id', '=', 'historicos_etapas.funcionarios_id')
                 ->join('status', 'historicos_etapas.status_id', '=', 'status.id')
                 ->join('ficha_tecnica', 'ficha_tecnica.id', '=', 'pedidos.fichatecnica_id')
@@ -145,7 +145,7 @@ class AtualizacaoTemposController extends Controller
                     $responsavel = $request->input('responsavel');
                 }
 
-                $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $status_id, $torre, $responsavel, $tipo_manutencao);
+                $retorno_tempo = $ajaxController->consultarResponsaveis($pedido->id, $pedido->id_status, $torre, $responsavel, $tipo_manutencao);
 
                 $pedido->colaborador = '';
 
