@@ -287,6 +287,8 @@ $(function ($) {
 
     }
 
+
+
     let radioMarcado = null;
 
     $('input[type=radio][name=departamento]').on('click', function () {
@@ -840,6 +842,7 @@ $(function ($) {
     }
 
     $(document).on('click', '.ver-detalhes', function() {
+        modalAbertoPorHover =false;
         var id = $(this).data('id');
         var status_id = $(this).data('status_id');
         var responsavel = $(this).data('responsavel');
@@ -1099,6 +1102,106 @@ $(function ($) {
         });
 
 
+
+    });
+
+
+        // botão preview - inicia o timer ao passar o mouse
+        let hoverTimer;
+        let modalAbertoPorHover = false;
+    $(document).on('mouseenter', '.ver-detalhes', function() {
+        let that = this;
+        hoverTimer = setTimeout(function() {
+        var id = $(that).data('id');
+        var status_id = $(that).data('status_id');
+        var responsavel = $(that).data('responsavel');
+        $('#texto_ep').text($(that).data('ep'));
+        $('#texto_os').text($(that).data('os'));
+
+        if(status_id == undefined || status_id == '') {
+            status_id = [6,7];
+        }
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/ajax-busca-responsveis',
+            data: {
+                'id': id,
+                'status_id': status_id,
+                'responsavel' : responsavel,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+
+                $('#tabela_responsaveis tbody').empty();
+                $.each(data, function(i, item) {
+                    var tr = $('<tr>');
+                    data_hora = convertDataHora(item.data)
+
+                    array_funcionarios = $('#array_funcionarios').val();
+                    array_funcionarios = JSON.parse(array_funcionarios);
+                    var tr = $('<tr>');
+
+                    // Cria o elemento select com as opções array_funcionarios
+                    select = $('<select class="form-control" name="responsavel" readonly disabled required>');
+                    select.append($('<option value="">Selecione</option>'));
+                    $.each(array_funcionarios, function(i, funcionario_item) {
+                        $selected = "";
+                        if(funcionario_item.toString() == item.responsavel.toString()) {
+                            $selected = "selected='selected'";
+                        }
+
+                        select.append($('<option value="'+funcionario_item+'" '+$selected+'>'+funcionario_item+'</option>'));
+                    });
+                    tr.append($('<td class="col-sm-1">').append(select));
+
+                    // Cria o elemento select com as opções de etapas
+                    select = $('<select class="form-control etapa  col-sm-12" name="etapa" readonly disabled required>');
+                    select.append($('<option value="">Selecione</option>'));
+                    select.append($('<option value="1" '+ (item.etapa == 'Início' ? "selected='selected'" : "") +'>Início</option>'));
+                    select.append($('<option value="2" '+ (item.etapa == 'Pausa' ? "selected='selected'" : "") +'>Pausa</option>'));
+                    select.append($('<option value="3" '+ (item.etapa == 'Continuar' ? "selected='selected'" : "") +'>Continuar</option>'));
+                    select.append($('<option value="4" '+ (item.etapa == 'Término' ? "selected='selected'" : "") +'>Término</option>'));
+
+                    tr.append($('<td class="col-sm-2">').append(select));
+                    select = $('<select style="display: '+ (item.etapa == 'Pausa' ? 'block' : 'none') +';" class="form-control" name="motivo_pausa" readonly disabled="disabled" required>');
+                    select.append($('<option  value="" '+ (item.motivo_pausa_id == '' ? "selected='selected'" : "") +'></option>'));
+                    select.append($('<option  value="1" '+ (item.motivo_pausa_id == '1' ? "selected='selected'" : "") +'>F.P – Faltando Peças</option>'));
+                    select.append($('<option value="2" '+ (item.motivo_pausa_id == '2' ? "selected='selected'" : "") +'>P.P – Problema na produção</option>'));
+                    select.append($('<option value="3" '+ (item.motivo_pausa_id == '3' ? "selected='selected'" : "") +'>P – Pausado</option>'));
+                    select.append($('<option value="4" '+ (item.motivo_pausa_id == '4' ? "selected='selected'" : "") +'>P.R – Protótipo</option>'));
+                    select.append($('<option value="5" '+ (item.motivo_pausa_id == '5' ? "selected='selected'" : "") +'>A.P – Assunto Pessoal</option>'));
+                    select.append($('<option value="6" '+ (item.motivo_pausa_id == '6' ? "selected='selected'" : "") +'>P.M – Problema na máquina</option>'));
+                    select.append($('<option value="7" '+ (item.motivo_pausa_id == '7' ? "selected='selected'" : "") +'>E.P - Esperando próxima produção</option>'));
+                    select.append($('<option value="8" '+ (item.motivo_pausa_id == '8' ? "selected='selected'" : "") +'>F.M - Faltando Material</option>'));
+
+                    tr.append($('<td class="col-sm-2">').append(select));
+                    tr.append($('<td class="text-nowrap col-sm-8">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-12" name="data_hora" value="'+data_hora+'" required>')));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-edit alterar-linha-valores text-primary" style="cursor:pointer;" data-id="'+id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-plus nova-linha-valores text-success" style="cursor:pointer;" data-id="'+id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-trash excluir-linha-valores text-danger" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+                    tr.append($('<td class="text-nowrap"><i class="fa fa-check salva-linha-valores text-success" title="Salvar registro" style="cursor:pointer;" data-id="'+id+'" data-historico_id="'+item.historico_id+'" data-status_id="'+item.departamento_id+'"></i></td>'));
+
+                    $('#tabela_responsaveis tbody').append(tr);
+                });
+                modalAbertoPorHover = true;
+                $('#modal_detalhes').show();
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                dados = JSON.parse(data.responseText);
+                alert('Erro ao buscar os responsáveis! ' + dados.error);
+            },
+
+        });
+    }, 100); // 100 milissegundos de delay
+    });
+
+    // se o mouse sair antes de 1s, cancela o preview
+    $(document).on('mouseleave', '.ver-detalhes', function() {
+            if(modalAbertoPorHover){
+
+                $('#modal_detalhes').hide();
+            }
 
     });
 

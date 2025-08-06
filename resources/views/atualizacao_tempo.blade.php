@@ -33,7 +33,7 @@
     @stop
     @section('content')
 
-    <div id='modal_detalhes'  class="modal" tabindex="-1" role="dialog" style="width: 100%;">
+    <div id='modal_detalhes'  class="modal" tabindex="-1" role="dialog" style="width: 70%;">
             <div class="modal-dialog modal-xl modal-dialog-centered modal-80w" role="document" >
                 <div class="modal-content">
                     <div class="modal-header">
@@ -76,12 +76,12 @@
         <form id="filtro" action="atualizacao_tempo" method="get" data-parsley-validate=""
                 class="form-horizontal form-label-left" novalidate="">
                 <div class="form-group row">
-                    <label for="ep" class="col-sm-1 col-form-label">EP</label>
+                    <label for="ep" class="col-sm-2 col-form-label text-right">EP</label>
                     <div class="col-sm-2">
                         <input type="text" id="ep" name="ep" class="form-control col-md-7 col-xs-12"
                             value="@if (isset($request) && $request->input('ep') != '') {{ $request->input('ep') }}@else @endif">
                     </div>
-                    <label for="os" class="col-sm-1 col-form-label">OS</label>
+                    <label for="os" class="col-sm-2 col-form-label text-right">OS</label>
                     <div class="col-sm-2">
                         <input type="text" id="os" name="os" class="form-control col-md-7 col-xs-12"
                             value="@if (isset($request) && $request->input('os') != '') {{ $request->input('os') }}@else @endif">
