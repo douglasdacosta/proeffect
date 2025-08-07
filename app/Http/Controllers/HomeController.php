@@ -102,7 +102,7 @@ class HomeController extends Controller
             $data1 = Carbon::createFromFormat('d/m/Y', $data)->startOfMonth()->format('d/m/Y'); //"01/08/2024";
             $data2 = $this->ultimoDiaUtil(date('d/m/Y')); //"05/08/2024";
             $tipo_consulta = 'G';
-            $status_ids =["1","2","3","4","5","6","7","8","9","10"];
+            $status_ids =["1","2","3","4","5","6","7","8","9","10","11"];
             $request = $this->GeraRequestBuscaOs($data1, $data2, $tipo_consulta, $status_ids);
 
             $pedidos = new PedidosController();
