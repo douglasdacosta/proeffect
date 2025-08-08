@@ -17,9 +17,9 @@
                             <thead>
                                 <tr style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
                                     <th scope="col">OS</th>
-                                    <th scope="col">EP</th>
+                                    <th scope="col" style="width: 100px">EP</th>
                                     <th scope="col">Qtde</th>
-                                    <th scope="col">Obs</th>
+                                    <th scope="col" style="width: 100px">Obs</th>
                                     <th scope="col">Prioridade</th>
                                     <th scope="col">Data status</th>
                                     <th scope="col">Usinagem</th>
