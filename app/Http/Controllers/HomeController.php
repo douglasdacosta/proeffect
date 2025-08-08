@@ -238,7 +238,7 @@ class HomeController extends Controller
             $data1 = $data_1_mes_anterior;
             $data2 = $data_mes_anterior_no_dia_atual;
             $tipo_consulta = 'G';
-            $status_ids =["1","2","3","4","5","6","7","8","9","10"];
+            $status_ids =["1","2","3","4","5","6","7","8","9","10", "11"];
             $request = $this->GeraRequestBuscaOs($data1, $data2, $tipo_consulta, $status_ids);
 
             $pedidos = new PedidosController();
