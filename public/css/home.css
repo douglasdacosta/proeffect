@@ -47,9 +47,14 @@
     overflow-x: auto;
  }
 
+ .info-box {
+
+    padding: 0px;
+ }
 
  .info-box .progress-description,
  .info-box .info-box-text {
+   font-size: 12px;
    display: block;
    overflow: auto;
    text-overflow: initial;
