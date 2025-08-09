@@ -232,14 +232,11 @@ class HomeController extends Controller
             // 1º dia do mês anterior
             $data_1_mes_anterior = $data_hoje->copy()->subMonth()->startOfMonth()->format('d/m/Y');
             // Mesmo dia do mês anterior
-            $data_mes_anterior_ultimo_dia = $data_hoje->copy()
-                ->subMonthNoOverflow()
-                ->endOfMonth()
-                ->format('d/m/Y');
+            $data_mes_dia_anterior = $data_hoje->copy()->subDay()->subMonth()->format('d/m/Y');
 
             $data = date('d/m/Y');
             $data1 = $data_1_mes_anterior;
-            $data2 = $data_mes_anterior_ultimo_dia;
+            $data2 = $data_mes_dia_anterior;
 
             $tipo_consulta = 'G';
             $status_ids =["1","2","3","4","5","6","7","8","9","10", "11"];
