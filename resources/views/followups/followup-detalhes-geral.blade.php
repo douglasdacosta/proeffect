@@ -17,7 +17,7 @@
                                 <tr>
                                     <th scope="col" style="min-width: 100px" title="Código do cliente">Cliente</th>
                                     <th scope="col" style="min-width: 150px">Assistente</th>
-                                    <th scope="col" style="min-width: 100px">EP</th>
+                                    <th scope="col" style="min-width: 130px">EP</th>
                                     <th scope="col" style="min-width: 100px">OS</th>
                                     <th scope="col" style="min-width: 100px">Qtde</th>
                                     <th scope="col" style="min-width: 100px" title="Data do pedido">Data</th>

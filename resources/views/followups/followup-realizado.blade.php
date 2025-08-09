@@ -14,7 +14,7 @@
                     <thead>
                         {{-- style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }} --}}
                         <tr>
-                            <th scope="col" style="min-width: 100px">EP</th>
+                            <th scope="col" style="min-width: 130px">EP</th>
                             <th scope="col" style="min-width: 100px">OS</th>
                             <th scope="col" style="min-width: 100px">Qtde</th>
                             <th scope="col" style="min-width: 100px" title="Data do pedido">Data</th>
