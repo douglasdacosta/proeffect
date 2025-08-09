@@ -15,23 +15,23 @@
                         <table class="table table-sm table-striped text-center" id="table_composicao">
                             <thead style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
                                 <tr>
-                                    <th scope="col" title="Código do cliente">Cliente</th>
-                                    <th scope="col">Assistente</th>
-                                    <th scope="col">EP</th>
-                                    <th scope="col">OS</th>
-                                    <th scope="col">Qtde</th>
-                                    <th scope="col" title="Data do pedido">Data</th>
-                                    <th scope="col" title="Data da entrega">Entrega</th>
-                                    <th scope="col" title="Alerta de dias">Alerta</th>
-                                    <th scope="col">Prioridade</th>
-                                    <th scope="col" title="Observações">Obs</th>
-                                    <th scope="col">Transporte</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Data Status</th>
-                                    <th scope="col">Usinagem</th>
-                                    <th scope="col">Acabamento</th>
-                                    <th scope="col">Montagem</th>
-                                    <th scope="col">Inspeção</th>
+                                    <th scope="col" style="min-width: 100px" title="Código do cliente">Cliente</th>
+                                    <th scope="col" style="min-width: 150px">Assistente</th>
+                                    <th scope="col" style="min-width: 100px">EP</th>
+                                    <th scope="col" style="min-width: 100px">OS</th>
+                                    <th scope="col" style="min-width: 100px">Qtde</th>
+                                    <th scope="col" style="min-width: 100px" title="Data do pedido">Data</th>
+                                    <th scope="col" style="min-width: 100px" title="Data da entrega">Entrega</th>
+                                    <th scope="col" style="min-width: 100px" title="Alerta de dias">Alerta</th>
+                                    <th scope="col" style="min-width: 100px">Prioridade</th>
+                                    <th scope="col" style="min-width: 150px" title="Observações">Obs</th>
+                                    <th scope="col" style="min-width: 300px" >Transporte</th>
+                                    <th scope="col" style="min-width: 100px">Status</th>
+                                    <th scope="col" style="min-width: 100px">Data Status</th>
+                                    <th scope="col" style="min-width: 100px">Usinagem</th>
+                                    <th scope="col" style="min-width: 100px">Acabamento</th>
+                                    <th scope="col" style="min-width: 100px">Montagem</th>
+                                    <th scope="col" style="min-width: 100px">Inspeção</th>
                                 </tr>
                             </thead>
                             <tbody>

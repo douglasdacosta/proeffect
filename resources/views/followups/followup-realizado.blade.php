@@ -14,24 +14,24 @@
                     <thead>
                         {{-- style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }} --}}
                         <tr>
-                            <th scope="col">EP</th>
-                            <th scope="col">OS</th>
-                            <th scope="col">Qtde</th>
-                            <th scope="col" title="Data do pedido">Data</th>
-                            <th scope="col" title="Data da entrega">Entrega</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Usinagem</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Acabamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Montagem</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[7] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[7] }}">Montagem Torre</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Inspeção</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Embalar</th>
-                            {{-- <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Expedição</th> --}}
-                            <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Entregue</th>
+                            <th scope="col" style="min-width: 100px">EP</th>
+                            <th scope="col" style="min-width: 100px">OS</th>
+                            <th scope="col" style="min-width: 100px">Qtde</th>
+                            <th scope="col" style="min-width: 100px" title="Data do pedido">Data</th>
+                            <th scope="col" style="min-width: 100px" title="Data da entrega">Entrega</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[4] }}">Apontamento</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[4] }}">Usinagem</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[5] }}">Apontamento</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[5] }}">Acabamento</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[6] }}">Apontamento</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[6] }}">Montagem</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[7] }}">Apontamento</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[7] }}">Montagem Torre</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[8] }}">Apontamento</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[8] }}">Inspeção</th>
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[9] }}">Embalar</th>
+                            {{-- <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[10] }}">Expedição</th> --}}
+                            <th scope="col"  style="min-width: 100px; background-color: {{ $palheta_cores[11] }}">Entregue</th>
 
                         </tr>
                     </thead>

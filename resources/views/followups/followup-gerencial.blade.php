@@ -19,35 +19,35 @@ use App\Providers\DateHelpers;
                     @endphp
                     <label for="codigo" class="col-sm-10 col-form-label">Status do Pedido: {{ Str::upper($key) }} </label>
                     <div class="form-group row overflow-followup" style="overflow-x:auto;  ">
-                        <table class="table table-sm table-striped text-center" id="table_composicao">
+                        <table class="table followup table-sm table-striped text-center" id="table_composicao">
                             <thead style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
                                 <tr>
-                                    <th scope="col" title="Código do cliente">Cliente</th>
-                                    <th scope="col">Assistente</th>
-                                    <th scope="col">EP</th>
-                                    <th scope="col">OS</th>
-                                    <th scope="col">Qtde</th>
-                                    <th scope="col" title="Data do pedido">Data</th>
-                                    <th scope="col" title="Data da entrega">Entrega</th>
-                                    <th scope="col">Prioridade</th>
-                                    <th scope="col" title="Observações">Obs</th>
-                                    <th scope="col">Valor Unit</th>
-                                    <th scope="col">Total</th>
-                                    <th scope="col">Total MO</th>
-                                    <th scope="col">Total MP</th>
-                                    <th scope="col">$MP</th>
-                                    <th scope="col">%MP</th>
-                                    <th scope="col">$MO</th>
-                                    <th scope="col">%MO</th>
-                                    <th scope="col">$HM</th>
-                                    <th scope="col">Transporte</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Data status</th>
-                                    <th scope="col">Usinagem</th>
-                                    <th scope="col">Acabamento</th>
-                                    <th scope="col">Montagem</th>
-                                    <th scope="col">Inspeção</th>
-                                    <th scope="col">Alerta departamento</th>
+                                    <th scope="col" style="min-width: 100px;" title="Código do cliente">Cliente</th>
+                                    <th scope="col" style="min-width: 150px;">Assistente</th>
+                                    <th scope="col" style="min-width: 100px;">EP</th>
+                                    <th scope="col" style="min-width: 100px;">OS</th>
+                                    <th scope="col" style="min-width: 100px;">Qtde</th>
+                                    <th scope="col" style="min-width: 100px;" title="Data do pedido">Data</th>
+                                    <th scope="col" style="min-width: 100px;"title="Data da entrega">Entrega</th>
+                                    <th scope="col" style="min-width: 100px;">Prioridade</th>
+                                    <th scope="col" style="min-width: 150px" title="Observações">Obs</th>
+                                    <th scope="col" style="min-width: 100px;">Valor Unit</th>
+                                    <th scope="col" style="min-width: 100px;">Total</th>
+                                    <th scope="col" style="min-width: 100px;">Total MO</th>
+                                    <th scope="col" style="min-width: 100px;">Total MP</th>
+                                    <th scope="col" style="min-width: 100px;">$MP</th>
+                                    <th scope="col" style="min-width: 100px;">%MP</th>
+                                    <th scope="col" style="min-width: 100px;">$MO</th>
+                                    <th scope="col" style="min-width: 100px;">%MO</th>
+                                    <th scope="col" style="min-width: 100px;">$HM</th>
+                                    <th scope="col" style="min-width: 300px;">Transporte</th>
+                                    <th scope="col" style="min-width: 100px;">Status</th>
+                                    <th scope="col" style="min-width: 100px;">Data status</th>
+                                    <th scope="col" style="min-width: 100px;">Usinagem</th>
+                                    <th scope="col" style="min-width: 100px;">Acabamento</th>
+                                    <th scope="col" style="min-width: 100px;">Montagem</th>
+                                    <th scope="col" style="min-width: 100px;">Inspeção</th>
+                                    <th scope="col" style="min-width: 100px;">Alerta departamento</th>
                                     <th scope="col" title="Alerta de dias">Alerta</th>
                                 </tr>
                             </thead>
@@ -62,17 +62,17 @@ use App\Providers\DateHelpers;
                                         $diasSobrando=0;
                                         $dias_alerta_departamento = 'text-primary';
                                         $status = strtolower($key);
-                                        
+
                                         if(!empty($maquinas[$status])) {
-                                            
+
                                             $retorno = PedidosController::calculaDiasSobrando($maquinas, $status, $pedido);
                                             $dias_alerta_departamento = $retorno['dias_alerta_departamento'];
                                             $diasSobrando = $retorno['diasSobrando'];
 
                                         }
 
-                                        
-                                        
+
+
                                         if ($dias_alerta < 6) {
                                             $class_dias_alerta = 'text-danger';
                                         } else {

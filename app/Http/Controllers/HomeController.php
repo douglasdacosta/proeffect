@@ -232,11 +232,15 @@ class HomeController extends Controller
             // 1º dia do mês anterior
             $data_1_mes_anterior = $data_hoje->copy()->subMonth()->startOfMonth()->format('d/m/Y');
             // Mesmo dia do mês anterior
-            $data_mes_anterior_no_dia_atual = $data_hoje->copy()->subDay()->subMonth()->format('d/m/Y');
+            $data_mes_anterior_ultimo_dia = $data_hoje->copy()
+                ->subMonthNoOverflow()
+                ->endOfMonth()
+                ->format('d/m/Y');
 
             $data = date('d/m/Y');
             $data1 = $data_1_mes_anterior;
-            $data2 = $data_mes_anterior_no_dia_atual;
+            $data2 = $data_mes_anterior_ultimo_dia;
+
             $tipo_consulta = 'G';
             $status_ids =["1","2","3","4","5","6","7","8","9","10", "11"];
             $request = $this->GeraRequestBuscaOs($data1, $data2, $tipo_consulta, $status_ids);
@@ -259,7 +263,7 @@ class HomeController extends Controller
                 }
             }
 
-            $percentual_comparativo = $this->calcularPercentual($total_soma_entrega_mes_anterior, $total_soma_entrega_mes);
+            $percentual_comparativo = $this->calcularPercentual($total_soma_entrega_mes_anterior, $total_soma_mes);
         }
 
         if(in_array('4', $perfis_dashboards)){

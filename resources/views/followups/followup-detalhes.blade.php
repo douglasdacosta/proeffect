@@ -16,20 +16,20 @@
                         <table class="table table-sm table-striped text-center" id="table_composicao">
                             <thead>
                                 <tr style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }}">
-                                    <th scope="col">OS</th>
-                                    <th scope="col" style="width: 100px">EP</th>
-                                    <th scope="col">Qtde</th>
-                                    <th scope="col" style="width: 100px">Obs</th>
-                                    <th scope="col">Prioridade</th>
-                                    <th scope="col">Data status</th>
-                                    <th scope="col">Usinagem</th>
-                                    <th scope="col">Acabamento</th>
-                                    <th scope="col">Montagem Torre</th>
-                                    <th scope="col">Montagem</th>
-                                    <th scope="col">Inspeção</th>
-                                    <th scope="col">Data entrega</th>
-                                    <th scope="col">Alerta departamento</th>
-                                    <th scope="col">Alerta de dias</th>
+                                    <th scope="col" style="min-width: 100px">OS</th>
+                                    <th scope="col" style="min-width: 100px">EP</th>
+                                    <th scope="col" style="min-width: 100px">Qtde</th>
+                                    <th scope="col" style="min-width: 130px">Obs</th>
+                                    <th scope="col" style="min-width: 100px">Prioridade</th>
+                                    <th scope="col" style="min-width: 100px">Data status</th>
+                                    <th scope="col" style="min-width: 100px">Usinagem</th>
+                                    <th scope="col" style="min-width: 100px">Acabamento</th>
+                                    <th scope="col" style="min-width: 100px">Montagem Torre</th>
+                                    <th scope="col" style="min-width: 100px">Montagem</th>
+                                    <th scope="col" style="min-width: 100px">Inspeção</th>
+                                    <th scope="col" style="min-width: 100px">Data entrega</th>
+                                    <th scope="col" style="min-width: 100px">Alerta departamento</th>
+                                    <th scope="col" style="min-width: 100px">Alerta de dias</th>
                                 </tr>
                             </thead>
                             <tbody>

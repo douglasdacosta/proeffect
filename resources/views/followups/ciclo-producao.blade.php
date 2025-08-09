@@ -37,27 +37,27 @@
                         </tr>
                         {{-- style="background-color: {{ $palheta_cores[$dado_pedido_status['id_status'][0]] }} --}}
                         <tr>
-                            <th scope="col">EP</th>
-                            <th scope="col">OS</th>
-                            <th scope="col">Qtde</th>
-                            <th scope="col">Prioridade</th>
-                            <th scope="col" title="Data do pedido">Data</th>
-                            <th scope="col" title="Data da entrega">Entrega</th>
-                            <th scope="col" title="Data da entrega">Data de contagem</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[4] }}">Dias Parados</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[5] }}">Dias Parados</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[6] }}">Dias Parados</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[8] }}">Dias Parados</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[9] }}">Dias Parados</th>
-                            {{-- <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Apontamento</th> --}}
-                            {{-- <th scope="col" style="background-color: {{ $palheta_cores[10] }}">Dias Parados</th> --}}
-                            <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Apontamento</th>
-                            <th scope="col" style="background-color: {{ $palheta_cores[11] }}">Dias Parados</th>
+                            <th scope="col" style="min-width: 100px">EP</th>
+                            <th scope="col" style="min-width: 100px">OS</th>
+                            <th scope="col" style="min-width: 100px">Qtde</th>
+                            <th scope="col" style="min-width: 100px">Prioridade</th>
+                            <th scope="col" style="min-width: 100px" title="Data do pedido">Data</th>
+                            <th scope="col" style="min-width: 100px" title="Data da entrega">Entrega</th>
+                            <th scope="col" style="min-width: 100px" title="Data da entrega">Data de contagem</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[4] }}">Apontamento</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[4] }}">Dias Parados</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[5] }}">Apontamento</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[5] }}">Dias Parados</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[6] }}">Apontamento</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[6] }}">Dias Parados</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[8] }}">Apontamento</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[8] }}">Dias Parados</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[9] }}">Apontamento</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[9] }}">Dias Parados</th>
+                            {{-- <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[10] }}">Apontamento</th> --}}
+                            {{-- <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[10] }}">Dias Parados</th> --}}
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[11] }}">Apontamento</th>
+                            <th scope="col" style="min-width: 100px; background-color: {{ $palheta_cores[11] }}">Dias Parados</th>
                             <th scope="col" title="Alerta de dias">Tempo da produção</th>
                             <th scope="col" title="Alerta de dias">Tempo de entrega</th>
 
