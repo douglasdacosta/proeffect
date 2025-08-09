@@ -259,7 +259,6 @@ class HomeController extends Controller
                     $total_soma_entrega_mes_anterior = isset($total_soma_entrega_mes_anterior) ? $total_soma_entrega_mes_anterior + $total : $total;
                 }
             }
-
             $percentual_comparativo = $this->calcularPercentual($total_soma_entrega_mes_anterior, $total_soma_mes);
         }
 
@@ -326,7 +325,7 @@ class HomeController extends Controller
             'os_atraso' => $qtqe_os_atrasada,
             'os_atraso_expedicao' => $qtqe_os_atrasada_expedicao,
             'data_atraso' => $data_atraso,
-            'comparativo_valor' => 'R$ '. number_format($total_soma_entrega_mes-$total_soma_entrega_mes_anterior, 2, ',', '.'),
+            'comparativo_valor' => 'R$ '. number_format( $total_soma_mes - $total_soma_entrega_mes_anterior, 2, ',', '.'),
             'comparativo_percentual' => number_format($percentual_comparativo, 0, ',', '.'),
             'array_material_alerta_30' => $array_material_alerta_30,
             'array_material_alerta_60' => $array_material_alerta_60,
