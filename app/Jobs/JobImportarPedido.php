@@ -68,7 +68,8 @@ class JobImportarPedido implements ShouldQueue
                     $fichatecnica = new Fichastecnicas();
                     $transportes = new transportes();
                     $ep = $itens['codigo'];
-                    $valor_unitario = $itens['unitario'];
+
+                    $valor_unitario = $itens['unitario']+$itens['ipi']-$itens['desconto'];
 
                     $numeroOs = $venda['numeroOS'];
                     $dataOS = $venda['dataOS'];
