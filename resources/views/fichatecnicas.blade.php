@@ -344,15 +344,15 @@
                 <tbody>
                     <tr>
                         <th><input type="text" id="soma_tempo_usinagem" name="soma_tempo_usinagem"
-                                class="form-control col-md-13" value="" readonly></th>
+                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_usinagem}}" readonly></th>
                         <td><input type="text" id="soma_tempo_acabamento" name="soma_tempo_acabamento"
-                                class="form-control col-md-13" value="" readonly></td>
+                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_acabamento}}" readonly></td>
                         <td><input type="text" id="soma_tempo_montagem" name="soma_tempo_montagem"
-                                class="form-control col-md-13" value="" readonly></td>
+                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_montagem}}" readonly></td>
                         <td><input type="text" id="soma_tempo_montagem_torre" name="soma_tempo_montagem_torre"
-                                class="form-control col-md-13" value="" readonly></td>
+                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_montagem_torre}}" readonly></td>
                         <td><input type="text" id="soma_tempo_inspecao" name="soma_tempo_inspecao"
-                                class="form-control col-md-13" value="" readonly></td>
+                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_inspecao}}" readonly></td>
                     </tr>
                 </tbody>
             </table>

@@ -322,11 +322,11 @@ $(function () {
         });
 
 
-        $('#soma_tempo_acabamento').val(somatempo_acabamento_total.toString().replace('.', ','));
-        $('#soma_tempo_montagem_torre').val(somamontagem_torre_total.toString().replace('.', ','));
-        $('#soma_tempo_montagem').val(somatempo_montagem_total.toString().replace('.', ','));
-        $('#soma_tempo_usinagem').val(somatempo_usinagem_total.toString().replace('.', ','));
-        $('#soma_tempo_inspecao').val(somatempo_inspecao_total.toString().replace('.', ','));
+        // $('#soma_tempo_acabamento').val(somatempo_acabamento_total.toString().replace('.', ','));
+        // $('#soma_tempo_montagem_torre').val(somamontagem_torre_total.toString().replace('.', ','));
+        // $('#soma_tempo_montagem').val(somatempo_montagem_total.toString().replace('.', ','));
+        // $('#soma_tempo_usinagem').val(somatempo_usinagem_total.toString().replace('.', ','));
+        // $('#soma_tempo_inspecao').val(somatempo_inspecao_total.toString().replace('.', ','));
 
         bloqueiaEP();
     }
