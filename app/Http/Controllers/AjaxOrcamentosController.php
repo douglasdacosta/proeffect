@@ -95,7 +95,7 @@ class AjaxOrcamentosController extends Controller
 
                 if($blank->{"blank_$key"} != '') {
 
-                    $MP->{"valorMP_$key"} = $val_chapa/$qtde_CH*$qtde_;
+                    $MP->{"valorMP_$key"} = $qtde_CH == 0 ? 0 : $val_chapa/$qtde_CH*$qtde_;
                     $dado[10] = json_encode(["valorMP_$key" => number_format($MP->{"valorMP_$key"}, 2, ',','')]);
 
 
