@@ -141,7 +141,6 @@ class FichatecnicaController extends Controller
 
         $fichatecnica= $fichatecnicas->where('id', '=', $request->input('id'))->get();
         $fichatecnicasitens= $fichatecnicasitens::with('materiais')->where('fichatecnica_id', '=', $request->input('id'))->orderByRaw("CASE WHEN blank='' THEN 1 ELSE 0 END ASC")->orderBy('blank','ASC')->get();
-
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,

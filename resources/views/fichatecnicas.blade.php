@@ -305,7 +305,7 @@
                                 <td data-name="tempo_montagem" class="tempo_montagem">
                                     {{ $fichatecnicaitem->tempo_montagem }}</td>
                                 <td data-name="tempo_montagem_torre" class="tempo_montagem_torre">
-                                    {{ $fichatecnicaitem->tempo_montagem_torre }}</td>
+                                    {{ $fichatecnicaitem->materiais->tempo_montagem_torre }}</td>
                                 <td data-name="tempo_inspecao" class="tempo_inspecao">
                                     {{ $fichatecnicaitem->tempo_inspecao }}</td>
                                 <th>
