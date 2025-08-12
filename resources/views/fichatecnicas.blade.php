@@ -344,15 +344,15 @@
                 <tbody>
                     <tr>
                         <th><input type="text" id="soma_tempo_usinagem" name="soma_tempo_usinagem"
-                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_usinagem}}"></th>
+                                class="form-control col-md-13" value="{{!empty($fichatecnicas[0]->tempo_usinagem) ? $fichatecnicas[0]->tempo_usinagem : '00:00:00'}}"></th>
                         <td><input type="text" id="soma_tempo_acabamento" name="soma_tempo_acabamento"
-                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_acabamento}}"></td>
+                                class="form-control col-md-13" value="{{!empty($fichatecnicas[0]->tempo_acabamento) ? $fichatecnicas[0]->tempo_acabamento : '00:00:00'}}"></td>
                         <td><input type="text" id="soma_tempo_montagem" name="soma_tempo_montagem"
-                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_montagem}}"></td>
+                                class="form-control col-md-13" value="{{!empty($fichatecnicas[0]->tempo_montagem) ? $fichatecnicas[0]->tempo_montagem : '00:00:00'}}"></td>
                         <td><input type="text" id="soma_tempo_montagem_torre" name="soma_tempo_montagem_torre"
-                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_montagem_torre}}"></td>
+                                class="form-control col-md-13" value="{{!empty($fichatecnicas[0]->tempo_montagem_torre) ? $fichatecnicas[0]->tempo_montagem_torre : '00:00:00'}}"></td>
                         <td><input type="text" id="soma_tempo_inspecao" name="soma_tempo_inspecao"
-                                class="form-control col-md-13" value="{{$fichatecnicas[0]->tempo_inspecao}}"></td>
+                                class="form-control col-md-13" value="{{!empty($fichatecnicas[0]->tempo_inspecao) ? $fichatecnicas[0]->tempo_inspecao : '00:00:00'}}"></td>
                     </tr>
                 </tbody>
             </table>
