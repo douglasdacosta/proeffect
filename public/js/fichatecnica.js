@@ -208,7 +208,7 @@ $(function () {
 
         $('#blank, #medidax, #mediday, #qtde').val('');
         $('#tempo_usinagem, #tempo_acabamento, #tempo_montagem, #tempo_montagem_torre, #tempo_inspecao').val('00:00');
-        calculaTempos();
+        calculaTempos(true);
     };
 
     $(document).on('click', '#table_composicao .edita_composicao', function () {
@@ -240,7 +240,7 @@ $(function () {
         $('#tempo_montagem_torre').val(formata0000(tmptorre));
         $('#tempo_montagem').val(formata0000(tmpmontagem));
         $('#tempo_inspecao').val(formata0000(tmpinspecao));
-        calculaTempos();
+        calculaTempos(true);
         $('.blank_' + id).remove();
     });
 
@@ -268,7 +268,7 @@ $(function () {
     $(document).on('click', '#table_composicao .close', function () {
         id = $(this).data('blank');
         $('.blank_' + id).remove();
-        calculaTempos();
+        calculaTempos(true);
     });
 
     $(document).on('click', 'button.close', function () {
@@ -284,7 +284,7 @@ $(function () {
     };
 
 
-    function calculaTempos() {
+    function calculaTempos(inclusao) {
         somatempo_usinagem_total = somatempo_acabamento_total = somatempo_montagem_total = somamontagem_torre_total = somatempo_inspecao_total = '00:00:00';
         $('.tempo_usinagem').each(function (i, e) {
             if (e.textContent != '') {
@@ -321,13 +321,13 @@ $(function () {
             }
         });
 
-
-        // $('#soma_tempo_acabamento').val(somatempo_acabamento_total.toString().replace('.', ','));
-        // $('#soma_tempo_montagem_torre').val(somamontagem_torre_total.toString().replace('.', ','));
-        // $('#soma_tempo_montagem').val(somatempo_montagem_total.toString().replace('.', ','));
-        // $('#soma_tempo_usinagem').val(somatempo_usinagem_total.toString().replace('.', ','));
-        // $('#soma_tempo_inspecao').val(somatempo_inspecao_total.toString().replace('.', ','));
-
+        if(inclusao) {
+            $('#soma_tempo_acabamento').val(somatempo_acabamento_total.toString().replace('.', ','));
+            $('#soma_tempo_montagem_torre').val(somamontagem_torre_total.toString().replace('.', ','));
+            $('#soma_tempo_montagem').val(somatempo_montagem_total.toString().replace('.', ','));
+            $('#soma_tempo_usinagem').val(somatempo_usinagem_total.toString().replace('.', ','));
+            $('#soma_tempo_inspecao').val(somatempo_inspecao_total.toString().replace('.', ','));
+        }
         bloqueiaEP();
     }
 
