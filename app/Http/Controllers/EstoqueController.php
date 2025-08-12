@@ -428,10 +428,10 @@ class EstoqueController extends Controller
 
         $qtde_por_pacote = !empty($estoque[0]->qtde_por_pacote) ? $estoque[0]->qtde_por_pacote : 0;
         $qtde_por_pacote_mo = !empty($estoque[0]->qtde_por_pacote_mo) ? $estoque[0]->qtde_por_pacote_mo : 0;
-        
-        
+
+
         $total_pacote_no_lote = $qtde_por_pacote + $qtde_por_pacote_mo;
-        
+
         $LoteEstoqueBaixados = new  LoteEstoqueBaixados();
 
         $pacotesbaixados = $LoteEstoqueBaixados->where('estoque_id', '=', $request->input('id'))->count();
@@ -516,6 +516,12 @@ class EstoqueController extends Controller
 
             $material = new Materiais();
             $material = $material->find($request->input('material_id'));
+
+            info('Salvando estoque: ' . $request->input('lote'));
+            info('Material: ' . $material->id . ' - Valor: ' . $material->valor);
+            info('Valor Unitário: ' . DateHelpers::formatFloatValue($valor_unitario));
+
+
             if($material->valor != DateHelpers::formatFloatValue($valor_unitario) && DateHelpers::formatFloatValue($valor_unitario) > 0) {
 
                 //busca ultimo lote do estoque para atualizar o valor do material
@@ -524,7 +530,7 @@ class EstoqueController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
 
-                $historico = "Valor do material alterado  de ". number_format($material->valor, 2, ',', '') . " para " . $ultimo_estoque->valor_unitario;
+                $historico = "Valor do material alterado pelo lote de ". number_format($material->valor, 2, ',', '') . " para " . $ultimo_estoque->valor_unitario;
                 $material->valor = $ultimo_estoque->valor_unitario;
                 $material->save();
 

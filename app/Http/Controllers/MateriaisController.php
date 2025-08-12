@@ -114,7 +114,7 @@ class MateriaisController extends Controller
 
             if($material[0]->valor != DateHelpers::formatFloatValue($request->input('valor'))) {
                 DateHelpers::formatDate_dmY($request->input("data_entrega"));
-                $historico = "Valor do material alterado pelo lote de ". number_format($material[0]->valor, 2, ',', '') . " para " . $request->input('valor');
+                $historico = "Valor do material alterado  de ". number_format($material[0]->valor, 2, ',', '') . " para " . $request->input('valor');
 
             }
     		$material_id = $this->salva($request, $historico);
