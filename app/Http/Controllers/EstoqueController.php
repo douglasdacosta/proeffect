@@ -521,7 +521,7 @@ class EstoqueController extends Controller
             info('Material: ' . $material->id . ' - Valor: ' . $material->valor);
             info('Valor Unitário: ' . DateHelpers::formatFloatValue($valor_unitario));
 
-            if($valor_unitario == 0) {
+            if(DateHelpers::formatFloatValue($valor_unitario) == 0) {
                 //busca o valor do ultimo lote do mesmo material que tenha valor maior que 0
                 $ultimoEstoque = Estoque::where('material_id', $material->id)
                                 ->where('valor_unitario', '>', 0)
