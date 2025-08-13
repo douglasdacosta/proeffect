@@ -521,8 +521,21 @@ class EstoqueController extends Controller
             info('Material: ' . $material->id . ' - Valor: ' . $material->valor);
             info('Valor Unitário: ' . DateHelpers::formatFloatValue($valor_unitario));
 
+            if($valor_unitario == 0) {
+                //busca o valor do ultimo lote do mesmo material que tenha valor maior que 0
+                $ultimoEstoque = Estoque::where('material_id', $material->id)
+                                ->where('valor_unitario', '>', 0)
+                                ->where('id', '<>', $estoque->id)
+                                ->orderBy('data', 'desc')
+                                ->orderBy('id', 'desc')
+                                ->first();
 
+                $valor_unitario = !empty($ultimoEstoque->valor_unitario) ? $ultimoEstoque->valor_unitario : 0;
+
+            }
             if($material->valor != DateHelpers::formatFloatValue($valor_unitario) && DateHelpers::formatFloatValue($valor_unitario) > 0) {
+
+
 
                 $historico = "Valor do material alterado pelo lote de ". number_format($material->valor, 2, ',', '') . " para " . DateHelpers::formatFloatValue($valor_unitario);
                 $material->valor = DateHelpers::formatFloatValue($valor_unitario);
