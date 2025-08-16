@@ -150,8 +150,8 @@
                                 location.reload();
                             }
                         } else {
-                            var data = JSON.parse(xhr.responseText);
-                            alert('Ocorreu um erro al alterar o status!')
+                            var data = xhr.responseText;
+                            alert('Erro! ' + data);
                         }
                     }
                 };
