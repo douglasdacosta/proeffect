@@ -625,6 +625,34 @@ class MaquinasController extends Controller
         $maquinas->prazo_inspecao = $request->input('prazo_inspecao');
         $maquinas->prazo_embalar = $request->input('prazo_embalar');
         $maquinas->prazo_expedicao = $request->input('prazo_expedicao');
+        $maquinas->segunda_inicio = $request->input('segunda_inicio');
+        $maquinas->segunda_almoco_inicio = $request->input('segunda_almoco_inicio');
+        $maquinas->segunda_almoco_fim = $request->input('segunda_almoco_fim');
+        $maquinas->segunda_fim = $request->input('segunda_fim');
+        $maquinas->terca_inicio = $request->input('terca_inicio');
+        $maquinas->terca_almoco_inicio = $request->input('terca_almoco_inicio');
+        $maquinas->terca_almoco_fim = $request->input('terca_almoco_fim');
+        $maquinas->terca_fim = $request->input('terca_fim');
+        $maquinas->quarta_inicio = $request->input('quarta_inicio');
+        $maquinas->quarta_almoco_inicio = $request->input('quarta_almoco_inicio');
+        $maquinas->quarta_almoco_fim = $request->input('quarta_almoco_fim');
+        $maquinas->quarta_fim = $request->input('quarta_fim');
+        $maquinas->quinta_inicio = $request->input('quinta_inicio');
+        $maquinas->quinta_almoco_inicio = $request->input('quinta_almoco_inicio');
+        $maquinas->quinta_almoco_fim = $request->input('quinta_almoco_fim');
+        $maquinas->quinta_fim = $request->input('quinta_fim');
+        $maquinas->sexta_inicio = $request->input('sexta_inicio');
+        $maquinas->sexta_almoco_inicio = $request->input('sexta_almoco_inicio');
+        $maquinas->sexta_almoco_fim = $request->input('sexta_almoco_fim');
+        $maquinas->sexta_fim = $request->input('sexta_fim');
+        $maquinas->sabado_inicio = $request->input('sabado_inicio');
+        $maquinas->sabado_almoco_inicio = $request->input('sabado_almoco_inicio');
+        $maquinas->sabado_almoco_fim = $request->input('sabado_almoco_fim');
+        $maquinas->sabado_fim = $request->input('sabado_fim');
+        $maquinas->domingo_inicio = $request->input('domingo_inicio');
+        $maquinas->domingo_almoco_inicio = $request->input('domingo_almoco_inicio');
+        $maquinas->domingo_almoco_fim = $request->input('domingo_almoco_fim');
+        $maquinas->domingo_fim = $request->input('domingo_fim');
 
         $maquinas->save();
 
