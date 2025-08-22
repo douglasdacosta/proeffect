@@ -51,7 +51,7 @@ class JobCorrecaoTempoApontamentos implements ShouldQueue
                 'pedidos.os'
             )
             ->join('pedidos', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
-            ->whereIn('pedidos.os', '=', [18554,18454,18414,18520,18503,18434])
+            ->whereIn('pedidos.status_id', [6,7])
             ->orderBy('historicos_etapas.pedidos_id', 'asc')
             ->orderBy('historicos_etapas.status_id', 'asc')
             ->orderBy('historicos_etapas.created_at', 'asc')

@@ -29,6 +29,8 @@ class Kernel extends ConsoleKernel
             $schedule->command('pessoas:gerar-hash')->everyFiveMinutes()->withoutOverlapping()->between('8:00', '22:00');
             $schedule->command('configuracoes:atualisar-materiais')->cron('0 0 1 * *')->withoutOverlapping(); // minuto hora dia-do-mês mês dia-da-semana
             $schedule->command('configuracoes:atualisar-tempos')->everyFifteenMinutes()->withoutOverlapping();
+            $schedule->command('command:correcaoTempoApontamentos')->cron('0 8,23 * * *')->withoutOverlapping(); // 08:00 e 22:00 todos os dias
+
         } catch (\Exception $th) {
             info($th);
         }
