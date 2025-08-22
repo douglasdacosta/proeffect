@@ -74,7 +74,7 @@ class ManutencaoProducaoController extends Controller
     public function ajaxAlterarPedido(Request $request) {
 
         try {
-            info($request->input());
+            // info($request->input());
 
 
             $texto = DB::transaction(function () use ($request) {
@@ -104,13 +104,51 @@ class ManutencaoProducaoController extends Controller
                         ->get()->toArray();
 
                     //verifica se não encontrou nenhuma etapa iniciada
-                    if(empty($etapasIniciadas)) {
+                    if(empty($etapasIniciadas) && $select_etapa_manutencao != 1) {
                         throw new \Exception('A etapa não foi iniciada, entre em contato com a administração.');
                     }
 
-                        info($etapasIniciadas);
+                    $senha= $request->input('senha');
+                    $funcionarios = $funcionarios->where('senha', '=', $senha)->get();
 
-                    //verifica se é termino
+                    $etapas = DB::table('historicos_etapas')
+                        ->select(
+                            'historicos_etapas.etapas_pedidos_id'
+                        )
+                        ->join('pedidos', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
+                        ->where('pedidos.id','=',$request->input('id'))
+                        ->where('historicos_etapas.funcionarios_id','=',$funcionarios[0]->id)
+                        ->orderBy('historicos_etapas.pedidos_id', 'asc')
+                        ->orderBy('historicos_etapas.status_id', 'asc')
+                        ->orderBy('historicos_etapas.created_at', 'desc')
+                        ->limit(1)
+                        ->get()
+                        ->toArray();
+
+                    if($etapas[0]->etapas_pedidos_id == 1) {
+                        $array_liberar=[2,4];
+
+                        if(!in_array($select_etapa_manutencao, $array_liberar)) {
+                                throw new \Exception(' A próxima etapa tem que ser PAUSA ou FINALIZADO');
+                        }
+                    }
+
+                    if($etapas[0]->etapas_pedidos_id == 2) {
+                        $array_liberar=[3];
+
+                        if(!in_array($select_etapa_manutencao, $array_liberar)) {
+                                throw new \Exception(' A próxima etapa tem que ser CONTINUAR');
+                        }
+                    }
+
+                    if($etapas[0]->etapas_pedidos_id == 3) {
+                        $array_liberar=[2,4];
+
+                        if(!in_array($select_etapa_manutencao, $array_liberar)) {
+                                throw new \Exception(' A próxima etapa deve ser PAUSA ou FINALIZADO');
+                        }
+                    }
+// dd($etapas);
                     if($select_etapa_manutencao == 4 ){
 
 
@@ -140,8 +178,7 @@ class ManutencaoProducaoController extends Controller
                         $MetapasAlteracao->save();
                     }
 
-                    $senha= $request->input('senha');
-                    $funcionarios = $funcionarios->where('senha', '=', $senha)->get();
+
 
                     $HistoricosEtapas->pedidos_id = $request->input('id');
                     $HistoricosEtapas->etapas_alteracao_id = $numero_etapas_alteracao;
