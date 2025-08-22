@@ -125,7 +125,9 @@ class ManutencaoProducaoController extends Controller
                         ->get()
                         ->toArray();
 
-                    if($etapas[0]->etapas_pedidos_id == 1) {
+                    $ultima_etapa = !empty($etapas[0]->etapas_pedidos_id) ? $etapas[0]->etapas_pedidos_id : 0;
+
+                    if($ultima_etapa == 1) {
                         $array_liberar=[2,4];
 
                         if(!in_array($select_etapa_manutencao, $array_liberar)) {
@@ -133,7 +135,7 @@ class ManutencaoProducaoController extends Controller
                         }
                     }
 
-                    if($etapas[0]->etapas_pedidos_id == 2) {
+                    if($ultima_etapa == 2) {
                         $array_liberar=[3];
 
                         if(!in_array($select_etapa_manutencao, $array_liberar)) {
@@ -141,7 +143,7 @@ class ManutencaoProducaoController extends Controller
                         }
                     }
 
-                    if($etapas[0]->etapas_pedidos_id == 3) {
+                    if($ultima_etapa == 3) {
                         $array_liberar=[2,4];
 
                         if(!in_array($select_etapa_manutencao, $array_liberar)) {
