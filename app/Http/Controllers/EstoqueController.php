@@ -544,7 +544,7 @@ class EstoqueController extends Controller
 
                     $MateriaisHistoricosValores = new MateriaisHistoricosValores();
                     $MateriaisHistoricosValores->materiais_id = $material->id;
-                    $MateriaisHistoricosValores->valor = DateHelpers::formatFloatValue($valor_unitario);
+                    $MateriaisHistoricosValores->valor = $valor_unitario;
                     $MateriaisHistoricosValores->save();
 
                     $historicos = new HistoricosMateriais();

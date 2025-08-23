@@ -35,74 +35,6 @@ class JobCorrecaoTempoApontamentos implements ShouldQueue
     {
         info("Dentro do job instance JobCorrecaoTempoApontamentos");
 
-<<<<<<< HEAD
-
-        $historicos_etapas = DB::table('historicos_etapas')
-            ->select(
-                'historicos_etapas.id',
-                'historicos_etapas.pedidos_id',
-                'historicos_etapas.numero_maquina',
-                'historicos_etapas.etapas_alteracao_id',
-                'historicos_etapas.status_id',
-                'historicos_etapas.etapas_pedidos_id',
-                'historicos_etapas.funcionarios_id',
-                'historicos_etapas.select_tipo_manutencao',
-                'historicos_etapas.select_motivo_pausas',
-                'historicos_etapas.texto_quantidade',
-                'historicos_etapas.created_at',
-                'pedidos.os'
-            )
-            ->join('pedidos', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
-            ->whereIn('pedidos.status_id', [6,7])
-            ->orderBy('historicos_etapas.pedidos_id', 'asc')
-            ->orderBy('historicos_etapas.status_id', 'asc')
-            ->orderBy('historicos_etapas.created_at', 'asc')
-            ->get();
-
-                
-/*
-SELECT
-	pedidos.id,
-    historicos_etapas.status_id,
-	historicos_etapas.etapas_pedidos_id,
-    historicos_etapas.created_at
-FROM
-	historicos_etapas
-inner join
-	pedidos
-ON
-	pedidos.id = historicos_etapas.pedidos_id
-WHERE
-	pedidos.os=18953
-ORDER BY
-	 `historicos_etapas`.`status_id` ASC ,
-	`historicos_etapas`.`etapas_pedidos_id` ASC
-
-    2817
-*/
-
-
-        foreach ($historicos_etapas as $historicos_etapa) {
-            $pedidos_id = $historicos_etapa->pedidos_id;
-            $status_id = $historicos_etapa->status_id;
-
-                $array_apontamentos[$pedidos_id][$status_id][] = [
-                    'pedidos_id' => $pedidos_id,
-                    'numero_maquina' => $historicos_etapa->numero_maquina,
-                    'etapas_alteracao_id' => $historicos_etapa->etapas_alteracao_id,
-                    'status_id' => $status_id,
-                    'etapas_pedidos_id' => $historicos_etapa->etapas_pedidos_id,
-                    'funcionarios_id' => $historicos_etapa->funcionarios_id,
-                    'select_tipo_manutencao' => $historicos_etapa->select_tipo_manutencao,
-                    'select_motivo_pausas' => $historicos_etapa->select_motivo_pausas,
-                    'texto_quantidade' => $historicos_etapa->texto_quantidade,
-                    'created_at' => $historicos_etapa->created_at,
-                    'os' => $historicos_etapa->os
-                ];
-
-
-        }
-=======
         $historicos_etapas = DB::select("
             SELECT *
             FROM (
@@ -127,7 +59,6 @@ ORDER BY
             ) t
             WHERE rn = 1
         ");
->>>>>>> 9e2833f72460727b6011922d4e104f43e0004ef0
 
         $array_dias_semana = [ 0 => 'domingo',1 => 'segunda',2 => 'terca',3 => 'quarta',4 => 'quinta',5 => 'sexta',6 => 'sabado'];
 
