@@ -57,7 +57,7 @@ class JobCorrecaoTempoApontamentos implements ShouldQueue
             ->orderBy('historicos_etapas.created_at', 'asc')
             ->get();
 
-
+                
 /*
 SELECT
 	pedidos.id,
