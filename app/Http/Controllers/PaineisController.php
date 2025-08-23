@@ -92,12 +92,13 @@ class PaineisController extends Controller
 
     public function paineisAcabamento(){
         $data = $this->carrega_dados(5,6);
-
+        info($data);
         return view('paineis.painel_acabamento', $data);
     }
 
     public function paineisMontagem(){
         $data = $this->carrega_dados(6,7);
+        info($data);
         return view('paineis.painel_montagem', $data);
     }
 

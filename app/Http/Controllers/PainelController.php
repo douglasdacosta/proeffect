@@ -197,10 +197,13 @@ class PainelController extends Controller
                                                         ON
                                                             C.pedidos_id=A.id
                                                             And C.status_id=A.status_id
-                                                            and C.etapas_pedidos_id = (select max(X.etapas_pedidos_id)
+                                                            and C.etapas_pedidos_id = (select X.etapas_pedidos_id
                                                                                             from historicos_etapas X WHERE
                                                                                             X.pedidos_id=A.id And
-                                                                                            X.status_id=A.status_id and  X.funcionarios_id =C.funcionarios_id
+                                                                                            X.status_id=A.status_id
+                                                                                            and  X.funcionarios_id =C.funcionarios_id
+                                                                                            and  X.select_tipo_manutencao = C.select_tipo_manutencao
+                                                                                            order by X.created_at desc limit 1
                                                                                         )
                                                         left join
                                                             etapas_pedidos D
@@ -239,10 +242,10 @@ class PainelController extends Controller
             $qdte_blank = 0;
             $conjuntos = array();
 
-            $pedidosController = new PedidosController();            
+            $pedidosController = new PedidosController();
             $maquinas = $pedidosController->getMaquinas();
-            $retorno = $pedidosController->calculaDiasSobrando($maquinas, strtolower($pedidos[$key]->nome), $pedido);            
-            
+            $retorno = $pedidosController->calculaDiasSobrando($maquinas, strtolower($pedidos[$key]->nome), $pedido);
+
             $pedidos[$key]->dias_alerta_departamento = $retorno['dias_alerta_departamento'];
             $pedidos[$key]->diasSobrando = $retorno['diasSobrando'];
 
@@ -294,6 +297,7 @@ class PainelController extends Controller
         if($concluidos){
             $pedidos = array_slice($pedidos, 0,3);
         }
+        info($pedidos);
         return $pedidos;
     }
 
@@ -474,7 +478,7 @@ class PainelController extends Controller
 
     private function carrega_dados($status_pendente, $status_concluido){
 
-        
+
         $pedidosCompletos = $this->busca_dados_pedidos($status_concluido, 3, true);
         $pedidosPendentes = $this->busca_dados_pedidos($status_pendente, 50, false);
 
