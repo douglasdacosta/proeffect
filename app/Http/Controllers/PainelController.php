@@ -297,7 +297,7 @@ class PainelController extends Controller
         if($concluidos){
             $pedidos = array_slice($pedidos, 0,3);
         }
-        info($pedidos);
+
         return $pedidos;
     }
 
