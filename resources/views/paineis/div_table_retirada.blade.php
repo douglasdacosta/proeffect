@@ -62,7 +62,7 @@ toggleBackgroundByClass('retirada');
         </thead>
         <tbody>
             @foreach ($pedidosCompletos as $pedido)
-            @php 
+            @php
             // dd($pedido);
             @endphp
                     <tr>
@@ -146,8 +146,8 @@ toggleBackgroundByClass('retirada');
                         @if(isset($usinagem) && $usinagem == true)
                             <td scope="col">{{$pedido->numero_maquina}}</td>
                         @endif
-                        <td scope="col">{{$pedido->motivo_pausa}}</td>
-                        <td scope="col">{{$pedido->qtde_pausa}}</td>
+                        <td scope="col">{{$pedido->etapa_codigo ==2 ? $pedido->motivo_pausa : ''}}</td>
+                        <td scope="col">{{$pedido->etapa_codigo ==2 ? $pedido->qtde_pausa : ''}}</td>
                         @if(isset($montagem) && $montagem == true)
                             <td scope="col">{{$pedido->responsavel}}</td>
                         @endif
