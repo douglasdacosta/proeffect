@@ -197,13 +197,17 @@ class PainelController extends Controller
                                                         ON
                                                             C.pedidos_id=A.id
                                                             And C.status_id=A.status_id
-                                                            and C.etapas_pedidos_id = (select X.etapas_pedidos_id
-                                                                                            from historicos_etapas X WHERE
-                                                                                            X.pedidos_id=A.id And
-                                                                                            X.status_id=A.status_id
-                                                                                            and  X.funcionarios_id =C.funcionarios_id
-                                                                                            and  X.select_tipo_manutencao = C.select_tipo_manutencao
-                                                                                            order by X.created_at desc limit 1
+                                                            and C.etapas_pedidos_id = (select
+                                                                                            X.etapas_pedidos_id
+                                                                                        from
+                                                                                            historicos_etapas X
+                                                                                        WHERE
+                                                                                            X.pedidos_id=A.id
+                                                                                            and X.status_id=A.status_id
+                                                                                            and X.funcionarios_id=C.funcionarios_id
+                                                                                        order by
+                                                                                            X.created_at desc
+                                                                                        limit 1
                                                                                         )
                                                         left join
                                                             etapas_pedidos D
@@ -441,7 +445,7 @@ class PainelController extends Controller
                         'etapas_pedidos_id' => $hestatus->etapas_pedidos_id     ,
                         'funcionarios_id' => $hestatus->funcionarios_id     ,
                         'select_tipo_manutencao' => $hestatus->select_tipo_manutencao   ,
-                        'select_motivo_pausas' => !empty($hestatus->select_motivo_pausas) ? $motivosPausa[$hestatus->select_motivo_pausas] : '' ,
+                        'select_motivo_pausas' => ($hestatus->etapas_pedidos_id == 2 && !empty($hestatus->select_motivo_pausas)) ? $motivosPausa[$hestatus->select_motivo_pausas] : '' ,
                         'texto_quantidade' => $hestatus->texto_quantidade   ,
                         'numero_maquina' => $hestatus->numero_maquina   ,
                         'created_at' => $hestatus->created_at   ,
