@@ -49,6 +49,7 @@ class JobCorrecaoTempoApontamentos implements ShouldQueue
                     historicos_etapas.select_tipo_manutencao,
                     historicos_etapas.select_motivo_pausas,
                     historicos_etapas.texto_quantidade,
+                    historicos_etapas.apontamento_automatico,
                     historicos_etapas.created_at,
                     pedidos.os,
                     ROW_NUMBER() OVER (PARTITION BY historicos_etapas.pedidos_id ORDER BY historicos_etapas.created_at DESC) AS rn
@@ -89,8 +90,8 @@ class JobCorrecaoTempoApontamentos implements ShouldQueue
                         }
                     }
 
-                    if($hora < 16) { //abertura de turno
-                        if($finalizacao->etapas_pedidos_id == 2) {
+                    if($hora < 9) { //abertura de turno
+                        if($finalizacao->etapas_pedidos_id == 2 && $finalizacao->apontamento_automatico == 1) {
 
                             foreach ($maquina[0] as $key => $hora_minuto) {
 
@@ -118,6 +119,7 @@ class JobCorrecaoTempoApontamentos implements ShouldQueue
                         $historicos_etapas->select_motivo_pausas = $finalizacao->select_motivo_pausas;
                         $historicos_etapas->texto_quantidade = $finalizacao->texto_quantidade;
                         $historicos_etapas->created_at = $data_hora;
+                        $historicos_etapas->apontamento_automatico = 1;
                         $historicos_etapas->save();
                         $etapas_pedidos_id = null;
                     }
