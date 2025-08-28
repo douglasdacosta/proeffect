@@ -211,6 +211,18 @@ class PainelController extends Controller
                                                                                             X.created_at desc
                                                                                         limit 1
                                                                                         )
+                                                            and C.id = (select
+                                                                                            X.id
+                                                                                        from
+                                                                                            historicos_etapas X
+                                                                                        WHERE
+                                                                                            X.pedidos_id=A.id
+                                                                                            and X.status_id=A.status_id
+                                                                                            and X.funcionarios_id=C.funcionarios_id
+                                                                                        order by
+                                                                                            X.created_at desc
+                                                                                        limit 1
+                                                                                        )
                                                         left join
                                                             etapas_pedidos D
                                                         on
