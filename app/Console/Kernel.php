@@ -30,6 +30,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('configuracoes:atualisar-materiais')->cron('0 0 1 * *')->withoutOverlapping(); // minuto hora dia-do-mês mês dia-da-semana
             $schedule->command('configuracoes:atualisar-tempos')->everyFifteenMinutes()->withoutOverlapping();
             $schedule->command('command:correcaoTempoApontamentos')->cron('0 8,23 * * 1-6')->withoutOverlapping(); // 08:00 e 22:00 todos os dias
+            $schedule->command('command:importarPedidoProjetos')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '20:00');
 
         } catch (\Exception $th) {
             info($th);

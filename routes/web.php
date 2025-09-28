@@ -134,3 +134,12 @@ Route::match(['post'],'/ajax-busca-responsveis', [App\Http\Controllers\AjaxContr
 Route::match(['post'],'/ajax-aplica-valores-fichatecnica', [App\Http\Controllers\AjaxController::class, 'ajaxAplicaValoresFichatecnica'])->name('ajax-aplica-valores-fichatecnica');
 Route::match(['post'],'/ajax-salva-novo-apontamento', [App\Http\Controllers\AjaxController::class, 'ajaxSalvaNovoApontamento'])->name('ajax-salva-novo-apontamento');
 Route::match(['post'],'/ajax-exclui-novo-apontamento', [App\Http\Controllers\AjaxController::class, 'ajaxExcluiNovoApontamento'])->name('ajax-exclui-novo-apontamento');
+
+Route::match(['get', 'post'],'/projetos', [App\Http\Controllers\ProjetosController::class, 'index'])->name('projetos')->middleware('afterAuth:projetos');
+Route::match(['get', 'post'],'/alterar-projetos', [App\Http\Controllers\ProjetosController::class, 'alterar'])->name('alterar-projetos')->middleware('afterAuth:projetos');
+Route::match(['get', 'post'],'/incluir-projetos', [App\Http\Controllers\ProjetosController::class, 'incluir'])->name('incluir-projetos')->middleware('afterAuth:projetos');
+
+Route::match(['get', 'post'],'/ajax-adicionar-tarefa-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAdicionarTarefaProjetos'])->name('ajax-adicionar-tarefa-projetos');
+Route::match(['get', 'post'],'/ajax-buscar-tarefas-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxBuscarTarefasProjetos'])->name('ajax-buscar-tarefas-projetos');
+Route::match(['get', 'post'],'/ajax-adicionar-apontamento-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAdicionarApontamentoProjetos'])->name('ajax-adicionar-apontamento-projetos');
+Route::match(['get', 'post'],'/ajax-adicionar-funcionario-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAdicionarFuncionarioProjetos'])->name('ajax-adicionar-funcionario-projetos');

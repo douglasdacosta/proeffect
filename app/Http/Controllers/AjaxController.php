@@ -6,6 +6,7 @@ use App\Models\Estoque;
 use App\Models\Fichastecnicas;
 use App\Models\Pedidos;
 use App\Models\Pessoas;
+use App\Models\Projetos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -283,6 +284,108 @@ class AjaxController extends Controller
             return response()->json(['success' => 'Apontamento excluído com sucesso.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao excluir apontamento: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+    function ajaxAdicionarTarefaProjetos(Request $request){
+        info($request->all());
+        $mensagem = $request->input('tarefa_modal');
+        $projetos_id = $request->input('projeto_id');
+        $data_tarefa = $request->input('data_tarefa');
+        $funcionario_id = $request->input('funcionario_id');
+
+        if(empty($mensagem) || empty($projetos_id)) {
+            return response()->json(['error' => 'Dados incompletos para adicionar tarefa.'], 400);
+        }
+
+
+
+
+        try {
+            DB::table('tarefas_projetos')->insert([
+                'projetos_id' => $projetos_id,
+                'funcionario_id' => $funcionario_id,
+                'funcionario_criador_id' => auth()->user()->id,
+                'data_hora' => $data_tarefa,
+                'mensagem' => $mensagem,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return response()->json(['success' => 'Tarefa adicionada com sucesso.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao adicionar tarefa: ' . $e->getMessage()], 500);
+        }
+    }
+
+    function ajaxBuscarTarefasProjetos(Request $request){
+        $projeto_id = $request->input('projeto_id');
+
+        if(empty($projeto_id)) {
+            return response()->json(['error' => 'Dados incompletos para buscar tarefas.'], 400);
+        }
+
+        try {
+            $tarefas = DB::table('tarefas_projetos')
+                ->leftjoin('funcionarios', 'tarefas_projetos.funcionario_id', '=', 'funcionarios.id')
+                ->leftjoin('funcionarios as criador', 'tarefas_projetos.funcionario_criador_id', '=', 'criador.id')
+                ->where('tarefas_projetos.projetos_id', $projeto_id)
+                ->orderBy('tarefas_projetos.created_at', 'desc')
+                ->select('tarefas_projetos.*', 'funcionarios.nome as funcionario_nome' , 'criador.nome as funcionario_criador_nome')
+                ->get();
+
+
+
+            return response()->json(['success' => true, 'tarefas' => $tarefas]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao buscar tarefas: ' . $e->getMessage()], 500);
+        }
+    }
+
+    function ajaxAdicionarApontamentoProjetos(Request $request){
+        $apontamento = $request->input('apontamento_id');
+        $projeto_id = $request->input('projeto_id');
+
+        $projetos = Projetos::find($projeto_id);
+        if(!$projetos) {
+            return response()->json(['error' => 'Projeto não encontrado.'], 404);
+        }
+
+        try {
+            DB::table('historicos_etapas_projetos')->insert([
+                'projetos_id' => $projeto_id,
+                'etapas_pedidos_id' => $apontamento,
+                'funcionarios_id' => auth()->user()->id,
+                'status_projetos_id' => $projetos->status_projetos_id,
+                'sub_status_projetos_id' => $projetos->sub_status_projetos_codigo,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return response()->json(['success' => 'Apontamento adicionado com sucesso.']);
+        } catch (\Exception $e) {
+            info($e->getMessage());
+            return response()->json(['error' => 'Erro ao adicionar apontamento: ' . $e->getMessage()], 500);
+        }
+    }
+
+    function ajaxAdicionarFuncionarioProjetos(Request $request){
+        $funcionario_id = $request->input('funcionario_id');
+        $projetos_id = $request->input('projeto_id');
+
+        if(empty($funcionario_id) || empty($projetos_id)) {
+            return response()->json(['error' => 'Dados incompletos para adicionar funcionário.'], 400);
+        }
+
+        try {
+            DB::table('projetos')->where('id', $projetos_id)->update([
+                'funcionarios_id' => $funcionario_id,
+            ]);
+
+            return response()->json(['success' => 'Funcionário adicionado com sucesso.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao adicionar funcionário: ' . $e->getMessage()], 500);
         }
     }
 }

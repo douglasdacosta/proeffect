@@ -76,7 +76,7 @@ class ApiERPController extends Controller
         return $this->Login();
     }
 
-    public function getVendasByStatus(){
+    public function getVendasByStatus($status = 7968){
         $client = new Client();
 
         $this->token = Cache::get('TOKEN');
@@ -88,7 +88,9 @@ class ApiERPController extends Controller
 
         $NumRecords = 1000;
         $page = 1;
-        $url = env('URL_ERP')."api/VendaV2?Status=7968&NumRecords=$NumRecords&page=$page";
+        $url = env('URL_ERP')."api/VendaV2?Status=$status&NumRecords=$NumRecords&page=$page";
+
+            info("URL: $url");
         $request = new Request('GET', $url, $headers);
         $response = $client->sendAsync($request)->wait();
         $body = $response->getBody();

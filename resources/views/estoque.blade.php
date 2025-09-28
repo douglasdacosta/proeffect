@@ -141,7 +141,7 @@
                             @foreach ($array_estoque as $item_estoque)
 
                                 <tr style="@if (isset($item_estoque['alerta_baixa_errada']) && $item_estoque['alerta_baixa_errada'] =='1') {{ ' background-color: rgb(233, 76, 76) '}}@else
-                                @if (isset($item_estoque['alerta_estoque_zerado']) && $item_estoque['alerta_estoque_zerado'] =='1') {{ ' background-color: yellow '}}@else @endif
+                                @if (isset($item_estoque['alerta_estoque_zerado']) && $item_estoque['alerta_estoque_zerado'] =='1') {{ ' background-color: #F2C807 '}}@else @endif
                                 @endif">
                                     <th data-field="id" scope="row"><a href={{ URL::route($rotaAlterar, array('id' => $item_estoque['id'] )) }}>{{$item_estoque['id']}}</a></th>
                                     <td data-field="fornecedor" nowrap >{{$item_estoque['fornecedor']}}</td>
