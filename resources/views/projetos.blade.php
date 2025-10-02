@@ -255,7 +255,7 @@ use App\Http\Controllers\PedidosController;
                                                 <th style="min-width: 150px;">Data solicitação</th>
                                                 <th style="min-width: 50px;">Qtde</th>
                                                 <th style="min-width: 100px;">Até/Urg</th>
-                                                <th style="min-width: 100px;">Pedido</th>
+                                                <th style="min-width: 150px;">Pedido</th>
                                                 <th style="min-width: 100px;">Valor</th>
                                                 <th style="min-width: 150px;">Cliente Ativo</th>
                                                 <th style="min-width: 150px;">Novo/Alteração</th>
@@ -302,7 +302,7 @@ use App\Http\Controllers\PedidosController;
                                                         <td>{{ $projeto['data_gerado']}}</td>
                                                         <td>{{ $projeto['qtde'] }}</td>
                                                         <td>{{ isset($projeto['prioridade_nome']) ? $projeto['prioridade_nome'] : '' }}</td>
-                                                        <td>{{ !isset($projeto['novo']) ? '' : (!empty($projeto['novo']) ? $projeto['novo'] : 'NOVO') }}</td>
+                                                        <td>{{ $projeto['com_pedido'] == 0 ? 'SEM PEDIDO' : ($projeto['com_pedido'] == 1 ? 'COM PEDIDO' : '') }}</td>
                                                         <td>{{ number_format($projeto['valor_unitario_adv'] * $projeto['qtde'], 2, ',', '.') }}</td>
                                                         <td>{{ !isset($projeto['cliente_ativo']) ? '' : ($projeto['cliente_ativo'] == 0 ? 'NÃO' : 'SIM') }}</td>
                                                         <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>

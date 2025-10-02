@@ -175,6 +175,7 @@ class ProjetosController extends Controller
                 'data_historico' => $projeto->data_historico,
                 'compromisso' => $projeto->compromisso,
                 'em_alerta' => $projeto->em_alerta,
+                'com_pedido' => $projeto->com_pedido,
                 'etapas_projetos_nome' => $projeto->etapas_projetos_nome,
                 'etapas_projetos_id' => $projeto->etapas_projetos_id
             );
@@ -277,7 +278,6 @@ class ProjetosController extends Controller
             if($request->input('status_id') == '2' || $request->input('status_id') == '36'){
                 $projeto->em_alerta = 0;
             }
-
 
 
             $projeto->os = $request->input('os');
