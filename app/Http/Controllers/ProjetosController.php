@@ -142,7 +142,7 @@ class ProjetosController extends Controller
             $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
             $HistoricosEtapasProjetos = $HistoricosEtapasProjetos->where('projetos_id', '=', $value->id)->orderby('created_at', 'DESC')->first();
 
-            $value->data_historico = !empty($HistoricosEtapasProjetos->data_hora) ? (new DateTime($HistoricosEtapasProjetos->data_hora))->format('d/m/Y') : '';
+            $value->data_historico = !empty($HistoricosEtapasProjetos->created_at) ? (new DateTime($HistoricosEtapasProjetos->created_at))->format('d/m/Y') : '';
 
 
         }
@@ -269,15 +269,15 @@ class ProjetosController extends Controller
                 $HistoricosEtapasProjetos->etapas_pedidos_id = $request->input('etapa_projeto_id');
                 $HistoricosEtapasProjetos->save();
 
+            } else {
+
+                $projeto->em_alerta = $request->input('em_alerta');
             }
 
             if($request->input('status_id') == '2' || $request->input('status_id') == '36'){
                 $projeto->em_alerta = 0;
-                $projeto->data_status = null;
-
-            } else {
-                $projeto->em_alerta = $request->input('em_alerta');
             }
+
 
 
             $projeto->os = $request->input('os');
