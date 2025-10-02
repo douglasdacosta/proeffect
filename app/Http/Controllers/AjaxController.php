@@ -352,6 +352,33 @@ class AjaxController extends Controller
             return response()->json(['error' => 'Projeto não encontrado.'], 404);
         }
 
+        //busca o ultimo historico de etapas do projeto
+        $ultimo_historico = DB::table('historicos_etapas_projetos')
+            ->where('projetos_id', $projeto_id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+
+        if($ultimo_historico->etapas_pedidos_id == 4 ) {
+            return response()->json(['error' => "Este já foi terminado!"], 400);
+        }
+
+        if($ultimo_historico->etapas_pedidos_id == 1 && $apontamento == $ultimo_historico->etapas_pedidos_id) {
+            return response()->json(['error' => "O apontamento já é INÍCIO. Favor lançar PAUSA, CONTINUAR ou TERMINAR"], 400);
+        }
+
+        if($ultimo_historico->etapas_pedidos_id == 2 && $apontamento <= 2) {
+            return response()->json(['error' => "O último apontamento é PAUSA. Favor lançar CONTINUAR!"], 400);
+        }
+
+        if($ultimo_historico->etapas_pedidos_id == 3 && in_array($apontamento, [1,4]) ) {
+            return response()->json(['error' => "O último apontamento é CONTINUAR. Favor lançar PAUSA ou TERMINAR!"], 400);
+        }
+
+
+
+
+
         try {
             DB::table('historicos_etapas_projetos')->insert([
                 'projetos_id' => $projeto_id,

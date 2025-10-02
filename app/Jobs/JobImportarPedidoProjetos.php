@@ -81,9 +81,9 @@ class JobImportarPedidoProjetos implements ShouldQueue
                     $idVendedor = $venda['idVendedor'];
 
                     if($idTipoSaida == 27) {
-                        $novo_alteracao = 1; // 1 = Alteração
-                    } else {
                         $novo_alteracao = 0; // 0 = Novo
+                    } else {
+                        $novo_alteracao = 1; // 1 = Alteração
                     }
 
                     $cliente= $ApiERPController->getClienteById($cliente);

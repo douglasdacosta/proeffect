@@ -1,5 +1,6 @@
 <?php
 use App\Providers\DateHelpers;
+use App\Http\Controllers\PedidosController;
 ?>
 @extends('adminlte::page')
 
@@ -200,11 +201,11 @@ use App\Providers\DateHelpers;
                         </div>
                     </div>
                     <div class="col-md-3 themed-grid-col row">
-                        <label for="ep" class="col-sm-4 col-form-label text-right">Status do pedido</label>
+                        <label for="departamento_id" class="col-sm-4 col-form-label text-right">Status do pedido</label>
                         <div class="col-sm-7" style="overflow-y: auto; height: 175px; border:1px solid #ced4da; border-radius: .25rem;">
                             @foreach ($AllStatus as $status)
                                 <div class="col-sm-8 form-check">
-                                    <input class="form-check-input col-sm-4" name="status_id[]" id="{{ $status->id }}" type="checkbox" @if(in_array($status->id, [1,2,3,4,5,6,7,8,9,10])) checked @endif value="{{ $status->id }}">
+                                    <input class="form-check-input col-sm-4" name="departamento_id[]" id="{{ $status->id }}" type="checkbox" @if(in_array($status->id, [1,2,3,4,5,6,7,])) checked @endif value="{{ $status->id }}">
                                     <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{ $status->id }}">{{ $status->nome }}</label>
                                 </div>
                             @endforeach
@@ -238,7 +239,12 @@ use App\Providers\DateHelpers;
                             @endphp
                             @if(isset($dados['departamentos']))
                                 @foreach ($dados['departamentos'] as $status_nome => $projetos)
-                                    @php $count ++; @endphp
+                                    @php
+                                        $count ++;
+                                        $somado_tempo_projeto = $somado_tempo_programacao = '00:00:00';
+                                        $pedidos_Controller = new PedidosController();
+
+                                    @endphp
                                     <h3>{{ $status_nome }} ({{ count($projetos) }})</h3>
                                     <table class="table table-striped text-center col-md-12" >
                                         <thead>
@@ -268,12 +274,30 @@ use App\Providers\DateHelpers;
                                                 <th style="min-width: 50px;">Apontamento</th>
                                             </tr>
                                         </thead>
-                                        <tbody>                                    
+                                        <tbody>
                                             @foreach($projetos as $key => $projeto)
-                                                @if(isset($projeto['id'])) 
+                                                @php
+
+                                                    $pedidos_Controller = new PedidosController();
+                                                    $tempo_projeto = $projeto['tempo_projetos'] ?? '00:00:00';
+                                                    $tempo_programacao = $projeto['tempo_programacao'] ?? '00:00:00';
+                                                    if($projeto['status_projetos_id'] == 4) {
+                                                        if( $projeto['etapas_projetos_id'] == 2){
+
+                                                            $somado_tempo_projeto = $pedidos_Controller->somarHoras($somado_tempo_projeto, $tempo_projeto);
+                                                        }
+                                                        if( $projeto['etapas_projetos_id'] == 3){
+
+                                                            $somado_tempo_programacao = $pedidos_Controller->somarHoras($somado_tempo_programacao, $tempo_programacao);
+                                                        }
+                                                    }
+
+                                                @endphp
+                                                @if(isset($projeto['id']))
                                                     <tr @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807" @endif >
-                                                        <th scope="row"><a href={{ URL::route($rotaAlterar, ['id' => $projeto['id']]) }}>{{ $projeto['id'] }}</a></th>                                                    
-                                                        <td title="{{ $projeto['nome_cliente'] }}">{{ $projeto['nome_cliente'] }}</td>
+                                                        <th scope="row"><a href={{ URL::route($rotaAlterar, ['id' => $projeto['id']]) }}>{{ $projeto['id'] }}</a></th>
+                                                        <td title="{{ trim($projeto['nome_cliente']) }}">{{ strlen(trim($projeto['nome_cliente'])) > 9 ? substr(trim($projeto['nome_cliente']), 0, 9) . '...' : trim($projeto['nome_cliente']) }}</td>
+
                                                         <td>{{ $projeto['ep'] }}</td>
                                                         <td>{{ $projeto['data_gerado']}}</td>
                                                         <td>{{ $projeto['qtde'] }}</td>
@@ -282,7 +306,7 @@ use App\Providers\DateHelpers;
                                                         <td>{{ number_format($projeto['valor_unitario_adv'] * $projeto['qtde'], 2, ',', '.') }}</td>
                                                         <td>{{ !isset($projeto['cliente_ativo']) ? '' : ($projeto['cliente_ativo'] == 0 ? 'NÃO' : 'SIM') }}</td>
                                                         <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
-                                                        <td>{{ isset($projeto['etapa_projeto']) ? $projeto['etapa_projeto'] : '' }}</td>
+                                                        <td>{{ isset($projeto['etapas_projetos_nome']) ? $projeto['etapas_projetos_nome'] : '' }}</td>
                                                         <td>
                                                             <i data-funcionariomontagem="" title="{{isset($projeto['nome_funcionario']) ? $projeto['nome_funcionario'] : ''}}"
                                                                 data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
@@ -296,7 +320,7 @@ use App\Providers\DateHelpers;
                                                         <td title="{{ trim($projeto['transporte']) }}">{{ strlen(trim($projeto['transporte'])) > 20 ? substr(trim($projeto['transporte']), 0, 20) . '...' : trim($projeto['transporte']) }}</td>
 
                                                         <td>{{ ' ' }}</td>
-                                                        <td>{{ isset($projeto['data_status']) ? Carbon\Carbon::parse($projeto['data_status'])->format('d/m/Y') : '' }}</td>
+                                                        <td>{{ isset($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}</td>
                                                         <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 20 ? substr(trim($projeto['mensagem']), 0, 20) . '...' : trim($projeto['mensagem']) }}</td>
                                                         <td nowrap >
                                                             @if($projeto['compromisso'] == 1)
@@ -317,22 +341,37 @@ use App\Providers\DateHelpers;
                                                 @endif
                                             @endforeach
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th style="min-width: 50px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 100px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 50px;"></th>
+                                                <th style="min-width: 100px;"></th>
+                                                <th style="min-width: 100px;"></th>
+                                                <th style="min-width: 100px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 150px;">{{ $somado_tempo_projeto ?? '' }}</th>
+                                                <th style="min-width: 200px;">{{ $somado_tempo_programacao ?? '' }}</th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 250px;"></th>
+                                                <th style="min-width: 250px;"></th>
+                                                <th style="min-width: 220px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 150px;"></th>
+                                                <th style="min-width: 50px;"></th>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 @endforeach
                             @endif
 
-
-                            {{-- @if (isset($projetos))
-                                                    
-                                                   
-                                                        
-                                                    </tr>
-                                                @endforeach
-                                            @endif
-                                        </tbody>
-                                    </table>
-                                @endforeach
-                            @endif --}}
                         </div>
                     </div>
                 </div>
@@ -487,7 +526,7 @@ use App\Providers\DateHelpers;
             <div class="form-group row">
                 <label for="tempo_projetos" class="col-sm-2 col-form-label">Tempo de projeto</label>
                 <div class="col-sm-1">
-                    <input type="text" class="form-control mask_minutos" id="tempo_projetos" name="tempo_projetos" placeholder="MM:SS"
+                    <input type="text" class="form-control mask_horas" id="tempo_projetos" name="tempo_projetos" placeholder="MM:SS"
                         value="@if (isset($projetos[0]->tempo_projetos)) {{ $projetos[0]->tempo_projetos }} @else {{ '' }} @endif">
                 </div>
             </div>
@@ -495,7 +534,7 @@ use App\Providers\DateHelpers;
             <div class="form-group row">
                 <label for="tempo_programacao" class="col-sm-2 col-form-label">Tempo de programação</label>
                 <div class="col-sm-1">
-                    <input type="text" class="form-control mask_minutos" id="tempo_programacao" name="tempo_programacao" placeholder="MM:SS"
+                    <input type="text" class="form-control mask_horas" id="tempo_programacao" name="tempo_programacao" placeholder="MM:SS"
                         value="@if (isset($projetos[0]->tempo_programacao)) {{ $projetos[0]->tempo_programacao }} @else {{ '' }} @endif">
                 </div>
             </div>
@@ -554,7 +593,7 @@ use App\Providers\DateHelpers;
                 </div>
             </div>
             <div class="form-group row">
-                <label for="transporte_id" class="col-sm-2 col-form-label">Trasporte</label>
+                <label for="transporte_id" class="col-sm-2 col-form-label">Transporte</label>
                 <div class="col-sm-4">
                     <select class="form-control" id="transporte_id" name="transporte_id">
                         <option value=""></option>
@@ -586,7 +625,7 @@ use App\Providers\DateHelpers;
             </div>
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label"></label>
-                <select class="form-control col-md-1" id="status" name="status">                    
+                <select class="form-control col-md-1" id="status" name="status">
                     <option value="A" @if (isset($projetos[0]->projeto) && $projetos[0]->projeto == 'A') {{ ' selected ' }}@else @endif>Ativo</option>
                     <option value="I" @if (isset($projetos[0]->projeto) && $projetos[0]->projeto == 'I') {{ ' selected ' }}@else @endif>Inativo</option>
                 </select>

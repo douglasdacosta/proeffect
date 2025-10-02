@@ -120,7 +120,7 @@ $(function ($) {
             return false;
         }
 
-        var projeto_id = $('.projetos_id').eq(0).val();
+        var projeto_id = $('#projeto_id').val();
 
         var apontamento_id = $('#apontamento_id').val();
 
@@ -157,7 +157,7 @@ $(function ($) {
 
     //antes de submit validar o campo tempo_projetos e  tempo_programacao
     $(document).on('submit', '#form_projetos', function (e) {
-        
+
         if($('#status_id').val() == 1) {
 
             var tempo_projetos = $('#tempo_projetos').val().trim();
@@ -176,7 +176,7 @@ $(function ($) {
                 $('#tempo_programacao').css('border', '1px solid red');
                 return false;
             }
-        
+
         }
     });
 

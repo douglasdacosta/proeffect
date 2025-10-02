@@ -44,6 +44,7 @@ class ProjetosController extends Controller
         $codigo_cliente = !empty($request->input('codigo_cliente')) ? ($request->input('codigo_cliente')) : (!empty($codigo_cliente) ? $codigo_cliente : false);
         $nome_cliente = !empty($request->input('nome_cliente')) ? ($request->input('nome_cliente')) : (!empty($nome_cliente) ? $nome_cliente : false);
         $os = !empty($request->input('os')) ? ($request->input('os')) : (!empty($os) ? $os : false);
+
         $ep = !empty($request->input('ep')) ? ($request->input('ep')) : (!empty($ep) ? $ep : false);
 
 
@@ -56,6 +57,7 @@ class ProjetosController extends Controller
             ->leftJoin('transportes', 'transportes.id', '=', 'projetos.transporte_id')
             ->leftJoin('funcionarios', 'funcionarios.id', '=', 'projetos.funcionarios_id')
             ->leftJoin('prioridades', 'prioridades.id', '=', 'projetos.prioridade_id')
+            ->leftJoin('etapas_projetos', 'etapas_projetos.id', '=', 'projetos.etapa_projeto_id')
             ->select('projetos.*',
             'projetos.ep',
             'pessoas.nome_cliente',
@@ -66,12 +68,14 @@ class ProjetosController extends Controller
             'sub_status_projetos.nome as sub_status_projetos_nome',
             'sub_status_projetos.codigo as sub_status_projetos_codigo',
             'transportes.nome as transporte',
-            'funcionarios.nome as nome_funcionario'
-            ,'prioridades.nome as prioridade_nome'
+            'funcionarios.nome as nome_funcionario',
+            'prioridades.nome as prioridade_nome',
+            'etapas_projetos.nome as etapas_projetos_nome',
+            'etapas_projetos.id as etapas_projetos_id'
             )
             ->orderby('status_projetos.nome', 'asc')
             ->orderby('projetos.data_entrega' , 'DESC')
-            ->orderby('projetos.data_gerado' , 'asc'); 
+            ->orderby('projetos.data_gerado' , 'asc');
 
 
 
@@ -85,15 +89,24 @@ class ProjetosController extends Controller
 
 
         if ($ep) {
-            $projetos = $projetos->where('projetos.ep', 'like', '%'.$ep.'%');
+            $projetos = $projetos->where('projetos.ep', 'like', '%' . $ep);
         }
 
         if ($id) {
             $projetos = $projetos->where('projetos.id', '=', $id);
         }
 
+        $departamento_id = [1,2,3,4,5,6,7];
+        if(!empty($request->input('departamento_id'))) {
+            $departamento_id = $request->input('departamento_id');
+        }
+
+        if($projetos) {
+            $projetos =$projetos->whereIn('projetos.status_projetos_id', $departamento_id);
+        }
+
         if ($os) {
-            $projetos = $projetos->where('projetos.os',  'like', '%'.$os.'%');
+            $projetos = $projetos->where('projetos.os',  '=', $os);
         }
 
         if(!empty($request->input('data_entrega')) && !empty($request->input('data_entrega_fim') )) {
@@ -125,9 +138,16 @@ class ProjetosController extends Controller
             $value->data_tarefa = !empty($tarefas_projetos->data_hora) ? (new DateTime($tarefas_projetos->data_hora))->format('d/m/Y') : '';
             $value->compromisso = !empty($tarefas_projetos->funcionario_id) ? 1 : 0;
 
-        }
-        
 
+            $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
+            $HistoricosEtapasProjetos = $HistoricosEtapasProjetos->where('projetos_id', '=', $value->id)->orderby('created_at', 'DESC')->first();
+
+            $value->data_historico = !empty($HistoricosEtapasProjetos->data_hora) ? (new DateTime($HistoricosEtapasProjetos->data_hora))->format('d/m/Y') : '';
+
+
+        }
+
+        $dados = [];
         foreach ($projetos as $projeto) {
             $dados['departamentos'][$projeto->status_nome][] = array(
                 'id' => $projeto->id,
@@ -142,16 +162,21 @@ class ProjetosController extends Controller
                 'sub_status_projetos_nome' => $projeto->sub_status_projetos_nome,
                 'status_projetos_id' => $projeto->id_status,
                 'prioridade_nome' => $projeto->prioridade_nome,
-                'novo_alteracao' => $projeto->novo_alteracao,            
+                'novo_alteracao' => $projeto->novo_alteracao,
                 'valor_unitario_adv' => $projeto->valor_unitario_adv,
                 'cliente_ativo' => $projeto->cliente_ativo,
-                'funcionarios_id' => $projeto->funcionarios_id,                  
+                'funcionarios_id' => $projeto->funcionarios_id,
                 'transporte' => $projeto->transporte,
+                'tempo_programacao' => $projeto->tempo_programacao,
+                'tempo_projetos' => $projeto->tempo_projetos,
                 'nome_funcionario' => $projeto->nome_funcionario,
                 'mensagem' => $projeto->mensagem,
                 'data_tarefa' => $projeto->data_tarefa,
+                'data_historico' => $projeto->data_historico,
                 'compromisso' => $projeto->compromisso,
-                'em_alerta' => $projeto->em_alerta
+                'em_alerta' => $projeto->em_alerta,
+                'etapas_projetos_nome' => $projeto->etapas_projetos_nome,
+                'etapas_projetos_id' => $projeto->etapas_projetos_id
             );
         }
 
@@ -178,7 +203,7 @@ class ProjetosController extends Controller
     */
     public function incluir(Request $request)
     {
-        
+
     }
 
     /**
@@ -200,7 +225,7 @@ class ProjetosController extends Controller
 
             return redirect()->route('projetos', ['id' => $projetos_id]);
         }
-         
+
         $data = array(
             'tela' => 'alterar',
             'nome_tela' => 'projetos',
@@ -250,9 +275,11 @@ class ProjetosController extends Controller
                 $projeto->em_alerta = 0;
                 $projeto->data_status = null;
 
+            } else {
+                $projeto->em_alerta = $request->input('em_alerta');
             }
 
-            
+
             $projeto->os = $request->input('os');
             $projeto->ep = $request->input('ep');
             $projeto->qtde = $request->input('qtde');
@@ -304,7 +331,7 @@ class ProjetosController extends Controller
     public function getAllSubStatus()
     {
         $Status = new SubStatusProjetos();
-        
+
         $Status = $Status->join('status_projetos', 'sub_status_projetos.status_projetos_id', '=', 'status_projetos.id');
 
         $Status = $Status->select('sub_status_projetos.*', 'status_projetos.nome as status_projeto_nome');
@@ -324,7 +351,7 @@ class ProjetosController extends Controller
     public function getSubStatus($codigo)
     {
                 $Status = new SubStatusProjetos();
-        
+
         $Status = $Status->join('status_projetos', 'sub_status_projetos.status_projetos_id', '=', 'status_projetos.id');
 
         $Status = $Status->select('sub_status_projetos.*', 'status_projetos.nome as status_projeto_nome');
