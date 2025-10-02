@@ -320,7 +320,7 @@ use App\Http\Controllers\PedidosController;
                                                         <td title="{{ trim($projeto['transporte']) }}">{{ strlen(trim($projeto['transporte'])) > 20 ? substr(trim($projeto['transporte']), 0, 20) . '...' : trim($projeto['transporte']) }}</td>
 
                                                         <td>{{ ' ' }}</td>
-                                                        <td>{{ isset($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}</td>
+                                                        <td>{{ isset($projeto['data_historico']) ? $projeto['data_historico'] : '' }}</td>
                                                         <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 10 ? substr(trim($projeto['mensagem']), 0, 10) . '...' : trim($projeto['mensagem']) }}</td>
                                                         <td nowrap >
                                                             @if($projeto['compromisso'] == 1)
