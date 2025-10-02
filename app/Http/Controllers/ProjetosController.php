@@ -73,9 +73,8 @@ class ProjetosController extends Controller
             'etapas_projetos.nome as etapas_projetos_nome',
             'etapas_projetos.id as etapas_projetos_id'
             )
-            ->orderby('status_projetos.nome', 'asc')
-            ->orderby('projetos.data_entrega' , 'DESC')
-            ->orderby('projetos.data_gerado' , 'asc');
+            ->orderby('status_projetos.ordem', 'asc')
+            ->orderby('projetos.data_gerado' , 'DESC');
 
 
 
@@ -181,6 +180,7 @@ class ProjetosController extends Controller
             );
         }
 
+
         // dd($projetos);
 
         $data = array(
@@ -195,6 +195,32 @@ class ProjetosController extends Controller
         );
 
         return view('projetos', $data);
+    }
+
+
+    function ordenarProjetosPorEtapaEData(array &$dados): void
+    {
+        if (!isset($dados['departamentos'])) {
+            return;
+        }
+
+        foreach ($dados['departamentos'] as $status => &$projetos) {
+            usort($projetos, function ($a, $b) {
+                // Ordena primeiro pelo etapas_projetos_id
+                if ($a['etapas_projetos_id'] == $b['etapas_projetos_id']) {
+                    // Se forem iguais, ordena pela data_gerado
+                    $dataA = DateTime::createFromFormat('d/m/Y', $a['data_gerado']);
+                    $dataB = DateTime::createFromFormat('d/m/Y', $b['data_gerado']);
+
+                    $timeA = $dataA ? $dataA->getTimestamp() : 0;
+                    $timeB = $dataB ? $dataB->getTimestamp() : 0;
+
+                    return $timeA <=> $timeB;
+                }
+
+                return $a['etapas_projetos_id'] <=> $b['etapas_projetos_id'];
+            });
+        }
     }
 
     /**

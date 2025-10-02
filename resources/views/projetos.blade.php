@@ -204,9 +204,12 @@ use App\Http\Controllers\PedidosController;
                         <label for="departamento_id" class="col-sm-4 col-form-label text-right">Status do pedido</label>
                         <div class="col-sm-7" style="overflow-y: auto; height: 175px; border:1px solid #ced4da; border-radius: .25rem;">
                             @foreach ($AllStatus as $status)
-                                <div class="col-sm-8 form-check">
-                                    <input class="form-check-input col-sm-4" name="departamento_id[]" id="{{ $status->id }}" type="checkbox" @if(in_array($status->id, [1,2,3,4,5,6,7,])) checked @endif value="{{ $status->id }}">
-                                    <label class="form-check-label col-sm-6" style="white-space:nowrap" for="{{ $status->id }}">{{ $status->nome }}</label>
+                                <div class="form-check">
+                                    <input class="form-check-input " name="departamento_id[]" id="{{ $status->id }}" type="checkbox" @if(in_array($status->id, [1,2,3,4,5,6,7,])) checked @endif value="{{ $status->id }}">
+                                <div class="form-check">
+                                    <label class="form-check-label " style="white-space:nowrap" for="{{ $status->id }}">{{ $status->nome }}</label>
+                                </div>
+
                                 </div>
                             @endforeach
                         </div>
@@ -526,7 +529,7 @@ use App\Http\Controllers\PedidosController;
             <div class="form-group row">
                 <label for="tempo_projetos" class="col-sm-2 col-form-label">Tempo de projeto</label>
                 <div class="col-sm-1">
-                    <input type="text" class="form-control mask_horas" id="tempo_projetos" name="tempo_projetos" placeholder="MM:SS"
+                    <input type="text" class="form-control mask_horas" id="tempo_projetos" name="tempo_projetos" placeholder="HH:MM:SS"
                         value="@if (isset($projetos[0]->tempo_projetos)) {{ $projetos[0]->tempo_projetos }} @else {{ '' }} @endif">
                 </div>
             </div>
@@ -534,7 +537,7 @@ use App\Http\Controllers\PedidosController;
             <div class="form-group row">
                 <label for="tempo_programacao" class="col-sm-2 col-form-label">Tempo de programação</label>
                 <div class="col-sm-1">
-                    <input type="text" class="form-control mask_horas" id="tempo_programacao" name="tempo_programacao" placeholder="MM:SS"
+                    <input type="text" class="form-control mask_horas" id="tempo_programacao" name="tempo_programacao" placeholder="HH:MM:SS"
                         value="@if (isset($projetos[0]->tempo_programacao)) {{ $projetos[0]->tempo_programacao }} @else {{ '' }} @endif">
                 </div>
             </div>
