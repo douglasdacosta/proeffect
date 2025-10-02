@@ -321,7 +321,7 @@ use App\Http\Controllers\PedidosController;
 
                                                         <td>{{ ' ' }}</td>
                                                         <td>{{ isset($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}</td>
-                                                        <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 20 ? substr(trim($projeto['mensagem']), 0, 20) . '...' : trim($projeto['mensagem']) }}</td>
+                                                        <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 10 ? substr(trim($projeto['mensagem']), 0, 10) . '...' : trim($projeto['mensagem']) }}</td>
                                                         <td nowrap >
                                                             @if($projeto['compromisso'] == 1)
                                                                 <i class="fas fa-exclamation-triangle" style="color:#d9534f" title="Possui compromisso"></i>
