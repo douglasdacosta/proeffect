@@ -180,6 +180,8 @@ class ProjetosController extends Controller
             );
         }
 
+        $this->ordenarProjetosPorEtapaEData($dados);
+
         $data = array(
             'tela' => 'pesquisar',
             'nome_tela' => 'projetos',
