@@ -528,7 +528,7 @@ use App\Http\Controllers\PedidosController;
             </div>
             <div class="form-group row">
                 <label for="tempo_projetos" class="col-sm-2 col-form-label">Tempo de projeto</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control mask_horas" id="tempo_projetos" name="tempo_projetos" placeholder="HH:MM:SS"
                         value="@if (isset($projetos[0]->tempo_projetos)) {{ $projetos[0]->tempo_projetos }} @else {{ '' }} @endif">
                 </div>
@@ -536,7 +536,7 @@ use App\Http\Controllers\PedidosController;
 
             <div class="form-group row">
                 <label for="tempo_programacao" class="col-sm-2 col-form-label">Tempo de programação</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control mask_horas" id="tempo_programacao" name="tempo_programacao" placeholder="HH:MM:SS"
                         value="@if (isset($projetos[0]->tempo_programacao)) {{ $projetos[0]->tempo_programacao }} @else {{ '' }} @endif">
                 </div>
@@ -551,7 +551,7 @@ use App\Http\Controllers\PedidosController;
             </div>
             <div class="form-group row">
                 <label for="alerta_dias" class="col-sm-2 col-form-label">Alerta dias</label>
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                     <input type="text" readonly class="form-control mask_date" id="alerta_dias" name="alerta_dias">
                 </div>
             </div>
@@ -609,14 +609,6 @@ use App\Http\Controllers\PedidosController;
                             @endforeach
                         @endif
                     </select>
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="status" class="col-sm-2 col-form-label">Data status</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control mask_date" id="data_status" name="data_status" disabled
-                        value="@if (isset($projetos[0]->data_status)) {{ Carbon\Carbon::parse($projetos[0]->data_status)->format('d/m/Y') }} @else {{ '' }} @endif">
                 </div>
             </div>
             <div class="form-group row ">

@@ -180,9 +180,6 @@ class ProjetosController extends Controller
             );
         }
 
-
-        // dd($projetos);
-
         $data = array(
             'tela' => 'pesquisar',
             'nome_tela' => 'projetos',
@@ -279,12 +276,21 @@ class ProjetosController extends Controller
             if ($request->input('id')) {
                 $projeto = $projeto::find($request->input('id'));
             }
+            // dd($request->all());
+            $status_id = $request->input('status_id');
+            $etapa_projeto_id = $request->input('etapa_projeto_id');
 
-            $status_projetos_id = $this->getSubStatus($request->input('status_id'));
+            if($etapa_projeto_id == 5 ) {
+                $status_id = 2;
+            }
+
+            $status_projetos_id = $this->getSubStatus($status_id);
+            // dd($status_projetos_id);
+            $sub_status_projetos_codigo = $status_projetos_id[0]['codigo'];
             $sub_status_projetos_id = $status_projetos_id[0]['id'];
             $status_projetos_id = $status_projetos_id[0]['status_projetos_id'];
 
-            if($projeto->sub_status_projetos_codigo != $request->input('status_id')){
+            if($projeto->sub_status_projetos_codigo != $status_id){
                 $projeto->data_status = date('Y-m-d');
                 $projeto->em_alerta = 1;
 
@@ -293,7 +299,7 @@ class ProjetosController extends Controller
                 $HistoricosEtapasProjetos->status_projetos_id = $status_projetos_id;
                 $HistoricosEtapasProjetos->sub_status_projetos_id = $sub_status_projetos_id;
                 $HistoricosEtapasProjetos->funcionarios_id = Auth::user()->id;
-                $HistoricosEtapasProjetos->etapas_pedidos_id = $request->input('etapa_projeto_id');
+                $HistoricosEtapasProjetos->etapas_pedidos_id = $etapa_projeto_id;
                 $HistoricosEtapasProjetos->save();
 
             } else {
@@ -301,10 +307,13 @@ class ProjetosController extends Controller
                 $projeto->em_alerta = $request->input('em_alerta');
             }
 
-            if($request->input('status_id') == '2' || $request->input('status_id') == '36'){
+            if($status_id == '2' || $status_id == '36'){
                 $projeto->em_alerta = 0;
             }
 
+            if($etapa_projeto_id == 5 ) {
+                $projeto->em_alerta = 0;
+            }
 
             $projeto->os = $request->input('os');
             $projeto->ep = $request->input('ep');
@@ -312,8 +321,8 @@ class ProjetosController extends Controller
             $projeto->pessoas_id = $request->input('clientes_id');
             $projeto->data_gerado = !empty($request->input('data_gerado')) ? DateHelpers::formatDate_dmY($request->input('data_gerado')) : null;
             $projeto->status_projetos_id = $status_projetos_id;
-            $projeto->sub_status_projetos_codigo = $request->input('status_id');
-            $projeto->etapa_projeto_id = $request->input('etapa_projeto_id');
+            $projeto->sub_status_projetos_codigo = $sub_status_projetos_codigo;
+            $projeto->etapa_projeto_id = $etapa_projeto_id;
             $projeto->prioridade_id = $request->input('prioridade_id');
             $projeto->transporte_id = $request->input('transporte_id');
             $projeto->cliente_ativo = $request->input('cliente_ativo');
@@ -376,16 +385,15 @@ class ProjetosController extends Controller
     */
     public function getSubStatus($codigo)
     {
-                $Status = new SubStatusProjetos();
 
+        $Status = new SubStatusProjetos();
         $Status = $Status->join('status_projetos', 'sub_status_projetos.status_projetos_id', '=', 'status_projetos.id');
-
         $Status = $Status->select('sub_status_projetos.*', 'status_projetos.nome as status_projeto_nome');
-        $Retorno = $Status->where('sub_status_projetos.codigo', '=', $codigo)
+        $Status = $Status->where('sub_status_projetos.codigo', '=', $codigo)
         ->orderby('sub_status_projetos.nome', 'asc')
         ->get()->toArray();
 
-        return $Retorno;
+        return $Status;
     }
 
     /**
@@ -410,7 +418,7 @@ class ProjetosController extends Controller
     {
         $etapas_projetos = new EtapasProjetos();
         return $etapas_projetos->where('status', '=', 'A')
-        ->orderby('etapas_projetos.nome', 'asc')
+        ->orderby('etapas_projetos.id', 'asc')
         ->get();
     }
 
