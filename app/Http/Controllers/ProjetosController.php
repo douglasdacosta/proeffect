@@ -141,7 +141,7 @@ class ProjetosController extends Controller
             $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
             $HistoricosEtapasProjetos = $HistoricosEtapasProjetos->where('projetos_id', '=', $value->id)->orderby('created_at', 'DESC')->first();
 
-            $value->data_historico = !empty($HistoricosEtapasProjetos->created_at) ? (new DateTime($HistoricosEtapasProjetos->created_at))->format('d/m/Y') : '';
+            $value->data_historico = !empty($HistoricosEtapasProjetos->created_at) ? $HistoricosEtapasProjetos->created_at : '';
 
 
         }
@@ -155,7 +155,7 @@ class ProjetosController extends Controller
                 'qtde' => $projeto->qtde,
                 'nome_cliente' => $projeto->nome_cliente,
                 'telefone' => $projeto->telefone,
-                'data_gerado' => $projeto->data_gerado ? (new DateTime($projeto->data_gerado))->format('d/m/Y') : '',
+                'data_gerado' => $projeto->data_gerado ? $projeto->data_gerado : '',
                 'data_entrega' => $projeto->data_entrega ? (new DateTime($projeto->data_entrega))->format('d/m/Y') : '',
                 'status_nome' => $projeto->status_nome,
                 'sub_status_projetos_nome' => $projeto->sub_status_projetos_nome,
@@ -214,10 +214,10 @@ class ProjetosController extends Controller
                     $timeA = $dataA ? $dataA->getTimestamp() : 0;
                     $timeB = $dataB ? $dataB->getTimestamp() : 0;
 
-                    return $timeA <=> $timeB;
+                    return $timeB <=> $timeA ;
                 }
 
-                return $a['etapas_projetos_id'] <=> $b['etapas_projetos_id'];
+                return $b['etapas_projetos_id'] <=> $a['etapas_projetos_id'];
             });
         }
     }
@@ -282,7 +282,7 @@ class ProjetosController extends Controller
             $status_id = $request->input('status_id');
             $etapa_projeto_id = $request->input('etapa_projeto_id');
 
-            if($etapa_projeto_id == 5 ) {
+            if($etapa_projeto_id == 5  && $etapa_projeto_id != 36) {
                 $status_id = 2;
             }
 
@@ -309,11 +309,7 @@ class ProjetosController extends Controller
                 $projeto->em_alerta = $request->input('em_alerta');
             }
 
-            if($status_id == '2' || $status_id == '36'){
-                $projeto->em_alerta = 0;
-            }
-
-            if($etapa_projeto_id == 5 ) {
+            if($etapa_projeto_id == 5  && $status_id == 36) {
                 $projeto->em_alerta = 0;
             }
 

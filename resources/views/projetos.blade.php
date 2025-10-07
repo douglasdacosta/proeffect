@@ -285,15 +285,27 @@ use App\Http\Controllers\PedidosController;
                                                     $tempo_projeto = $projeto['tempo_projetos'] ?? '00:00:00';
                                                     $tempo_programacao = $projeto['tempo_programacao'] ?? '00:00:00';
                                                     if($projeto['status_projetos_id'] == 4) {
-                                                        if( $projeto['etapas_projetos_id'] == 2){
+                                                        if( in_array($projeto['etapas_projetos_id'], [1,2]) ){
 
                                                             $somado_tempo_projeto = $pedidos_Controller->somarHoras($somado_tempo_projeto, $tempo_projeto);
                                                         }
-                                                        if( $projeto['etapas_projetos_id'] == 3){
+                                                        if( in_array($projeto['etapas_projetos_id'], [1,2,3]) ){
 
                                                             $somado_tempo_programacao = $pedidos_Controller->somarHoras($somado_tempo_programacao, $tempo_programacao);
                                                         }
+
                                                     }
+                                                    $tempo_desenvolvimento_em_dias = '';
+                                                    if( in_array($projeto['etapas_projetos_id'], [1,2,3,4]) ){
+
+                                                        $data_gerado = $projeto['data_gerado'];
+                                                        $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_gerado)->diffInDays(\Carbon\Carbon::now());
+                                                    }else {
+
+                                                        $data_historico = $projeto['data_historico'];
+                                                        $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_historico)->diffInDays(\Carbon\Carbon::now());
+                                                    }
+
 
                                                 @endphp
                                                 @if(isset($projeto['id']))
@@ -302,7 +314,7 @@ use App\Http\Controllers\PedidosController;
                                                         <td title="{{ trim($projeto['nome_cliente']) }}">{{ strlen(trim($projeto['nome_cliente'])) > 9 ? substr(trim($projeto['nome_cliente']), 0, 9) . '...' : trim($projeto['nome_cliente']) }}</td>
 
                                                         <td>{{ $projeto['ep'] }}</td>
-                                                        <td>{{ $projeto['data_gerado']}}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($projeto['data_gerado'])->format('d/m/Y') }}</td>
                                                         <td>{{ $projeto['qtde'] }}</td>
                                                         <td>{{ isset($projeto['prioridade_nome']) ? $projeto['prioridade_nome'] : '' }}</td>
                                                         <td>{{ $projeto['com_pedido'] == 0 ? 'SEM PEDIDO' : ($projeto['com_pedido'] == 1 ? 'COM PEDIDO' : '') }}</td>
@@ -322,8 +334,8 @@ use App\Http\Controllers\PedidosController;
                                                         <td>{{ isset($projeto['sub_status_projetos_nome']) ? $projeto['sub_status_projetos_nome'] : '' }}</td>
                                                         <td title="{{ trim($projeto['transporte']) }}">{{ strlen(trim($projeto['transporte'])) > 20 ? substr(trim($projeto['transporte']), 0, 20) . '...' : trim($projeto['transporte']) }}</td>
 
-                                                        <td>{{ ' ' }}</td>
-                                                        <td>{{ isset($projeto['data_historico']) ? $projeto['data_historico'] : '' }}</td>
+                                                        <td>{{ $tempo_desenvolvimento_em_dias }}</td>
+                                                        <td>{{ isset($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}</td>
                                                         <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 10 ? substr(trim($projeto['mensagem']), 0, 10) . '...' : trim($projeto['mensagem']) }}</td>
                                                         <td nowrap >
                                                             @if($projeto['compromisso'] == 1)
