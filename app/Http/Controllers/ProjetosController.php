@@ -282,7 +282,7 @@ class ProjetosController extends Controller
             $status_id = $request->input('status_id');
             $etapa_projeto_id = $request->input('etapa_projeto_id');
 
-            if($etapa_projeto_id == 5  && $etapa_projeto_id != 36) {
+            if($etapa_projeto_id == 5  && $status_id != 36) {
                 $status_id = 2;
             }
 
