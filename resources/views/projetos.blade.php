@@ -322,10 +322,13 @@ use App\Http\Controllers\PedidosController;
                                                         <td>{{ !isset($projeto['cliente_ativo']) ? '' : ($projeto['cliente_ativo'] == 0 ? 'NÃO' : 'SIM') }}</td>
                                                         <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
                                                         <td>
+
                                                             <select class="form-control pesquisa_etapas_projetos" data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
+                                                                <option @if(empty($projeto['etapas_projetos_id']) ) selected="selected" @endif value=""></option>
                                                                 @if (isset($AllEtapasProjetos))
                                                                     @foreach ($AllEtapasProjetos as $EtapasProjeto)
-                                                                        <option value="{{ $EtapasProjeto->id }}" @if (isset($projeto['etapas_projetos_id']) && $projeto['etapas_projetos_id'] == $EtapasProjeto->id) selected @endif>{{ $EtapasProjeto->nome }}</option>
+                                                                        <option value="{{ $EtapasProjeto->id }}"
+                                                                             @if (!empty($projeto['etapas_projetos_id']) && $projeto['etapas_projetos_id'] === $EtapasProjeto->id) selected="selected" @endif>{{  $EtapasProjeto->nome }}</option>
                                                                     @endforeach
                                                                 @endif
                                                             </select>
