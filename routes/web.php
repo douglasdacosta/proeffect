@@ -143,3 +143,5 @@ Route::match(['get', 'post'],'/ajax-adicionar-tarefa-projetos', [App\Http\Contro
 Route::match(['get', 'post'],'/ajax-buscar-tarefas-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxBuscarTarefasProjetos'])->name('ajax-buscar-tarefas-projetos');
 Route::match(['get', 'post'],'/ajax-adicionar-apontamento-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAdicionarApontamentoProjetos'])->name('ajax-adicionar-apontamento-projetos');
 Route::match(['get', 'post'],'/ajax-adicionar-funcionario-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAdicionarFuncionarioProjetos'])->name('ajax-adicionar-funcionario-projetos');
+Route::match(['get', 'post'],'/ajax-alterar-status-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAlterarStatusProjetos'])->name('ajaxAlterarStatusProjetos');
+Route::match(['get', 'post'],'/ajax-alterar-etapas-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAlterarEtapasProjetos'])->name('ajaxAlterarEtapasProjetos');

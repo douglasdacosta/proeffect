@@ -237,7 +237,7 @@ use App\Http\Controllers\PedidosController;
                         </div>
                         <div class="x_content">
                             @php
-                             $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 => '#c1d9d0', 10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583'];
+                             $palheta_cores = ['Expedição' => '#ff003d', 'Projetos' => '#ee7e4c', 'Reunião' => '#8f639f', 'Vendas' => '#94c5a5', 'Em Preparação' => '#ead56c', 'Entregue' => '#0fbab7', 'Expedição' => '#f7c41f', 'Cancelado' => '#898b75', 'Desenvolvimento' => '#c1d9d0', 'Vendas' => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583'];
                              $count = 0;
                             @endphp
                             @if(isset($dados['departamentos']))
@@ -251,7 +251,7 @@ use App\Http\Controllers\PedidosController;
                                     <h3>{{ $status_nome }} ({{ count($projetos) }})</h3>
                                     <table class="table table-striped text-center col-md-12" >
                                         <thead>
-                                            <tr style="background-color: {{$palheta_cores[$count]}}">
+                                            <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
                                                 <th style="min-width: 50px;">ID</th>
                                                 <th style="min-width: 150px;">Cliente</th>
                                                 <th style="min-width: 100px;">EP</th>
@@ -321,7 +321,15 @@ use App\Http\Controllers\PedidosController;
                                                         <td>{{ number_format($projeto['valor_unitario_adv'] * $projeto['qtde'], 2, ',', '.') }}</td>
                                                         <td>{{ !isset($projeto['cliente_ativo']) ? '' : ($projeto['cliente_ativo'] == 0 ? 'NÃO' : 'SIM') }}</td>
                                                         <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
-                                                        <td>{{ isset($projeto['etapas_projetos_nome']) ? $projeto['etapas_projetos_nome'] : '' }}</td>
+                                                        <td>
+                                                            <select class="form-control pesquisa_etapas_projetos" data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
+                                                                @if (isset($AllEtapasProjetos))
+                                                                    @foreach ($AllEtapasProjetos as $EtapasProjeto)
+                                                                        <option value="{{ $EtapasProjeto->id }}" @if (isset($projeto['etapas_projetos_id']) && $projeto['etapas_projetos_id'] == $EtapasProjeto->id) selected @endif>{{ $EtapasProjeto->nome }}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                        </td>
                                                         <td>
                                                             <i data-funcionariomontagem="" title="{{isset($projeto['nome_funcionario']) ? $projeto['nome_funcionario'] : ''}}"
                                                                 data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
@@ -331,7 +339,28 @@ use App\Http\Controllers\PedidosController;
                                                         <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
                                                         <td>{{ !empty($projeto['data_entrega']) ? Carbon\Carbon::parse($projeto['data_entrega'])->format('d/m/Y') : '' }}</td>
                                                         <td ></td>
-                                                        <td>{{ isset($projeto['sub_status_projetos_nome']) ? $projeto['sub_status_projetos_nome'] : '' }}</td>
+                                                        <td>
+                                                            @if (isset($AllSubStatus))
+
+                                                                <select class="form-control pesquisa_status_id" id="pesquisa_status_id" name="pesquisa_status_id" data-projeto="{{ $projeto['id'] }}">
+                                                                    <option value=""></option>
+                                                                    @php
+                                                                        $grouped = $AllSubStatus->groupBy('status_projeto_nome');
+                                                                    @endphp
+
+                                                                    @foreach ($grouped as $groupName => $subStatuses)
+                                                                        <optgroup label="{{ $groupName }}">
+                                                                            @foreach ($subStatuses as $stats)
+                                                                                <option value="{{ $stats->codigo }}"
+                                                                                    @if ((isset($projeto['sub_status_projetos_codigo']) && $projeto['sub_status_projetos_codigo'] == $stats->codigo)) selected="selected" @endif>
+                                                                                    {{ $stats->nome }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endforeach
+                                                                </select>
+                                                            @endif
+                                                        </td>
                                                         <td title="{{ trim($projeto['transporte']) }}">{{ strlen(trim($projeto['transporte'])) > 20 ? substr(trim($projeto['transporte']), 0, 20) . '...' : trim($projeto['transporte']) }}</td>
 
                                                         <td>{{ $tempo_desenvolvimento_em_dias }}</td>

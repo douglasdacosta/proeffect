@@ -66,6 +66,7 @@ class ProjetosController extends Controller
             'status_projetos.nome as status_nome',
             'status_projetos.id as id_status',
             'sub_status_projetos.nome as sub_status_projetos_nome',
+            'sub_status_projetos.id as sub_status_projetos_id',
             'sub_status_projetos.codigo as sub_status_projetos_codigo',
             'transportes.nome as transporte',
             'funcionarios.nome as nome_funcionario',
@@ -159,6 +160,8 @@ class ProjetosController extends Controller
                 'data_entrega' => $projeto->data_entrega ? (new DateTime($projeto->data_entrega))->format('d/m/Y') : '',
                 'status_nome' => $projeto->status_nome,
                 'sub_status_projetos_nome' => $projeto->sub_status_projetos_nome,
+                'sub_status_projetos_id' => $projeto->sub_status_projetos_id,
+                'sub_status_projetos_codigo' => $projeto->sub_status_projetos_codigo,
                 'status_projetos_id' => $projeto->id_status,
                 'prioridade_nome' => $projeto->prioridade_nome,
                 'novo_alteracao' => $projeto->novo_alteracao,
@@ -187,8 +190,10 @@ class ProjetosController extends Controller
             'nome_tela' => 'projetos',
             'dados' => $dados,
             'request' => $request,
+            'AllEtapasProjetos' => $this->getAllEtapasProjetos(),
             'AllFuncionarios' => $this->getAllFuncionarios(),
             'AllStatus' => $this->getAllStatus(),
+            'AllSubStatus' => $this->getAllSubStatus(),
             'rotaIncluir' => 'incluir-projetos',
             'rotaAlterar' => 'alterar-projetos'
         );

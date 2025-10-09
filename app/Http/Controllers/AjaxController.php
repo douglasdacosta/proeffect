@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Estoque;
 use App\Models\Fichastecnicas;
+use App\Models\HistoricosEtapasProjetos;
 use App\Models\Pedidos;
 use App\Models\Pessoas;
 use App\Models\Projetos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AjaxController extends Controller
@@ -415,4 +417,91 @@ class AjaxController extends Controller
             return response()->json(['error' => 'Erro ao adicionar funcionário: ' . $e->getMessage()], 500);
         }
     }
+
+
+    function ajaxAlterarStatusProjetos(Request $request){
+        $status = $request->input('status');
+        $projeto_id = $request->input('projeto_id');
+
+        $projetosController = new ProjetosController();
+        $status_projetos_id = $projetosController->getSubStatus($status);
+        $sub_status_projetos_codigo = $status_projetos_id[0]['codigo'];
+        $status_projetos_id = $status_projetos_id[0]['status_projetos_id'];
+
+        if(empty($status) || empty($projeto_id)) {
+            return response()->json(['error' => 'Dados incompletos para alterar status.'], 400);
+        }
+
+        try {
+            DB::table('projetos')->where('id', $projeto_id)->update([
+                'sub_status_projetos_codigo' => $sub_status_projetos_codigo,
+                'status_projetos_id' => $status_projetos_id
+
+            ]);
+
+            return response()->json(['success' => 'Status alterado com sucesso.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao alterar status: ' . $e->getMessage()], 500);
+        }
+    }
+
+    function ajaxAlterarEtapasProjetos(Request $request){
+
+        $projeto = new Projetos();
+        $projetosController = new ProjetosController();
+
+        $sub_status_projetos_codigo = $request->input('sub_status_projetos_codigo');
+        $etapa_projeto_id = $request->input('etapa');
+        $projeto_id = $request->input('projeto_id');
+
+        if(empty($sub_status_projetos_codigo) || empty($projeto_id ) || empty($etapa_projeto_id)) {
+            return response()->json(['error' => 'Dados incompletos para alterar a Etapa.'], 400);
+        }
+
+
+        $projeto = $projeto::find($projeto_id);
+
+        $projeto->etapa_projeto_id = $etapa_projeto_id;
+        try {
+
+            if($etapa_projeto_id == 5  && $sub_status_projetos_codigo != 36) {
+                $sub_status_projetos_codigo = 2;
+            }
+
+            $status_projetos_id = $projetosController->getSubStatus($sub_status_projetos_codigo);
+
+            $sub_status_projetos_id = $status_projetos_id[0]['id'];
+            $status_projetos_id = $status_projetos_id[0]['status_projetos_id'];
+
+            $projeto->status_projetos_id = $status_projetos_id;
+
+            if($projeto->sub_status_projetos_codigo != $sub_status_projetos_codigo){
+                $projeto->data_status = date('Y-m-d');
+                $projeto->em_alerta = 1;
+
+                $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
+                $HistoricosEtapasProjetos->projetos_id = $projeto->id;
+                $HistoricosEtapasProjetos->status_projetos_id = $status_projetos_id;
+                $HistoricosEtapasProjetos->sub_status_projetos_id = $sub_status_projetos_id;
+                $HistoricosEtapasProjetos->funcionarios_id = Auth::user()->id;
+                $HistoricosEtapasProjetos->etapas_pedidos_id = $etapa_projeto_id;
+                $HistoricosEtapasProjetos->save();
+
+            }
+
+            $projeto->sub_status_projetos_codigo = $sub_status_projetos_codigo;
+            if($etapa_projeto_id == 5  && $sub_status_projetos_codigo == 36) {
+                $projeto->em_alerta = 0;
+            }
+
+            $projeto->save();
+
+            return response()->json(['success' => 'Etapa alterada com sucesso.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao alterar a Etapa: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
 }

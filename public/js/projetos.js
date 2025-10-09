@@ -226,4 +226,70 @@ $(function ($) {
         }
     });
 
+    $(document).on('change', '.pesquisa_status_id', function (e) {
+
+        var projeto = $(this).data('projeto');
+        var status = $(this).val();
+        $('.overlay').show();
+        $.ajax({
+            type: "POST",
+            url: '/ajax-alterar-status-projetos',
+            data: {
+                'projeto_id': projeto,
+                'status': status,
+                '_token': $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                $('.overlay').hide();
+                if (data.success) {
+                    alert('Status alterado com sucesso');
+                } else {
+                    alert(data.message);
+                }
+
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                alert('Erro ao alterar status: ' + data.responseText);
+                $('.overlay').hide();
+            },
+
+        });
+
+    });
+
+    $(document).on('change', '.pesquisa_etapas_projetos', function (e) {
+        var projeto = $(this).data('projeto');
+        var sub_status_projetos_codigo = $(this).data('sub_status_projetos_codigo');
+        var etapa = $(this).val();
+
+        $('.overlay').show();
+        $.ajax({
+            type: "POST",
+            url: '/ajax-alterar-etapas-projetos',
+            data: {
+                'projeto_id': projeto,
+                'etapa': etapa,
+                'sub_status_projetos_codigo': sub_status_projetos_codigo,
+                '_token': $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                $('.overlay').hide();
+                if (data.success) {
+                    alert('Etapa alterada com sucesso');
+                } else {
+                    alert(data.message);
+                }
+
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                alert('Erro ao alterar a etapa: ' + data.responseText);
+                $('.overlay').hide();
+            },
+
+        });
+
+    });
+
 });
