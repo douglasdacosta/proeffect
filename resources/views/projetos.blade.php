@@ -323,7 +323,9 @@ use App\Http\Controllers\PedidosController;
                                                         <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
                                                         <td>
 
-                                                            <select class="form-control pesquisa_etapas_projetos" data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
+                                                            <select class="form-control pesquisa_etapas_projetos"
+                                                            @if($projeto['sub_status_projetos_codigo'] != 1) disabled="disabled" @endif
+                                                            data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
                                                                 <option @if(empty($projeto['etapas_projetos_id']) ) selected="selected" @endif value=""></option>
                                                                 @if (isset($AllEtapasProjetos))
                                                                     @foreach ($AllEtapasProjetos as $EtapasProjeto)
