@@ -145,3 +145,7 @@ Route::match(['get', 'post'],'/ajax-adicionar-apontamento-projetos', [App\Http\C
 Route::match(['get', 'post'],'/ajax-adicionar-funcionario-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAdicionarFuncionarioProjetos'])->name('ajax-adicionar-funcionario-projetos');
 Route::match(['get', 'post'],'/ajax-alterar-status-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAlterarStatusProjetos'])->name('ajaxAlterarStatusProjetos');
 Route::match(['get', 'post'],'/ajax-alterar-etapas-projetos', [App\Http\Controllers\AjaxController::class, 'ajaxAlterarEtapasProjetos'])->name('ajaxAlterarEtapasProjetos');
+
+Route::match(['get', 'post'],'/configuracoes-projetos', [App\Http\Controllers\ConfiguracoesProjetosController::class, 'index'])->name('configuracoes-projetos')->middleware('afterAuth:configuracoes-projetos');
+Route::match(['get', 'post'],'/alterar-configuracoes-projetos', [App\Http\Controllers\ConfiguracoesProjetosController::class, 'alterar'])->name('alterar-configuracoes-projetos')->middleware('afterAuth:configuracoes-projetos');
+Route::match(['get', 'post'],'/incluir-configuracoes-projetos', [App\Http\Controllers\ConfiguracoesProjetosController::class, 'incluir'])->name('incluir-configuracoes-projetos')->middleware('afterAuth:configuracoes-projetos');
