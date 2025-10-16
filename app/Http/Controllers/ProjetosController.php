@@ -16,6 +16,7 @@ use App\Models\HistoricosEtapasProjetos;
 use App\Models\TarefasProjetos;
 use DateTime;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ProjetosController extends Controller
 {
@@ -192,11 +193,14 @@ class ProjetosController extends Controller
 
                     $hoje = new DateTime();
 
-                    // Calculando a diferença entre as datas
-                    $diferenca = $hoje->diff($data_prazo_entrega)->days;
+                    // // Calculando a diferença entre as datas
+                    // $intervalo = $hoje->diff($data_prazo_entrega);
+                    // $diferenca = $intervalo->days * ($intervalo->invert ? -1 : 1);
+                    
+                    $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays(Carbon::now(), false);
                     $projeto->cor_alerta = 'green';
                     //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
-                    if($data_prazo_entrega->format('d/m/Y') < $hoje->format('d/m/Y')) {
+                    if($diferenca>0) {
                         $diferenca = $diferenca * -1;
                         $projeto->cor_alerta = 'red';
                     }
