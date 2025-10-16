@@ -118,6 +118,7 @@ class ManutencaoProducaoController extends Controller
                         ->join('pedidos', 'historicos_etapas.pedidos_id', '=', 'pedidos.id')
                         ->where('pedidos.id','=',$request->input('id'))
                         ->where('historicos_etapas.funcionarios_id','=',$funcionarios[0]->id)
+                        ->where('historicos_etapas.status_id' ,'=', $request->input('atualStatus'))
                         ->orderBy('historicos_etapas.pedidos_id', 'asc')
                         ->orderBy('historicos_etapas.status_id', 'asc')
                         ->orderBy('historicos_etapas.created_at', 'desc')
@@ -150,7 +151,7 @@ class ManutencaoProducaoController extends Controller
                                 throw new \Exception(' A próxima etapa deve ser PAUSA ou FINALIZADO');
                         }
                     }
-// dd($etapas);
+
                     if($select_etapa_manutencao == 4 ){
 
 
