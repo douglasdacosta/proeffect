@@ -226,10 +226,10 @@ class ProjetosController extends Controller
                     $projeto->data_prazo_entrega = $data_prazo_entrega->format('d/m/Y');
                     $hoje = new DateTime();
                     // Calculando a diferença entre as datas
-                    $diferenca = $hoje->diff($data_prazo_entrega)->days;
+                    $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays(Carbon::now(), false);
                     $projeto->cor_alerta = 'green';
                     //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
-                    if($data_prazo_entrega < $hoje) {
+                    if($diferenca > 0) {
                         $diferenca = $diferenca * -1;
                         $projeto->cor_alerta = 'red';
                     }
