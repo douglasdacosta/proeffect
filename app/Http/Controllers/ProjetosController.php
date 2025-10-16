@@ -180,7 +180,8 @@ class ProjetosController extends Controller
                     $prazo_entrega = $configuracaoProjetos['10_ou_mais_horas'];
                 }
 
-                if(!empty($prazo_entrega)) {
+                if(!empty($prazo_entrega) and $projeto->id_status == 4) {
+
                     $data_gerado= new DateTime($projeto->data_gerado);
 
                     //A DATA DO PRAZO ENTREGA É A SOMA DA DATA GERADO + PRAZO ENTREGA
@@ -195,17 +196,49 @@ class ProjetosController extends Controller
                     $diferenca = $hoje->diff($data_prazo_entrega)->days;
                     $projeto->cor_alerta = 'green';
                     //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
+                    if($data_prazo_entrega->format('d/m/Y') < $hoje->format('d/m/Y')) {
+                        $diferenca = $diferenca * -1;
+                        $projeto->cor_alerta = 'red';
+                    }
+                    $projeto->alerta_dias = $diferenca;
+                    if($data_prazo_entrega->format('d/m/Y') == $hoje->format('d/m/Y')) {
+                        $projeto->cor_alerta = 'green';
+                        $projeto->alerta_dias = 0;
+                    }
+
+
+                } else if($projeto->id_status == 3) { //EM AVALIAÇÃO
+
+                    if($projeto->sub_status_projetos_id == 3) {
+                        $prazo_entrega = $configuracaoProjetos['em_avaliacao'];
+                    } elseif($projeto->sub_status_projetos_id == 4) {
+                        $prazo_entrega = $configuracaoProjetos['elaboracao_design'];
+                    }
+
+                    $data_gerado= new DateTime($projeto->data_gerado);
+                    //A DATA DO PRAZO ENTREGA É A SOMA DA DATA GERADO + PRAZO ENTREGA
+                    $data_prazo_entrega = clone $data_gerado;
+                    $data_prazo_entrega->modify("+{$prazo_entrega} days");
+                    $projeto->data_prazo_entrega = $data_prazo_entrega->format('d/m/Y');
+                    $hoje = new DateTime();
+                    // Calculando a diferença entre as datas
+                    $diferenca = $hoje->diff($data_prazo_entrega)->days;
+                    $projeto->cor_alerta = 'green';
+                    //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
                     if($data_prazo_entrega < $hoje) {
                         $diferenca = $diferenca * -1;
                         $projeto->cor_alerta = 'red';
                     }
                     $projeto->alerta_dias = $diferenca;
+                    if($data_prazo_entrega->format('d/m/Y') == $hoje->format('d/m/Y')) {
+                        $projeto->cor_alerta = 'green';
+                        $projeto->alerta_dias = 0;
+                    }
+                    $projeto->alerta_dias = $diferenca;
 
-                } else {
+                }else {
                     $projeto->data_prazo_entrega = $projeto->alerta_dias = '';
                 }
-
-
             }
 
             $dados['departamentos'][$projeto->status_nome][] = array(
