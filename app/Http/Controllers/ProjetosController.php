@@ -10,6 +10,7 @@ use App\Providers\DateHelpers;
 use App\Models\StatusProjetos;
 use App\Models\SubStatusProjetos;
 use App\Http\Controllers\PedidosController;
+use App\Models\ConfiguracoesProjetos;
 use App\Models\EtapasProjetos;
 use App\Models\HistoricosEtapasProjetos;
 use App\Models\TarefasProjetos;
@@ -147,8 +148,66 @@ class ProjetosController extends Controller
 
         }
 
+        $configuracaoProjetos = new ConfiguracoesProjetos();
+        $configuracaoProjetos = $configuracaoProjetos->where('id', '=', 1)->first();
+
+        $configuracaoProjetos = json_decode($configuracaoProjetos->dados, true);
+
+        // dd($configuracaoProjetos);
+
         $dados = [];
         foreach ($projetos as $projeto) {
+
+
+            // array:6 [▼ // app/Http/Controllers/ProjetosController.php:156
+            //     "0_2_horas" => "1"
+            //     "2_6_horas" => "2"
+            //     "6_10_horas" => "3"
+            //     "em_avaliacao" => "5"
+            //     "10_ou_mais_horas" => "4"
+            //     "elaboracao_design" => "6"
+            //     ]
+
+            $prazo_entrega = '';
+            if(!empty($projeto->tempo_projetos)) {
+                if($projeto->tempo_projetos <= 2 && !empty($configuracaoProjetos['0_2_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['0_2_horas'];
+                } elseif($projeto->tempo_projetos > 2 && $projeto->tempo_projetos <= 6 && !empty($configuracaoProjetos['2_6_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['2_6_horas'];
+                } elseif($projeto->tempo_projetos > 6 && $projeto->tempo_projetos <= 10 && !empty($configuracaoProjetos['6_10_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['6_10_horas'];
+                } elseif($projeto->tempo_projetos > 10 && !empty($configuracaoProjetos['10_ou_mais_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['10_ou_mais_horas'];
+                }
+
+                if(!empty($prazo_entrega)) {
+                    $data_gerado= new DateTime($projeto->data_gerado);
+
+                    //A DATA DO PRAZO ENTREGA É A SOMA DA DATA GERADO + PRAZO ENTREGA
+                    $data_prazo_entrega = clone $data_gerado;
+
+                    $data_prazo_entrega->modify("+{$prazo_entrega} days");
+                    $projeto->data_prazo_entrega = $data_prazo_entrega->format('d/m/Y');
+
+                    $hoje = new DateTime();
+
+                    // Calculando a diferença entre as datas
+                    $diferenca = $hoje->diff($data_prazo_entrega)->days;
+                    $projeto->cor_alerta = 'green';
+                    //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
+                    if($data_prazo_entrega < $hoje) {
+                        $diferenca = $diferenca * -1;
+                        $projeto->cor_alerta = 'red';
+                    }
+                    $projeto->alerta_dias = $diferenca;
+
+                } else {
+                    $projeto->data_prazo_entrega = $projeto->alerta_dias = '';
+                }
+
+
+            }
+
             $dados['departamentos'][$projeto->status_nome][] = array(
                 'id' => $projeto->id,
                 'os' => $projeto->os,
@@ -179,7 +238,10 @@ class ProjetosController extends Controller
                 'em_alerta' => $projeto->em_alerta,
                 'com_pedido' => $projeto->com_pedido,
                 'etapas_projetos_nome' => $projeto->etapas_projetos_nome,
-                'etapas_projetos_id' => $projeto->etapas_projetos_id
+                'etapas_projetos_id' => $projeto->etapas_projetos_id,
+                'data_prazo_entrega' => $projeto->data_prazo_entrega ?? '',
+                'alerta_dias' => $projeto->alerta_dias ?? '',
+                'cor_alerta' => $projeto->cor_alerta ?? '',
             );
         }
 
@@ -189,6 +251,7 @@ class ProjetosController extends Controller
             'tela' => 'pesquisar',
             'nome_tela' => 'projetos',
             'dados' => $dados,
+            'configuracaoProjetos' => $configuracaoProjetos,
             'request' => $request,
             'AllEtapasProjetos' => $this->getAllEtapasProjetos(),
             'AllFuncionarios' => $this->getAllFuncionarios(),

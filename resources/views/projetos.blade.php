@@ -342,8 +342,8 @@ use App\Http\Controllers\PedidosController;
                                                             class="fas fa-users add_funcionarios_projetos"></i>
                                                         <td>{{ isset($projeto['tempo_projetos']) ? $projeto['tempo_projetos'] : '' }}</td>
                                                         <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
-                                                        <td>{{ !empty($projeto['data_entrega']) ? Carbon\Carbon::parse($projeto['data_entrega'])->format('d/m/Y') : '' }}</td>
-                                                        <td ></td>
+                                                        <td>{{ !empty($projeto['data_prazo_entrega']) ? $projeto['data_prazo_entrega'] : '' }}</td>
+                                                        <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? $projeto['alerta_dias'] : '' }}</td>
                                                         <td>
                                                             @if (isset($AllSubStatus))
 
