@@ -136,6 +136,8 @@ Route::match(['post'],'/ajax-salva-novo-apontamento', [App\Http\Controllers\Ajax
 Route::match(['post'],'/ajax-exclui-novo-apontamento', [App\Http\Controllers\AjaxController::class, 'ajaxExcluiNovoApontamento'])->name('ajax-exclui-novo-apontamento');
 
 Route::match(['get', 'post'],'/projetos', [App\Http\Controllers\ProjetosController::class, 'index'])->name('projetos')->middleware('afterAuth:projetos');
+Route::match(['get', 'post'],'/projetos-consulta-detalhes/{id}', [App\Http\Controllers\ProjetosController::class, 'consultaDetalhes'])->name('consulta-detalhes')->middleware('afterAuth:projetos');
+Route::match(['get', 'post'],'/projetos-ativa-desativa-alerta/{id}', [App\Http\Controllers\ProjetosController::class, 'ativaDesativaAlerta'])->name('ativa-desativa-alerta')->middleware('afterAuth:projetos');
 Route::match(['get', 'post'],'/alterar-projetos', [App\Http\Controllers\ProjetosController::class, 'alterar'])->name('alterar-projetos')->middleware('afterAuth:projetos');
 Route::match(['get', 'post'],'/incluir-projetos', [App\Http\Controllers\ProjetosController::class, 'incluir'])->name('incluir-projetos')->middleware('afterAuth:projetos');
 

@@ -230,21 +230,24 @@ $(function ($) {
 
         var projeto = $(this).data('projeto');
         var status = $(this).val();
-        $('.overlay').show();
-        $.ajax({
-            type: "POST",
-            url: '/ajax-alterar-status-projetos',
+
+        //se status = 1 redirecionar para alterar-projetos?id=170"
+        if (status == 1) {
+            $.ajax({
+            type: "GET",
+            url: '/projetos-consulta-detalhes/' + projeto + '/',
             data: {
                 'projeto_id': projeto,
-                'status': status,
                 '_token': $('meta[name="csrf-token"]').attr('content'),
             },
             success: function (data) {
-                $('.overlay').hide();
-                if (data.success) {
-                    alert('Status alterado com sucesso');
+
+                if (data.projeto.tempo_projetos == null || data.projeto.tempo_programacao == null) {
+
+                    alert('Obrigatório preencher o tempo de projetos e tempo de programação para LIBERADO PARA PROJETOS. Você será redirecionado para a página de alteração do projeto.');
+                    window.location.href = '/alterar-projetos?id=' + projeto;
                 } else {
-                    alert(data.message);
+                    alteraStatusProjeto(projeto, status);
                 }
 
             },
@@ -254,9 +257,43 @@ $(function ($) {
                 $('.overlay').hide();
             },
 
-        });
+            });
+        } else {
+            $('.overlay').show();
+            alteraStatusProjeto(projeto, status);
+        }
 
     });
+
+    function alteraStatusProjeto(projeto, status) {
+        $('.overlay').show();
+                    $.ajax({
+                        type: "POST",
+                        url: '/ajax-alterar-status-projetos',
+                        data: {
+                            'projeto_id': projeto,
+                            'status': status,
+                            '_token': $('meta[name="csrf-token"]').attr('content'),
+                        },
+                        success: function (data) {
+                            $('.overlay').hide();
+                            if (data.success) {
+                                alert('Status alterado com sucesso');
+                                //recarrega a tela sem histórico
+                                location.reload();
+                            } else {
+                                alert(data.message);
+                            }
+
+                        },
+                        error: function (data, textStatus, errorThrown) {
+
+                            alert('Erro ao alterar status: ' + data.responseText);
+                            $('.overlay').hide();
+                        },
+
+                    });
+    }
 
     $(document).on('change', '.pesquisa_etapas_projetos', function (e) {
         var projeto = $(this).data('projeto');
@@ -285,6 +322,41 @@ $(function ($) {
             error: function (data, textStatus, errorThrown) {
 
                 alert('Erro ao alterar a etapa: ' + data.responseText);
+                $('.overlay').hide();
+            },
+
+        });
+
+    });
+
+    $(document).on('click', '.toggle_alerta_projetos', function (e) {
+        var projeto_id = $(this).data('projeto_id');
+        //muda a cor a linha de acordo com o status atual
+
+
+
+        $('.overlay').show();
+        $.ajax({
+            type: "GET",
+            url: '/projetos-ativa-desativa-alerta/' + projeto_id + '/',
+            data: {
+                'projeto_id': projeto_id,
+                '_token': $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                $('.overlay').hide();
+                $('.linha_' + projeto_id).css('background-color', function() {
+                    return $(this).css('background-color') == 'rgb(242, 200, 7)' ? '' : '#F2C807';
+                });
+
+                $('.toggle_alerta_projetos[data-projeto_id="' + projeto_id + '"]').css('color', function() {
+                    return $(this).css('color') == 'rgb(217, 83, 79)' ? '#12ad04' : '#d9534f';
+                });
+
+            },
+            error: function (data, textStatus, errorThrown) {
+
+                alert('Erro ao alterar alerta: ' + data.responseText);
                 $('.overlay').hide();
             },
 

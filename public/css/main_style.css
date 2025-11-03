@@ -55,3 +55,12 @@
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 36px !important; /* Ajusta a altura da seta */
 }
+
+.alerta_limitador i {
+    animation: piscar 1s infinite;
+}
+
+@keyframes piscar {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+}

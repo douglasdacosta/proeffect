@@ -164,16 +164,30 @@
                                     } else {
                                         $previsao_meses = round($previsao_meses, 1);
                                     }
-                                     
+
+                                    $alerta_limitador = '';
+
+
+                                    // Verifica se estoque mínimo é menor que o limitador e ajusta os tipos de dados para comparar (estoque_minimo 207.000 e minimo_limitador 208000)
+                                    $estoque_minimo = (int) str_replace('.', '', $item_estoque['estoque_minimo']);
+                                    $minimo_limitador = (int) str_replace('.', '', $item_estoque['minimo_limitador']);
+
+                                    if($estoque_minimo < (empty($minimo_limitador) ? 0 : $minimo_limitador)) {
+                                        $alerta_limitador = 'alerta_limitador';
+                                    }
+
                                     @endphp
                                     <td data-field="pacote" >{{ $estoque_total }}</td>
                                     <td data-field="pacote" >{{$item_estoque['pacote']}}</td>
+
                                     <td data-field="estoqu_minimo" >{{$item_estoque['estoque_minimo']}}</td>
                                     <td>
                                         <input type="checkbox" class="form-check-input inventarios" data-estoque="{{$item_estoque['id']}}" id="ck_inventario_{{$item_estoque['id']}}" name="ck_inventario_{{$item_estoque['id']}}"
                                         @if(isset($item_estoque['inventario']) && $item_estoque['inventario'] == 1) checked="checked" @endif value='1' >
                                     </td>
-                                    <td data-field="alerta" >@if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif</td>
+                                    <td data-field="alerta" class='{{$alerta_limitador}}' title="@if (empty($item_estoque['minimo_limitador'])) Limitador mínimo não configurado @else Mínimo limitador em '{{number_format($item_estoque['minimo_limitador'], '0', '', '.')}}' @endif">
+                                        @if($item_estoque['alerta'] == 0) <i class="text-danger fas fa-arrow-down"></i> @else <i class="text-success fas fa-arrow-up"></i> @endif
+                                    </td>
                                     <td data-field="previsao" title="{{$previsao_meses}} meses">{{ $previsao_meses }}</td>
                                     <th  scope="row">
                                         <a href="#">

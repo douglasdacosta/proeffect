@@ -169,6 +169,12 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="minimo_limitador" class="col-sm-2 col-form-label">Mínimo limitador</label>
+                <div class="col-sm-2">
+                <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="minimo_limitador" name="minimo_limitador" value="@if (isset($materiais[0]->minimo_limitador)){{$materiais[0]->minimo_limitador}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="consumo_medio_mensal" class="col-sm-2 col-form-label">Consumo médio mensal</label>
                 <div class="col-sm-2">
                 <input type="text" pattern="[0-9]+$" class="form-control sonumeros" id="consumo_medio_mensal" name="consumo_medio_mensal" value="@if (isset($materiais[0]->consumo_medio_mensal)){{$materiais[0]->consumo_medio_mensal}}@else{{''}}@endif">

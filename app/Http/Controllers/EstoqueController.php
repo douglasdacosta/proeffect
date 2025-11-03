@@ -129,7 +129,8 @@ class EstoqueController extends Controller
                                             B.material,
                                             A.material_id,
                                             B.consumo_medio_mensal,
-                                            A.alerta_baixa_errada
+                                            A.alerta_baixa_errada,
+                                            B.minimo_limitador
                                         FROM
                                             estoque A
                                         INNER JOIN
@@ -244,6 +245,7 @@ class EstoqueController extends Controller
             $array_estoque[$value->id]['estoque_comprado'] = number_format($estoque_comprado,0, '','.');
             $array_estoque[$value->id]['estoque_minimo'] = number_format($value->estoque_minimo,0, '','.');
             $array_estoque[$value->id]['estoque_atual'] = number_format($value->estoque_atual,0, '','.');
+            $array_estoque[$value->id]['minimo_limitador'] = $value->minimo_limitador;
             $array_totais[$value->material][] = $value->estoque_atual;
             $array_estoque[$value->id]['alerta_baixa_errada'] = $value->alerta_baixa_errada;
             $array_estoque[$value->id]['alerta_estoque_zerado'] = ($value->estoque_atual == 0 && $value->estoque_minimo > 0) ? 1 : 0;
@@ -522,7 +524,7 @@ class EstoqueController extends Controller
             info('Valor Unitário: ' . DateHelpers::formatFloatValue($valor_unitario));
             $valor_unitario = DateHelpers::formatFloatValue($valor_unitario);
             if($valor_unitario == 0) {
-                
+
                 //busca o valor do ultimo lote do mesmo material que tenha valor maior que 0
                 $ultimoEstoque = Estoque::where('material_id', $material->id)
                                 ->where('valor_unitario', '>', 0)

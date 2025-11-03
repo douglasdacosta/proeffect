@@ -253,6 +253,7 @@ use App\Http\Controllers\PedidosController;
                                         <thead>
                                             <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
                                                 <th style="min-width: 50px;">ID</th>
+                                                <th style="min-width: 50px;">Muda Alerta</th>
                                                 <th style="min-width: 150px;">Cliente</th>
                                                 <th style="min-width: 100px;">EP</th>
                                                 <th style="min-width: 150px;">Data solicitação</th>
@@ -295,22 +296,19 @@ use App\Http\Controllers\PedidosController;
                                                         }
 
                                                     }
-                                                    $tempo_desenvolvimento_em_dias = '';
-                                                    if( in_array($projeto['etapas_projetos_id'], [1,2,3,4]) ){
 
-                                                        $data_gerado = $projeto['data_gerado'];
-                                                        $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_gerado)->diffInDays(\Carbon\Carbon::now());
-                                                    }else {
-
-                                                        $data_historico = $projeto['data_historico'];
-                                                        $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_historico)->diffInDays(\Carbon\Carbon::now());
-                                                    }
-
+                                                    $data_historico = $projeto['data_historico'];
+                                                    $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_historico)->diffInDays(\Carbon\Carbon::now());
 
                                                 @endphp
                                                 @if(isset($projeto['id']))
-                                                    <tr @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807" @endif >
+                                                    <tr class="linha_{{ $projeto['id'] }}" @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807" @endif >
                                                         <th scope="row"><a href={{ URL::route($rotaAlterar, ['id' => $projeto['id']]) }}>{{ $projeto['id'] }}</a></th>
+                                                        <td>
+                                                            <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
+                                                            @if (isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) color:#d9534f @else color:#12ad04 @endif"
+                                                            class="fas fa-bell toggle_alerta_projetos"></i>
+                                                        </td>
                                                         <td title="{{ trim($projeto['nome_cliente']) }}">{{ strlen(trim($projeto['nome_cliente'])) > 9 ? substr(trim($projeto['nome_cliente']), 0, 9) . '...' : trim($projeto['nome_cliente']) }}</td>
 
                                                         <td>{{ $projeto['ep'] }}</td>

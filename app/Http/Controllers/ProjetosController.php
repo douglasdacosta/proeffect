@@ -196,7 +196,7 @@ class ProjetosController extends Controller
                     // // Calculando a diferença entre as datas
                     // $intervalo = $hoje->diff($data_prazo_entrega);
                     // $diferenca = $intervalo->days * ($intervalo->invert ? -1 : 1);
-                    
+
                     $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays(Carbon::now(), false);
                     $projeto->cor_alerta = 'green';
                     //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
@@ -325,6 +325,33 @@ class ProjetosController extends Controller
                 return $b['etapas_projetos_id'] <=> $a['etapas_projetos_id'];
             });
         }
+    }
+
+    public function consultaDetalhes(Request $request, $id)
+    {
+        $projeto = Projetos::find($id);
+
+        if (!$projeto) {
+            return response()->json(['error' => 'Projeto não encontrado'], 404);
+        }
+
+        // Retorne os detalhes do projeto como JSON
+        return response()->json(['projeto' => $projeto]);
+    }
+
+    public function ativaDesativaAlerta(Request $request, $id)
+    {
+        $projeto = Projetos::find($id);
+
+        if (!$projeto) {
+            return response()->json(['error' => 'Projeto não encontrado'], 404);
+        }
+
+        // Alterna o valor de em_alerta
+        $projeto->em_alerta = !$projeto->em_alerta;
+        $projeto->save();
+
+        return response()->json(['success' => true, 'em_alerta' => $projeto->em_alerta]);
     }
 
     /**
