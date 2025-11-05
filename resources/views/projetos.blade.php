@@ -297,8 +297,17 @@ use App\Http\Controllers\PedidosController;
 
                                                     }
 
-                                                    $data_historico = $projeto['data_historico'];
-                                                    $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_historico)->diffInDays(\Carbon\Carbon::now());
+                                                    $tempo_desenvolvimento_em_dias = '';
+                                                    if( in_array($projeto['etapas_projetos_id'], [1,2,3,4]) ){
+
+                                                        $data_gerado = $projeto['data_gerado'];
+                                                        $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_gerado)->diffInDays(\Carbon\Carbon::now());
+                                                    }else {
+
+                                                        $data_historico = $projeto['data_historico'];
+                                                        $tempo_desenvolvimento_em_dias = \Carbon\Carbon::createFromDate($data_historico)->diffInDays(\Carbon\Carbon::now());
+                                                    }
+
 
                                                 @endphp
                                                 @if(isset($projeto['id']))
@@ -341,7 +350,7 @@ use App\Http\Controllers\PedidosController;
                                                         <td>{{ isset($projeto['tempo_projetos']) ? $projeto['tempo_projetos'] : '' }}</td>
                                                         <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
                                                         <td>{{ !empty($projeto['data_prazo_entrega']) ? $projeto['data_prazo_entrega'] : '' }}</td>
-                                                        <td style="color: {{ $projeto['cor_alerta'] }};">{{ $projeto['alerta_dias'] }}</td>
+                                                        <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
                                                         <td>
                                                             @if (isset($AllSubStatus))
 
@@ -366,8 +375,10 @@ use App\Http\Controllers\PedidosController;
                                                         </td>
                                                         <td title="{{ trim($projeto['transporte']) }}">{{ strlen(trim($projeto['transporte'])) > 20 ? substr(trim($projeto['transporte']), 0, 20) . '...' : trim($projeto['transporte']) }}</td>
 
-                                                        <td>{{ $tempo_desenvolvimento_em_dias }}</td>
-                                                        <td>{{ isset($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}</td>
+                                                        <td>{{ $tempo_desenvolvimento_em_dias . $projeto['data_historico']}}</td>
+                                                        <td>
+                                                            {{ !empty($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}
+                                                        </td>
                                                         <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 10 ? substr(trim($projeto['mensagem']), 0, 10) . '...' : trim($projeto['mensagem']) }}</td>
                                                         <td nowrap >
                                                             @if($projeto['compromisso'] == 1)
@@ -391,6 +402,7 @@ use App\Http\Controllers\PedidosController;
                                         <tfoot>
                                             <tr>
                                                 <th style="min-width: 50px;"></th>
+                                                <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 100px;"></th>
                                                 <th style="min-width: 150px;"></th>

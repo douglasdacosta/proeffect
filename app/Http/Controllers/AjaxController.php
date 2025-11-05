@@ -420,22 +420,48 @@ class AjaxController extends Controller
 
 
     function ajaxAlterarStatusProjetos(Request $request){
-        $status = $request->input('status');
-        $projeto_id = $request->input('projeto_id');
+        $status_id = $request->input('status');
+        $id = $request->input('projeto_id');
+
+        $projeto = new Projetos();
+        $projeto = $projeto::find($id);
 
         $projetosController = new ProjetosController();
-        $status_projetos_id = $projetosController->getSubStatus($status);
+        $status_projetos_id = $projetosController->getSubStatus($status_id);
         $sub_status_projetos_codigo = $status_projetos_id[0]['codigo'];
+        $sub_status_projetos_id = $status_projetos_id[0]['id'];
         $status_projetos_id = $status_projetos_id[0]['status_projetos_id'];
 
-        if(empty($status) || empty($projeto_id)) {
+        $em_alerta = 1;
+        if($projeto->sub_status_projetos_codigo != $status_id){
+            $projeto->data_status = date('Y-m-d');
+
+            $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
+            $HistoricosEtapasProjetos->projetos_id = $projeto->id;
+            $HistoricosEtapasProjetos->status_projetos_id = $status_projetos_id;
+            $HistoricosEtapasProjetos->sub_status_projetos_id = $sub_status_projetos_id;
+            $HistoricosEtapasProjetos->funcionarios_id = Auth::user()->id;
+            $HistoricosEtapasProjetos->etapas_pedidos_id = $projeto->etapa_projeto_id;
+            $HistoricosEtapasProjetos->save();
+
+        }
+
+        if($projeto->etapa_projeto_id == 5  && $status_id == 36) {
+            $em_alerta = 0;
+        }
+
+
+
+
+        if(empty($status_id) || empty($id)) {
             return response()->json(['error' => 'Dados incompletos para alterar status.'], 400);
         }
 
         try {
-            DB::table('projetos')->where('id', $projeto_id)->update([
+            DB::table('projetos')->where('id', $id)->update([
                 'sub_status_projetos_codigo' => $sub_status_projetos_codigo,
-                'status_projetos_id' => $status_projetos_id
+                'status_projetos_id' => $status_projetos_id,
+                'em_alerta' => $em_alerta,
 
             ]);
 

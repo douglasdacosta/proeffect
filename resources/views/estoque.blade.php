@@ -130,7 +130,7 @@
                         <th data-sortable='true' >Pacote</th>
                         <th data-sortable='true' >Estoque mínimo</th>
                         <th data-sortable='false' >Inventário <button type="button" class="btn btn-warning" id="btn_limpar_inventario" title="Limpar Inventário"><i class="fa fa-trash"></i></button></th>
-                        <th data-sortable='true' >Alerta</th>
+                        <th style="max-width: 10px" data-sortable='true' >Alerta</th>
                         <th data-sortable='true' >Previsão</th>
                         <th data-sortable='false' >Etiqueta</th>
                     </tr>

@@ -22,30 +22,42 @@
 
                 <input type="hidden" id="id" name="id"  value="@if (isset($configuracoes[0]->id)){{$configuracoes[0]->id}}@else{{''}}@endif">
                 <div class="form-group row">
-                    <label for="0_2_horas" class="col-sm-1 col-form-label text-right" title=''>0-2 Dias</label>
+                    <label for="0_2_horas" class="col-sm-1 col-form-label text-right" title=''>0-2 horas</label>
                     <div class="col-sm-1">
                         <input type="text" class="form-control" id="0_2_horas" placeholder="XX dias úteis" name="0_2_horas" value="@if (isset($configuracoes['0_2_horas'])){{$configuracoes['0_2_horas']}}@else{{''}}@endif">
                     </div>
+                    <div class="col-sm-1">
+                        <label class="col-sm-1 col-form-label text-left" title=''>dias</label>
+                    </div>
                 </div>
 
                 <div class="form-group row">
-                    <label for="2_6_horas" class="col-sm-1 col-form-label text-right" title=''>2-6 Dias</label>
+                    <label for="2_6_horas" class="col-sm-1 col-form-label text-right" title=''>2-6 horas</label>
                     <div class="col-sm-1">
                         <input type="text" class="form-control" id="2_6_horas" placeholder="XX dias úteis" name="2_6_horas" value="@if (isset($configuracoes['2_6_horas'])){{$configuracoes['2_6_horas']}}@else{{''}}@endif">
                     </div>
-                </div>
-
-                <div class="form-group row">
-                    <label for="6_10_horas" class="col-sm-1 col-form-label text-right" title=''>6-10 Dias</label>
                     <div class="col-sm-1">
-                        <input type="text" class="form-control" id="6_10_horas" placeholder="XX dias úteis" name="6_10_horas" value="@if (isset($configuracoes['6_10_horas'])){{$configuracoes['6_10_horas']}}@else{{''}}@endif">
+                        <label class="col-sm-1 col-form-label text-left" title=''>dias</label>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label for="10_ou_mais_horas" class="col-sm-1 col-form-label text-right" title=''>10 ou mais Dias</label>
+                    <label for="6_10_horas" class="col-sm-1 col-form-label text-right" title=''>6-10 horas</label>
+                    <div class="col-sm-1">
+                        <input type="text" class="form-control" id="6_10_horas" placeholder="XX dias úteis" name="6_10_horas" value="@if (isset($configuracoes['6_10_horas'])){{$configuracoes['6_10_horas']}}@else{{''}}@endif">
+                    </div>
+                    <div class="col-sm-1">
+                        <label class="col-sm-1 col-form-label text-left" title=''>dias</label>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="10_ou_mais_horas" class="col-sm-1 col-form-label text-right" title=''>10 ou mais horas</label>
                     <div class="col-sm-1">
                         <input type="text" class="form-control" id="10_ou_mais_horas" placeholder="XX dias úteis" name="10_ou_mais_horas" value="@if (isset($configuracoes['10_ou_mais_horas'])){{$configuracoes['10_ou_mais_horas']}}@else{{''}}@endif">
+                    </div>
+                    <div class="col-sm-1">
+                        <label class="col-sm-1 col-form-label text-left" title=''>dias</label>
                     </div>
                 </div>
 
@@ -56,12 +68,18 @@
                     <div class="col-sm-1">
                         <input type="text" class="form-control" id="em_avaliacao" placeholder="XX dias úteis" name="em_avaliacao" value="@if (isset($configuracoes['em_avaliacao'])){{$configuracoes['em_avaliacao']}}@else{{''}}@endif">
                     </div>
+                    <div class="col-sm-1">
+                        <label class="col-sm-1 col-form-label text-left" title=''>dias</label>
+                    </div>
                 </div>
 
                 <div class="form-group row">
                     <label for="elaboracao_design" class="col-sm-1 col-form-label text-right" title=''>Elaboração Design</label>
                     <div class="col-sm-1">
                         <input type="text" class="form-control" id="elaboracao_design" placeholder="XX dias úteis" name="elaboracao_design" value="@if (isset($configuracoes['elaboracao_design'])){{$configuracoes['elaboracao_design']}}@else{{''}}@endif">
+                    </div>
+                    <div class="col-sm-1">
+                        <label class="col-sm-1 col-form-label text-left" title=''>dias</label>
                     </div>
                 </div>
 

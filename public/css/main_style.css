@@ -56,8 +56,18 @@
     height: 36px !important; /* Ajusta a altura da seta */
 }
 
+.alerta_limitador {
+    font-size: 24px;
+    animation: piscar 1s infinite;
+    background-color: yellow;
+    border-radius: 50%;
+}
+
 .alerta_limitador i {
     animation: piscar 1s infinite;
+    background-color: yellow;
+    border-radius: 50%;
+
 }
 
 @keyframes piscar {

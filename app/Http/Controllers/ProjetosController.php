@@ -159,47 +159,38 @@ class ProjetosController extends Controller
         $dados = [];
         foreach ($projetos as $projeto) {
 
-
-            // array:6 [▼ // app/Http/Controllers/ProjetosController.php:156
-            //     "0_2_horas" => "1"
-            //     "2_6_horas" => "2"
-            //     "6_10_horas" => "3"
-            //     "em_avaliacao" => "5"
-            //     "10_ou_mais_horas" => "4"
-            //     "elaboracao_design" => "6"
-            //     ]
-
             $prazo_entrega = '';
             if(!empty($projeto->tempo_projetos)) {
-                if($projeto->tempo_projetos <= 2 && !empty($configuracaoProjetos['0_2_horas'])) {
+                $t = explode(':', $projeto->tempo_projetos);
+                $horas = (int)$t[0];
+                $minutos = isset($t[1]) ? (int)$t[1] : 0;
+                $segundos = isset($t[2]) ? (int)$t[2] : 0;
+                $tempo_projeto = number_format($horas + ($minutos / 60) + ($segundos / 3600), 2);
+
+                if($tempo_projeto <= 2 && !empty($configuracaoProjetos['0_2_horas'])) {
                     $prazo_entrega = $configuracaoProjetos['0_2_horas'];
-                } elseif($projeto->tempo_projetos > 2 && $projeto->tempo_projetos <= 6 && !empty($configuracaoProjetos['2_6_horas'])) {
+                } elseif($tempo_projeto > 2 && $tempo_projeto <= 6 && !empty($configuracaoProjetos['2_6_horas'])) {
                     $prazo_entrega = $configuracaoProjetos['2_6_horas'];
-                } elseif($projeto->tempo_projetos > 6 && $projeto->tempo_projetos <= 10 && !empty($configuracaoProjetos['6_10_horas'])) {
+                } elseif($tempo_projeto > 6 && $tempo_projeto <= 10 && !empty($configuracaoProjetos['6_10_horas'])) {
                     $prazo_entrega = $configuracaoProjetos['6_10_horas'];
-                } elseif($projeto->tempo_projetos > 10 && !empty($configuracaoProjetos['10_ou_mais_horas'])) {
+                } elseif($tempo_projeto > 10 && !empty($configuracaoProjetos['10_ou_mais_horas'])) {
                     $prazo_entrega = $configuracaoProjetos['10_ou_mais_horas'];
                 }
 
                 if(!empty($prazo_entrega) and $projeto->id_status == 4) {
 
-                    $data_gerado= new DateTime($projeto->data_gerado);
+                    $data_historico= new DateTime($projeto->data_historico);
+                    $data_prazo_entrega = clone $data_historico;
 
-                    //A DATA DO PRAZO ENTREGA É A SOMA DA DATA GERADO + PRAZO ENTREGA
-                    $data_prazo_entrega = clone $data_gerado;
-
-                    $data_prazo_entrega->modify("+{$prazo_entrega} days");
+                    $data_prazo_entrega = Carbon::parse($data_prazo_entrega);
+                    $data_prazo_entrega->addWeekdays($prazo_entrega);
                     $projeto->data_prazo_entrega = $data_prazo_entrega->format('d/m/Y');
 
                     $hoje = new DateTime();
 
-                    // // Calculando a diferença entre as datas
-                    // $intervalo = $hoje->diff($data_prazo_entrega);
-                    // $diferenca = $intervalo->days * ($intervalo->invert ? -1 : 1);
-
                     $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays(Carbon::now(), false);
                     $projeto->cor_alerta = 'green';
-                    //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
+
                     if($diferenca>0) {
                         $diferenca = $diferenca * -1;
                         $projeto->cor_alerta = 'red';
@@ -211,38 +202,42 @@ class ProjetosController extends Controller
                     }
 
 
-                } else if($projeto->id_status == 3) { //EM AVALIAÇÃO
-
-                    if($projeto->sub_status_projetos_id == 3) {
-                        $prazo_entrega = $configuracaoProjetos['em_avaliacao'];
-                    } elseif($projeto->sub_status_projetos_id == 4) {
-                        $prazo_entrega = $configuracaoProjetos['elaboracao_design'];
-                    }
-
-                    $data_gerado= new DateTime($projeto->data_gerado);
-                    //A DATA DO PRAZO ENTREGA É A SOMA DA DATA GERADO + PRAZO ENTREGA
-                    $data_prazo_entrega = clone $data_gerado;
-                    $data_prazo_entrega->modify("+{$prazo_entrega} days");
-                    $projeto->data_prazo_entrega = $data_prazo_entrega->format('d/m/Y');
-                    $hoje = new DateTime();
-                    // Calculando a diferença entre as datas
-                    $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays(Carbon::now(), false);
-                    $projeto->cor_alerta = 'green';
-                    //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
-                    if($diferenca > 0) {
-                        $diferenca = $diferenca * -1;
-                        $projeto->cor_alerta = 'red';
-                    }
-                    $projeto->alerta_dias = $diferenca;
-                    if($data_prazo_entrega->format('d/m/Y') == $hoje->format('d/m/Y')) {
-                        $projeto->cor_alerta = 'green';
-                        $projeto->alerta_dias = 0;
-                    }
-                    $projeto->alerta_dias = $diferenca;
-
-                }else {
+                } else {
                     $projeto->data_prazo_entrega = $projeto->alerta_dias = '';
                 }
+            }
+
+            if($projeto->id_status == 3) { //EM AVALIAÇÃO
+
+                if($projeto->sub_status_projetos_id == 3) {
+                    $prazo_entrega = $configuracaoProjetos['em_avaliacao'];
+                } elseif($projeto->sub_status_projetos_id == 4) {
+                    $prazo_entrega = $configuracaoProjetos['elaboracao_design'];
+                }
+
+                $data_historico= new DateTime($projeto->data_historico);
+                //A DATA DO PRAZO ENTREGA É A SOMA DA DATA GERADO + PRAZO ENTREGA
+                $data_prazo_entrega = clone $data_historico;
+
+                $data_prazo_entrega = Carbon::parse($data_prazo_entrega);
+                $data_prazo_entrega->addWeekdays($prazo_entrega);
+                $projeto->data_prazo_entrega = $data_prazo_entrega->format('d/m/Y');
+                $hoje = new DateTime();
+                // Calculando a diferença entre as datas
+                $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays(Carbon::now(), false);
+                $projeto->cor_alerta = 'green';
+                //A DIFERENÇA ENTRE A DATA ATUAL E A DATA DO PRAZO DE ENTREGA, se for negativa, já passou do prazo e mostra numero negativo
+                if($diferenca > 0) {
+                    $diferenca = $diferenca * -1;
+                    $projeto->cor_alerta = 'red';
+                }
+                $projeto->alerta_dias = $diferenca;
+                if($data_prazo_entrega->format('d/m/Y') == $hoje->format('d/m/Y')) {
+                    $projeto->cor_alerta = 'green';
+                    $projeto->alerta_dias = 0;
+                }
+                $projeto->alerta_dias = $diferenca;
+
             }
 
             $dados['departamentos'][$projeto->status_nome][] = array(
