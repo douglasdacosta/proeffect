@@ -299,7 +299,7 @@ class PainelController extends Controller
             }
 
             $pedidos[$key]->blanks = $qdte_blank;
-            $pedidos[$key]->conjuntos = count($conjuntos['conjuntos']);
+            $pedidos[$key]->conjuntos = !empty($conjuntos['conjuntos']) ? count($conjuntos['conjuntos']) : 0;
 
             if(isset($pedidos[$key-1]) && $pedidos[$key-1]->os_validar == $pedidos[$key]->os_validar && $pedidos[$key-1]->ep_validar == $pedidos[$key]->ep_validar) {
                 $pedidos[$key]->os = '';
