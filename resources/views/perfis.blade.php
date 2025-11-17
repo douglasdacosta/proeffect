@@ -105,29 +105,44 @@
             </div>
 
             <div class="form-group row">
-                <div class="col-sm-6">
-                    <label for="tela" class="col-sm-2 col-form-label">Telas</label>
-                    <div class="col-sm-6">
-                        @foreach ($telas as $tela)
-                            <div class="form-check row">
-                                <input class="form-check-input" name="telas[]" value="{{$tela->id}}" type="checkbox" @if($tela->checked){{'checked'}}@endif/>
-                                <label class="form-check-label" for="{{$tela->id}}">{{$tela->nome}}</label>
-                            </div>
-                        @endforeach
+                    <div class="container-fluid">
+                        <label for="tela" class="col-sm-2 col-form-label ">Permissão de Telas</label>
+                        <div class="form-group row">
+                                @foreach ($telas as $tela)
+                                    <div class="card ml-2 p-4" style="width: 18rem;">
+                                        <div class="card-body">
+                                            <input class="form-check-input" name="telas[]" value="{{$tela->id}}" type="checkbox" @if($tela->checked){{'checked'}}@endif/>
+                                            <label class="form-check-label font-weight-bold" for="{{$tela->id}}">{{$tela->nome}}</label>
+                                            @foreach ($acoes as $acao)
+                                                @if($acao->submenus_id == $tela->id)
+                                                    <div class="form-check row">
+                                                        <input class="form-check-input" name="permissoes[]" value="{{$tela->id}}_{{$acao->id}}" type="checkbox"
+                                                            @if(!empty($perfis[0]->id) && !empty($permissoes[$perfis[0]->id][$tela->id]['acoes']) && in_array($acao->id, $permissoes[$perfis[0]->id][$tela->id]['acoes'])) {{'checked'}} @endif/>
+                                                        <label class="form-check-label" for="{{$acao->id}}">{{$acao->nome}}</label>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+
+                                    </div>
+                                @endforeach
+                        </div>
+                    </div>
+                    <div class="container-fluid">
+                        <label for="tela" class="col-sm-2 col-form-label ">Permissão de Dashboasds</label>
+                        <div class="form-group row">
+                                @foreach ($dashboards as $dashboard)
+                                    <div class="card ml-2 p-4" style="width: 18rem;">
+                                        <div class="card-body">
+                                            <input class="form-check-input" name="dashboard[]" value="{{$dashboard->id}}" type="checkbox" @if($dashboard->checked){{'checked'}}@endif/>
+                                            <label class="form-check-label font-weight-bold" for="{{$dashboard->id}}">{{$tela->nome}}</label>
+                                        </div>
+
+                                    </div>
+                                @endforeach
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6">
-                    <label for="dashboards" class="col-sm-2 col-form-label">Dashboasds</label>
-                    <div class="col-sm-6">
-                        @foreach ($dashboards as $dashboard)
-                            <div class="form-check row">
-                                <input class="form-check-input" name="dashboards[]" value="{{$dashboard->id}}" type="checkbox" @if($dashboard->checked){{'checked'}}@endif/>
-                                <label class="form-check-label" for="{{$dashboard->id}}">{{$dashboard->nome}}</label>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
 
                 <label for="status" class="col-sm-2 col-form-label"></label>
                 <select class="form-control col-md-1" id="status" name="status">

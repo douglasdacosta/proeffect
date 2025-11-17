@@ -6,12 +6,16 @@ use App\Http\Controllers\Auth\ValidaPermissaoAcessoController;
 use App\Models\Dashboards;
 use App\Models\PerfilSubmenus;
 use App\Models\Perfis;
+use App\Models\Acoes;
 use App\Models\PerfisDashboards;
+use App\Models\PermissoesPerfis;
 use App\Models\SubMenus;
 use Illuminate\Http\Request;
 
 class PerfisController extends Controller
 {
+    public $permissoes_liberadas = [];
+
     /**
      * Create a new controller instance.
      *
@@ -30,6 +34,7 @@ class PerfisController extends Controller
      */
     public function index(Request $request)
     {
+
         $perfis = new Perfis();
 
         $id = !empty($request->input('id')) ? ($request->input('id')) : ( !empty($id) ? $id : false );
@@ -89,12 +94,18 @@ class PerfisController extends Controller
         $perfis_dashboards = new PerfisDashboards();
         $perfis_dashboards = $perfis_dashboards->where('status', '=', 'A')->get();
 
+        $this->permissoes_liberadas = (new ValidaPermissaoAcessoController())->validaAcaoLiberada(16, (new ValidaPermissaoAcessoController())->retornaPerfil());
+
+        $acoes = new Acoes();
+        $acoes = $acoes->get();
 
         $tela = 'incluir';
     	$data = array(
 				'tela' => $tela,
                 'nome_tela' => 'perfis',
                 'telas' => $telas,
+                'acoes' => $acoes,
+                'permissoes_liberadas' => $this->permissoes_liberadas,
                 'dashboards' => $dashboards,
 				'request' => $request,
 				'rotaIncluir' => 'incluir-perfis',
@@ -135,6 +146,7 @@ class PerfisController extends Controller
         $PerfilSubmenus = new PerfilSubmenus();
         $PerfilSubmenus = $PerfilSubmenus->where('perfil_id', '=', $request->input('id'))->get()->toArray();
 
+        $array_PermissoesPerfis = array();
         foreach ($telas as $key => $value) {
 
             $value->checked = false;
@@ -143,6 +155,16 @@ class PerfisController extends Controller
                     $value->checked = true;
                 }
             }
+
+            $PermissoesPerfis = new PermissoesPerfis();
+
+
+            $permissoes = $PermissoesPerfis->where('perfil_id', '=', $request->input('id'))->where('submenus_id', '=', $value->id)->get()->toArray();
+
+            foreach ($permissoes as $key => $permissao) {
+                $array_PermissoesPerfis[$request->input('id')][$value->id]['acoes'][] = $permissao['acao_id'];
+            }
+
         }
 
 
@@ -161,13 +183,17 @@ class PerfisController extends Controller
             }
         }
 
+        $acoes = new Acoes();
+        $acoes = $acoes->get();
 
         $tela = 'alterar';
     	$data = array(
 				'tela' => $tela,
                 'nome_tela' => 'perfis',
                 'telas' => $telas,
+                'acoes' => $acoes,
                 'dashboards' => $dashboards,
+                'permissoes' => $array_PermissoesPerfis,
 				'perfis'=> $perfis,
 				'request' => $request,
 				'rotaIncluir' => 'incluir-perfis',
@@ -186,6 +212,7 @@ class PerfisController extends Controller
 
         $perfis->nome = $request->input('nome');
         $perfis->status = $request->input('status');
+        $permissoes = $request->input('permissoes');
 
         $perfis->save();
 
@@ -214,6 +241,21 @@ class PerfisController extends Controller
         }else {
             // Se nenhum dashboard for selecionado, remove todos os dashboards do perfil
             $perfis->perfis_dashboards()->sync([]);
+        }
+
+        PermissoesPerfis::where('perfil_id', $perfis->id)->delete();
+
+        foreach ($permissoes as $key => $permissao) {
+            list($tela, $acao) = explode("_", $permissao);
+
+            PermissoesPerfis::updateOrCreate(
+                [
+                    'perfil_id' => $perfis->id,
+                    'acao_id' => $acao,
+                    'submenus_id' => $tela
+                ],
+                []
+            );
         }
 
         return $perfis->id;

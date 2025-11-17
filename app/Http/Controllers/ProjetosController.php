@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Auth\ValidaPermissaoAcessoController;
 use App\Models\Funcionarios;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -20,6 +21,8 @@ use Carbon\Carbon;
 
 class ProjetosController extends Controller
 {
+    public $permissoes_liberadas = [];
+
     /**
     * Create a new controller instance.
     *
@@ -39,6 +42,9 @@ class ProjetosController extends Controller
     {
 
         // dd($request->all());
+
+        $this->permissoes_liberadas = (new ValidaPermissaoAcessoController())->validaAcaoLiberada(22, (new ValidaPermissaoAcessoController())->retornaPerfil());
+
         $funcionarios = new Funcionarios();
         $funcionarios = $funcionarios->where('status','=','A')->orderby('nome')->get();
 
@@ -285,6 +291,7 @@ class ProjetosController extends Controller
             'dados' => $dados,
             'configuracaoProjetos' => $configuracaoProjetos,
             'request' => $request,
+            'permissoes_liberadas' => $this->permissoes_liberadas,
             'AllEtapasProjetos' => $this->getAllEtapasProjetos(),
             'AllFuncionarios' => $this->getAllFuncionarios(),
             'AllStatus' => $this->getAllStatus(),
