@@ -169,10 +169,10 @@
 
 
                                     // Verifica se estoque mínimo é menor que o limitador e ajusta os tipos de dados para comparar (estoque_minimo 207.000 e minimo_limitador 208000)
-                                    $estoque_minimo = (int) str_replace('.', '', $item_estoque['estoque_minimo']);
+                                    $estoque_total_calculo = (int) str_replace('.', '', $estoque_total_float);
                                     $minimo_limitador = (int) str_replace('.', '', $item_estoque['minimo_limitador']);
 
-                                    if($estoque_minimo < (empty($minimo_limitador) ? 0 : $minimo_limitador)) {
+                                    if($estoque_total_calculo < (empty($minimo_limitador) ? 0 : $minimo_limitador)) {
                                         $alerta_limitador = 'alerta_limitador';
                                     }
 

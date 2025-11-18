@@ -66,6 +66,7 @@ class ProjetosController extends Controller
             ->leftJoin('funcionarios', 'funcionarios.id', '=', 'projetos.funcionarios_id')
             ->leftJoin('prioridades', 'prioridades.id', '=', 'projetos.prioridade_id')
             ->leftJoin('etapas_projetos', 'etapas_projetos.id', '=', 'projetos.etapa_projeto_id')
+            ->leftJoin('historicos_etapas_projetos', 'historicos_etapas_projetos.projetos_id', '=', 'projetos.id')
             ->select('projetos.*',
             'projetos.ep',
             'pessoas.nome_cliente',
@@ -80,8 +81,11 @@ class ProjetosController extends Controller
             'funcionarios.nome as nome_funcionario',
             'prioridades.nome as prioridade_nome',
             'etapas_projetos.nome as etapas_projetos_nome',
-            'etapas_projetos.id as etapas_projetos_id'
+            'etapas_projetos.id as etapas_projetos_id',
+            'status_projetos.ordem as ordem',
+            'projetos.data_gerado',
             )
+            ->distinct()
             ->orderby('status_projetos.ordem', 'asc')
             ->orderby('projetos.data_gerado' , 'DESC');
 
@@ -118,13 +122,18 @@ class ProjetosController extends Controller
         }
 
         if(!empty($request->input('data_entrega')) && !empty($request->input('data_entrega_fim') )) {
-            $projetos = $projetos->whereBetween('projetos.data_entrega', [DateHelpers::formatDate_dmY($request->input('data_entrega')), DateHelpers::formatDate_dmY($request->input('data_entrega_fim'))]);
+
+            $data_1 = DateHelpers::formatDate_dmY($request->input('data_entrega')).' 00:00:01';
+            $data_2 = DateHelpers::formatDate_dmY($request->input('data_entrega_fim')).' 23:59:59';
+
+            $projetos = $projetos->whereBetween('historicos_etapas_projetos.created_at', [$data_1, $data_2]);
         }
         if(!empty($request->input('data_entrega')) && empty($request->input('data_entrega_fim') )) {
-            $projetos = $projetos->where('projetos.data_entrega', '>=', DateHelpers::formatDate_dmY($request->input('data_entrega')));
+
+            $projetos = $projetos->where('historicos_etapas_projetos.created_at', '>=', DateHelpers::formatDate_dmY($request->input('data_entrega').' 00:00:01'));
         }
         if(empty($request->input('data_entrega')) && !empty($request->input('data_entrega_fim') )) {
-            $projetos = $projetos->where('projetos.data_entrega', '<=', DateHelpers::formatDate_dmY($request->input('data_entrega_fim')));
+            $projetos = $projetos->where('historicos_etapas_projetos.created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_entrega_fim')).' 23:59:59');
         }
 
         if ($codigo_cliente) {
@@ -192,11 +201,9 @@ class ProjetosController extends Controller
                     $data_prazo_entrega->addWeekdays($prazo_entrega);
                     $projeto->data_prazo_entrega = $data_prazo_entrega->format('d/m/Y');
 
-                    $hoje = new DateTime();
-
-                    $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays(Carbon::now(), false);
+                    $hoje = Carbon::today();
+                    $diferenca = Carbon::parse($data_prazo_entrega)->diffInDays($hoje, false);
                     $projeto->cor_alerta = 'green';
-
                     if($diferenca>0) {
                         $diferenca = $diferenca * -1;
                         $projeto->cor_alerta = 'red';
@@ -251,6 +258,7 @@ class ProjetosController extends Controller
                 'os' => $projeto->os,
                 'ep' => $projeto->ep,
                 'qtde' => $projeto->qtde,
+                'blank' => $projeto->blank,
                 'nome_cliente' => $projeto->nome_cliente,
                 'telefone' => $projeto->telefone,
                 'data_gerado' => $projeto->data_gerado ? $projeto->data_gerado : '',
@@ -450,6 +458,7 @@ class ProjetosController extends Controller
             $projeto->os = $request->input('os');
             $projeto->ep = $request->input('ep');
             $projeto->qtde = $request->input('qtde');
+            $projeto->blank = $request->input('blank');
             $projeto->pessoas_id = $request->input('clientes_id');
             $projeto->data_gerado = !empty($request->input('data_gerado')) ? DateHelpers::formatDate_dmY($request->input('data_gerado')) : null;
             $projeto->status_projetos_id = $status_projetos_id;

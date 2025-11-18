@@ -297,6 +297,7 @@ use App\Http\Controllers\PedidosController;
                                                     <th style="min-width: 100px;">EP</th>
                                                     <th style="min-width: 150px;">Data solicitação</th>
                                                     <th style="min-width: 50px;">Qtde</th>
+                                                    <th style="min-width: 50px;">Blank</th>
                                                     <th style="min-width: 100px;">Até/Urg</th>
                                                     <th style="min-width: 150px;">Pedido</th>
                                                     <th style="min-width: 100px;">Valor</th>
@@ -455,6 +456,7 @@ use App\Http\Controllers\PedidosController;
                                                             <td>{{ $projeto['ep'] }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($projeto['data_gerado'])->format('d/m/Y') }}</td>
                                                             <td>{{ $projeto['qtde'] }}</td>
+                                                            <td>{{ $projeto['blank'] }}</td>
                                                             <td>{{ isset($projeto['prioridade_nome']) ? $projeto['prioridade_nome'] : '' }}</td>
                                                             <td>{{ $projeto['com_pedido'] == 0 ? 'SEM PEDIDO' : ($projeto['com_pedido'] == 1 ? 'COM PEDIDO' : '') }}</td>
                                                             <td>{{ number_format($projeto['valor_unitario_adv'] * $projeto['qtde'], 2, ',', '.') }}</td>
@@ -570,6 +572,7 @@ use App\Http\Controllers\PedidosController;
                                                 <th style="min-width: 100px;"></th>
                                                 <th style="min-width: 100px;"></th>
                                                 <th style="min-width: 100px;"></th>
+                                                <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 150px;"></th>
@@ -756,6 +759,14 @@ use App\Http\Controllers\PedidosController;
                 <div class="col-sm-2">
                     <input type="text" class="form-control mask_horas" id="tempo_programacao" name="tempo_programacao" placeholder="HH:MM:SS"
                         value="@if (isset($projetos[0]->tempo_programacao)) {{ $projetos[0]->tempo_programacao }} @else {{ '' }} @endif">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="blank" class="col-sm-2 col-form-label">Blank</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" id="blank" name="blank"
+                        value="@if (isset($projetos[0]->blank)) {{ $projetos[0]->blank }} @else {{ '' }} @endif">
                 </div>
             </div>
 
