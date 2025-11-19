@@ -134,7 +134,7 @@
                                 @foreach ($dashboards as $dashboard)
                                     <div class="card ml-2 p-4" style="width: 18rem;">
                                         <div class="card-body">
-                                            <input class="form-check-input" name="dashboard[]" value="{{$dashboard->id}}" type="checkbox" @if($dashboard->checked){{'checked'}}@endif/>
+                                            <input class="form-check-input" name="dashboards[]" value="{{$dashboard->id}}" type="checkbox" @if($dashboard->checked){{'checked'}}@endif/>
                                             <label class="form-check-label font-weight-bold" for="{{$dashboard->id}}">{{$dashboard->nome}}</label>
                                         </div>
 

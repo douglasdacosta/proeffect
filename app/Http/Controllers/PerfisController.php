@@ -214,6 +214,7 @@ class PerfisController extends Controller
         $perfis->status = $request->input('status');
         $permissoes = $request->input('permissoes');
 
+
         $perfis->save();
 
         if(!empty($request->input('telas'))) {
