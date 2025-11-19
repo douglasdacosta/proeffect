@@ -135,7 +135,7 @@
                                     <div class="card ml-2 p-4" style="width: 18rem;">
                                         <div class="card-body">
                                             <input class="form-check-input" name="dashboard[]" value="{{$dashboard->id}}" type="checkbox" @if($dashboard->checked){{'checked'}}@endif/>
-                                            <label class="form-check-label font-weight-bold" for="{{$dashboard->id}}">{{$tela->nome}}</label>
+                                            <label class="form-check-label font-weight-bold" for="{{$dashboard->id}}">{{$dashboard->nome}}</label>
                                         </div>
 
                                     </div>
