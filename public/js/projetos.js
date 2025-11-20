@@ -1,3 +1,36 @@
+var ligado = false;
+    function toggleBackgroundByClass(className) {
+
+        setInterval(() => {
+
+            let elements = document.querySelectorAll(`.${className}`);
+            // Se data_antecipacao e data_retirada são classes, use "."
+            let elements_dtr = document.querySelectorAll('.data_antecipacao');
+            let elements_dt = document.querySelectorAll('.data_prazo_entrega');
+
+            if(!ligado){
+                // Esconder data_antecipacao e mostrar data_retirada
+                elements.forEach(el => el.style.backgroundColor = "");
+
+                elements_dtr.forEach(el => el.style.display = 'none');
+                elements_dt.forEach(el => el.style.display = 'block');
+
+                ligado = true;
+            } else {
+
+                elements.forEach(el => el.style.backgroundColor = "#f5a2a2");
+
+                elements_dtr.forEach(el => el.style.display = 'block');
+                elements_dt.forEach(el => el.style.display = 'none');
+
+                ligado = false;
+            }
+
+    }, 2500); // Alterna a cada 5 segundos
+}
+
+toggleBackgroundByClass('alerta_data_antecipacao');
+
 
 $(function ($) {
 

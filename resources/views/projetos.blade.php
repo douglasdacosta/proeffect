@@ -261,14 +261,15 @@ use App\Http\Controllers\PedidosController;
                                                     <th style="min-width: 50px;">Qtde</th>
                                                     <th style="min-width: 100px;">Até/Urg</th>
                                                     <th style="min-width: 150px;">Novo/Alteração</th>
+                                                    <th style="min-width: 250px;">Status</th>
                                                     <th style="min-width: 150px;">Etapa Projeto</th>
-                                                    <th style="min-width: 150px;">Colaborador</th>
                                                     <th style="min-width: 150px;">Tempo Projeto</th>
                                                     <th style="min-width: 200px;">Tempo Programação</th>
                                                     <th style="min-width: 150px;">Prazo Entrega</th>
                                                     <th style="min-width: 150px;">Alerta dias</th>
                                                     <th style="min-width: 150px;">Data Status</th>
                                                     <th style="min-width: 150px;">Data Tarefa</th>
+                                                    <th style="min-width: 150px;">Colaborador</th>
                                                     <th style="min-width: 50px;">Apontamento</th>
                                                 </tr>
                                             @endif
@@ -284,9 +285,13 @@ use App\Http\Controllers\PedidosController;
                                                     <th style="min-width: 150px;">Pedido</th>
                                                     <th style="min-width: 100px;">Valor</th>
                                                     <th style="min-width: 150px;">Novo/Alteração</th>
+                                                    <th style="min-width: 250px;">Status</th>
                                                     <th style="min-width: 150px;">Etapa Projeto</th>
+                                                    <th style="min-width: 150px;">Data Tarefa</th>
+                                                    <th style="min-width: 150px;">Data Status</th>
                                                     <th style="min-width: 150px;">Prazo Entrega</th>
                                                     <th style="min-width: 150px;">Alerta dias</th>
+
                                                 </tr>
                                             @endif
                                             @if(!empty($permissoes_liberadas) && (in_array(3, $permissoes_liberadas)))
@@ -303,19 +308,20 @@ use App\Http\Controllers\PedidosController;
                                                     <th style="min-width: 100px;">Valor</th>
                                                     <th style="min-width: 150px;">Cliente Ativo</th>
                                                     <th style="min-width: 150px;">Novo/Alteração</th>
+                                                    <th style="min-width: 150px;">Data Status</th>
+                                                    <th style="min-width: 250px;">Status</th>
                                                     <th style="min-width: 150px;">Etapa Projeto</th>
-                                                    <th style="min-width: 150px;">Colaborador</th>
                                                     <th style="min-width: 150px;">Tempo Projeto</th>
                                                     <th style="min-width: 200px;">Tempo Programação</th>
                                                     <th style="min-width: 150px;">Prazo Entrega</th>
                                                     <th style="min-width: 150px;">Alerta dias</th>
-                                                    <th style="min-width: 250px;">Status</th>
+
                                                     <th style="min-width: 250px;">Transporte</th>
-                                                    <th style="min-width: 220px;">Tempo Desenvolvimento</th>
-                                                    <th style="min-width: 150px;">Data Status</th>
-                                                    <th style="min-width: 150px;">Observação</th>
                                                     <th style="min-width: 150px;">Data Tarefa</th>
+                                                    <th style="min-width: 220px;">Tempo Desenvolvimento</th>
                                                     <th style="min-width: 50px;">Apontamento</th>
+                                                    <th style="min-width: 150px;">Colaborador</th>
+                                                    <th style="min-width: 150px;">Observação</th>
                                                 </tr>
                                             @endif
 
@@ -368,6 +374,28 @@ use App\Http\Controllers\PedidosController;
                                                             <td>{{ isset($projeto['prioridade_nome']) ? $projeto['prioridade_nome'] : '' }}</td>
                                                             <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
                                                             <td>
+                                                                @if (isset($AllSubStatus))
+
+                                                                    <select class="form-control pesquisa_status_id" id="pesquisa_status_id" name="pesquisa_status_id" data-projeto="{{ $projeto['id'] }}">
+                                                                        <option value=""></option>
+                                                                        @php
+                                                                            $grouped = $AllSubStatus->groupBy('status_projeto_nome');
+                                                                        @endphp
+
+                                                                        @foreach ($grouped as $groupName => $subStatuses)
+                                                                            <optgroup label="{{ $groupName }}">
+                                                                                @foreach ($subStatuses as $stats)
+                                                                                    <option value="{{ $stats->codigo }}"
+                                                                                        @if ((isset($projeto['sub_status_projetos_codigo']) && $projeto['sub_status_projetos_codigo'] == $stats->codigo)) selected="selected" @endif>
+                                                                                        {{ $stats->nome }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </optgroup>
+                                                                        @endforeach
+                                                                    </select>
+                                                                @endif
+                                                            </td>
+                                                            <td>
                                                                 <select class="form-control pesquisa_etapas_projetos"
                                                                 @if($projeto['sub_status_projetos_codigo'] != 1) disabled="disabled" @endif
                                                                 data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
@@ -380,14 +408,12 @@ use App\Http\Controllers\PedidosController;
                                                                     @endif
                                                                 </select>
                                                             </td>
-                                                            <td>
-                                                                <i data-funcionariomontagem="" title="{{isset($projeto['nome_funcionario']) ? $projeto['nome_funcionario'] : ''}}"
-                                                                    data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
-                                                                @if ($projeto['nome_funcionario'] !=  '') color:#044f04 @else color:#cacaca @endif"
-                                                                class="fas fa-users add_funcionarios_projetos"></i>
                                                             <td>{{ isset($projeto['tempo_projetos']) ? $projeto['tempo_projetos'] : '' }}</td>
                                                             <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
-                                                            <td>{{ !empty($projeto['data_prazo_entrega']) ? $projeto['data_prazo_entrega'] : '' }}</td>
+                                                            <td  @if(!empty($projeto['data_antecipacao']))  class='alerta_data_antecipacao' @else {{ '' }} @endif>
+                                                                <span class='data_antecipacao' style="display: none;"> {{$projeto['data_antecipacao']}} </span>
+                                                                <span class='data_prazo_entrega' style="display: block;"> {{$projeto['data_prazo_entrega']}} </span>
+                                                            </td>
                                                             <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
                                                             <td>
                                                                 {{ !empty($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}
@@ -401,6 +427,12 @@ use App\Http\Controllers\PedidosController;
                                                                     class="fas fa-plus add_tarefa_projetos"></i>
                                                             </td>
                                                             <td>
+                                                                <i data-funcionariomontagem="" title="{{isset($projeto['nome_funcionario']) ? $projeto['nome_funcionario'] : ''}}"
+                                                                    data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
+                                                                @if ($projeto['nome_funcionario'] !=  '') color:#044f04 @else color:#cacaca @endif"
+                                                                class="fas fa-users add_funcionarios_projetos"></i>
+                                                            </td>
+                                                            <td>
                                                                 @if($projeto['status_projetos_id'] == 4)
                                                                     <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer; color:#004ad3"
                                                                     class="fas fa-edit add_apontamentos_projetos"></i>
@@ -409,6 +441,7 @@ use App\Http\Controllers\PedidosController;
                                                             </td>
                                                         </tr>
                                                     @endif
+
                                                     @if(!empty($permissoes_liberadas) && @(in_array(2, $permissoes_liberadas)))
                                                         <tr class="linha_{{ $projeto['id'] }}" @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807" @endif >
                                                             <th scope="row"><a href={{ URL::route($rotaAlterar, ['id' => $projeto['id']]) }}>{{ $projeto['id'] }}</a></th>
@@ -425,66 +458,6 @@ use App\Http\Controllers\PedidosController;
                                                             <td>{{ $projeto['com_pedido'] == 0 ? 'SEM PEDIDO' : ($projeto['com_pedido'] == 1 ? 'COM PEDIDO' : '') }}</td>
                                                             <td>{{ number_format($projeto['valor_unitario_adv'] * $projeto['qtde'], 2, ',', '.') }}</td>
                                                             <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
-                                                            <td>
-
-                                                                <select class="form-control pesquisa_etapas_projetos"
-                                                                @if($projeto['sub_status_projetos_codigo'] != 1) disabled="disabled" @endif
-                                                                data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
-                                                                    <option @if(empty($projeto['etapas_projetos_id']) ) selected="selected" @endif value=""></option>
-                                                                    @if (isset($AllEtapasProjetos))
-                                                                        @foreach ($AllEtapasProjetos as $EtapasProjeto)
-                                                                            <option value="{{ $EtapasProjeto->id }}"
-                                                                                @if (!empty($projeto['etapas_projetos_id']) && $projeto['etapas_projetos_id'] === $EtapasProjeto->id) selected="selected" @endif>{{  $EtapasProjeto->nome }}</option>
-                                                                        @endforeach
-                                                                    @endif
-                                                                </select>
-                                                            </td>
-                                                            <td>{{ !empty($projeto['data_prazo_entrega']) ? $projeto['data_prazo_entrega'] : '' }}</td>
-                                                            <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
-                                                        </tr>
-                                                    @endif
-                                                    @if(!empty($permissoes_liberadas) && @(in_array(3, $permissoes_liberadas)))
-                                                        <tr class="linha_{{ $projeto['id'] }}" @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807" @endif >
-                                                            <th scope="row"><a href={{ URL::route($rotaAlterar, ['id' => $projeto['id']]) }}>{{ $projeto['id'] }}</a></th>
-                                                            <td>
-                                                                <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
-                                                                @if (isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) color:#d9534f @else color:#12ad04 @endif"
-                                                                class="fas fa-bell toggle_alerta_projetos"></i>
-                                                            </td>
-                                                            <td title="{{ trim($projeto['nome_cliente']) }}">{{ strlen(trim($projeto['nome_cliente'])) > 9 ? substr(trim($projeto['nome_cliente']), 0, 9) . '...' : trim($projeto['nome_cliente']) }}</td>
-
-                                                            <td>{{ $projeto['ep'] }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($projeto['data_gerado'])->format('d/m/Y') }}</td>
-                                                            <td>{{ $projeto['qtde'] }}</td>
-                                                            <td>{{ $projeto['blank'] }}</td>
-                                                            <td>{{ isset($projeto['prioridade_nome']) ? $projeto['prioridade_nome'] : '' }}</td>
-                                                            <td>{{ $projeto['com_pedido'] == 0 ? 'SEM PEDIDO' : ($projeto['com_pedido'] == 1 ? 'COM PEDIDO' : '') }}</td>
-                                                            <td>{{ number_format($projeto['valor_unitario_adv'] * $projeto['qtde'], 2, ',', '.') }}</td>
-                                                            <td>{{ !isset($projeto['cliente_ativo']) ? '' : ($projeto['cliente_ativo'] == 0 ? 'NÃO' : 'SIM') }}</td>
-                                                            <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
-                                                            <td>
-
-                                                                <select class="form-control pesquisa_etapas_projetos"
-                                                                @if($projeto['sub_status_projetos_codigo'] != 1) disabled="disabled" @endif
-                                                                data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
-                                                                    <option @if(empty($projeto['etapas_projetos_id']) ) selected="selected" @endif value=""></option>
-                                                                    @if (isset($AllEtapasProjetos))
-                                                                        @foreach ($AllEtapasProjetos as $EtapasProjeto)
-                                                                            <option value="{{ $EtapasProjeto->id }}"
-                                                                                @if (!empty($projeto['etapas_projetos_id']) && $projeto['etapas_projetos_id'] === $EtapasProjeto->id) selected="selected" @endif>{{  $EtapasProjeto->nome }}</option>
-                                                                        @endforeach
-                                                                    @endif
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <i data-funcionariomontagem="" title="{{isset($projeto['nome_funcionario']) ? $projeto['nome_funcionario'] : ''}}"
-                                                                    data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
-                                                                @if ($projeto['nome_funcionario'] !=  '') color:#044f04 @else color:#cacaca @endif"
-                                                                class="fas fa-users add_funcionarios_projetos"></i>
-                                                            <td>{{ isset($projeto['tempo_projetos']) ? $projeto['tempo_projetos'] : '' }}</td>
-                                                            <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
-                                                            <td>{{ !empty($projeto['data_prazo_entrega']) ? $projeto['data_prazo_entrega'] : '' }}</td>
-                                                            <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
                                                             <td>
                                                                 @if (isset($AllSubStatus))
 
@@ -507,13 +480,19 @@ use App\Http\Controllers\PedidosController;
                                                                     </select>
                                                                 @endif
                                                             </td>
-                                                            <td title="{{ trim($projeto['transporte']) }}">{{ strlen(trim($projeto['transporte'])) > 20 ? substr(trim($projeto['transporte']), 0, 20) . '...' : trim($projeto['transporte']) }}</td>
-
-                                                            <td>{{ $tempo_desenvolvimento_em_dias }}</td>
                                                             <td>
-                                                                {{ !empty($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}
+                                                                <select class="form-control pesquisa_etapas_projetos"
+                                                                @if($projeto['sub_status_projetos_codigo'] != 1) disabled="disabled" @endif
+                                                                data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
+                                                                    <option @if(empty($projeto['etapas_projetos_id']) ) selected="selected" @endif value=""></option>
+                                                                    @if (isset($AllEtapasProjetos))
+                                                                        @foreach ($AllEtapasProjetos as $EtapasProjeto)
+                                                                            <option value="{{ $EtapasProjeto->id }}"
+                                                                                @if (!empty($projeto['etapas_projetos_id']) && $projeto['etapas_projetos_id'] === $EtapasProjeto->id) selected="selected" @endif>{{  $EtapasProjeto->nome }}</option>
+                                                                        @endforeach
+                                                                    @endif
+                                                                </select>
                                                             </td>
-                                                            <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 10 ? substr(trim($projeto['mensagem']), 0, 10) . '...' : trim($projeto['mensagem']) }}</td>
                                                             <td nowrap >
                                                                 @if($projeto['compromisso'] == 1)
                                                                     <i class="fas fa-exclamation-triangle" style="color:#d9534f" title="Possui compromisso"></i>
@@ -523,12 +502,113 @@ use App\Http\Controllers\PedidosController;
                                                                     class="fas fa-plus add_tarefa_projetos"></i>
                                                             </td>
                                                             <td>
-                                                                @if($projeto['status_projetos_id'] == 4)
-                                                                    <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer; color:#004ad3"
-                                                                    class="fas fa-edit add_apontamentos_projetos"></i>
+                                                                {{ !empty($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}
+                                                            </td>
+                                                            <td  @if(!empty($projeto['data_antecipacao']))  class='alerta_data_antecipacao' @else {{ '' }} @endif>
+                                                                @if(!empty($projeto['data_antecipacao']))
+                                                                    <span class='data_antecipacao' style="display: none;"> {{$projeto['data_antecipacao']}} </span>
+                                                                <span class='data_prazo_entrega' style="display: block;"> {{$projeto['data_prazo_entrega']}} </span>
+                                                                @else
+                                                                    {{$projeto['data_prazo_entrega']}}
                                                                 @endif
 
                                                             </td>
+                                                            <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
+                                                        </tr>
+                                                    @endif
+
+                                                    @if(!empty($permissoes_liberadas) && @(in_array(3, $permissoes_liberadas)))
+                                                        <tr class="linha_{{ $projeto['id'] }}" @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807" @endif >
+                                                            <th scope="row"><a href={{ URL::route($rotaAlterar, ['id' => $projeto['id']]) }}>{{ $projeto['id'] }}</a></th>
+                                                            <td>
+                                                                <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
+                                                                @if (isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) color:#d9534f @else color:#12ad04 @endif"
+                                                                class="fas fa-bell toggle_alerta_projetos"></i>
+                                                            </td>
+                                                            <td title="{{ trim($projeto['nome_cliente']) }}">{{ strlen(trim($projeto['nome_cliente'])) > 9 ? substr(trim($projeto['nome_cliente']), 0, 9) . '...' : trim($projeto['nome_cliente']) }}</td>
+
+                                                            <td>{{ $projeto['ep'] }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($projeto['data_gerado'])->format('d/m/Y') }}</td>
+                                                            <td>{{ $projeto['qtde'] }}</td>
+                                                            <td>{{ $projeto['blank'] }}</td>
+                                                            <td>{{ isset($projeto['prioridade_nome']) ? $projeto['prioridade_nome'] : '' }}</td>
+                                                            <td>{{ $projeto['com_pedido'] == 0 ? 'SEM PEDIDO' : ($projeto['com_pedido'] == 1 ? 'COM PEDIDO' : '') }}</td>
+                                                            <td>{{ number_format($projeto['valor_unitario_adv'] * $projeto['qtde'], 2, ',', '.') }}</td>
+                                                            <td>{{ !isset($projeto['cliente_ativo']) ? '' : ($projeto['cliente_ativo'] == 0 ? 'NÃO' : 'SIM') }}</td>
+                                                            <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
+                                                            <td>
+                                                                {{ !empty($projeto['data_historico']) ? Carbon\Carbon::parse($projeto['data_historico'])->format('d/m/Y') : '' }}
+                                                            </td>
+                                                            <td>
+                                                                @if (isset($AllSubStatus))
+
+                                                                    <select class="form-control pesquisa_status_id" id="pesquisa_status_id" name="pesquisa_status_id" data-projeto="{{ $projeto['id'] }}">
+                                                                        <option value=""></option>
+                                                                        @php
+                                                                            $grouped = $AllSubStatus->groupBy('status_projeto_nome');
+                                                                        @endphp
+
+                                                                        @foreach ($grouped as $groupName => $subStatuses)
+                                                                            <optgroup label="{{ $groupName }}">
+                                                                                @foreach ($subStatuses as $stats)
+                                                                                    <option value="{{ $stats->codigo }}"
+                                                                                        @if ((isset($projeto['sub_status_projetos_codigo']) && $projeto['sub_status_projetos_codigo'] == $stats->codigo)) selected="selected" @endif>
+                                                                                        {{ $stats->nome }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </optgroup>
+                                                                        @endforeach
+                                                                    </select>
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <select class="form-control pesquisa_etapas_projetos"
+                                                                @if($projeto['sub_status_projetos_codigo'] != 1) disabled="disabled" @endif
+                                                                data-projeto="{{ $projeto['id'] }}" data-sub_status_projetos_codigo="{{ $projeto['sub_status_projetos_codigo'] }}" id="pesquisa_etapas_projetos" name="pesquisa_etapas_projetos">
+                                                                    <option @if(empty($projeto['etapas_projetos_id']) ) selected="selected" @endif value=""></option>
+                                                                    @if (isset($AllEtapasProjetos))
+                                                                        @foreach ($AllEtapasProjetos as $EtapasProjeto)
+                                                                            <option value="{{ $EtapasProjeto->id }}"
+                                                                                @if (!empty($projeto['etapas_projetos_id']) && $projeto['etapas_projetos_id'] === $EtapasProjeto->id) selected="selected" @endif>{{  $EtapasProjeto->nome }}</option>
+                                                                        @endforeach
+                                                                    @endif
+                                                                </select>
+                                                            </td>
+
+                                                            <td>{{ isset($projeto['tempo_projetos']) ? $projeto['tempo_projetos'] : '' }}</td>
+                                                            <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
+                                                            <td  @if(!empty($projeto['data_antecipacao']))  class='alerta_data_antecipacao' @else {{ '' }} @endif>
+                                                                <span class='data_antecipacao' style="display: none;"> {{$projeto['data_antecipacao']}} </span>
+                                                                <span class='data_prazo_entrega'> {{$projeto['data_prazo_entrega']}} </span>
+                                                            </td>
+                                                            <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
+
+                                                            <td title="{{ trim($projeto['transporte']) }}">{{ strlen(trim($projeto['transporte'])) > 20 ? substr(trim($projeto['transporte']), 0, 20) . '...' : trim($projeto['transporte']) }}</td>
+                                                            <td nowrap >
+                                                                @if($projeto['compromisso'] == 1)
+                                                                    <i class="fas fa-exclamation-triangle" style="color:#d9534f" title="Possui compromisso"></i>
+                                                                @endif
+                                                                {{ isset($projeto['data_tarefa']) ? $projeto['data_tarefa'].' '  : '' }}
+                                                                <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer; color:#12ad04"
+                                                                    class="fas fa-plus add_tarefa_projetos"></i>
+                                                            </td>
+                                                            <td>{{ $tempo_desenvolvimento_em_dias }}</td>
+
+
+                                                            <td>
+                                                                @if($projeto['status_projetos_id'] == 4)
+                                                                <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer; color:#004ad3"
+                                                                class="fas fa-edit add_apontamentos_projetos"></i>
+                                                                @endif
+
+                                                            </td>
+                                                            <td>
+                                                                <i data-funcionariomontagem="" title="{{isset($projeto['nome_funcionario']) ? $projeto['nome_funcionario'] : ''}}"
+                                                                data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
+                                                                @if ($projeto['nome_funcionario'] !=  '') color:#044f04 @else color:#cacaca @endif"
+                                                                class="fas fa-users add_funcionarios_projetos"></i>
+                                                            </td>
+                                                            <td title="{{ trim($projeto['mensagem']) }}">{{ strlen(trim($projeto['mensagem'])) > 10 ? substr(trim($projeto['mensagem']), 0, 10) . '...' : trim($projeto['mensagem']) }}</td>
                                                         </tr>
                                                     @endif
 
@@ -704,7 +784,7 @@ use App\Http\Controllers\PedidosController;
             <div class="form-group row">
                 <label for="com_pedido" class="col-sm-2 col-form-label">Valor</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control mask_money" id="valor_unitario_adv" name="valor_unitario_adv"
+                    <input type="text" class="form-control mask_valor" id="valor_unitario_adv" name="valor_unitario_adv"
                         value="@if (isset($projetos[0]->valor_unitario_adv)) {{ number_format($projetos[0]->valor_unitario_adv, 2, ',', '.') }} @else{{ '' }} @endif">
                 </div>
             </div>
@@ -773,14 +853,14 @@ use App\Http\Controllers\PedidosController;
             <div class="form-group row">
                 <label for="data_entrega" class="col-sm-2 col-form-label">Prazo entrega</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega"
+                    <input type="text" readonly class="form-control mask_date" id="data_entrega" name="data_entrega"
                         value="@if (isset($projetos[0]->data_entrega)) {{ Carbon\Carbon::parse($projetos[0]->data_entrega)->format('d/m/Y') }} @else {{ '' }} @endif">
                 </div>
             </div>
             <div class="form-group row">
-                <label for="alerta_dias" class="col-sm-2 col-form-label">Alerta dias</label>
+                <label for="data_antecipacao" class="col-sm-2 col-form-label">Data antecipação</label>
                 <div class="col-sm-1">
-                    <input type="text" readonly class="form-control mask_date" id="alerta_dias" name="alerta_dias">
+                    <input type="text" class="form-control mask_date" id="data_antecipacao" name="data_antecipacao" placeholder="DD/MM/AAAA" value="@if (isset($projetos[0]->data_antecipacao)) {{ Carbon\Carbon::parse($projetos[0]->data_antecipacao)->format('d/m/Y') }} @else {{ '' }} @endif">
                 </div>
             </div>
             <div class="form-group row">
@@ -853,6 +933,8 @@ use App\Http\Controllers\PedidosController;
                     <option value="I" @if (isset($projetos[0]->projeto) && $projetos[0]->projeto == 'I') {{ ' selected ' }}@else @endif>Inativo</option>
                 </select>
             </div>
+
+
             <div class="form-group row">
                 <div class="col-sm-5">
                     <button class="btn btn-danger" onclick="window.history.back();" type="button">Cancelar</button>
@@ -861,6 +943,20 @@ use App\Http\Controllers\PedidosController;
                     <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
             </div>
+
+            @if (!empty($historicos))
+            <label for="observacao" class="col-sm-2 col-form-label">Históricos</label>
+                <div class="form-group row">
+                    @foreach ($historicos as $historico)
+                        <div class="col-sm-12">
+                            <div class="d-flex p-2 bd-highlight overflow-auto">
+                                <span class="font-weight-bold mr-2">{!! '[' . \Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:i:s') . '] <br/>' !!}</span>
+                                {!! nl2br($historico->historico) !!}
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
             </form>
 
         @stop

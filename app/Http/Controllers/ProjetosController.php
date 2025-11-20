@@ -14,6 +14,7 @@ use App\Http\Controllers\PedidosController;
 use App\Models\ConfiguracoesProjetos;
 use App\Models\EtapasProjetos;
 use App\Models\HistoricosEtapasProjetos;
+use App\Models\ProjetosLogs;
 use App\Models\TarefasProjetos;
 use DateTime;
 use Illuminate\Support\Facades\Auth;
@@ -41,8 +42,6 @@ class ProjetosController extends Controller
     public function index(Request $request)
     {
 
-        // dd($request->all());
-
         $this->permissoes_liberadas = (new ValidaPermissaoAcessoController())->validaAcaoLiberada(22, (new ValidaPermissaoAcessoController())->retornaPerfil());
 
         $funcionarios = new Funcionarios();
@@ -54,9 +53,6 @@ class ProjetosController extends Controller
         $os = !empty($request->input('os')) ? ($request->input('os')) : (!empty($os) ? $os : false);
 
         $ep = !empty($request->input('ep')) ? ($request->input('ep')) : (!empty($ep) ? $ep : false);
-
-
-
 
         $projetos = DB::table('projetos')
             ->leftJoin('status_projetos', 'projetos.status_projetos_id', '=', 'status_projetos.id')
@@ -84,6 +80,7 @@ class ProjetosController extends Controller
             'etapas_projetos.id as etapas_projetos_id',
             'status_projetos.ordem as ordem',
             'projetos.data_gerado',
+            'projetos.data_antecipacao'
             )
             ->distinct()
             ->orderby('status_projetos.ordem', 'asc')
@@ -98,7 +95,6 @@ class ProjetosController extends Controller
         } else {
             $projetos = $projetos->where('projetos.status', '=', 'A');
         }
-
 
         if ($ep) {
             $projetos = $projetos->where('projetos.ep', 'like', '%' . $ep);
@@ -286,6 +282,7 @@ class ProjetosController extends Controller
                 'etapas_projetos_nome' => $projeto->etapas_projetos_nome,
                 'etapas_projetos_id' => $projeto->etapas_projetos_id,
                 'data_prazo_entrega' => $projeto->data_prazo_entrega ?? '',
+                'data_antecipacao' => $projeto->data_antecipacao ? (new DateTime($projeto->data_antecipacao))->format('d/m/Y') : '',
                 'alerta_dias' => $projeto->alerta_dias ?? '',
                 'cor_alerta' => $projeto->cor_alerta ?? '',
             );
@@ -389,16 +386,96 @@ class ProjetosController extends Controller
         $metodo = $request->method();
         if ($metodo == 'POST') {
 
+            $configuracaoProjetos = new ConfiguracoesProjetos();
+        $configuracaoProjetos = $configuracaoProjetos->where('id', '=', 1)->first();
+
+        $configuracaoProjetos = json_decode($configuracaoProjetos->dados, true);
+
+        $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
+        $HistoricosEtapasProjetos = $HistoricosEtapasProjetos->where('projetos_id', '=', $request->input('id'))->orderby('created_at', 'DESC')->first();
+
+        $data_historico = !empty($HistoricosEtapasProjetos->created_at) ? $HistoricosEtapasProjetos->created_at : '';
+
+        $status_projetos_id = $this->getSubStatus($request->input('status_id'));
+        $sub_status_projetos_id = $status_projetos_id[0]['id'];
+        $status_projetos_id = $status_projetos_id[0]['status_projetos_id'];
+
+        if(!empty($request->input('tempo_projetos'))) {
+
+                $t = explode(':', $request->input('tempo_projetos'));
+                $horas = (int)$t[0];
+                $minutos = isset($t[1]) ? (int)$t[1] : 0;
+                $segundos = isset($t[2]) ? (int)$t[2] : 0;
+                $tempo_projeto = number_format($horas + ($minutos / 60) + ($segundos / 3600), 2);
+
+                if($tempo_projeto <= 2 && !empty($configuracaoProjetos['0_2_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['0_2_horas'];
+                } elseif($tempo_projeto > 2 && $tempo_projeto <= 6 && !empty($configuracaoProjetos['2_6_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['2_6_horas'];
+                } elseif($tempo_projeto > 6 && $tempo_projeto <= 10 && !empty($configuracaoProjetos['6_10_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['6_10_horas'];
+                } elseif($tempo_projeto > 10 && !empty($configuracaoProjetos['10_ou_mais_horas'])) {
+                    $prazo_entrega = $configuracaoProjetos['10_ou_mais_horas'];
+                }
+
+                if(!empty($prazo_entrega) && $status_projetos_id == 4) {
+
+                    // dd($data_historico, $prazo_entrega);
+                    $data_historico= new DateTime($data_historico);
+                    $data_prazo_entrega = clone $data_historico;
+
+                    $data_prazo_entrega = Carbon::parse($data_prazo_entrega);
+                    $data_prazo_entrega->addWeekdays($prazo_entrega);
+
+                    $request->merge([
+                        'data_entrega' => $data_prazo_entrega->format('Y-m-d H:i:s')
+                    ]);
+
+                } else {
+                    $request->merge([
+                        'data_entrega' => null
+                    ]);
+                }
+            }
+
+
+            if($status_projetos_id == 3) { //EM AVALIAÇÃO
+
+                if($sub_status_projetos_id == 3) {
+                    $prazo_entrega = $configuracaoProjetos['em_avaliacao'];
+                } elseif($sub_status_projetos_id == 4) {
+                    $prazo_entrega = $configuracaoProjetos['elaboracao_design'];
+                }
+
+                $data_historico= new DateTime($data_historico);
+                //A DATA DO PRAZO ENTREGA É A SOMA DA DATA GERADO + PRAZO ENTREGA
+                $data_prazo_entrega = clone $data_historico;
+
+                $data_prazo_entrega = Carbon::parse($data_prazo_entrega);
+                $data_prazo_entrega->addWeekdays($prazo_entrega);
+
+                $request->merge([
+                    'data_entrega' => $data_prazo_entrega->format('Y-m-d H:i:s')
+                ]);
+
+            }
+
             $projetos_id = $this->salva($request);
+
+
 
             return redirect()->route('projetos', ['id' => $projetos_id]);
         }
+
+        $historicos = new ProjetosLogs();
+        $historicos = $historicos->where('projetos_id', '=', $request->input('id'))->orderby('created_at', 'DESC')->get();
 
         $data = array(
             'tela' => 'alterar',
             'nome_tela' => 'projetos',
             'projetos' => $projetos,
             'request' => $request,
+            'historicos' => $historicos,
             'clientes' => (new PedidosController())->getAllClientes(),
             'prioridades' => (new PedidosController())->getAllprioridades(),
             'transportes' => (new PedidosController())->getAlltransportes(),
@@ -416,6 +493,7 @@ class ProjetosController extends Controller
     {
         $id = DB::transaction(function () use ($request) {
             $projeto = new Projetos();
+            $projeto_logs = new ProjetosLogs();
 
             if ($request->input('id')) {
                 $projeto = $projeto::find($request->input('id'));
@@ -455,12 +533,39 @@ class ProjetosController extends Controller
                 $projeto->em_alerta = 0;
             }
 
+            $labels = [
+                'valor_unitario_adv' => 'Valor Unitário',
+                'os' => 'OS',
+                'ep' => 'EP',
+                'qtde' => 'Qtde',
+                'blank' => 'Blank',
+                'pessoas_id' => 'Cliente',
+                'data_gerado' => 'Data Gerado',
+                'data_antecipacao' => 'Data Antecipação',
+                'data_entrega' => 'Data Entrega',
+                'observacao' => 'Observação',
+                'status' => 'Situação',
+                'status_projetos_id' => 'Status',
+                'sub_status_projetos_codigo' => 'Status do projeto',
+                'transporte_id' => 'Transporte',
+                'prioridade_id' => 'Prioridade',
+                'cliente_ativo' => 'Cliente Ativo',
+                'novo_alteracao' => 'Novo Alteração',
+                'tempo_projetos' => 'Tempo Projetos',
+                'tempo_programacao' => 'Tempo Programação',
+                'funcionarios_id' => 'Funcionario',
+                'data_entrega' => 'Data Entrega',
+                'observacao' => 'Observação',
+            ];
+
+
             $projeto->os = $request->input('os');
             $projeto->ep = $request->input('ep');
             $projeto->qtde = $request->input('qtde');
             $projeto->blank = $request->input('blank');
             $projeto->pessoas_id = $request->input('clientes_id');
             $projeto->data_gerado = !empty($request->input('data_gerado')) ? DateHelpers::formatDate_dmY($request->input('data_gerado')) : null;
+            $projeto->data_antecipacao = !empty($request->input('data_antecipacao')) ? DateHelpers::formatDate_dmY($request->input('data_antecipacao')) : null;
             $projeto->status_projetos_id = $status_projetos_id;
             $projeto->sub_status_projetos_codigo = $sub_status_projetos_codigo;
             $projeto->etapa_projeto_id = $etapa_projeto_id;
@@ -476,7 +581,40 @@ class ProjetosController extends Controller
             $projeto->data_entrega = !empty($request->input('data_entrega')) ? DateHelpers::formatDate_dmY($request->input('data_entrega')) : null;
             $projeto->observacao = trim($request->input('observacao'));
             $projeto->status = $request->input('status');
+
+            $alteracoes = [];
+
+            $usuarioLogado = auth()->user()->name; // ou id, como preferir
+
+            foreach ($labels as $campo => $label) {
+
+            if ($projeto->isDirty($campo)) {
+
+                $antes = $projeto->getOriginal($campo);
+                $depois = $projeto->$campo;
+
+                $antesNormalizado = $this->normalizarValor($campo, $antes);
+                $depoisNormalizado = $this->normalizarValor($campo, $depois);
+
+                // Só registra se realmente mudou
+                if ($antesNormalizado != $depoisNormalizado) {
+
+                    $antesTexto = $antesNormalizado ?? 'vazio';
+                    $depoisTexto = $depoisNormalizado ?? 'vazio';
+
+                    $alteracoes[] = "Campo \"{$label}\" alterado de \"{$antesTexto}\" para \"{$depoisTexto}\" por \"{$usuarioLogado}\"";
+                }
+            }
+        }
+
             $projeto->save();
+
+            if(count($alteracoes) > 0) {
+                $projeto_logs = new ProjetosLogs();
+                $projeto_logs->projetos_id = $projeto->id;
+                $projeto_logs->historico = implode("<br>", $alteracoes);
+                $projeto_logs->save();
+            }
 
             return $projeto->id;
         });
@@ -485,6 +623,18 @@ class ProjetosController extends Controller
     }
 
 
+    public function normalizarValor($campo, $valor)
+    {
+        if ($valor === null) {
+            return null;
+        }
+
+        if (in_array($campo, ['data_gerado', 'data_antecipacao', 'data_entrega', 'data_tarefa', 'data_status'])) {
+            return \Carbon\Carbon::parse($valor)->format('Y-m-d');
+        }
+
+        return $valor;
+    }
     /**
     * Busca todos os status_projetos
     *
