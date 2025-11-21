@@ -411,8 +411,13 @@ use App\Http\Controllers\PedidosController;
                                                             <td>{{ isset($projeto['tempo_projetos']) ? $projeto['tempo_projetos'] : '' }}</td>
                                                             <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
                                                             <td  @if(!empty($projeto['data_antecipacao']))  class='alerta_data_antecipacao' @else {{ '' }} @endif>
-                                                                <span class='data_antecipacao' style="display: none;"> {{$projeto['data_antecipacao']}} </span>
+                                                                @if(!empty($projeto['data_antecipacao']))
+                                                                    <span class='data_antecipacao' style="display: none;"> {{$projeto['data_antecipacao']}} </span>
                                                                 <span class='data_prazo_entrega' style="display: block;"> {{$projeto['data_prazo_entrega']}} </span>
+                                                                @else
+                                                                    {{$projeto['data_prazo_entrega']}}
+                                                                @endif
+
                                                             </td>
                                                             <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
                                                             <td>
@@ -578,8 +583,13 @@ use App\Http\Controllers\PedidosController;
                                                             <td>{{ isset($projeto['tempo_projetos']) ? $projeto['tempo_projetos'] : '' }}</td>
                                                             <td>{{ isset($projeto['tempo_programacao']) ? $projeto['tempo_programacao'] : '' }}</td>
                                                             <td  @if(!empty($projeto['data_antecipacao']))  class='alerta_data_antecipacao' @else {{ '' }} @endif>
-                                                                <span class='data_antecipacao' style="display: none;"> {{$projeto['data_antecipacao']}} </span>
-                                                                <span class='data_prazo_entrega'> {{$projeto['data_prazo_entrega']}} </span>
+                                                                @if(!empty($projeto['data_antecipacao']))
+                                                                    <span class='data_antecipacao' style="display: none;"> {{$projeto['data_antecipacao']}} </span>
+                                                                <span class='data_prazo_entrega' style="display: block;"> {{$projeto['data_prazo_entrega']}} </span>
+                                                                @else
+                                                                    {{$projeto['data_prazo_entrega']}}
+                                                                @endif
+
                                                             </td>
                                                             <td style="color: {{ $projeto['cor_alerta'] }};">{{ !empty($projeto['alerta_dias']) ? abs($projeto['alerta_dias']) : '' }}</td>
 
