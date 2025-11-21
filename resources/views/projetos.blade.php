@@ -254,11 +254,12 @@ use App\Http\Controllers\PedidosController;
                                             @if(!empty($permissoes_liberadas) && (in_array(1, $permissoes_liberadas)))
                                                 <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
                                                     <th style="min-width: 50px;">ID</th>
-                                                    <th style="min-width: 50px;">Muda Alerta</th>
+                                                    <th style="min-width: 50px;">Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
                                                     <th style="min-width: 100px;">EP</th>
                                                     <th style="min-width: 150px;">Data solicitação</th>
                                                     <th style="min-width: 50px;">Qtde</th>
+                                                    <th style="min-width: 50px;">Blank</th>
                                                     <th style="min-width: 100px;">Até/Urg</th>
                                                     <th style="min-width: 150px;">Novo/Alteração</th>
                                                     <th style="min-width: 250px;">Status</th>
@@ -276,7 +277,7 @@ use App\Http\Controllers\PedidosController;
                                             @if(!empty($permissoes_liberadas) && (in_array(2, $permissoes_liberadas)))
                                                 <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
                                                     <th style="min-width: 50px;">ID</th>
-                                                    <th style="min-width: 50px;">Muda Alerta</th>
+                                                    <th style="min-width: 50px;">Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
                                                     <th style="min-width: 100px;">EP</th>
                                                     <th style="min-width: 150px;">Data solicitação</th>
@@ -297,7 +298,7 @@ use App\Http\Controllers\PedidosController;
                                             @if(!empty($permissoes_liberadas) && (in_array(3, $permissoes_liberadas)))
                                                 <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
                                                     <th style="min-width: 50px;">ID</th>
-                                                    <th style="min-width: 50px;">Muda Alerta</th>
+                                                    <th style="min-width: 50px;">Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
                                                     <th style="min-width: 100px;">EP</th>
                                                     <th style="min-width: 150px;">Data solicitação</th>
@@ -371,6 +372,7 @@ use App\Http\Controllers\PedidosController;
                                                             <td>{{ $projeto['ep'] }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($projeto['data_gerado'])->format('d/m/Y') }}</td>
                                                             <td>{{ $projeto['qtde'] }}</td>
+                                                            <td>{{ $projeto['blank'] }}</td>
                                                             <td>{{ isset($projeto['prioridade_nome']) ? $projeto['prioridade_nome'] : '' }}</td>
                                                             <td>{{ $projeto['novo_alteracao'] == 0 ? 'NOVO' : ($projeto['novo_alteracao'] == 1 ? 'ALTERAÇÃO' : '') }}</td>
                                                             <td>
