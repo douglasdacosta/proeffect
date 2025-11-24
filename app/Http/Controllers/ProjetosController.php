@@ -489,6 +489,110 @@ class ProjetosController extends Controller
         return view('projetos', $data);
     }
 
+    /**
+     * Resolve a descrição de campos relacionais para exibição no histórico
+     *
+     * @param string $campo Nome do campo
+     * @param mixed $valor Valor do campo (geralmente um ID)
+     * @return string|mixed Descrição legível ou o valor original
+     */
+    private function resolverDescricao($campo, $valor)
+    {
+        if ($valor === null) {
+            return null;
+        }
+
+        try {
+            switch ($campo) {
+                case 'status_projetos_id':
+                    $status = StatusProjetos::find($valor);
+                    return $status ? $status->nome : $valor;
+
+                case 'sub_status_projetos_codigo':
+                    $subStatus = SubStatusProjetos::where('codigo', $valor)->first();
+                    return $subStatus ? $subStatus->nome : $valor;
+
+                case 'etapa_projeto_id':
+                    $etapa = EtapasProjetos::find($valor);
+                    return $etapa ? $etapa->nome : $valor;
+
+                case 'pessoas_id':
+                    $pessoa = DB::table('pessoas')->find($valor);
+                    return $pessoa ? $pessoa->nome_cliente : $valor;
+
+                case 'transporte_id':
+                    $transporte = DB::table('transportes')->find($valor);
+                    return $transporte ? $transporte->nome : $valor;
+
+                case 'prioridade_id':
+                    $prioridade = DB::table('prioridades')->find($valor);
+                    return $prioridade ? $prioridade->nome : $valor;
+
+                case 'funcionarios_id':
+                    $funcionario = Funcionarios::find($valor);
+                    return $funcionario ? $funcionario->nome : $valor;
+
+                case 'cliente_ativo':
+                    return $valor == 1 ? 'Sim' : 'Não';
+
+                case 'status':
+                    return $valor == 'A' ? 'Ativo' : 'Inativo';
+
+                case 'novo_alteracao':
+                    return $valor == 'N' ? 'Novo' : 'Alteração';
+
+                case 'com_pedido':
+                    return $valor == 1 ? 'Sim' : 'Não';
+
+                default:
+                    return $valor;
+            }
+        } catch (\Exception $e) {
+            // Em caso de erro, retorna o valor original
+            return $valor;
+        }
+    }
+
+    /**
+     * Normaliza valores para comparação no histórico
+     * Converte datas e resolve descrições de campos relacionais
+     *
+     * @param string $campo Nome do campo
+     * @param mixed $valor Valor do campo
+     * @return string|null Valor normalizado
+     */
+    public function normalizarValor($campo, $valor)
+    {
+        if ($valor === null) {
+            return null;
+        }
+
+        // Normalizar datas para formato brasileiro
+        if (in_array($campo, ['data_gerado', 'data_antecipacao', 'data_entrega', 'data_tarefa', 'data_status'])) {
+            try {
+                return \Carbon\Carbon::parse($valor)->format('d/m/Y');
+            } catch (\Exception $e) {
+                return $valor;
+            }
+        }
+
+        // Normalizar valores monetários
+        if ($campo === 'valor_unitario_adv') {
+            return 'R$ ' . number_format($valor, 2, ',', '.');
+        }
+
+        // Normalizar campos de tempo
+        if (in_array($campo, ['tempo_projetos', 'tempo_programacao'])) {
+            if (!empty($valor)) {
+                return $valor; // Mantém formato HH:MM:SS
+            }
+            return null;
+        }
+
+        // Resolver descrições para campos relacionais
+        return $this->resolverDescricao($campo, $valor);
+    }
+
     public function salva($request)
     {
         $id = DB::transaction(function () use ($request) {
@@ -533,29 +637,30 @@ class ProjetosController extends Controller
                 $projeto->em_alerta = 0;
             }
 
+            // Labels atualizados para melhor legibilidade
             $labels = [
                 'valor_unitario_adv' => 'Valor Unitário',
                 'os' => 'OS',
                 'ep' => 'EP',
-                'qtde' => 'Qtde',
+                'qtde' => 'Quantidade',
                 'blank' => 'Blank',
                 'pessoas_id' => 'Cliente',
-                'data_gerado' => 'Data Gerado',
-                'data_antecipacao' => 'Data Antecipação',
-                'data_entrega' => 'Data Entrega',
+                'data_gerado' => 'Data de Geração',
+                'data_antecipacao' => 'Data de Antecipação',
+                'data_entrega' => 'Data de Entrega',
                 'observacao' => 'Observação',
                 'status' => 'Situação',
-                'status_projetos_id' => 'Status',
-                'sub_status_projetos_codigo' => 'Status do projeto',
+                'status_projetos_id' => 'Status do Projeto',
+                'sub_status_projetos_codigo' => 'Sub-Status',
+                'etapa_projeto_id' => 'Etapa do Projeto',
                 'transporte_id' => 'Transporte',
                 'prioridade_id' => 'Prioridade',
                 'cliente_ativo' => 'Cliente Ativo',
-                'novo_alteracao' => 'Novo Alteração',
-                'tempo_projetos' => 'Tempo Projetos',
-                'tempo_programacao' => 'Tempo Programação',
-                'funcionarios_id' => 'Funcionario',
-                'data_entrega' => 'Data Entrega',
-                'observacao' => 'Observação',
+                'novo_alteracao' => 'Tipo',
+                'tempo_projetos' => 'Tempo de Projeto',
+                'tempo_programacao' => 'Tempo de Programação',
+                'funcionarios_id' => 'Responsável',
+                'com_pedido' => 'Com Pedido',
             ];
 
 
@@ -583,29 +688,26 @@ class ProjetosController extends Controller
             $projeto->status = $request->input('status');
 
             $alteracoes = [];
-
-            $usuarioLogado = auth()->user()->name; // ou id, como preferir
+            $usuarioLogado = auth()->user()->name;
 
             foreach ($labels as $campo => $label) {
+                if ($projeto->isDirty($campo)) {
+                    $antes = $projeto->getOriginal($campo);
+                    $depois = $projeto->$campo;
 
-            if ($projeto->isDirty($campo)) {
+                    // Normaliza os valores (converte datas e resolve descrições)
+                    $antesNormalizado = $this->normalizarValor($campo, $antes);
+                    $depoisNormalizado = $this->normalizarValor($campo, $depois);
 
-                $antes = $projeto->getOriginal($campo);
-                $depois = $projeto->$campo;
+                    // Só registra se realmente mudou
+                    if ($antesNormalizado != $depoisNormalizado) {
+                        $antesTexto = $antesNormalizado ?? 'vazio';
+                        $depoisTexto = $depoisNormalizado ?? 'vazio';
 
-                $antesNormalizado = $this->normalizarValor($campo, $antes);
-                $depoisNormalizado = $this->normalizarValor($campo, $depois);
-
-                // Só registra se realmente mudou
-                if ($antesNormalizado != $depoisNormalizado) {
-
-                    $antesTexto = $antesNormalizado ?? 'vazio';
-                    $depoisTexto = $depoisNormalizado ?? 'vazio';
-
-                    $alteracoes[] = "Campo \"{$label}\" alterado de \"{$antesTexto}\" para \"{$depoisTexto}\" por \"{$usuarioLogado}\"";
+                        $alteracoes[] = "Campo \"{$label}\" alterado de \"{$antesTexto}\" para \"{$depoisTexto}\" por \"{$usuarioLogado}\"";
+                    }
                 }
             }
-        }
 
             $projeto->save();
 
@@ -623,18 +725,6 @@ class ProjetosController extends Controller
     }
 
 
-    public function normalizarValor($campo, $valor)
-    {
-        if ($valor === null) {
-            return null;
-        }
-
-        if (in_array($campo, ['data_gerado', 'data_antecipacao', 'data_entrega', 'data_tarefa', 'data_status'])) {
-            return \Carbon\Carbon::parse($valor)->format('Y-m-d');
-        }
-
-        return $valor;
-    }
     /**
     * Busca todos os status_projetos
     *
