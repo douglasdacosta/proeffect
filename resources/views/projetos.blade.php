@@ -248,80 +248,79 @@ use App\Http\Controllers\PedidosController;
                                         $pedidos_Controller = new PedidosController();
 
                                     @endphp
-                                    <h3>{{ $status_nome }} ({{ count($projetos) }})</h3>
+                                    <h3>{{ $status_nome }} ({{ count($projetos)}})</h3>
                                     <table class="table table-striped text-center col-md-12" >
                                         <thead>
                                             @if(!empty($permissoes_liberadas) && (in_array(1, $permissoes_liberadas)))
                                                 <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
-                                                    <th style="min-width: 50px;">ID</th>
+                                                    <th >ID</th>
                                                     <th >Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
-                                                    <th style="min-width: 100px;">EP</th>
-                                                    <th style="min-width: 150px;">Data solicitação</th>
-                                                    <th style="min-width: 50px;">Qtde</th>
-                                                    <th style="min-width: 50px;">Blank</th>
-                                                    <th style="min-width: 100px;">Até/Urg</th>
-                                                    <th style="min-width: 150px;">Novo/Alteração</th>
-                                                    <th style="min-width: 250px;">Status</th>
+                                                    <th >EP</th>
+                                                    <th >Data solicitação</th>
+                                                    <th >Qtde</th>
+                                                    <th >Blank</th>
+                                                    <th >Até/Urg</th>
+                                                    <th >Novo/Alteração</th>
+                                                    <th >Status</th>
                                                     <th style="min-width: 150px;">Etapa Projeto</th>
                                                     <th style="min-width: 150px;">Tempo Projeto</th>
-                                                    <th style="min-width: 200px;">Tempo Programação</th>
-                                                    <th style="min-width: 150px;">Prazo Entrega</th>
-                                                    <th style="min-width: 150px;">Alerta dias</th>
-                                                    <th style="min-width: 150px;">Data Status</th>
-                                                    <th style="min-width: 150px;">Data Tarefa</th>
-                                                    <th style="min-width: 150px;">Colaborador</th>
-                                                    <th style="min-width: 50px;">Apontamento</th>
+                                                    <th >Tempo Programação</th>
+                                                    <th >Prazo Entrega</th>
+                                                    <th >Alerta dias</th>
+                                                    <th >Data Status</th>
+                                                    <th >Data Tarefa</th>
+                                                    <th >Colaborador</th>
+                                                    <th >Apontamento</th>
                                                 </tr>
                                             @endif
                                             @if(!empty($permissoes_liberadas) && (in_array(2, $permissoes_liberadas)))
                                                 <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
-                                                    <th style="min-width: 50px;">ID</th>
+                                                    <th >ID</th>
                                                     <th >Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
-                                                    <th style="min-width: 100px;">EP</th>
-                                                    <th style="min-width: 150px;">Data solicitação</th>
-                                                    <th style="min-width: 50px;">Qtde</th>
-                                                    <th style="min-width: 100px;">Até/Urg</th>
+                                                    <th >EP</th>
+                                                    <th >Data solicitação</th>
+                                                    <th >Qtde</th>
+                                                    <th >Até/Urg</th>
                                                     <th style="min-width: 150px;">Pedido</th>
-                                                    <th style="min-width: 100px;">Valor</th>
-                                                    <th style="min-width: 150px;">Novo/Alteração</th>
+                                                    <th >Valor</th>
+                                                    <th >Novo/Alteração</th>
                                                     <th style="min-width: 250px;">Status</th>
                                                     <th style="min-width: 150px;">Etapa Projeto</th>
-                                                    <th style="min-width: 150px;">Data Tarefa</th>
-                                                    <th style="min-width: 150px;">Data Status</th>
-                                                    <th style="min-width: 150px;">Prazo Entrega</th>
-                                                    <th style="min-width: 150px;">Alerta dias</th>
+                                                    <th >Data Tarefa</th>
+                                                    <th >Data Status</th>
+                                                    <th >Prazo Entrega</th>
+                                                    <th >Alerta dias</th>
 
                                                 </tr>
                                             @endif
                                             @if(!empty($permissoes_liberadas) && (in_array(3, $permissoes_liberadas)))
                                                 <tr style="background-color: {{$palheta_cores[trim($status_nome)]}}">
-                                                    <th style="min-width: 50px;">ID</th>
+                                                    <th >ID</th>
                                                     <th >Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
-                                                    <th style="min-width: 100px;">EP</th>
-                                                    <th style="min-width: 150px;">Data solicitação</th>
-                                                    <th style="min-width: 50px;">Qtde</th>
-                                                    <th style="min-width: 50px;">Blank</th>
-                                                    <th style="min-width: 100px;">Até/Urg</th>
+                                                    <th >EP</th>
+                                                    <th >Data solicitação</th>
+                                                    <th >Qtde</th>
+                                                    <th >Blank</th>
+                                                    <th >Até/Urg</th>
                                                     <th style="min-width: 150px;">Pedido</th>
-                                                    <th style="min-width: 100px;">Valor</th>
-                                                    <th style="min-width: 150px;">Cliente Ativo</th>
-                                                    <th style="min-width: 150px;">Novo/Alteração</th>
-                                                    <th style="min-width: 150px;">Data Status</th>
+                                                    <th >Valor</th>
+                                                    <th >Cliente Ativo</th>
+                                                    <th >Novo/Alteração</th>
+                                                    <th >Data Status</th>
                                                     <th style="min-width: 250px;">Status</th>
                                                     <th style="min-width: 150px;">Etapa Projeto</th>
-                                                    <th style="min-width: 150px;">Tempo Projeto</th>
-                                                    <th style="min-width: 200px;">Tempo Programação</th>
-                                                    <th style="min-width: 150px;">Prazo Entrega</th>
-                                                    <th style="min-width: 150px;">Alerta dias</th>
-
+                                                    <th >Tempo Projeto</th>
+                                                    <th >Tempo Programação</th>
+                                                    <th >Prazo Entrega</th>
+                                                    <th >Alerta dias</th>
                                                     <th style="min-width: 250px;">Transporte</th>
-                                                    <th style="min-width: 150px;">Data Tarefa</th>
-                                                    <th style="min-width: 220px;">Tempo Desenvolvimento</th>
-                                                    <th style="min-width: 50px;">Apontamento</th>
-                                                    <th style="min-width: 150px;">Colaborador</th>
+                                                    <th >Data Tarefa</th>
+                                                    <th >Tempo Desenvolvimento</th>
+                                                    <th >Apontamento</th>
+                                                    <th >Colaborador</th>
                                                     <th style="min-width: 150px;">Observação</th>
                                                 </tr>
                                             @endif
@@ -525,7 +524,7 @@ use App\Http\Controllers\PedidosController;
                                                     @endif
 
                                                     @if(!empty($permissoes_liberadas) && @(in_array(3, $permissoes_liberadas)))
-                                                        <tr class="linha_{{ $projeto['id'] }}" @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807" @endif >
+                                                        <tr class="linha_{{ $projeto['id'] }}" @if(isset($projeto['em_alerta']) && $projeto['em_alerta'] == 1) style="background-color: #F2C807"  @endif >
                                                             <th scope="row"><a href={{ URL::route($rotaAlterar, ['id' => $projeto['id']]) }}>{{ $projeto['id'] }}</a></th>
                                                             <td>
                                                                 <i data-projeto_id="{{ $projeto['id'] }}" style="cursor:pointer;
@@ -631,6 +630,7 @@ use App\Http\Controllers\PedidosController;
                                             @if(!empty($permissoes_liberadas) && ((in_array(1, $permissoes_liberadas))))
                                             <tr>
                                                 <th style="min-width: 50px;"></th>
+                                                <th style="min-width: 50px;"></th>
                                                 <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 100px;"></th>
@@ -655,6 +655,7 @@ use App\Http\Controllers\PedidosController;
                                             @endif
                                             @if(!empty($permissoes_liberadas) && ((in_array(3, $permissoes_liberadas))))
                                             <tr>
+                                                <th style="min-width: 50px;"></th>
                                                 <th style="min-width: 50px;"></th>
                                                 <th style="min-width: 150px;"></th>
                                                 <th style="min-width: 150px;"></th>
