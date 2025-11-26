@@ -262,9 +262,9 @@ use App\Http\Controllers\PedidosController;
                                                     <th >Blank</th>
                                                     <th >Até/Urg</th>
                                                     <th >Novo/Alteração</th>
-                                                    <th >Status</th>
+                                                    <th style="min-width: 250px;">Status</th>
                                                     <th style="min-width: 150px;">Etapa Projeto</th>
-                                                    <th style="min-width: 150px;">Tempo Projeto</th>
+                                                    <th >Tempo Projeto</th>
                                                     <th >Tempo Programação</th>
                                                     <th >Prazo Entrega</th>
                                                     <th >Alerta dias</th>
@@ -306,7 +306,7 @@ use App\Http\Controllers\PedidosController;
                                                     <th >Blank</th>
                                                     <th >Até/Urg</th>
                                                     <th style="min-width: 150px;">Pedido</th>
-                                                    <th >Valor</th>
+                                                    <th style="min-width: 100px;">Valor</th>
                                                     <th >Cliente Ativo</th>
                                                     <th >Novo/Alteração</th>
                                                     <th >Data Status</th>
@@ -629,58 +629,58 @@ use App\Http\Controllers\PedidosController;
                                         <tfoot>
                                             @if(!empty($permissoes_liberadas) && ((in_array(1, $permissoes_liberadas))))
                                             <tr>
-                                                <th style="min-width: 50px;"></th>
-                                                <th style="min-width: 50px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 50px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;">{{ $somado_tempo_projeto ?? '' }}</th>
-                                                <th style="min-width: 200px;">{{ $somado_tempo_programacao ?? '' }}</th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 250px;"></th>
-                                                <th style="min-width: 250px;"></th>
-                                                <th style="min-width: 220px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 50px;"></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th>{{ $somado_tempo_projeto ?? '' }}</th>
+                                                <th>{{ $somado_tempo_programacao ?? '' }}</th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
                                             </tr>
                                             @endif
                                             @if(!empty($permissoes_liberadas) && ((in_array(3, $permissoes_liberadas))))
                                             <tr>
-                                                <th style="min-width: 50px;"></th>
-                                                <th style="min-width: 50px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 50px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 100px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;">{{ $somado_tempo_projeto ?? '' }}</th>
-                                                <th style="min-width: 200px;">{{ $somado_tempo_programacao ?? '' }}</th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 250px;"></th>
-                                                <th style="min-width: 250px;"></th>
-                                                <th style="min-width: 220px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 150px;"></th>
-                                                <th style="min-width: 50px;"></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th>{{ $somado_tempo_projeto ?? '' }}</th>
+                                                <th>{{ $somado_tempo_programacao ?? '' }}</th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
                                             </tr>
                                             @endif
                                         </tfoot>
