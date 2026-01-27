@@ -64,6 +64,10 @@
                       <th>Contato</th>
                       <th>Telefone</th>
                       <th>Email</th>
+                      <th>Contato Venda - Followup</th>
+                      <th>Whats Venda</th>
+                      <th>Contato Pós Venda</th>
+                      <th>Whats Pós Venda</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -75,6 +79,10 @@
                               <td>{{$pessoa->nome_contato}}</td>
                               <td class='mask_phone'>{{$pessoa->telefone}}</td>
                               <td>{{$pessoa->email}}</td>
+                              <td>{{$pessoa->contato_venda}}</td>
+                              <td class='mask_phone'>{{$pessoa->numero_whatsapp_venda}}</td>
+                              <td>{{$pessoa->contato_pos_venda}}</td>
+                              <td class='mask_phone'>{{$pessoa->numero_whatsapp_pos_venda}}</td>
                             </tr>
                         @endforeach
                     @endif
@@ -178,6 +186,30 @@
                 <label for="email" class="col-sm-2 col-form-label">Email</label>
                 <div class="col-sm-4">
                 <input type="text" class="form-control is-invalid" required id="email" name="email" value="@if (isset($pessoas[0]->email)){{$pessoas[0]->email}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="contato_venda" class="col-sm-2 col-form-label">Contato Venda - Followup</label>
+                <div class="col-sm-4">
+                <input type="text" class="form-control" id="contato_venda" name="contato_venda" value="@if (isset($pessoas[0]->contato_venda)){{$pessoas[0]->contato_venda}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="numero_whatsapp_venda" class="col-sm-2 col-form-label">Número Whatsapp Venda</label>
+                <div class="col-sm-2">
+                <input type="text" class="form-control mask_phone" id="numero_whatsapp_venda" name="numero_whatsapp_venda" value="@if (isset($pessoas[0]->numero_whatsapp_venda)){{$pessoas[0]->numero_whatsapp_venda}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="contato_pos_venda" class="col-sm-2 col-form-label">Contato Pós Venda</label>
+                <div class="col-sm-4">
+                <input type="text" class="form-control" id="contato_pos_venda" name="contato_pos_venda" value="@if (isset($pessoas[0]->contato_pos_venda)){{$pessoas[0]->contato_pos_venda}}@else{{''}}@endif">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="numero_whatsapp_pos_venda" class="col-sm-2 col-form-label">Número Whatsapp Pós Venda</label>
+                <div class="col-sm-2">
+                <input type="text" class="form-control mask_phone" id="numero_whatsapp_pos_venda" name="numero_whatsapp_pos_venda" value="@if (isset($pessoas[0]->numero_whatsapp_pos_venda)){{$pessoas[0]->numero_whatsapp_pos_venda}}@else{{''}}@endif">
                 </div>
             </div>
             <div class="form-group row">

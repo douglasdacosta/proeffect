@@ -88,6 +88,11 @@ Route::match(['get', 'post'],'/relatorio-producao', [App\Http\Controllers\Relato
 
 Route::match(['get', 'post'],'/paineis', [App\Http\Controllers\PaineisController::class, 'index'])->name('paineis')->middleware('afterAuth:paineis');
 
+Route::match(['get', 'post'],'/iaqualidade', [App\Http\Controllers\IaQualidadeController::class, 'index'])->name('iaqualidade')->middleware('afterAuth:iaqualidade');
+Route::match(['post'],'/iaqualidade/enviar', [App\Http\Controllers\IaQualidadeController::class, 'enviarLead'])->name('iaqualidade.enviar')->middleware('afterAuth:iaqualidade');
+Route::match(['post'],'/iaqualidade/remover', [App\Http\Controllers\IaQualidadeController::class, 'removerLead'])->name('iaqualidade.remover')->middleware('afterAuth:iaqualidade');
+Route::match(['post'],'/iaqualidade/finalizar', [App\Http\Controllers\IaQualidadeController::class, 'finalizarLead'])->name('iaqualidade.finalizar')->middleware('afterAuth:iaqualidade');
+
 Route::match(['get', 'post'],'/manutencao-status', [App\Http\Controllers\ManutencaoProducaoController::class, 'pesquisar'])->name('manutencao-status');
 Route::match(['post'],'/manutencao-producao-alterar-pedido', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedido'])->name('manutencao-producao-alterar-pedido');
 Route::match(['post'],'/manutencao-producao-salvar_caixas', [App\Http\Controllers\ManutencaoProducaoController::class, 'ajaxAlterarPedidoCaixa'])->name('manutencao-producao-salvar_caixas');
@@ -151,3 +156,7 @@ Route::match(['get', 'post'],'/ajax-alterar-etapas-projetos', [App\Http\Controll
 Route::match(['get', 'post'],'/configuracoes-projetos', [App\Http\Controllers\ConfiguracoesProjetosController::class, 'index'])->name('configuracoes-projetos')->middleware('afterAuth:configuracoes-projetos');
 Route::match(['get', 'post'],'/alterar-configuracoes-projetos', [App\Http\Controllers\ConfiguracoesProjetosController::class, 'alterar'])->name('alterar-configuracoes-projetos')->middleware('afterAuth:configuracoes-projetos');
 Route::match(['get', 'post'],'/incluir-configuracoes-projetos', [App\Http\Controllers\ConfiguracoesProjetosController::class, 'incluir'])->name('incluir-configuracoes-projetos')->middleware('afterAuth:configuracoes-projetos');
+
+Route::match(['get', 'post'],'/configuracao-ia', [App\Http\Controllers\ConfiguracaoIaController::class, 'index'])->name('configuracao-ia')->middleware('afterAuth:configuracao-ia');
+Route::match(['get', 'post'],'/alterar-configuracao-ia', [App\Http\Controllers\ConfiguracaoIaController::class, 'alterar'])->name('alterar-configuracao-ia')->middleware('afterAuth:configuracao-ia');
+Route::match(['get', 'post'],'/incluir-configuracao-ia', [App\Http\Controllers\ConfiguracaoIaController::class, 'incluir'])->name('incluir-configuracao-ia')->middleware('afterAuth:configuracao-ia');

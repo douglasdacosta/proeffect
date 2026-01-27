@@ -146,6 +146,10 @@ class PessoasController extends Controller
         $pessoas->estado = $request->input('estado');
         $pessoas->telefone = preg_replace("/[^0-9]/", "", $request->input('telefone'));
         $pessoas->email = $request->input('email');
+        $pessoas->contato_venda = $request->input('contato_venda');
+        $pessoas->numero_whatsapp_venda = preg_replace("/[^0-9]/", "", $request->input('numero_whatsapp_venda'));
+        $pessoas->contato_pos_venda = $request->input('contato_pos_venda');
+        $pessoas->numero_whatsapp_pos_venda = preg_replace("/[^0-9]/", "", $request->input('numero_whatsapp_pos_venda'));
         $pessoas->fornecedor = $request->input('fornecedor');
         $pessoas->loja = $request->input('loja');
         $pessoas->status = $request->input('status');
