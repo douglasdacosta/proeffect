@@ -7,6 +7,9 @@ use App\Http\Controllers\PedidosController;
 @section('title', 'Pro Effect')
 
 @section('adminlte_css')
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/main_style.css') }}" />
 @stop
@@ -29,21 +32,7 @@ use App\Http\Controllers\PedidosController;
             </div>
         @stop
         @section('content')
-        {{-- <div id="toastsContainerTopRight" class="toasts-top-right fixed">
-                <div class="toast fade show" role="alert" style="width: 350px" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header">
-                        <strong class="mr-auto">Alerta!</strong>
-                        <small></small>
-                        <button data-dismiss="toast" type="button" class="ml-2 mb-1 close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="toast-body textoAlerta" style="text-decoration-style: solid; font-weight: bold; font-size: larger;">
-                        <!-- Conteúdo do alerta -->
-                    </div>
-                </div>
-            </div> --}}
-            <input type="hidden" class="projeto_id" name="projeto_id" id="projeto_id" value=""/>
+             <input type="hidden" class="projeto_id" name="projeto_id" id="projeto_id" value=""/>
             <div id='modal_funcionarios_projetos' class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" style="width: 800px">
