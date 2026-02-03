@@ -175,23 +175,22 @@ class IaQualidadeController extends Controller
     public function finalizarLead(Request $request)
     {
         try {
+            $ids = $request->input('ids');
 
-            $retorno = DB::transaction(function () use ($request) {
-                $ids = $request->input('ids');
+            if (empty($ids)) {
+                return redirect()->back()->with('error', 'Nenhum pedido selecionado');
+            }
 
-                if (empty($ids)) {
-                    return redirect()->back()->with('error', 'Nenhum pedido selecionado');
-                }
+            if (is_string($ids)) {
+                $ids = explode(',', $ids);
+            }
 
-                if (is_string($ids)) {
-                    $ids = explode(',', $ids);
-                }
-
+            $retorno = DB::transaction(function () use ($request, $ids) {
                 DB::table('pedidos')
                     ->whereIn('id', $ids)
                     ->update([
                         'status_lead' => 'finalizado',
-                        'data_envio_ultimo_lead' => now()
+                        'datahora_envio_ultimo_lead' => now()
                     ]);
 
                 //enviar para a API de que envia leads em formato Json
@@ -235,32 +234,45 @@ class IaQualidadeController extends Controller
                 if (!empty($dataToSend) && !empty($url)) {
                     $jsonData = json_encode($dataToSend);
 
-                    $ch = curl_init($url); // Substitua pela URL correta da API
+                    $ch = curl_init($url);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json',
-                        'Authorization: Bearer ' . env('API_ENVIAR_LEADS_TOKEN') // Substitua pelo token correto se necessário
+                        'Authorization: Bearer ' . env('API_ENVIAR_LEADS_TOKEN')
                     ]);
                     curl_setopt($ch, CURLOPT_POST, true);
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
 
                     $response = curl_exec($ch);
                     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
 
                     if ($httpCode !== 200) {
-                        DB::rollBack();
-                        return redirect()->back()->with('error', 'Erro ao enviar dados para a API: ' . $response);
+                          \Log::info($httpCode);
+                        if ($response === false) {
+                            $error = curl_error($ch);
+                            $errno = curl_errno($ch);
+
+                            \Log::info([
+                                'curl_error' => $error,
+                                'curl_errno' => $errno,
+                            ]);
+                        }
+
+                        throw new \Exception('Erro ao enviar dados para a API: ' . $response);
                     }
 
+                    return ['success' => true, 'message' => 'Lead(s) finalizado(s) com sucesso'];
                 } else {
-                    return redirect()->back()->with('success', 'Simulação finalizada com sucesso');
+                    return ['success' => true, 'message' => 'Simulação finalizada com sucesso'];
                 }
-
-                return redirect()->back()->with('success', 'Lead(s) finalizado(s) com sucesso');
-
             });
+
+            return redirect()->back()->with('success', $retorno['message']);
+
         } catch (\Exception $e) {
-            DB::rollBack();
             return redirect()->back()->with('error', 'Erro ao finalizar lead: ' . $e->getMessage());
         }
     }

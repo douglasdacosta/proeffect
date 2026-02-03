@@ -29,7 +29,11 @@ use App\Http\Controllers\PedidosController;
         @section('content_header')
             <div class="form-group row">
                 <h1 class="m-0 text-dark col-sm-10 col-form-label">Pesquisa de {{ $nome_tela }}</h1>
+                <div class="col-sm-1">
+                    @include('layouts.nav-open-incluir', ['rotaIncluir' => $rotaIncluir])
+                </div>
             </div>
+
         @stop
         @section('content')
              <input type="hidden" class="projeto_id" name="projeto_id" id="projeto_id" value=""/>
@@ -687,6 +691,40 @@ use App\Http\Controllers\PedidosController;
     @case('alterar')
     @case('incluir')
         @section('content')
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading">Erros na Validação</h4>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading">Erro</h4>
+                    {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading">Sucesso</h4>
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
             @if ($tela == 'alterar')
                 @section('content_header')
                     <h1 class="m-0 text-dark">Alteração de {{ $nome_tela }}</h1>
@@ -713,7 +751,7 @@ use App\Http\Controllers\PedidosController;
                 <label for="os" class="col-sm-2 col-form-label">OS</label>
                 <div class="col-sm-1">
                     <input type="text" class="form-control" id="os" name="os"
-                        value="@if (isset($projetos[0]->os) && $projetos[0]->os) {{ $projetos[0]->os }} @else{{ '' }} @endif">
+                        value="@if (old('os')) {{ old('os') }} @elseif (isset($projetos[0]->os) && $projetos[0]->os) {{ $projetos[0]->os }} @else{{ '' }} @endif">
                 </div>
             </div>
 
@@ -725,7 +763,7 @@ use App\Http\Controllers\PedidosController;
                         @if (isset($clientes))
                             @foreach ($clientes as $clientes)
                                 <option value="{{ $clientes->id }}"
-                                    @if (isset($projetos[0]->pessoas_id) && $projetos[0]->pessoas_id == $clientes->id) selected="selected" @else{{ '' }} @endif>
+                                    @if ((old('clientes_id') && old('clientes_id') == $clientes->id) || (isset($projetos[0]->pessoas_id) && $projetos[0]->pessoas_id == $clientes->id)) selected="selected" @else{{ '' }} @endif>
                                     {{ $clientes->codigo_cliente . ' - ' . $clientes->nome_cliente }}
                                 </option>
                             @endforeach
@@ -737,7 +775,7 @@ use App\Http\Controllers\PedidosController;
                 <label for="fichatecnica" class="col-sm-2 col-form-label">EP</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="ep" name="ep"
-                        value="@if (isset($projetos[0]->ep) && $projetos[0]->ep) {{ $projetos[0]->ep }} @else{{ '' }} @endif">
+                        value="@if (old('ep')) {{ old('ep') }} @elseif (isset($projetos[0]->ep) && $projetos[0]->ep) {{ $projetos[0]->ep }} @else{{ '' }} @endif">
                 </div>
             </div>
             <div class="form-group row">
@@ -752,7 +790,7 @@ use App\Http\Controllers\PedidosController;
                 <label for="qtde" class="col-sm-2 col-form-label">Qtde</label>
                 <div class="col-sm-1">
                     <input type="text" class="form-control sonumeros" id="qtde" name="qtde"
-                        value="@if (isset($projetos[0]->qtde)) {{ $projetos[0]->qtde }} @else{{ '' }} @endif">
+                        value="@if (old('qtde')) {{ old('qtde') }} @elseif (isset($projetos[0]->qtde)) {{ $projetos[0]->qtde }} @else{{ '' }} @endif">
                 </div>
             </div>
 
@@ -787,7 +825,7 @@ use App\Http\Controllers\PedidosController;
                 <label for="com_pedido" class="col-sm-2 col-form-label">Valor</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control mask_valor" id="valor_unitario_adv" name="valor_unitario_adv"
-                        value="@if (isset($projetos[0]->valor_unitario_adv)) {{ number_format($projetos[0]->valor_unitario_adv, 2, ',', '.') }} @else{{ '' }} @endif">
+                        value="@if (old('valor_unitario_adv')) {{ old('valor_unitario_adv') }} @elseif (isset($projetos[0]->valor_unitario_adv)) {{ number_format($projetos[0]->valor_unitario_adv, 2, ',', '.') }} @else{{ '' }} @endif">
                 </div>
             </div>
 
@@ -795,9 +833,9 @@ use App\Http\Controllers\PedidosController;
                 <label for="cliente_ativo" class="col-sm-2 col-form-label">Cliente Ativo</label>
                 <div class="col-sm-10">
                     <select class="form-control col-md-2" id="cliente_ativo" name="cliente_ativo">
-                        <option value="" @if (isset($projetos[0]->cliente_ativo) && $projetos[0]->cliente_ativo == '') {{ ' selected ' }}@else @endif></option>
-                        <option value="0" @if (isset($projetos[0]->cliente_ativo) && $projetos[0]->cliente_ativo == '0') {{ ' selected ' }}@else @endif>NÃO</option>
-                        <option value="1" @if (isset($projetos[0]->cliente_ativo) && $projetos[0]->cliente_ativo == '1') {{ ' selected ' }}@else @endif>SIM</option>
+                        <option value="" @if ((old('cliente_ativo') === '' || old('cliente_ativo') === null) && (isset($projetos[0]->cliente_ativo) && $projetos[0]->cliente_ativo == '')) {{ ' selected ' }}@else @endif></option>
+                        <option value="0" @if ((old('cliente_ativo') === '0') || (isset($projetos[0]->cliente_ativo) && $projetos[0]->cliente_ativo == '0')) {{ ' selected ' }}@else @endif>NÃO</option>
+                        <option value="1" @if ((old('cliente_ativo') === '1') || (isset($projetos[0]->cliente_ativo) && $projetos[0]->cliente_ativo == '1')) {{ ' selected ' }}@else @endif>SIM</option>
                     </select>
                 </div>
             </div>
@@ -805,9 +843,9 @@ use App\Http\Controllers\PedidosController;
                 <label for="novo_alteracao" class="col-sm-2 col-form-label">Novo/Alteração</label>
                 <div class="col-sm-10">
                     <select class="form-control col-md-2" id="novo_alteracao" name="novo_alteracao">
-                        <option value="" @if (isset($projetos[0]->novo_alteracao) && $projetos[0]->novo_alteracao == '') {{ ' selected ' }}@else @endif></option>
-                        <option value="0" @if (isset($projetos[0]->novo_alteracao) && $projetos[0]->novo_alteracao == '0') {{ ' selected ' }}@else @endif>NOVO</option>
-                        <option value="1" @if (isset($projetos[0]->novo_alteracao) && $projetos[0]->novo_alteracao == '1') {{ ' selected ' }}@else @endif>ALTERAÇÃO</option>
+                        <option value="" @if ((old('novo_alteracao') === '' || old('novo_alteracao') === null) && (isset($projetos[0]->novo_alteracao) && $projetos[0]->novo_alteracao == '')) {{ ' selected ' }}@else @endif></option>
+                        <option value="0" @if ((old('novo_alteracao') === '0') || (isset($projetos[0]->novo_alteracao) && $projetos[0]->novo_alteracao == '0')) {{ ' selected ' }}@else @endif>NOVO</option>
+                        <option value="1" @if ((old('novo_alteracao') === '1') || (isset($projetos[0]->novo_alteracao) && $projetos[0]->novo_alteracao == '1')) {{ ' selected ' }}@else @endif>ALTERAÇÃO</option>
                     </select>
                 </div>
             </div>
@@ -820,7 +858,7 @@ use App\Http\Controllers\PedidosController;
                         @if (isset($AllFuncionarios))
                             @foreach ($AllFuncionarios as $funcionario)
                                 <option value="{{ $funcionario->id }}"
-                                    @if ((isset($projetos[0]->funcionarios_id) && $projetos[0]->funcionarios_id == $funcionario->id) || ($tela == 'incluir' && $funcionario->id == 1)) selected="selected" @else{{ '' }} @endif>
+                                    @if ((old('funcionarios_id') && old('funcionarios_id') == $funcionario->id) || (isset($projetos[0]->funcionarios_id) && $projetos[0]->funcionarios_id == $funcionario->id) || ($tela == 'incluir' && $funcionario->id == 1)) selected="selected" @else{{ '' }} @endif>
                                     {{ $funcionario->nome }}
                                 </option>
                             @endforeach
@@ -832,7 +870,7 @@ use App\Http\Controllers\PedidosController;
                 <label for="tempo_projetos" class="col-sm-2 col-form-label">Tempo de projeto</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control mask_horas" id="tempo_projetos" name="tempo_projetos" placeholder="HH:MM:SS"
-                        value="@if (isset($projetos[0]->tempo_projetos)) {{ $projetos[0]->tempo_projetos }} @else {{ '' }} @endif">
+                        value="@if (old('tempo_projetos')) {{ old('tempo_projetos') }} @elseif (isset($projetos[0]->tempo_projetos)) {{ $projetos[0]->tempo_projetos }} @else {{ '' }} @endif">
                 </div>
             </div>
 
@@ -840,15 +878,15 @@ use App\Http\Controllers\PedidosController;
                 <label for="tempo_programacao" class="col-sm-2 col-form-label">Tempo de programação</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control mask_horas" id="tempo_programacao" name="tempo_programacao" placeholder="HH:MM:SS"
-                        value="@if (isset($projetos[0]->tempo_programacao)) {{ $projetos[0]->tempo_programacao }} @else {{ '' }} @endif">
+                        value="@if (old('tempo_programacao')) {{ old('tempo_programacao') }} @elseif (isset($projetos[0]->tempo_programacao)) {{ $projetos[0]->tempo_programacao }} @else {{ '' }} @endif">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="blank" class="col-sm-2 col-form-label">Blank</label>
                 <div class="col-sm-2">
-                    <input type="text" class="form-control" id="blank" name="blank"
-                        value="@if (isset($projetos[0]->blank)) {{ $projetos[0]->blank }} @else {{ '' }} @endif">
+                    <input type="number" class="form-control" id="blank" name="blank" min="0"
+                        value="@if (old('blank')) {{ old('blank') }} @elseif (isset($projetos[0]->blank)) {{ $projetos[0]->blank }} @else {{ '' }} @endif">
                 </div>
             </div>
 
@@ -862,7 +900,7 @@ use App\Http\Controllers\PedidosController;
             <div class="form-group row">
                 <label for="data_antecipacao" class="col-sm-2 col-form-label">Data antecipação</label>
                 <div class="col-sm-1">
-                    <input type="text" class="form-control mask_date" id="data_antecipacao" name="data_antecipacao" placeholder="DD/MM/AAAA" value="@if (isset($projetos[0]->data_antecipacao)) {{ Carbon\Carbon::parse($projetos[0]->data_antecipacao)->format('d/m/Y') }} @else {{ '' }} @endif">
+                    <input type="text" class="form-control mask_date" id="data_antecipacao" name="data_antecipacao" placeholder="DD/MM/AAAA" value="@if (old('data_antecipacao')) {{ old('data_antecipacao') }} @elseif (isset($projetos[0]->data_antecipacao)) {{ Carbon\Carbon::parse($projetos[0]->data_antecipacao)->format('d/m/Y') }} @else {{ '' }} @endif">
                 </div>
             </div>
             <div class="form-group row">
@@ -879,7 +917,7 @@ use App\Http\Controllers\PedidosController;
                                 <optgroup label="{{ $groupName }}">
                                     @foreach ($subStatuses as $stats)
                                         <option value="{{ $stats->codigo }}"
-                                            @if ((isset($projetos[0]->sub_status_projetos_codigo) && $projetos[0]->sub_status_projetos_codigo == $stats->codigo) || ($tela == 'incluir' && $stats->codigo == 1)) selected="selected" @endif>
+                                            @if ((old('status_id') && old('status_id') == $stats->codigo) || (isset($projetos[0]->sub_status_projetos_codigo) && $projetos[0]->sub_status_projetos_codigo == $stats->codigo) || ($tela == 'incluir' && $stats->codigo == 1)) selected="selected" @endif>
                                             {{ $stats->nome }}
                                         </option>
                                     @endforeach
@@ -897,7 +935,7 @@ use App\Http\Controllers\PedidosController;
                         @if (isset($AllEtapas))
                             @foreach ($AllEtapas as $etapas)
                                 <option value="{{ $etapas->id }}"
-                                    @if ((isset($projetos[0]->etapa_projeto_id) && $projetos[0]->etapa_projeto_id == $etapas->id) || ($tela == 'incluir' && $etapas->id == 1)) selected="selected" @else{{ '' }} @endif>
+                                    @if ((old('etapa_projeto_id') && old('etapa_projeto_id') == $etapas->id) || (isset($projetos[0]->etapa_projeto_id) && $projetos[0]->etapa_projeto_id == $etapas->id) || ($tela == 'incluir' && $etapas->id == 1)) selected="selected" @else{{ '' }} @endif>
                                     {{ $etapas->nome }}
                                 </option>
                             @endforeach
@@ -913,7 +951,7 @@ use App\Http\Controllers\PedidosController;
                         @if (isset($transportes))
                             @foreach ($transportes as $transporte)
                                 <option value="{{ $transporte->id }}"
-                                    @if (isset($projetos[0]->transporte_id) && $projetos[0]->transporte_id == $transporte->id) selected="selected" @else{{ '' }} @endif>
+                                    @if ((old('transporte_id') && old('transporte_id') == $transporte->id) || (isset($projetos[0]->transporte_id) && $projetos[0]->transporte_id == $transporte->id)) selected="selected" @else{{ '' }} @endif>
                                     {{ $transporte->nome }}
                                 </option>
                             @endforeach
@@ -924,15 +962,15 @@ use App\Http\Controllers\PedidosController;
             <div class="form-group row ">
                 <label for="em_alerta" class="col-sm-2 col-form-label">Alerta</label>
                 <select class="form-control custom-select col-md-2 " id="em_alerta" name="em_alerta">
-                    <option value="0" @if (isset($projetos[0]->em_alerta) && $projetos[0]->em_alerta == '0'){{ ' selected '}}@else @endif>Sem alerta</option>
-                    <option value="1" @if (isset($projetos[0]->em_alerta) && $projetos[0]->em_alerta =='1'){{ ' selected '}}@else @endif>Em alerta</option>
+                    <option value="0" @if ((old('em_alerta') === '0') || (isset($projetos[0]->em_alerta) && $projetos[0]->em_alerta == '0')){{ ' selected '}}@else @endif>Sem alerta</option>
+                    <option value="1" @if ((old('em_alerta') === '1') || (isset($projetos[0]->em_alerta) && $projetos[0]->em_alerta =='1')){{ ' selected '}}@else @endif>Em alerta</option>
                 </select>
             </div>
             <div class="form-group row">
                 <label for="status" class="col-sm-2 col-form-label"></label>
                 <select class="form-control col-md-1" id="status" name="status">
-                    <option value="A" @if (isset($projetos[0]->projeto) && $projetos[0]->projeto == 'A') {{ ' selected ' }}@else @endif>Ativo</option>
-                    <option value="I" @if (isset($projetos[0]->projeto) && $projetos[0]->projeto == 'I') {{ ' selected ' }}@else @endif>Inativo</option>
+                    <option value="A" @if ((old('status') === 'A') || (isset($projetos[0]->projeto) && $projetos[0]->projeto == 'A')) {{ ' selected ' }}@else @endif>Ativo</option>
+                    <option value="I" @if ((old('status') === 'I') || (isset($projetos[0]->projeto) && $projetos[0]->projeto == 'I')) {{ ' selected ' }}@else @endif>Inativo</option>
                 </select>
             </div>
 

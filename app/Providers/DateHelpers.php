@@ -40,8 +40,11 @@ class DateHelpers
      * @return string
      */
     public static function formatFloatValue($value) {
+        if (empty($value)) {
+            return '0.00';
+        }
         $value = preg_replace('/\,/', '.', preg_replace('/\./', '', $value));
-        return number_format($value, 2, '.', '');
+        return number_format((float)$value, 2, '.', '');
     }
 
     /**
@@ -50,6 +53,9 @@ class DateHelpers
      * @return string
      */
     public static function formatRealFormat($value) {
-        return number_format($value, 2, ',', '');
+        if (empty($value)) {
+            return '0,00';
+        }
+        return number_format((float)$value, 2, ',', '');
     }
 }
