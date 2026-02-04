@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Auth\ValidaPermissaoAcessoController;
 use App\Models\Funcionarios;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\Projetos;
 use App\Providers\DateHelpers;
@@ -171,7 +172,13 @@ class ProjetosController extends Controller
         foreach ($projetos as $projeto) {
 
             $prazo_entrega = '';
-            if(!empty($projeto->tempo_projetos)) {
+            if (!empty($projeto->data_entrega_congelada) || $projeto->alerta_dias_congelado !== null) {
+                $projeto->data_prazo_entrega = !empty($projeto->data_entrega_congelada)
+                    ? (new DateTime($projeto->data_entrega_congelada))->format('d/m/Y')
+                    : '';
+                $projeto->alerta_dias = $projeto->alerta_dias_congelado ?? '';
+                $projeto->cor_alerta = ($projeto->alerta_dias !== '' && $projeto->alerta_dias < 0) ? 'red' : 'green';
+            } elseif(!empty($projeto->tempo_projetos)) {
                 $t = explode(':', $projeto->tempo_projetos);
                 $horas = (int)$t[0];
                 $minutos = isset($t[1]) ? (int)$t[1] : 0;
@@ -216,7 +223,7 @@ class ProjetosController extends Controller
                 }
             }
 
-            if($projeto->id_status == 3) { //EM AVALIAÇÃO
+            if(empty($projeto->data_entrega_congelada) && $projeto->alerta_dias_congelado === null && $projeto->id_status == 3) { //EM AVALIAÇÃO
 
                 if($projeto->sub_status_projetos_id == 3) {
                     $prazo_entrega = $configuracaoProjetos['em_avaliacao'];
@@ -362,13 +369,43 @@ class ProjetosController extends Controller
     }
 
     /**
-    * Show the application dashboard.
+    * Show the application dashboard - Create new project.
     *
     * @return \Illuminate\Contracts\Support\Renderable
     */
     public function incluir(Request $request)
     {
+        // Validar permissões
+        $this->permissoes_liberadas = (new ValidaPermissaoAcessoController())
+            ->validaAcaoLiberada(22, (new ValidaPermissaoAcessoController())->retornaPerfil());
 
+        $metodo = $request->method();
+
+        // Tratamento para POST - Salvar novo projeto
+        if ($metodo == 'POST') {
+            return $this->processarInclusao($request);
+        }
+
+        // GET Request - Exibir formulário vazio
+        $data = [
+            'tela' => 'incluir',
+            'nome_tela' => 'projetos',
+            'projetos' => collect([new Projetos()]),
+            'request' => $request,
+            'clientes' => (new PedidosController())->getAllClientes(),
+            'prioridades' => (new PedidosController())->getAllprioridades(),
+            'transportes' => (new PedidosController())->getAlltransportes(),
+            'AllStatus' => $this->getAllStatus(),
+            'AllSubStatus' => $this->getAllSubStatus(),
+            'AllFuncionarios' => $this->getAllFuncionarios(),
+            'AllEtapas' => $this->getAllEtapasProjetos(),
+            'rotaIncluir' => 'incluir-projetos',
+            'rotaAlterar' => 'alterar-projetos',
+            'permissoes_liberadas' => $this->permissoes_liberadas,
+            'historicos' => collect([])
+        ];
+
+        return view('projetos', $data);
     }
 
     /**
@@ -568,7 +605,7 @@ class ProjetosController extends Controller
         }
 
         // Normalizar datas para formato brasileiro
-        if (in_array($campo, ['data_gerado', 'data_antecipacao', 'data_entrega', 'data_tarefa', 'data_status'])) {
+        if (in_array($campo, ['data_gerado', 'data_antecipacao', 'data_entrega', 'data_entrega_congelada', 'data_tarefa', 'data_status'])) {
             try {
                 return \Carbon\Carbon::parse($valor)->format('d/m/Y');
             } catch (\Exception $e) {
@@ -591,6 +628,48 @@ class ProjetosController extends Controller
 
         // Resolver descrições para campos relacionais
         return $this->resolverDescricao($campo, $valor);
+    }
+
+    private function calcularPrazoCongelado(?string $tempoProjetos, array $configuracaoProjetos, DateTime $dataBase): array
+    {
+        if (empty($tempoProjetos)) {
+            return [null, null];
+        }
+
+        $t = explode(':', $tempoProjetos);
+        $horas = (int)$t[0];
+        $minutos = isset($t[1]) ? (int)$t[1] : 0;
+        $segundos = isset($t[2]) ? (int)$t[2] : 0;
+        $tempo_projeto = number_format($horas + ($minutos / 60) + ($segundos / 3600), 2);
+
+        $prazo_entrega = null;
+        if ($tempo_projeto <= 2 && !empty($configuracaoProjetos['0_2_horas'])) {
+            $prazo_entrega = $configuracaoProjetos['0_2_horas'];
+        } elseif ($tempo_projeto > 2 && $tempo_projeto <= 6 && !empty($configuracaoProjetos['2_6_horas'])) {
+            $prazo_entrega = $configuracaoProjetos['2_6_horas'];
+        } elseif ($tempo_projeto > 6 && $tempo_projeto <= 10 && !empty($configuracaoProjetos['6_10_horas'])) {
+            $prazo_entrega = $configuracaoProjetos['6_10_horas'];
+        } elseif ($tempo_projeto > 10 && !empty($configuracaoProjetos['10_ou_mais_horas'])) {
+            $prazo_entrega = $configuracaoProjetos['10_ou_mais_horas'];
+        }
+
+        if (empty($prazo_entrega)) {
+            return [null, null];
+        }
+
+        $data_prazo_entrega = Carbon::parse($dataBase)->addWeekdays($prazo_entrega);
+        $hoje = Carbon::today();
+        $diferenca = $data_prazo_entrega->diffInDays($hoje, false);
+
+        if ($diferenca > 0) {
+            $diferenca = $diferenca * -1;
+        }
+
+        if ($data_prazo_entrega->format('d/m/Y') == $hoje->format('d/m/Y')) {
+            $diferenca = 0;
+        }
+
+        return [$data_prazo_entrega->format('Y-m-d H:i:s'), $diferenca];
     }
 
     public function salva($request)
@@ -616,20 +695,17 @@ class ProjetosController extends Controller
             $sub_status_projetos_id = $status_projetos_id[0]['id'];
             $status_projetos_id = $status_projetos_id[0]['status_projetos_id'];
 
-            if($projeto->sub_status_projetos_codigo != $status_id){
+            // Verificar se é novo projeto ou se houve mudança de status
+            $ehNovoProjeto = !$request->input('id');
+            $houveMudancaStatus = !$ehNovoProjeto && $projeto->sub_status_projetos_codigo != $status_id;
+
+            // Se houver mudança de status, marcar para criar histórico DEPOIS de salvar
+            $criarHistorico = $houveMudancaStatus || $ehNovoProjeto;
+
+            if($criarHistorico){
                 $projeto->data_status = date('Y-m-d');
                 $projeto->em_alerta = 1;
-
-                $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
-                $HistoricosEtapasProjetos->projetos_id = $projeto->id;
-                $HistoricosEtapasProjetos->status_projetos_id = $status_projetos_id;
-                $HistoricosEtapasProjetos->sub_status_projetos_id = $sub_status_projetos_id;
-                $HistoricosEtapasProjetos->funcionarios_id = Auth::user()->id;
-                $HistoricosEtapasProjetos->etapas_pedidos_id = $etapa_projeto_id;
-                $HistoricosEtapasProjetos->save();
-
             } else {
-
                 $projeto->em_alerta = $request->input('em_alerta');
             }
 
@@ -648,6 +724,8 @@ class ProjetosController extends Controller
                 'data_gerado' => 'Data de Geração',
                 'data_antecipacao' => 'Data de Antecipação',
                 'data_entrega' => 'Data de Entrega',
+                'data_entrega_congelada' => 'Prazo Entrega (Congelado)',
+                'alerta_dias_congelado' => 'Alerta Dias (Congelado)',
                 'observacao' => 'Observação',
                 'status' => 'Situação',
                 'status_projetos_id' => 'Status do Projeto',
@@ -667,7 +745,7 @@ class ProjetosController extends Controller
             $projeto->os = $request->input('os');
             $projeto->ep = $request->input('ep');
             $projeto->qtde = $request->input('qtde');
-            $projeto->blank = $request->input('blank');
+            $projeto->blank = $request->input('blank') && is_numeric($request->input('blank')) ? (int)$request->input('blank') : null;
             $projeto->pessoas_id = $request->input('clientes_id');
             $projeto->data_gerado = !empty($request->input('data_gerado')) ? DateHelpers::formatDate_dmY($request->input('data_gerado')) : null;
             $projeto->data_antecipacao = !empty($request->input('data_antecipacao')) ? DateHelpers::formatDate_dmY($request->input('data_antecipacao')) : null;
@@ -686,6 +764,23 @@ class ProjetosController extends Controller
             $projeto->data_entrega = !empty($request->input('data_entrega')) ? DateHelpers::formatDate_dmY($request->input('data_entrega')) : null;
             $projeto->observacao = trim($request->input('observacao'));
             $projeto->status = $request->input('status');
+
+            $deveCongelarPrazo = $criarHistorico && ($status_projetos_id == 4 || (int)$status_id === 36);
+            if ($deveCongelarPrazo && empty($projeto->data_entrega_congelada) && $projeto->alerta_dias_congelado === null) {
+                $configuracaoProjetos = ConfiguracoesProjetos::where('id', '=', 1)->first();
+                $configuracaoProjetos = $configuracaoProjetos ? json_decode($configuracaoProjetos->dados, true) : [];
+
+                [$data_entrega_congelada, $alerta_dias_congelado] = $this->calcularPrazoCongelado(
+                    $projeto->tempo_projetos,
+                    $configuracaoProjetos,
+                    new DateTime()
+                );
+
+                if (!empty($data_entrega_congelada) || $alerta_dias_congelado !== null) {
+                    $projeto->data_entrega_congelada = $data_entrega_congelada;
+                    $projeto->alerta_dias_congelado = $alerta_dias_congelado;
+                }
+            }
 
             $alteracoes = [];
             $usuarioLogado = auth()->user()->name;
@@ -709,7 +804,19 @@ class ProjetosController extends Controller
                 }
             }
 
+            // SALVAR o projeto ANTES de criar histórico
             $projeto->save();
+
+            // AGORA criar histórico com o ID do projeto já salvo
+            if($criarHistorico) {
+                $HistoricosEtapasProjetos = new HistoricosEtapasProjetos();
+                $HistoricosEtapasProjetos->projetos_id = $projeto->id; // Agora tem ID!
+                $HistoricosEtapasProjetos->status_projetos_id = $status_projetos_id;
+                $HistoricosEtapasProjetos->sub_status_projetos_id = $sub_status_projetos_id;
+                $HistoricosEtapasProjetos->funcionarios_id = Auth::user()->id;
+                $HistoricosEtapasProjetos->etapas_pedidos_id = $etapa_projeto_id;
+                $HistoricosEtapasProjetos->save();
+            }
 
             if(count($alteracoes) > 0) {
                 $projeto_logs = new ProjetosLogs();
@@ -801,6 +908,152 @@ class ProjetosController extends Controller
         return $etapas_projetos->where('status', '=', 'A')
         ->orderby('etapas_projetos.id', 'asc')
         ->get();
+    }
+
+    /**
+     * Processamento de inclusão de novo projeto (POST)
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function processarInclusao(Request $request)
+    {
+        try {
+            // 1. Validar dados
+            $this->validarDadosInclusao($request);
+
+            // 2. Preparar dados para salvamento
+            $this->prepararDadosParaSalvamento($request);
+
+            // 3. Salvar via método existente
+            $projetos_id = $this->salva($request);
+
+            // 4. Redirecionar com sucesso
+            return redirect()->route('projetos', ['id' => $projetos_id])
+                ->with('success', 'Projeto criado com sucesso!');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Retornar com erros de validação
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (\Exception $e) {
+            // Log do erro
+            Log::error('Erro ao criar projeto: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Erro ao salvar projeto: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * Validar dados de inclusão de novo projeto
+     *
+     * @param Request $request
+     * @return void
+     */
+    private function validarDadosInclusao(Request $request)
+    {
+        $request->validate([
+            // Campos opcionais - Cliente
+            'clientes_id' => 'nullable|integer|exists:pessoas,id',
+
+            // Campos opcionais - OS
+            'os' => 'nullable|string|max:50',
+
+            // Campos opcionais - EP
+            'ep' => 'nullable|string|max:100',
+
+            // Campos básicos
+            'qtde' => 'nullable|integer|min:0',
+            'blank' => 'nullable|integer',
+
+            // Datas
+            'data_gerado' => 'nullable|date_format:d/m/Y',
+            'data_antecipacao' => 'nullable|date_format:d/m/Y',
+
+            // Valores monetários
+            'valor_unitario_adv' => 'nullable|regex:/^[\d.,]+$/|min:0',
+
+            // Tempos (formato HH:MM:SS)
+            'tempo_projetos' => 'nullable|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/',
+            'tempo_programacao' => 'nullable|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/',
+
+            // Status e relacionamentos
+            'status_id' => 'nullable|integer',
+            'etapa_projeto_id' => 'nullable|integer|exists:etapas_projetos,id',
+            'prioridade_id' => 'nullable|integer|exists:prioridades,id',
+            'transporte_id' => 'nullable|integer|exists:transportes,id',
+            'funcionarios_id' => 'nullable|integer|exists:funcionarios,id',
+
+            // Booleanos
+            'cliente_ativo' => 'nullable|in:0,1',
+            'com_pedido' => 'nullable|in:0,1',
+            'novo_alteracao' => 'nullable|in:0,1',
+            'em_alerta' => 'nullable|in:0,1',
+            'status' => 'nullable|in:A,I',
+
+            // Observações
+            'observacao' => 'nullable|string',
+        ], [
+            'clientes_id.exists' => 'Cliente selecionado não existe',
+            'valor_unitario_adv.regex' => 'Valor deve ser um número válido (ex: 2342,34 ou 2342.34)',
+            'valor_unitario_adv.min' => 'Valor deve ser maior ou igual a 0',
+            'data_gerado.date_format' => 'Data de solicitação deve estar no formato DD/MM/AAAA',
+            'data_antecipacao.date_format' => 'Data de antecipação deve estar no formato DD/MM/AAAA',
+            'tempo_projetos.regex' => 'Tempo de projeto deve estar no formato HH:MM:SS',
+            'tempo_programacao.regex' => 'Tempo de programação deve estar no formato HH:MM:SS',
+            'etapa_projeto_id.exists' => 'Etapa selecionada não existe',
+            'prioridade_id.exists' => 'Prioridade selecionada não existe',
+            'transporte_id.exists' => 'Transporte selecionado não existe',
+            'funcionarios_id.exists' => 'Funcionário selecionado não existe',
+            'novo_alteracao.in' => 'Campo Novo/Alteração deve ser NOVO ou ALTERAÇÃO',
+            'cliente_ativo.in' => 'Campo Cliente Ativo deve ser SIM ou NÃO',
+            'com_pedido.in' => 'Campo Pedido deve ser Com Pedido ou Sem Pedido',
+            'em_alerta.in' => 'Campo Alerta deve ser Em Alerta ou Sem Alerta',
+            'status.in' => 'Campo Status deve ser Ativo ou Inativo',
+        ]);
+    }
+
+    /**
+     * Preparar dados para salvamento na inclusão
+     *
+     * @param Request $request
+     * @return void
+     */
+    private function prepararDadosParaSalvamento(Request $request)
+    {
+        // 1. Definir status padrão se não informado (1 = Solicitado)
+        if (empty($request->input('status_id'))) {
+            $request->merge(['status_id' => 1]);
+        }
+
+        // 2. Definir data de geração se vazia (data atual)
+        if (empty($request->input('data_gerado'))) {
+            $request->merge(['data_gerado' => date('d/m/Y')]);
+        }
+
+        // 3. Definir tipo como "Novo"
+        $request->merge(['novo_alteracao' => 0]);
+
+        // 4. Ativar novo projeto
+        $request->merge(['status' => 'A']);
+
+        // 5. Ativar alerta
+        $request->merge(['em_alerta' => 1]);
+
+        // 6. Definir cliente ativo padrão
+        if (empty($request->input('cliente_ativo'))) {
+            $request->merge(['cliente_ativo' => 1]);
+        }
+
+        // 7. Definir com_pedido padrão
+        if (empty($request->input('com_pedido'))) {
+            $request->merge(['com_pedido' => 0]);
+        }
     }
 
 }

@@ -230,15 +230,11 @@ class IaQualidadeController extends Controller
                         if ($response === false) {
                             $error = curl_error($ch);
                             $errno = curl_errno($ch);
-                        
                             \Log::info([
                                 'curl_error' => $error,
                                 'curl_errno' => $errno,
                             ]);
-                        } else {
-                            \Log::info($httpCode);
                         }
-                        
 
                         throw new \Exception('Erro ao enviar dados para a API: ' . $response);
                     }
