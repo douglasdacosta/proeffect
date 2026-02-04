@@ -45,6 +45,8 @@ class IaQualidadeController extends Controller
                 'pedidos.os',
                 'ficha_tecnica.ep',
                 'pedidos.qtde',
+                'pedidos.pessoas_id',
+                'pedidos.datahora_envio_ultimo_lead',
                 'pessoas.contato_pos_venda',
                 'pessoas.numero_whatsapp_pos_venda'
             )

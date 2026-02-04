@@ -103,11 +103,13 @@
                                 <tr>
                                     <th style="width: 50px;">ID</th>
                                     <th>Data de Entrega</th>
+                                    <th>Id CLiente</th>
                                     <th>OS</th>
                                     <th>EP</th>
                                     <th>Quantidade</th>
                                     <th>Responsável Qualidade</th>
                                     <th>Whats do Cliente</th>
+                                    <th>Data envio</th>
                                     <th style="width: 80px;">Selecionar<br><input type="checkbox" id="selectAllEnviar"></th>
                                 </tr>
                             </thead>
@@ -117,6 +119,7 @@
                                         <tr>
                                             <td>{{ $pedido->id }}</td>
                                             <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
+                                            <td><a href="/alterar-clientes?id={{ $pedido->pessoas_id }}" target="_blank">{{ $pedido->pessoas_id }}</a></td>
                                             <td>{{ $pedido->os }}</td>
                                             <td>{{ $pedido->ep }}</td>
                                             <td>{{ $pedido->qtde }}</td>
@@ -129,7 +132,8 @@
                                                 <td>
                                                     {{""}}
                                                 </td>
-                                                @endif
+                                            @endif
+                                            <td>{{ !empty($pedido->datahora_envio_ultimo_lead) ? \Carbon\Carbon::parse($pedido->datahora_envio_ultimo_lead)->format('d/m/Y H:i:s') : '' }}</td>
                                             <td>
                                                 <input type="checkbox" name="ids[]" value="{{ $pedido->id }}" class="checkbox-item checkbox-enviar">
                                             </td>
