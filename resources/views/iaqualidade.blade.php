@@ -145,7 +145,6 @@
                                                 @else
                                                     {{ '' }}
                                                 @endif
-                                                <input type="checkbox" name="ids[]" value="{{ $pedido->id }}" class="checkbox-item checkbox-enviar">
                                             </td>
                                         </tr>
                                     @endforeach
