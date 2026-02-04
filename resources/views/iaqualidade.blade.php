@@ -133,8 +133,18 @@
                                                     {{""}}
                                                 </td>
                                             @endif
-                                            <td>{{ !empty($pedido->datahora_envio_ultimo_lead) ? \Carbon\Carbon::parse($pedido->datahora_envio_ultimo_lead)->format('d/m/Y H:i:s') : '' }}</td>
                                             <td>
+                                                @if($pedido->numero_whatsapp_pos_venda)
+                                                    {{ !empty($pedido->datahora_envio_ultimo_lead) ? \Carbon\Carbon::parse($pedido->datahora_envio_ultimo_lead)->format('d/m/Y H:i:s') : '' }}</td>
+                                                @else
+                                                    {{ '' }}
+                                                @endif
+                                            <td>
+                                                @if($pedido->numero_whatsapp_pos_venda)
+                                                    <input type="checkbox" name="ids[]" value="{{ $pedido->id }}" class="checkbox-item checkbox-enviar">
+                                                @else
+                                                    {{ '' }}
+                                                @endif
                                                 <input type="checkbox" name="ids[]" value="{{ $pedido->id }}" class="checkbox-item checkbox-enviar">
                                             </td>
                                         </tr>
