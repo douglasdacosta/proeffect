@@ -133,6 +133,21 @@ class ProjetosController extends Controller
             $projetos = $projetos->where('historicos_etapas_projetos.created_at', '<=', DateHelpers::formatDate_dmY($request->input('data_entrega_fim')).' 23:59:59');
         }
 
+        if(!empty($request->input('data_entrada')) && !empty($request->input('data_entrada_fim') )) {
+
+            $data_1 = DateHelpers::formatDate_dmY($request->input('data_entrada')).' 00:00:00';
+            $data_2 = DateHelpers::formatDate_dmY($request->input('data_entrada_fim')).' 00:00:00';
+
+            $projetos = $projetos->whereBetween('projetos.data_gerado', [$data_1, $data_2]);
+        }
+        if(!empty($request->input('data_entrada')) && empty($request->input('data_entrada_fim') )) {
+
+            $projetos = $projetos->where('projetos.data_gerado', '>=', DateHelpers::formatDate_dmY($request->input('data_entrada')).' 00:00:00');
+        }
+        if(empty($request->input('data_entrada')) && !empty($request->input('data_entrada_fim') )) {
+            $projetos = $projetos->where('projetos.data_gerado', '<=', DateHelpers::formatDate_dmY($request->input('data_entrada_fim')).' 00:00:00');
+        }
+
         if ($codigo_cliente) {
             $projetos = $projetos->where('pessoas.codigo_cliente', '=', $codigo_cliente);
         }

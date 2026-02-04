@@ -167,15 +167,15 @@ use App\Http\Controllers\PedidosController;
                                 <input type="text" id="nome_cliente" name="nome_cliente" class="form-control col-md-13" value="">
                             </div>
                             <label for="os" class="col-sm-1 col-form-label text-right">OS</label>
-                            <div class="col-sm-2">
+                            <div class="col-sm-1">
                                 <input type="text" id="os" name="os" class="form-control" value="">
                             </div>
-                        </div>
-                        <div class="row">
                             <label for="ep" class="col-sm-1 col-form-label text-right">EP</label>
                             <div class="col-sm-1">
                                 <input type="text" id="ep" name="ep" class="form-control col-md-13" value="">
                             </div>
+                        </div>
+                        <div class="row col-sm-9">
                             <label for="data_entrega" class="col-sm-2 col-form-label text-right">Data entrega: de</label>
                             <div class="col-sm-2">
                                 <input type="text" class="form-control mask_date" id="data_entrega" name="data_entrega" placeholder="DD/MM/AAAA">
@@ -183,6 +183,17 @@ use App\Http\Controllers\PedidosController;
                             <label for="data_entrega_fim" class="col-form-label text-right">até</label>
                             <div class="col-sm-2">
                                 <input type="text" class="form-control mask_date" id="data_entrega_fim" name="data_entrega_fim" placeholder="DD/MM/AAAA">
+                            </div>
+                        </div>
+                        <div class="row col-sm-9">
+
+                            <label for="data_entrada" class="col-sm-2 col-form-label text-right">Data entrada: de</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control mask_date" id="data_entrada" name="data_entrada" placeholder="DD/MM/AAAA">
+                            </div>
+                            <label for="data_entrada_fim" class="col-form-label text-right">até</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control mask_date" id="data_entrada_fim" name="data_entrada_fim" placeholder="DD/MM/AAAA">
                             </div>
                             <label for="status" class="col-sm-1 col-form-label">&nbsp;</label>
                             <div class="col-sm-2">
@@ -250,7 +261,7 @@ use App\Http\Controllers\PedidosController;
                                                     <th >Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
                                                     <th >EP</th>
-                                                    <th >Data solicitação</th>
+                                                    <th >Data entrada</th>
                                                     <th >Qtde</th>
                                                     <th >Blank</th>
                                                     <th >Até/Urg</th>
@@ -273,7 +284,7 @@ use App\Http\Controllers\PedidosController;
                                                     <th >Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
                                                     <th >EP</th>
-                                                    <th >Data solicitação</th>
+                                                    <th >Data entrada</th>
                                                     <th >Qtde</th>
                                                     <th >Até/Urg</th>
                                                     <th style="min-width: 150px;">Pedido</th>
@@ -294,7 +305,7 @@ use App\Http\Controllers\PedidosController;
                                                     <th >Alerta</th>
                                                     <th style="min-width: 150px;">Cliente</th>
                                                     <th >EP</th>
-                                                    <th >Data solicitação</th>
+                                                    <th >Data entrada</th>
                                                     <th >Qtde</th>
                                                     <th >Blank</th>
                                                     <th >Até/Urg</th>
