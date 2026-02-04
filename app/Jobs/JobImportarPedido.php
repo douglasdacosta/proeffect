@@ -61,7 +61,7 @@ class JobImportarPedido implements ShouldQueue
                 }
 
                 foreach($venda['itens'] as $itens) {
-                    info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
+                    
 
                     $pedidos = new Pedidos();
                     $pessoas = new Pessoas();
@@ -70,7 +70,7 @@ class JobImportarPedido implements ShouldQueue
                     $ep = $itens['codigo'];
 
                     $valor_unitario = $itens['unitario']+$itens['ipi']-$itens['desconto'];
-
+                    info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs . ' valorunitario: '.$valor_unitario);
                     $numeroOs = $venda['numeroOS'];
                     $dataOS = $venda['dataOS'];
                     $prevEntrega = $venda['prevEntrega'];
