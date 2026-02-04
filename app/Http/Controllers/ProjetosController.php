@@ -765,7 +765,7 @@ class ProjetosController extends Controller
             $projeto->observacao = trim($request->input('observacao'));
             $projeto->status = $request->input('status');
 
-            $deveCongelarPrazo = $criarHistorico && ($status_projetos_id == 4 || (int)$status_id === 36);
+            $deveCongelarPrazo = $criarHistorico && ($status_projetos_id == 8 || $status_projetos_id == 5 );
             if ($deveCongelarPrazo && empty($projeto->data_entrega_congelada) && $projeto->alerta_dias_congelado === null) {
                 $configuracaoProjetos = ConfiguracoesProjetos::where('id', '=', 1)->first();
                 $configuracaoProjetos = $configuracaoProjetos ? json_decode($configuracaoProjetos->dados, true) : [];
