@@ -1,10 +1,10 @@
 @extends('adminlte::page')
 
 @section('title', 'Pro Effect')
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="js/jquery.mask.js"></script>
-<script src="js/bootstrap.4.6.2.js"></script>
-<script src="js/main_custom.js"></script>
+
+@section('adminlte_css')
+    <link rel="stylesheet" href="{{ asset('DataTables/datatables.min.css') }}">
+@endsection
 
 @section('content_header')
 <div class="form-group row">
@@ -98,30 +98,30 @@
                 <div class="x_content">
                     <form id="formAcoes" method="POST" class="form-horizontal">
                         @csrf
-                        <table class="table table-striped text-center">
+                        <table id="table_iaqualidade" class="table table-striped text-center">
                             <thead>
                                 <tr>
-                                    <th style="width: 50px;">ID</th>
-                                    <th>Data de Entrega</th>
-                                    <th>Id CLiente</th>
-                                    <th>OS</th>
-                                    <th>EP</th>
-                                    <th>Quantidade</th>
-                                    <th>Responsável Qualidade</th>
-                                    <th>Whats do Cliente</th>
-                                    <th>Data envio</th>
-                                    <th style="width: 80px;">Selecionar<br><input type="checkbox" id="selectAllEnviar"></th>
+                                    <th style="width: 50px;" data-sortable='true'>ID</th>
+                                    <th data-sortable='true'>Data de Entrega</th>
+                                    <th data-sortable='true'>Nome Cliente</th>
+                                    <th data-sortable='true'>OS</th>
+                                    <th data-sortable='true'>EP</th>
+                                    <th data-sortable='true'>Quantidade</th>
+                                    <th data-sortable='true'>Responsável Qualidade</th>
+                                    <th data-sortable='true'>Whats do Cliente</th>
+                                    <th data-sortable='true'>Data envio</th>
+                                    <th style="width: 80px;" data-sortable='false'>Selecionar<br><input type="checkbox" id="selectAllEnviar"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if(isset($pedidos) && count($pedidos) > 0)
                                     @foreach ($pedidos as $pedido)
                                         <tr>
-                                            <td>{{ $pedido->id }}</td>
+                                            <td title="{{ strlen($pedido->id) > 12 ? $pedido->id : '' }}">{{ strlen($pedido->id) > 12 ? substr($pedido->id, 0, 12) . '...' : $pedido->id }}</td>
                                             <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
-                                            <td><a href="/alterar-clientes?id={{ $pedido->pessoas_id }}" target="_blank">{{ $pedido->pessoas_id }}</a></td>
+                                            <td><a href="/alterar-clientes?id={{ $pedido->pessoas_id }}" target="_blank">{{ $pedido->contato_pos_venda }}</a></td>
                                             <td>{{ $pedido->os }}</td>
-                                            <td>{{ $pedido->ep }}</td>
+                                            <td title="{{ strlen($pedido->ep) > 12 ? $pedido->ep : '' }}">{{ strlen($pedido->ep) > 12 ? substr($pedido->ep, 0, 12) . '...' : $pedido->ep }}</td>
                                             <td>{{ $pedido->qtde }}</td>
                                             <td>{{ $pedido->contato_pos_venda }}</td>
                                             @if($pedido->numero_whatsapp_pos_venda)
@@ -184,6 +184,8 @@
 @stop
 
 @section('js')
+<script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+<script src="{{ asset('js/iaqualidade.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.checkbox-item');

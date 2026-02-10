@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
         Commands\ImportarPedidoAntigo::class,
         Commands\GerarHashPessoas::class,
         Commands\AtualisarMateriais::class,
+        Commands\GerarLeadsIaQualidade::class,
     ];
     /**
      * Define the application's command schedule.
@@ -31,6 +32,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('configuracoes:atualisar-tempos')->everyFifteenMinutes()->withoutOverlapping();
             $schedule->command('command:correcaoTempoApontamentos')->cron('0 8,23 * * 1-6')->withoutOverlapping(); // 08:00 e 22:00 todos os dias
             $schedule->command('command:importarPedidoProjetos')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '20:00');
+            $schedule->command('command:gerarLeadsIaQualidade')->dailyAt('07:00')->withoutOverlapping();
 
         } catch (\Exception $th) {
             info($th);

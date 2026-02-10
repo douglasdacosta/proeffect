@@ -36,85 +36,111 @@ class IaQualidadeController extends Controller
         $responsavelQualidade = !empty($request->input('responsavel_qualidade')) ? $request->input('responsavel_qualidade') : null;
         $statusLead = !empty($request->input('status_lead')) ? $request->input('status_lead') : 'pendente';
 
-        // Query base para buscar dados
-        $query = DB::table('pedidos')
-            ->distinct()
+        // Query base para buscar dados na tabela de leads
+        $query = DB::table('ia_qualidade_leads')
             ->select(
-                'pedidos.id',
-                'hp.created_at as data_entrega',
-                'pedidos.os',
-                'ficha_tecnica.ep',
-                'pedidos.qtde',
-                'pedidos.pessoas_id',
-                'pedidos.datahora_envio_ultimo_lead',
-                'pessoas.contato_pos_venda',
-                'pessoas.numero_whatsapp_pos_venda'
-            )
-            ->join('historicos_pedidos as hp', function ($join) {
-                $join->on('hp.pedidos_id', '=', 'pedidos.id');
-                // pega somente o último histórico via subquery por pedido
-                $join->whereRaw('hp.id = (select max(h2.id) from historicos_pedidos h2 where h2.pedidos_id = pedidos.id)');
-            })
-            ->join('pessoas', 'pedidos.pessoas_id', '=', 'pessoas.id')
-            ->join('ficha_tecnica', 'pedidos.fichatecnica_id', '=', 'ficha_tecnica.id');
-
-
-        $query->where('pedidos.status_id', 11); // Filtrar por entregues
-
-        // Bustar da tabela de configuracoes_ia
-        $param_entrega_qualidade = DB::table('configuracoes_ia')->value('tempo_entrega_dias');
-
-        //diferença entre a data entregue e a data do período param_entrega_qualidade
-        $query->whereRaw(
-            "DATEDIFF(CURRENT_DATE, hp.created_at) >= ?",
-            [$param_entrega_qualidade]
-        );
+                'ia_qualidade_leads.pedido_id as id',
+                'ia_qualidade_leads.data_entrega',
+                'ia_qualidade_leads.os',
+                'ia_qualidade_leads.ep',
+                'ia_qualidade_leads.qtde',
+                'ia_qualidade_leads.pessoas_id',
+                'ia_qualidade_leads.datahora_envio_ultimo_lead',
+                'ia_qualidade_leads.contato_pos_venda',
+                'ia_qualidade_leads.numero_whatsapp_pos_venda',
+                'ia_qualidade_leads.responsavel_qualidade'
+            );
 
 
         if(!empty($dataEntregaDe) && !empty($dataEntregaAte )) {
-            $query = $query->whereBetween('hp.created_at', [DateHelpers::formatDate_dmY($dataEntregaDe), DateHelpers::formatDate_dmY($dataEntregaAte)]);
+            $query = $query->whereBetween('ia_qualidade_leads.data_entrega', [DateHelpers::formatDate_dmY($dataEntregaDe), DateHelpers::formatDate_dmY($dataEntregaAte)]);
         }
         if(!empty($dataEntregaDe) && empty($dataEntregaAte )) {
-            $query = $query->where('hp.created_at', '>=', DateHelpers::formatDate_dmY($dataEntregaDe));
+            $query = $query->where('ia_qualidade_leads.data_entrega', '>=', DateHelpers::formatDate_dmY($dataEntregaDe));
         }
         if(empty($dataEntregaDe) && !empty($dataEntregaAte )) {
-            $query = $query->where('hp.created_at', '<=', DateHelpers::formatDate_dmY($dataEntregaAte));
+            $query = $query->where('ia_qualidade_leads.data_entrega', '<=', DateHelpers::formatDate_dmY($dataEntregaAte));
         }
 
         if ($os) {
-            $query->where('pedidos.os', 'like', '%' . $os . '%');
+            $query->where('ia_qualidade_leads.os', 'like', '%' . $os . '%');
         }
 
         if ($ep) {
-            $query->where('ficha_tecnica.ep', 'like', '%' . $ep . '%');
+            $query->where('ia_qualidade_leads.ep', 'like', '%' . $ep . '%');
         }
 
         if ($quantidade) {
-            $query->where('pedidos.qtde', '=', $quantidade);
+            $query->where('ia_qualidade_leads.qtde', '=', $quantidade);
         }
 
         if ($responsavelQualidade) {
-            $query->where('pedidos.responsavel_qualidade', 'like', '%' . $responsavelQualidade . '%');
+            $query->where('ia_qualidade_leads.responsavel_qualidade', 'like', '%' . $responsavelQualidade . '%');
         }
 
         $query->limit(100);
 
         // Filtrar por status do lead
         if ($statusLead === 'pendente') {
-            $query->where('pedidos.status_lead', '=', 'pendente');
+            $query->where('ia_qualidade_leads.status_lead', '=', 'pendente');
         } elseif ($statusLead === 'removido') {
-            $query->where('pedidos.status_lead', '=', 'removido');
+            $query->where('ia_qualidade_leads.status_lead', '=', 'removido');
         } elseif ($statusLead === 'finalizado') {
-            $query->where('pedidos.status_lead', '=', 'finalizado');
+            $query->where('ia_qualidade_leads.status_lead', '=', 'finalizado');
         }
 
         $pedidos = $query->get();
+
+        // Agrupar por OS
+        $pedidosAgrupados = [];
+        foreach ($pedidos as $pedido) {
+            $os = $pedido->os;
+
+            if (!isset($pedidosAgrupados[$os])) {
+                $pedidosAgrupados[$os] = [
+                    'id' => $pedido->id,
+                    'data_entrega' => $pedido->data_entrega,
+                    'os' => $pedido->os,
+                    'ep' => [],
+                    'qtde_total' => 0,
+                    'pessoas_id' => $pedido->pessoas_id,
+                    'datahora_envio_ultimo_lead' => $pedido->datahora_envio_ultimo_lead,
+                    'contato_pos_venda' => $pedido->contato_pos_venda,
+                    'numero_whatsapp_pos_venda' => $pedido->numero_whatsapp_pos_venda,
+                    'responsavel_qualidade' => $pedido->responsavel_qualidade,
+                    'pedidos_ids' => []
+                ];
+            }
+
+            // Adicionar EP e quantidade
+            if (!in_array($pedido->ep, $pedidosAgrupados[$os]['ep'])) {
+                $pedidosAgrupados[$os]['ep'][] = $pedido->ep;
+            }
+            $pedidosAgrupados[$os]['qtde_total'] += $pedido->qtde;
+            $pedidosAgrupados[$os]['pedidos_ids'][] = $pedido->id;
+        }
+
+        // Converter para array de objetos para manter compatibilidade com view
+        $pedidosAgrupados = array_map(function ($grupo) {
+            return (object) [
+                'id' => implode(',', $grupo['pedidos_ids']),
+                'data_entrega' => $grupo['data_entrega'],
+                'os' => $grupo['os'],
+                'ep' => implode(',', $grupo['ep']),
+                'qtde' => $grupo['qtde_total'],
+                'pessoas_id' => $grupo['pessoas_id'],
+                'datahora_envio_ultimo_lead' => $grupo['datahora_envio_ultimo_lead'],
+                'contato_pos_venda' => $grupo['contato_pos_venda'],
+                'numero_whatsapp_pos_venda' => $grupo['numero_whatsapp_pos_venda'],
+                'responsavel_qualidade' => $grupo['responsavel_qualidade'],
+            ];
+        }, $pedidosAgrupados);
 
         $tela = 'pesquisa';
         $data = array(
             'tela' => $tela,
             'nome_tela' => 'IA Qualidade',
-            'pedidos' => $pedidos,
+            'pedidos' => $pedidosAgrupados,
             'request' => $request,
         );
         return view('iaqualidade', $data);
@@ -136,8 +162,8 @@ class IaQualidadeController extends Controller
             $ids = explode(',', $ids);
         }
 
-        DB::table('pedidos')
-            ->whereIn('id', $ids)
+        DB::table('ia_qualidade_leads')
+            ->whereIn('pedido_id', $ids)
             ->update([
                 'status_lead' => 'removido',
                 'datahora_envio_ultimo_lead' => now()
@@ -163,8 +189,8 @@ class IaQualidadeController extends Controller
             }
 
             $retorno = DB::transaction(function () use ($request, $ids) {
-                DB::table('pedidos')
-                    ->whereIn('id', $ids)
+                DB::table('ia_qualidade_leads')
+                    ->whereIn('pedido_id', $ids)
                     ->update([
                         'status_lead' => 'finalizado',
                         'datahora_envio_ultimo_lead' => now()
@@ -172,24 +198,19 @@ class IaQualidadeController extends Controller
 
                 //enviar para a API de que envia leads em formato Json
                 //ID 	Data de Entrega 	OS 	EP 	Quantidade 	Responsável Qualidade 	Whats do Cliente
-                $pedidosComWhatsapp = DB::table('pedidos')
+                $pedidosComWhatsapp = DB::table('ia_qualidade_leads')
                     ->select(
-                        'pedidos.id',
-                        'hp.created_at as data_entrega',
-                        'pedidos.os',
-                        'ficha_tecnica.ep',
-                        'pedidos.qtde',
-                        'pessoas.contato_pos_venda',
-                        'pessoas.numero_whatsapp_pos_venda'
+                        'ia_qualidade_leads.pedido_id as id',
+                        'ia_qualidade_leads.data_entrega',
+                        'ia_qualidade_leads.os',
+                        'ia_qualidade_leads.ep',
+                        'ia_qualidade_leads.qtde',
+                        'ia_qualidade_leads.contato_pos_venda',
+                        'ia_qualidade_leads.numero_whatsapp_pos_venda',
+                        'ia_qualidade_leads.responsavel_qualidade'
                     )
-                    ->join('historicos_pedidos as hp', function ($join) {
-                        $join->on('hp.pedidos_id', '=', 'pedidos.id');
-                        $join->whereRaw('hp.id = (select max(h2.id) from historicos_pedidos h2 where h2.pedidos_id = pedidos.id)');
-                    })
-                    ->join('pessoas', 'pedidos.pessoas_id', '=', 'pessoas.id')
-                    ->join('ficha_tecnica', 'pedidos.fichatecnica_id', '=', 'ficha_tecnica.id')
-                    ->whereIn('pedidos.id', $ids)
-                    ->whereNotNull('pessoas.numero_whatsapp_pos_venda')
+                    ->whereIn('ia_qualidade_leads.pedido_id', $ids)
+                    ->whereNotNull('ia_qualidade_leads.numero_whatsapp_pos_venda')
                     ->get();
 
                 //transforma dados em json e envia para API
@@ -201,7 +222,7 @@ class IaQualidadeController extends Controller
                         'os' => $pedido->os,
                         'ep' => $pedido->ep,
                         'quantidade' => $pedido->qtde,
-                        'responsavel_qualidade' => $request->input('responsavel_qualidade'),
+                        'responsavel_qualidade' => $pedido->responsavel_qualidade ?? $request->input('responsavel_qualidade'),
                         'whats_cliente' => $pedido->numero_whatsapp_pos_venda
                     ];
                 }
