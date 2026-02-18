@@ -122,7 +122,17 @@
                                     <td>{{ $renovacao->periodo_renovacao }}</td>
                                     <td>@if($renovacao->data_vencimento) {{ \Carbon\Carbon::parse($renovacao->data_vencimento)->format('d/m/Y H:i:s') }} @else {{ '' }} @endif</td>
                                     <td>{{ $renovacao->inicio_renovacao ? \Carbon\Carbon::parse($renovacao->inicio_renovacao)->format('d/m/Y H:i:s') : '' }}</td>
-                                    <td>{{ $renovacao->previsao ? $renovacao->previsao . ( $renovacao->previsao ==1 ? ' Mês' : ' Meses') : '' }}</td>
+                                    <td>
+                                        @if($renovacao->previsao == 'mensal')
+                                            Mensal
+                                        @elseif($renovacao->previsao == 'anual')
+                                            Anual
+                                        @elseif($renovacao->previsao == 'outros')
+                                            Outros
+                                        @else
+                                            {{ $renovacao->previsao }}
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($renovacao->data_vencimento)
                                             @if($renovacao->em_alerta)
@@ -130,7 +140,6 @@
                                             @else
                                                 <i class="fas fa-arrow-down text-success"></i>
                                             @endif
-                                        @else
                                             {{ '' }}
                                         @endif
                                     </td>
@@ -263,9 +272,14 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label for="previsao" class="col-sm-2 col-form-label">Previsão (meses)</label>
+                <label for="previsao" class="col-sm-2 col-form-label">Previsão</label>
                 <div class="col-sm-3">
-                    <input type="number" class="form-control" id="previsao" name="previsao" value="@if (isset($renovacao[0]->previsao)){{ $renovacao[0]->previsao }}@else{{''}}@endif">
+                    <select class="form-control" id="previsao" name="previsao">
+                        <option value="">Selecione</option>
+                        <option value="mensal" @if (isset($renovacao[0]->previsao) && $renovacao[0]->previsao == 'mensal'){{ ' selected '}}@endif>Mensal</option>
+                        <option value="anual" @if (isset($renovacao[0]->previsao) && $renovacao[0]->previsao == 'anual'){{ ' selected '}}@endif>Anual</option>
+                        <option value="outros" @if (isset($renovacao[0]->previsao) && $renovacao[0]->previsao == 'outros'){{ ' selected '}}@endif>Outros</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group row">
