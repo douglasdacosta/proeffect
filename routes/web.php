@@ -29,6 +29,11 @@ Route::match(['get', 'post'],'/materiais', [App\Http\Controllers\MateriaisContro
 Route::match(['get', 'post'],'/alterar-materiais', [App\Http\Controllers\MateriaisController::class, 'alterar'])->name('alterar-materiais')->middleware('afterAuth:materiais');
 Route::match(['get', 'post'],'/incluir-materiais', [App\Http\Controllers\MateriaisController::class, 'incluir'])->name('incluir-materiais')->middleware('afterAuth:materiais');
 
+Route::match(['get', 'post'],'/renovacoes', [App\Http\Controllers\RenovacoesController::class, 'index'])->name('renovacoes')->middleware('afterAuth:renovacoes');
+Route::match(['get', 'post'],'/alterar-renovacoes', [App\Http\Controllers\RenovacoesController::class, 'alterar'])->name('alterar-renovacoes')->middleware('afterAuth:renovacoes');
+Route::match(['get', 'post'],'/incluir-renovacoes', [App\Http\Controllers\RenovacoesController::class, 'incluir'])->name('incluir-renovacoes')->middleware('afterAuth:renovacoes');
+Route::match(['post'],'/finalizar-renovacoes', [App\Http\Controllers\RenovacoesController::class, 'finalizar'])->name('finalizar-renovacoes')->middleware('afterAuth:renovacoes');
+
 Route::match(['get', 'post'],'/clientes', [App\Http\Controllers\PessoasController::class, 'index'])->name('clientes')->middleware('afterAuth:clientes');
 Route::match(['get', 'post'],'/alterar-clientes', [App\Http\Controllers\PessoasController::class, 'alterar'])->name('alterar-clientes')->middleware('afterAuth:clientes');
 Route::match(['get', 'post'],'/incluir-clientes', [App\Http\Controllers\PessoasController::class, 'incluir'])->name('incluir-clientes')->middleware('afterAuth:clientes');
