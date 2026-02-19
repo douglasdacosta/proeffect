@@ -114,14 +114,14 @@
                             @foreach ($lista as $renovacao)
                                 <tr style="background-color: {{ $cor }};">
                                     <th scope="row"><a href="{{ route('alterar-renovacoes', ['id' => $renovacao->id]) }}">{{ $renovacao->id }}</a></th>
-                                    <td>@if($renovacao->data_abertura) {{ \Carbon\Carbon::parse($renovacao->data_abertura)->format('d/m/Y H:i:s') }} @else {{ '' }} @endif</td>
+                                    <td>@if($renovacao->data_abertura) {{ \Carbon\Carbon::parse($renovacao->data_abertura)->format('d/m/Y') }} @else {{ '' }} @endif</td>
                                     <td>{{ $renovacao->departamento_nome }}</td>
                                     <td title="{{ $renovacao->descricao }}">{{ \Illuminate\Support\Str::limit($renovacao->descricao, 25, '...') }}</td>
                                     <td>{{ $renovacao->responsavel }}</td>
                                     <td>{{ $renovacao->numero_documento }}</td>
                                     <td>{{ $renovacao->periodo_renovacao }}</td>
-                                    <td>@if($renovacao->data_vencimento) {{ \Carbon\Carbon::parse($renovacao->data_vencimento)->format('d/m/Y H:i:s') }} @else {{ '' }} @endif</td>
-                                    <td>{{ $renovacao->inicio_renovacao ? \Carbon\Carbon::parse($renovacao->inicio_renovacao)->format('d/m/Y H:i:s') : '' }}</td>
+                                    <td>@if($renovacao->data_vencimento) {{ \Carbon\Carbon::parse($renovacao->data_vencimento)->format('d/m/Y') }} @else {{ '' }} @endif</td>
+                                    <td>{{ $renovacao->inicio_renovacao ? \Carbon\Carbon::parse($renovacao->inicio_renovacao)->format('d/m/Y') : '' }}</td>
                                     <td>
                                         @if($renovacao->previsao == 'mensal')
                                             Mensal
@@ -141,7 +141,7 @@
                                             {{ '' }}
                                         @endif
                                     </td>
-                                    <td>@if($renovacao->data_finalizado) {{ \Carbon\Carbon::parse($renovacao->data_finalizado)->format('d/m/Y H:i:s') }} @else {{ '' }} @endif</td>
+                                    <td>@if($renovacao->data_finalizado) {{ \Carbon\Carbon::parse($renovacao->data_finalizado)->format('d/m/Y') }} @else {{ '' }} @endif</td>
                                     <td>
                                         @if($renovacao->status == 'F')
                                             <span class="badge badge-success">Finalizado</span>
