@@ -133,12 +133,10 @@
                                             {{ $renovacao->previsao }}
                                         @endif
                                     </td>
-                                    <td>
-                                        @if($renovacao->data_vencimento)
-                                            @if($renovacao->em_alerta)
-                                                <span class="alerta_limitador"><i class="fas fa-arrow-up"></i></span>
-                                            @else
-                                                <i class="fas fa-arrow-down text-success"></i>
+                                    <td class="@if($renovacao->em_alerta) alerta_limitador @endif" title="@if($renovacao->em_alerta) Início da renovação é hoje ou vencimento já passou @endif">
+                                        @if($renovacao->data_vencimento || $renovacao->inicio_renovacao)
+                                            @if($renovacao->alerta_direcao)
+                                                <i class="fas fa-arrow-{{ $renovacao->alerta_direcao }} text-{{ $renovacao->alerta_cor }}"></i>
                                             @endif
                                             {{ '' }}
                                         @endif

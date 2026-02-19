@@ -47,4 +47,15 @@ $(document).ready(function() {
         $('#gerar_nova_renovacao').prop('checked', false);
         $('#modal_finalizar_renovacao').modal('show');
     });
+
+    $(document).on('submit', '#incluir, #alterar, #form_finalizar_renovacao', function (e) {
+        var $form = $(this);
+        if ($form.data('submitting')) {
+            e.preventDefault();
+            return false;
+        }
+
+        $form.data('submitting', true);
+        $form.find('button[type="submit"]').prop('disabled', true);
+    });
 });

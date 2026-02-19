@@ -56,8 +56,30 @@ class RenovacoesController extends Controller
             ->get()
             ->map(function ($item) {
                 $item->em_alerta = false;
-                if ($item->status == 'P' && !empty($item->data_vencimento)) {
-                    $item->em_alerta = Carbon::parse($item->data_vencimento)->isPast();
+                $item->alerta_direcao = null;
+                $item->alerta_cor = null;
+
+                if ($item->status == 'P') {
+                    if (!empty($item->inicio_renovacao)) {
+                        $inicio = Carbon::parse($item->inicio_renovacao)->startOfDay();
+                        $hoje = Carbon::today();
+
+                        if ($inicio->greaterThan($hoje)) {
+                            $item->em_alerta = false;
+                            $item->alerta_direcao = 'up';
+                            $item->alerta_cor = 'success';
+                        } else {
+                            $item->em_alerta = true;
+                            $item->alerta_direcao = 'down';
+                            $item->alerta_cor = 'danger';
+
+                        }
+                    } elseif (!empty($item->data_vencimento)) {
+                        $alerta_vencimento = Carbon::parse($item->data_vencimento)->isPast();
+                        $item->em_alerta = $alerta_vencimento;
+                        $item->alerta_direcao = $alerta_vencimento ? 'down' : 'up';
+                        $item->alerta_cor = $alerta_vencimento ? 'danger' : 'success';
+                    }
                 }
                 return $item;
             });
