@@ -7,6 +7,7 @@ use App\Models\Funcionarios;
 use App\Models\Pedidos;
 use App\Models\Perfis;
 use App\Models\PerfisDashboards;
+use App\Models\Renovacoes;
 use App\Models\Tarefas;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -36,6 +37,7 @@ class HomeController extends Controller
         $total_soma_entrega_dia=$qtde_vendas_mes=$total_soma_mes=$qtde_vendas_entrega_mes=$total_soma_entrega_mes=0;
         $qtqe_os_atrasada=$qtqe_os_atrasada_expedicao=$total_soma_entrega_mes_anterior=$percentual_comparativo=0;
         $array_material_alerta_30=$array_material_alerta_60=[];
+        $renovacoes = collect();
 
         $user = \Auth::user();
 
@@ -64,6 +66,17 @@ class HomeController extends Controller
                             ->whereNull('tarefas.finalizado')
                             ->orderBy('tarefas.data_hora', 'desc')
                             ->get();
+
+        if(in_array('6', $perfis_dashboards)){
+            $renovacoes = Renovacoes::query()
+                ->select('renovacoes.*', 'perfis.nome as departamento_nome')
+                ->leftJoin('perfis', 'perfis.id', '=', 'renovacoes.departamento_id')
+                ->where('renovacoes.status', '=', 'P')
+                ->orderBy('renovacoes.data_vencimento', 'asc')
+                ->orderBy('renovacoes.data_abertura', 'desc')
+                ->limit(10)
+                ->get();
+        }
 
         //se tiver permissão de vendas ou comparativo (o comparativo presisa do valor de vendas)
         if(in_array('1', $perfis_dashboards) || in_array('3', $perfis_dashboards) ){
@@ -331,7 +344,8 @@ class HomeController extends Controller
             'array_material_alerta_60' => $array_material_alerta_60,
             'data_30' => $data_30,
             'data_60' => $data_60,
-            'tarefas' => $tarefas
+            'tarefas' => $tarefas,
+            'renovacoes' => $renovacoes
             ];
 
         return view('home', $dados);

@@ -228,6 +228,57 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        @endif
+
+        @if(in_array('6', $perfis_dashboards))
+            <div class="form-group col-md-12">
+                <div class="card">
+                    <div class="card-header border-transparent text-center">
+                        <h4 class="">
+                            <i class="fas fa-caret-right text-danger"></i> Renovações
+                        </h4>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-0 renovacoes">
+                        <div class="table-responsive">
+                            <table class="table m-0">
+                                <tbody>
+                                    @if($renovacoes && $renovacoes->count())
+                                        @foreach ($renovacoes as $renovacao)
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ route('alterar-renovacoes', ['id' => $renovacao->id]) }}">
+                                                        <i class="fas fa-caret-right text-danger"></i> {{ ' ID: ' . $renovacao->id }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <i class="fas fa-caret-right text-danger"></i>
+                                                    {{ ' Vencimento: ' . ($renovacao->data_vencimento ? \Carbon\Carbon::parse($renovacao->data_vencimento)->format('d/m/Y') : '') }}
+                                                </td>
+                                                <td>{{ ' Departamento: ' . $renovacao->departamento_nome }}</td>
+                                                <td title="{{ $renovacao->descricao }}">
+                                                    {{ ' Descrição: ' . \Illuminate\Support\Str::limit($renovacao->descricao, 50, '...') }}
+                                                </td>
+                                                @if(empty($renovacao->data_hora_lido))
+                                                    <td id="renovacao_{{$renovacao->id}}" class="marcar_lido_renovacao text-center" style="cursor: pointer;" data-id="{{$renovacao->id}}"> <span>Renovação não lida </span> <i class="far fa-check-circle text-danger"></i> </td>
+                                                @else
+                                                    <td id="renovacao_{{$renovacao->id}}" class="text-center"> <span>Renovação lida </span> <i class="far fa-check-circle text-success"></i> </td>
+                                                @endif
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">Nenhuma renovação pendente</td>
+                                        </tr>
+                                    @endif
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         @endif
         </div>
     </div>

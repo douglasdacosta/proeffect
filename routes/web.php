@@ -33,6 +33,7 @@ Route::match(['get', 'post'],'/renovacoes', [App\Http\Controllers\RenovacoesCont
 Route::match(['get', 'post'],'/alterar-renovacoes', [App\Http\Controllers\RenovacoesController::class, 'alterar'])->name('alterar-renovacoes')->middleware('afterAuth:renovacoes');
 Route::match(['get', 'post'],'/incluir-renovacoes', [App\Http\Controllers\RenovacoesController::class, 'incluir'])->name('incluir-renovacoes')->middleware('afterAuth:renovacoes');
 Route::match(['post'],'/finalizar-renovacoes', [App\Http\Controllers\RenovacoesController::class, 'finalizar'])->name('finalizar-renovacoes')->middleware('afterAuth:renovacoes');
+Route::match(['post'],'/marcar-renovacao-lida', [App\Http\Controllers\RenovacoesController::class, 'marcarRenovacaoLida'])->name('marcar-renovacao-lida');
 
 Route::match(['get', 'post'],'/clientes', [App\Http\Controllers\PessoasController::class, 'index'])->name('clientes')->middleware('afterAuth:clientes');
 Route::match(['get', 'post'],'/alterar-clientes', [App\Http\Controllers\PessoasController::class, 'alterar'])->name('alterar-clientes')->middleware('afterAuth:clientes');

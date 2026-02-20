@@ -276,4 +276,19 @@ class RenovacoesController extends Controller
             return Carbon::parse(str_replace('/', '-', $value))->format('Y-m-d H:i:s');
         }
     }
+
+    public function marcarRenovacaoLida(Request $request)
+    {
+        $renovacao = Renovacoes::find($request->input('renovacao'));
+
+        if (empty($renovacao)) {
+            return response()->json(['error' => true, 'message' => 'Renovação não encontrada.'], 404);
+        }
+
+        $renovacao->data_hora_lido = date('Y-m-d H:i:s');
+        $renovacao->lido = 1;
+        $renovacao->save();
+
+        return response()->json(['success' => true]);
+    }
 }
