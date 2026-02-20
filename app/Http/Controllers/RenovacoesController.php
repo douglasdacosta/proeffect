@@ -52,7 +52,7 @@ class RenovacoesController extends Controller
 
         $renovacoes = $renovacoes
             ->orderBy('perfis.nome', 'asc')
-            ->orderBy('renovacoes.data_vencimento', 'asc')
+            ->orderBy('renovacoes.inicio_renovacao', 'asc')
             ->get()
             ->map(function ($item) {
                 $item->em_alerta = false;

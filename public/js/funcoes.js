@@ -1,6 +1,6 @@
 
 $(function ($) {
-    
+
 
     $(document).on('click', '.marcar_lido', function () {
         var tarefa = $(this).data('id');
@@ -48,6 +48,6 @@ $(function ($) {
 
     });
 
-   
+
 }); //FIM DO BLOCO DE JQUERY READY
 

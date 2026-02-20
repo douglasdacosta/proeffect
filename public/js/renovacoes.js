@@ -1,9 +1,9 @@
 $(document).ready(function() {
 
-    if ($('#table_renovacoes').length) {
-        $('#table_renovacoes').DataTable({
+    if ($('.table_renovacoes').length) {
+        $('.table_renovacoes').DataTable({
             "paging": true,
-            "lengthChange": true,
+            "lengthChange": false,
             "searching": true,
             "ordering": true,
             "info": true,

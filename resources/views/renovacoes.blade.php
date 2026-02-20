@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="{{ asset('css/main_style.css') }}">
 @endsection
 
+<?php
+    $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 =>
+    '#c1d9d0', 10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583', 15 => '#f7c41f', 16 => '#898b75', 17 => '#c1d9d0'];
+?>
+
 
 @if(isset($tela) and $tela == 'pesquisa')
     @section('content_header')
@@ -53,7 +58,7 @@
                 </div>
                 <label for="vencimento" class="col-sm-2 col-form-label">Vencimento</label>
                 <div class="col-sm-2">
-                    <input type="text" id="vencimento" name="vencimento" class="form-control mask_date" value="@if (isset($request) && $request->input('vencimento') != ''){{$request->input('vencimento')}}@else @endif">
+                    <input type="date" id="vencimento" name="vencimento" class="form-control" value="@if (isset($request) && $request->input('vencimento') != ''){{$request->input('vencimento')}}@else @endif">
                 </div>
                 <label for="status" class="col-sm-1 col-form-label"></label>
                 <select class="form-control col-sm-2" id="status" name="status">
@@ -78,87 +83,97 @@
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
-                <table id="table_renovacoes" class="table table-striped text-center">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Data da abertura</th>
-                      <th>Departamento</th>
-                      <th>Descrição</th>
-                      <th>Responsável</th>
-                      <th>Número de documento</th>
-                      <th>Período de renovação</th>
-                      <th>Data do Vencimento</th>
-                      <th>Início da renovação</th>
-                      <th>Previsão</th>
-                      <th>Alerta</th>
-                      <th>Data finalizado</th>
-                      <th>Finalizar</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  @if(isset($renovacoes) && $renovacoes->count())
+                @if(isset($renovacoes) && $renovacoes->count())
+                    @php
+                        $departamento_cores = [];
+                        $cor_index = 0;
+                    @endphp
+                    @foreach ($renovacoes->groupBy('departamento_nome') as $departamento_nome => $lista)
                         @php
-                            $cores = ['#f7f7f7', '#f0f8ff', '#fff4e6', '#f3f9f1', '#fdf1f5', '#f2f6ff', '#f7f1ff'];
-                            $departamento_cores = [];
-                            $cor_index = 0;
-                        @endphp
-                        @foreach ($renovacoes->groupBy('departamento_nome') as $departamento_nome => $lista)
-                            @php
-                                if (!isset($departamento_cores[$departamento_nome])) {
-                                    $departamento_cores[$departamento_nome] = $cores[$cor_index % count($cores)];
+                            if (!isset($departamento_cores[$departamento_nome])) {
+                                $departamento_id = optional($lista->first())->departamento_id;
+                                if (!empty($palheta_cores[$departamento_id])) {
+                                    $departamento_cores[$departamento_nome] = $palheta_cores[$departamento_id];
+                                } else {
+                                    $chave = ($cor_index % count($palheta_cores)) + 1;
+                                    $departamento_cores[$departamento_nome] = $palheta_cores[$chave] ?? '#f7f7f7';
                                     $cor_index++;
                                 }
-                                $cor = $departamento_cores[$departamento_nome];
-                            @endphp
-                            @foreach ($lista as $renovacao)
-                                <tr style="background-color: {{ $cor }};">
-                                    <th scope="row"><a href="{{ route('alterar-renovacoes', ['id' => $renovacao->id]) }}">{{ $renovacao->id }}</a></th>
-                                    <td>@if($renovacao->data_abertura) {{ \Carbon\Carbon::parse($renovacao->data_abertura)->format('d/m/Y') }} @else {{ '' }} @endif</td>
-                                    <td>{{ $renovacao->departamento_nome }}</td>
-                                    <td title="{{ $renovacao->descricao }}">{{ \Illuminate\Support\Str::limit($renovacao->descricao, 25, '...') }}</td>
-                                    <td>{{ $renovacao->responsavel }}</td>
-                                    <td>{{ $renovacao->numero_documento }}</td>
-                                    <td>{{ $renovacao->periodo_renovacao }}</td>
-                                    <td>@if($renovacao->data_vencimento) {{ \Carbon\Carbon::parse($renovacao->data_vencimento)->format('d/m/Y') }} @else {{ '' }} @endif</td>
-                                    <td>{{ $renovacao->inicio_renovacao ? \Carbon\Carbon::parse($renovacao->inicio_renovacao)->format('d/m/Y') : '' }}</td>
-                                    <td>
-                                        @if($renovacao->previsao == 'mensal')
-                                            Mensal
-                                        @elseif($renovacao->previsao == 'anual')
-                                            Anual
-                                        @elseif($renovacao->previsao == 'outros')
-                                            Outros
-                                        @else
-                                            {{ $renovacao->previsao }}
-                                        @endif
-                                    </td>
-                                    <td class="@if($renovacao->em_alerta) alerta_limitador @endif" title="@if($renovacao->em_alerta) Início da renovação é hoje ou vencimento já passou @endif">
-                                        @if($renovacao->data_vencimento || $renovacao->inicio_renovacao)
-                                            @if($renovacao->alerta_direcao)
-                                                <i class="fas fa-arrow-{{ $renovacao->alerta_direcao }} text-{{ $renovacao->alerta_cor }}"></i>
-                                            @endif
-                                            {{ '' }}
-                                        @endif
-                                    </td>
-                                    <td>@if($renovacao->data_finalizado) {{ \Carbon\Carbon::parse($renovacao->data_finalizado)->format('d/m/Y') }} @else {{ '' }} @endif</td>
-                                    <td>
-                                        @if($renovacao->status == 'F')
-                                            <span class="badge badge-success">Finalizado</span>
-                                        @else
-                                            <button type="button" class="btn btn-sm btn-success btn-finalizar-renovacao" data-id="{{ $renovacao->id }}">Finalizar</button>
-                                        @endif
-                                    </td>
+                            }
+                            $cor_header = $departamento_cores[$departamento_nome];
+                        @endphp
+                        <div class="mb-4">
+                            <table class="table table-striped text-center table_renovacoes">
+                              <thead>
+                                <tr style="background-color: {{ $cor_header }}; ">
+                                    <th colspan="13" class="text-left"><h5 class="mb-2 font-weight-bold">Departamento: {{ $departamento_nome }}</h5></th>
                                 </tr>
-                            @endforeach
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="13" class="text-center text-muted">Nenhum registro encontrado</td>
-                        </tr>
-                    @endif
-                  </tbody>
-                </table>
+
+                                <tr style="background-color: {{ $cor_header }}; ">
+                                  <th>ID</th>
+                                  <th>Data da abertura</th>
+                                  <th>Departamento</th>
+                                  <th>Descrição</th>
+                                  <th>Responsável</th>
+                                  <th>Número de documento</th>
+                                  <th>Período de renovação</th>
+                                  <th>Data do Vencimento</th>
+                                  <th>Início da renovação</th>
+                                  <th>Previsão</th>
+                                  <th>Alerta</th>
+                                  <th>Data finalizado</th>
+                                  <th>Finalizar</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @foreach ($lista as $renovacao)
+                                    <tr>
+                                        <th scope="row"><a href="{{ route('alterar-renovacoes', ['id' => $renovacao->id]) }}">{{ $renovacao->id }}</a></th>
+                                        <td>@if($renovacao->data_abertura) {{ \Carbon\Carbon::parse($renovacao->data_abertura)->format('d/m/Y') }} @else {{ '' }} @endif</td>
+                                        <td>{{ $renovacao->departamento_nome }}</td>
+                                        <td title="{{ $renovacao->descricao }}">{{ \Illuminate\Support\Str::limit($renovacao->descricao, 25, '...') }}</td>
+                                        <td>{{ $renovacao->responsavel }}</td>
+                                        <td>{{ $renovacao->numero_documento }}</td>
+                                        <td>{{ $renovacao->periodo_renovacao }}</td>
+                                        <td>@if($renovacao->data_vencimento) {{ \Carbon\Carbon::parse($renovacao->data_vencimento)->format('d/m/Y') }} @else {{ '' }} @endif</td>
+                                        <td>{{ $renovacao->inicio_renovacao ? \Carbon\Carbon::parse($renovacao->inicio_renovacao)->format('d/m/Y') : '' }}</td>
+                                        <td>
+                                            @if($renovacao->previsao == 'mensal')
+                                                Mensal
+                                            @elseif($renovacao->previsao == 'anual')
+                                                Anual
+                                            @elseif($renovacao->previsao == 'outros')
+                                                Outros
+                                            @else
+                                                {{ $renovacao->previsao }}
+                                            @endif
+                                        </td>
+                                        <td class="@if($renovacao->em_alerta) alerta_limitador @endif" title="@if($renovacao->em_alerta) Início da renovação é hoje ou vencimento já passou @endif">
+                                            @if($renovacao->data_vencimento || $renovacao->inicio_renovacao)
+                                                @if($renovacao->alerta_direcao)
+                                                    <i class="fas fa-arrow-{{ $renovacao->alerta_direcao }} text-{{ $renovacao->alerta_cor }}"></i>
+                                                @endif
+                                                {{ '' }}
+                                            @endif
+                                        </td>
+                                        <td>@if($renovacao->data_finalizado) {{ \Carbon\Carbon::parse($renovacao->data_finalizado)->format('d/m/Y') }} @else {{ '' }} @endif</td>
+                                        <td>
+                                            @if($renovacao->status == 'F')
+                                                <span class="badge badge-success">Finalizado</span>
+                                            @else
+                                                <button type="button" class="btn btn-sm btn-success btn-finalizar-renovacao" data-id="{{ $renovacao->id }}">Finalizar</button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                              </tbody>
+                            </table>
+                        </div>
+                    @endforeach
+                    <div class="clearfix"></div>
+                @else
+                    <div class="text-center text-muted">Nenhum registro encontrado</div>
+                @endif
               </div>
             </div>
           </div>
