@@ -8,7 +8,7 @@
 @endsection
 
 <?php
-    $palheta_cores = [1 => '#ff003d', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 =>
+    $palheta_cores = [1 => '#f23f6a', 2 => '#ee7e4c', 3 => '#8f639f', 4 => '#94c5a5', 5 => '#ead56c', 6 => '#0fbab7', 7 => '#f7c41f', 8 => '#898b75', 9 =>
     '#c1d9d0', 10 => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583', 15 => '#f7c41f', 16 => '#898b75', 17 => '#c1d9d0'];
 ?>
 
@@ -105,20 +105,20 @@
                         <div class="mb-4">
                             <table class="table table-striped text-center table_renovacoes">
                               <thead>
-                                <tr style="background-color: {{ $cor_header }}; ">
+                                <tr >
                                     <th colspan="13" class="text-left"><h5 class="mb-2 font-weight-bold">Departamento: {{ $departamento_nome }}</h5></th>
                                 </tr>
 
                                 <tr style="background-color: {{ $cor_header }}; ">
                                   <th>ID</th>
-                                  <th>Data da abertura</th>
+                                  <th>Abertura</th>
                                   <th>Departamento</th>
                                   <th>Descrição</th>
-                                  <th>Responsável</th>
-                                  <th>Número de documento</th>
-                                  <th>Período de renovação</th>
-                                  <th>Data do Vencimento</th>
-                                  <th>Início da renovação</th>
+                                  <th>Resp</th>
+                                  <th>Documento</th>
+                                  <th title="Período de renovação">Período Renovação</th>
+                                  <th>Vencimento</th>
+                                  <th>Início renovação</th>
                                   <th>Previsão</th>
                                   <th>Alerta</th>
                                   <th>Data finalizado</th>
@@ -131,7 +131,7 @@
                                         <th scope="row"><a href="{{ route('alterar-renovacoes', ['id' => $renovacao->id]) }}">{{ $renovacao->id }}</a></th>
                                         <td>@if($renovacao->data_abertura) {{ \Carbon\Carbon::parse($renovacao->data_abertura)->format('d/m/Y') }} @else {{ '' }} @endif</td>
                                         <td>{{ $renovacao->departamento_nome }}</td>
-                                        <td title="{{ $renovacao->descricao }}">{{ \Illuminate\Support\Str::limit($renovacao->descricao, 25, '...') }}</td>
+                                        <td data-toggle="tooltip" data-placement="top" title="{{ $renovacao->descricao }}">{{ \Illuminate\Support\Str::limit($renovacao->descricao, 70, '...') }}</td>
                                         <td>{{ $renovacao->responsavel }}</td>
                                         <td>{{ $renovacao->numero_documento }}</td>
                                         <td>{{ $renovacao->periodo_renovacao }}</td>

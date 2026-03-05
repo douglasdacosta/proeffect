@@ -1,7 +1,13 @@
 $(document).ready(function() {
 
+    function initTooltips() {
+        $('[data-toggle="tooltip"]').tooltip('dispose').tooltip();
+    }
+
+    initTooltips();
+
     if ($('.table_renovacoes').length) {
-        $('.table_renovacoes').DataTable({
+        var tableRenovacoes = $('.table_renovacoes').DataTable({
             "paging": true,
             "lengthChange": false,
             "searching": true,
@@ -40,6 +46,10 @@ $(document).ready(function() {
                     "searchable": false
                 }
             ]
+        });
+
+        tableRenovacoes.on('draw.dt', function () {
+            initTooltips();
         });
     }
 

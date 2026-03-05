@@ -72,6 +72,7 @@ class HomeController extends Controller
                 ->select('renovacoes.*', 'perfis.nome as departamento_nome')
                 ->leftJoin('perfis', 'perfis.id', '=', 'renovacoes.departamento_id')
                 ->where('renovacoes.status', '=', 'P')
+                ->where('renovacoes.data_vencimento', '<=', Carbon::now()->format('Y-m-d'))
                 ->orderBy('renovacoes.data_vencimento', 'asc')
                 ->orderBy('renovacoes.data_abertura', 'desc')
                 ->limit(10)

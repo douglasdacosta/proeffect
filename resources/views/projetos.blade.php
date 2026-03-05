@@ -241,7 +241,7 @@ use App\Http\Controllers\PedidosController;
                         </div>
                         <div class="x_content">
                             @php
-                             $palheta_cores = ['Expedição' => '#ff003d', 'Projetos' => '#ee7e4c', 'Reunião' => '#8f639f', 'Vendas' => '#94c5a5', 'Em Preparação' => '#ead56c', 'Entregue' => '#0fbab7', 'Expedição' => '#f7c41f', 'Cancelado' => '#898b75', 'Desenvolvimento' => '#c1d9d0', 'Vendas' => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583'];
+                             $palheta_cores = ['Expedição' => '#f23f6a', 'Projetos' => '#ee7e4c', 'Reunião' => '#8f639f', 'Vendas' => '#94c5a5', 'Em Preparação' => '#ead56c', 'Entregue' => '#0fbab7', 'Expedição' => '#f7c41f', 'Cancelado' => '#898b75', 'Desenvolvimento' => '#c1d9d0', 'Vendas' => '#da8f72', 11 => '#00caf8', 12 => '#ffe792', 13 => '#9a5071', 14 => '#4a8583'];
                              $count = 0;
                             @endphp
                             @if(isset($dados['departamentos']))
