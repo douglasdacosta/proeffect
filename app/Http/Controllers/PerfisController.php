@@ -213,7 +213,10 @@ class PerfisController extends Controller
 
         $perfis->nome = $request->input('nome');
         $perfis->status = $request->input('status');
-        $permissoes = $request->input('permissoes');
+        $permissoes = $request->input('permissoes', []);
+        if (!is_array($permissoes)) {
+            $permissoes = [];
+        }
 
 
         $perfis->save();
