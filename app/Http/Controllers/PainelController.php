@@ -72,6 +72,7 @@ class PainelController extends Controller
                                     when C.select_motivo_pausas ='6' then 'P.M – Problema na máquina'
                                     when C.select_motivo_pausas ='7' then 'E.P - Esperando próxima produção'
                                     when C.select_motivo_pausas ='8' then 'F.M - Faltando Material'
+                                    when C.select_motivo_pausas ='9' then 'HH - Chapelona'
                                 END as  motivo_pausa,
                                 C.etapas_pedidos_id as etapa_codigo,
                                 C.texto_quantidade as  qtde_pausa,
@@ -168,6 +169,7 @@ class PainelController extends Controller
                                                                 when C.select_motivo_pausas ='6' then 'P.M – Problema na máquina'
                                                                 when C.select_motivo_pausas ='7' then 'E.P - Esperando próxima produção'
                                                                 when C.select_motivo_pausas ='8' then 'F.M - Faltando Material'
+                                                                when C.select_motivo_pausas ='9' then 'HH - Chapelona'
                                                             END as  motivo_pausa,
                                                             C.etapas_pedidos_id as etapa_codigo,
                                                             C.texto_quantidade as  qtde_pausa,

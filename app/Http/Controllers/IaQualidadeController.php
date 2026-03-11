@@ -46,10 +46,10 @@ class IaQualidadeController extends Controller
                 'ia_qualidade_leads.qtde',
                 'ia_qualidade_leads.pessoas_id',
                 'ia_qualidade_leads.datahora_envio_ultimo_lead',
-                'ia_qualidade_leads.contato_pos_venda',
-                'ia_qualidade_leads.numero_whatsapp_pos_venda',
+                'pessoas.nome_cliente as contato_pos_venda',
+                'pessoas.numero_whatsapp_pos_venda',
                 'ia_qualidade_leads.responsavel_qualidade'
-            );
+            )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id');
 
 
         if(!empty($dataEntregaDe) && !empty($dataEntregaAte )) {
@@ -205,25 +205,51 @@ class IaQualidadeController extends Controller
                         'ia_qualidade_leads.os',
                         'ia_qualidade_leads.ep',
                         'ia_qualidade_leads.qtde',
-                        'ia_qualidade_leads.contato_pos_venda',
-                        'ia_qualidade_leads.numero_whatsapp_pos_venda',
+                        'pessoas.nome_cliente as contato_pos_venda',
+                        'pessoas.numero_whatsapp_pos_venda',
                         'ia_qualidade_leads.responsavel_qualidade'
-                    )
+                    )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id')
+
                     ->whereIn('ia_qualidade_leads.pedido_id', $ids)
-                    ->whereNotNull('ia_qualidade_leads.numero_whatsapp_pos_venda')
+                    ->whereNotNull('pessoas.numero_whatsapp_pos_venda')
                     ->get();
 
                 //transforma dados em json e envia para API
-                $dataToSend = [];
+                $pedidosAgrupados = [];
                 foreach ($pedidosComWhatsapp as $pedido) {
+                    $os = $pedido->os;
+
+                    if (!isset($pedidosAgrupados[$os])) {
+                        $pedidosAgrupados[$os] = [
+                            'id' => $pedido->id,
+                            'data_entrega' => $pedido->data_entrega,
+                            'os' => $pedido->os,
+                            'ep' => [],
+                            'qtde_total' => 0,
+                            'responsavel_qualidade' => $pedido->responsavel_qualidade,
+                            'whats_cliente' => $pedido->numero_whatsapp_pos_venda,
+                            'pedidos_ids' => []
+                        ];
+                    }
+
+                    if (!in_array($pedido->ep, $pedidosAgrupados[$os]['ep'])) {
+                        $pedidosAgrupados[$os]['ep'][] = $pedido->ep;
+                    }
+
+                    $pedidosAgrupados[$os]['qtde_total'] += $pedido->qtde;
+                    $pedidosAgrupados[$os]['pedidos_ids'][] = $pedido->id;
+                }
+
+                $dataToSend = [];
+                foreach ($pedidosAgrupados as $grupo) {
                     $dataToSend[] = [
-                        'id' => $pedido->id,
-                        'data_entrega' => $pedido->data_entrega,
-                        'os' => $pedido->os,
-                        'ep' => $pedido->ep,
-                        'quantidade' => $pedido->qtde,
-                        'responsavel_qualidade' => $pedido->responsavel_qualidade ?? $request->input('responsavel_qualidade'),
-                        'whats_cliente' => $pedido->numero_whatsapp_pos_venda
+                        'id' => implode(',', $grupo['pedidos_ids']),
+                        'data_entrega' => $grupo['data_entrega'],
+                        'os' => $grupo['os'],
+                        'ep' => implode(',', $grupo['ep']),
+                        'quantidade' => $grupo['qtde_total'],
+                        'responsavel_qualidade' => $grupo['responsavel_qualidade'] ?? $request->input('responsavel_qualidade'),
+                        'whats_cliente' => $grupo['whats_cliente']
                     ];
                 }
 

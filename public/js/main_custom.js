@@ -906,6 +906,7 @@ $(function ($) {
                     select.append($('<option value="6" '+ (item.motivo_pausa_id == '6' ? "selected='selected'" : "") +'>P.M – Problema na máquina</option>'));
                     select.append($('<option value="7" '+ (item.motivo_pausa_id == '7' ? "selected='selected'" : "") +'>E.P - Esperando próxima produção</option>'));
                     select.append($('<option value="8" '+ (item.motivo_pausa_id == '8' ? "selected='selected'" : "") +'>F.M - Faltando Material</option>'));
+                    select.append($('<option value="9" '+ (item.motivo_pausa_id == '9' ? "selected='selected'" : "") +'>HH - Chapelona</option>'));
 
                     tr.append($('<td>').append(select));
                     tr.append($('<td class="text-nowrap">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-12" name="data_hora" value="'+data_hora+'" required>')));
@@ -1031,6 +1032,7 @@ $(function ($) {
         select.append($('<option value="6">P.M – Problema na máquina</option>'));
         select.append($('<option value="7">E.P - Esperando próxima produção</option>'));
         select.append($('<option value="8">F.M - Faltando Material</option>'));
+        select.append($('<option value="9">HH - Chapelona</option>'));
         tr.append($('<td>').append(select));
 
         tr.append($('<td><input type="text" class="form-control date_time col-sm-12" name="data_hora" required></td>'));
@@ -1180,6 +1182,7 @@ $(function ($) {
                     select.append($('<option value="6" '+ (item.motivo_pausa_id == '6' ? "selected='selected'" : "") +'>P.M – Problema na máquina</option>'));
                     select.append($('<option value="7" '+ (item.motivo_pausa_id == '7' ? "selected='selected'" : "") +'>E.P - Esperando próxima produção</option>'));
                     select.append($('<option value="8" '+ (item.motivo_pausa_id == '8' ? "selected='selected'" : "") +'>F.M - Faltando Material</option>'));
+                    select.append($('<option value="9" '+ (item.motivo_pausa_id == '9' ? "selected='selected'" : "") +'>HH - Chapelona</option>'));
 
                     tr.append($('<td class="col-sm-2">').append(select));
                     tr.append($('<td class="text-nowrap col-sm-8">').append($('<input type="text" readonly disabled class="form-control date_time col-sm-12" name="data_hora" value="'+data_hora+'" required>')));

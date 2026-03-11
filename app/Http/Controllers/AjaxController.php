@@ -143,6 +143,7 @@ class AjaxController extends Controller
                         WHEN historicos_etapas.select_motivo_pausas = '6' THEN 'P.M – Problema na máquina'
                         WHEN historicos_etapas.select_motivo_pausas = '7' THEN 'E.P - Esperando próxima produção'
                         WHEN historicos_etapas.select_motivo_pausas = '8' THEN 'F.M - Faltando Material'
+                        WHEN historicos_etapas.select_motivo_pausas = '9' THEN 'HH - Chapelona'
                     END AS motivo_pausa
                 "),
                 'historicos_etapas.select_motivo_pausas as motivo_pausa_id',
