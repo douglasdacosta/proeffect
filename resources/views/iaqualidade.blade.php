@@ -106,7 +106,6 @@
                                     <th data-sortable='true'>Nome Cliente</th>
                                     <th data-sortable='true'>OS</th>
                                     <th data-sortable='true'>EP</th>
-                                    <th data-sortable='true'>Quantidade</th>
                                     <th data-sortable='true'>Responsável Qualidade</th>
                                     <th data-sortable='true'>Whats do Cliente</th>
                                     <th data-sortable='true'>Data envio</th>
@@ -121,8 +120,7 @@
                                             <td>{{ \Carbon\Carbon::parse($pedido->data_entrega)->format('d/m/Y') }}</td>
                                             <td><a href="/alterar-clientes?id={{ $pedido->pessoas_id }}" target="_blank">{{ $pedido->contato_pos_venda }}</a></td>
                                             <td>{{ $pedido->os }}</td>
-                                            <td title="{{ strlen($pedido->ep) > 12 ? $pedido->ep : '' }}">{{ strlen($pedido->ep) > 12 ? substr($pedido->ep, 0, 12) . '...' : $pedido->ep }}</td>
-                                            <td>{{ $pedido->qtde }}</td>
+                                            <td title="{{ strlen($pedido->ep) > 12 ? $pedido->ep_texto : '' }}">{{ strlen($pedido->ep) > 12 ? substr($pedido->ep, 0, 12) . '...' : $pedido->ep }}</td>
                                             <td>{{ $pedido->contato_pos_venda }}</td>
                                             @if($pedido->numero_whatsapp_pos_venda)
                                                 <td class="mask_phone">
@@ -135,10 +133,11 @@
                                             @endif
                                             <td>
                                                 @if($pedido->numero_whatsapp_pos_venda)
-                                                    {{ !empty($pedido->datahora_envio_ultimo_lead) ? \Carbon\Carbon::parse($pedido->datahora_envio_ultimo_lead)->format('d/m/Y H:i:s') : '' }}</td>
+                                                    {{ !empty($pedido->datahora_envio_ultimo_lead) ? \Carbon\Carbon::parse($pedido->datahora_envio_ultimo_lead)->format('d/m/Y H:i:s') : '' }}
                                                 @else
                                                     {{ '' }}
                                                 @endif
+                                            </td>
                                             <td>
                                                 @if($pedido->numero_whatsapp_pos_venda)
                                                     <input type="checkbox" name="ids[]" value="{{ $pedido->id }}" class="checkbox-item checkbox-enviar">

@@ -43,13 +43,15 @@ class IaQualidadeController extends Controller
                 'ia_qualidade_leads.data_entrega',
                 'ia_qualidade_leads.os',
                 'ia_qualidade_leads.ep',
+                DB::raw("COALESCE(NULLIF(ia_qualidade_leads.descricao, ''), pedidos.descricao) as descricao"),
                 'ia_qualidade_leads.qtde',
                 'ia_qualidade_leads.pessoas_id',
                 'ia_qualidade_leads.datahora_envio_ultimo_lead',
                 'pessoas.nome_cliente as contato_pos_venda',
                 'pessoas.numero_whatsapp_pos_venda',
                 'ia_qualidade_leads.responsavel_qualidade'
-            )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id');
+            )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id')
+            ->leftJoin('pedidos', 'ia_qualidade_leads.pedido_id', '=', 'pedidos.id');
 
 
         if(!empty($dataEntregaDe) && !empty($dataEntregaAte )) {
@@ -101,6 +103,7 @@ class IaQualidadeController extends Controller
                     'id' => $pedido->id,
                     'data_entrega' => $pedido->data_entrega,
                     'os' => $pedido->os,
+                    'descricao' => $pedido->descricao,
                     'ep' => [],
                     'qtde_total' => 0,
                     'pessoas_id' => $pedido->pessoas_id,
@@ -113,21 +116,31 @@ class IaQualidadeController extends Controller
             }
 
             // Adicionar EP e quantidade
-            if (!in_array($pedido->ep, $pedidosAgrupados[$os]['ep'])) {
-                $pedidosAgrupados[$os]['ep'][] = $pedido->ep;
+            if (!in_array($pedido->ep, $pedidosAgrupados[$os]['ep'])) {                
+                $pedidosAgrupados[$os]['ep'][] = [
+                    'codigo' => $pedido->ep,
+                    'descricao' => $pedido->descricao,
+                    'quantidade' => $pedido->qtde
+                ];
             }
-            $pedidosAgrupados[$os]['qtde_total'] += $pedido->qtde;
             $pedidosAgrupados[$os]['pedidos_ids'][] = $pedido->id;
         }
 
         // Converter para array de objetos para manter compatibilidade com view
         $pedidosAgrupados = array_map(function ($grupo) {
+            
+            $ep_texto = implode("\n", array_map(function($ep) {
+                return $ep['codigo'] . ' (' . $ep['descricao'] . ' - ' . $ep['quantidade'] . ')';
+            }, $grupo['ep']));
+
             return (object) [
                 'id' => implode(',', $grupo['pedidos_ids']),
                 'data_entrega' => $grupo['data_entrega'],
                 'os' => $grupo['os'],
-                'ep' => implode(',', $grupo['ep']),
-                'qtde' => $grupo['qtde_total'],
+                'ep' => implode(",", array_map(function($ep) {
+                    return $ep['codigo'];
+                }, $grupo['ep'])),
+                'ep_texto' => $ep_texto,
                 'pessoas_id' => $grupo['pessoas_id'],
                 'datahora_envio_ultimo_lead' => $grupo['datahora_envio_ultimo_lead'],
                 'contato_pos_venda' => $grupo['contato_pos_venda'],

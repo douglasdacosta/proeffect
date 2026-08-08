@@ -34,7 +34,7 @@ $(document).ready(function() {
         },
         "columnDefs": [
             {
-                "targets": 9,
+                "targets": 8,
                 "orderable": false,
                 "searchable": false
             }
