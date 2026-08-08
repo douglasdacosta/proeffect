@@ -204,11 +204,13 @@ class IaQualidadeController extends Controller
                         'ia_qualidade_leads.data_entrega',
                         'ia_qualidade_leads.os',
                         'ia_qualidade_leads.ep',
+                        DB::raw("COALESCE(NULLIF(ia_qualidade_leads.descricao, ''), pedidos.descricao) as descricao"),
                         'ia_qualidade_leads.qtde',
                         'pessoas.nome_cliente as contato_pos_venda',
                         'pessoas.numero_whatsapp_pos_venda',
                         'ia_qualidade_leads.responsavel_qualidade'
                     )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id')
+                    ->join('pedidos', 'ia_qualidade_leads.pedido_id', '=', 'pedidos.id')
 
                     ->whereIn('ia_qualidade_leads.pedido_id', $ids)
                     ->whereNotNull('pessoas.numero_whatsapp_pos_venda')
@@ -232,11 +234,14 @@ class IaQualidadeController extends Controller
                         ];
                     }
 
-                    if (!in_array($pedido->ep, $pedidosAgrupados[$os]['ep'])) {
-                        $pedidosAgrupados[$os]['ep'][] = $pedido->ep;
+                    if (!isset($pedidosAgrupados[$os]['eps'][$pedido->ep])) {
+                        $pedidosAgrupados[$os]['eps'][$pedido->ep] = [
+                            'codigo' => $pedido->ep,
+                            'descricao' => $pedido->descricao,
+                            'quantidade' => $pedido->qtde
+                        ];
                     }
 
-                    $pedidosAgrupados[$os]['qtde_total'] += $pedido->qtde;
                     $pedidosAgrupados[$os]['pedidos_ids'][] = $pedido->id;
                 }
 
@@ -244,12 +249,13 @@ class IaQualidadeController extends Controller
                 foreach ($pedidosAgrupados as $grupo) {
                     $dataToSend[] = [
                         'id' => implode(',', $grupo['pedidos_ids']),
-                        'data_entrega' => $grupo['data_entrega'],
-                        'os' => $grupo['os'],
-                        'ep' => implode(',', $grupo['ep']),
-                        'quantidade' => $grupo['qtde_total'],
-                        'responsavel_qualidade' => $grupo['responsavel_qualidade'] ?? $request->input('responsavel_qualidade'),
-                        'whats_cliente' => $grupo['whats_cliente']
+                        'os' => [
+                            'numero' => $grupo['os'],
+                            'data_entrega' => $grupo['data_entrega'],
+                            'responsavel_qualidade' => $grupo['responsavel_qualidade'] ?? $request->input('responsavel_qualidade'),
+                            'whats_cliente' => $grupo['whats_cliente'],
+                            'eps' => array_values($grupo['eps'])
+                        ]
                     ];
                 }
 
@@ -259,7 +265,7 @@ class IaQualidadeController extends Controller
                 if (!empty($dataToSend) && !empty($url)) {
                     $jsonData = json_encode($dataToSend);
 
-                    $ch = curl_init($url);
+                   $ch = curl_init($url);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);

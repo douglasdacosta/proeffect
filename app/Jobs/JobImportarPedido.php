@@ -68,9 +68,9 @@ class JobImportarPedido implements ShouldQueue
                     $fichatecnica = new Fichastecnicas();
                     $transportes = new transportes();
                     $ep = $itens['codigo'];
-
+                    $quantidade = $itens['quantidade'];
                     $valor_unitario = $itens['unitario']+$itens['ipi']-$itens['desconto'];
-                    info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs . ' valorunitario: '.$valor_unitario);
+                    info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs . ' valorunitario: '.$valor_unitario . ' descricao: '.$itens['descricao']);
                     $numeroOs = $venda['numeroOS'];
                     $dataOS = $venda['dataOS'];
                     $prevEntrega = $venda['prevEntrega'];
@@ -107,6 +107,7 @@ class JobImportarPedido implements ShouldQueue
                         'dataOS' => $dataOS,
                         'prevEntrega' => $prevEntrega,
                         'quantidade' => $itens['quantidade'],
+                        'descricao' => $itens['descricao'],
                         'valor_unitario_adv' => $valor_unitario
                     ];
 
@@ -130,6 +131,8 @@ class JobImportarPedido implements ShouldQueue
             $pedidos->fichatecnica_id = $dados['fichatecnicaId'];
             $pedidos->pessoas_id = $dados['pessoa_id'];
             $pedidos->status_id = 1;
+            $descricao = substr($dados['descricao'], 0, 255);            
+            $pedidos->descricao = $descricao;
             $pedidos->transporte_id = $dados['transporte_id'];
             $pedidos->qtde =$dados['quantidade'];
             $pedidos->data_gerado = substr($dados['dataOS'], 0, 10);
@@ -141,7 +144,16 @@ class JobImportarPedido implements ShouldQueue
             $this->historicosPedidos($pedidos->id, 1);
             $this->salvaAlerta($pedidos->id);
             return $pedidos->id;
+        } else {
+            if(empty($pedido->descricao)) {
+                //alterar o pedido pelo id    
+                $pedidos = Pedidos::find($pedido->id);
+                $pedidos->descricao = substr($dados['descricao'], 0, 255);
+                $pedidos->save();
+                info("Descricao atualizada para o pedido: ".$pedidos->id);
+            }
         }
+
 
         return $pedido->id;
     }
