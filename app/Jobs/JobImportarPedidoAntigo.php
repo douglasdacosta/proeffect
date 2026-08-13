@@ -37,7 +37,6 @@ class JobImportarPedidoAntigo implements ShouldQueue
      */
     public function handle()
     {
-        return true;;
         info("Dentro do job instance JobImportarPedidoAntigo");
         $dados_pedidos = [];
         $id = DB::transaction(function () {
@@ -50,47 +49,71 @@ class JobImportarPedidoAntigo implements ShouldQueue
 
             $ApiERPController = new ApiERPController();
             $ApiERPController->getToken();
-            $vendas = $ApiERPController->getVendasByStatus();
 
-            foreach ($vendas['os'] as $key => $venda) {
+            $NumRecords = 100;
+            $pages = 1;
 
-                $idOs = $venda['idOs'];
+            // busca de 100 em 100 registros até a página não retornar mais nenhuma OS
+            do {
+                $vendas = $ApiERPController->getAllVendas($NumRecords, $pages);
 
-                if(!$venda || empty($venda['prevEntrega'])) {
-                    info(" OS não encontrada ".$venda['numeroOS'] . " ou sem data de prevEntrega");
-                    continue;
+                if (empty($vendas['os'])) {
+                    break;
                 }
 
-                foreach($venda['itens'] as $itens) {
-                    // info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
+                foreach ($vendas['os'] as $key => $venda) {
 
+                    $idOs = $venda['idOs'];
 
-                    $pedidos = new Pedidos();
-                    $pessoas = new Pessoas();
-                    $fichatecnica = new Fichastecnicas();
-                    $transportes = new transportes();
-                    $ep = $itens['codigo'];
-                    $valor_unitario = $itens['unitario'];
-
-                    $numeroOs = $venda['numeroOS'];
-                    $dataOS = $venda['dataOS'];
-                    $prevEntrega = $venda['prevEntrega'];
-                    $cliente_id = $venda['numCli'];
-                    $cliente = $venda['idCliente'];
-                    $idVendedor = $venda['idVendedor'];
-
-                    $fichatecnica = $fichatecnica->where('ep', '=', $ep)->where('status', '=', 'A')->get();
-
-                    if(empty($fichatecnica[0]->id)){
-                        info("EP ".$ep." não existente no CRM");
+                    if(!$venda || empty($venda['prevEntrega'])) {
+                        info(" OS não encontrada ".$venda['numeroOS'] . " ou sem data de prevEntrega");
                         continue;
                     }
-                    info("update pedidos set valor_unitario_adv = '".$itens['unitario']."' where os = '".$venda['numeroOS']."' and fichatecnica_id = '".$fichatecnica[0]->id."'");
+
+                    foreach($venda['itens'] as $itens) {
+                        // info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
 
 
+                        $pedidos = new Pedidos();
+                        $pessoas = new Pessoas();
+                        $fichatecnica = new Fichastecnicas();
+                        $transportes = new transportes();
+                        $ep = $itens['codigo'];
+                        $valor_unitario = $itens['unitario'];
+                        $quantidade = $itens['quantidade'];
 
+                        $numeroOs = $venda['numeroOS'];
+                        $dataOS = $venda['dataOS'];
+                        $prevEntrega = $venda['prevEntrega'];
+                        $cliente_id = $venda['numCli'];
+                        $cliente = $venda['idCliente'];
+                        $idVendedor = $venda['idVendedor'];
+
+                        $fichatecnica = $fichatecnica->where('ep', '=', $ep)->where('status', '=', 'A')->get();
+
+                        if(empty($fichatecnica[0]->id)){
+                            info("EP ".$ep." não existente no CRM");
+                            continue;
+                        }
+
+                        $pedido = $pedidos->where('os', '=', $numeroOs)->where('fichatecnica_id', '=', $fichatecnica[0]->id)->first();
+
+                        if(empty($pedido->id)){
+                            info("Pedido não encontrado para atualização. OS:".$numeroOs." fichatecnica_id:".$fichatecnica[0]->id);
+                            continue;
+                        }
+
+                        $pedidos = Pedidos::find($pedido->id);
+                        $pedidos->descricao = substr($itens['descricao'], 0, 255);
+                        $pedidos->save();
+
+                        info("Pedido atualizado ( ".substr($itens['descricao'], 0, 255)."   ) para o pedido: ".$pedidos->id);
+
+                    }
                 }
-            }
+
+                $pages++;
+            } while (count($vendas['os']) === $NumRecords);
         });
 
         return $id;

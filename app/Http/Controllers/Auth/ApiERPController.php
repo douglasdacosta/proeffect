@@ -98,6 +98,26 @@ class ApiERPController extends Controller
         return $resposta;
     }
 
+    public function getAllVendas($NumRecords = 50, $page = 1){
+        $client = new Client();
+
+        $this->token = Cache::get('TOKEN');
+
+        $headers = [
+        'accept' => 'text/plain',
+        'Authorization' => "Bearer $this->token"
+        ];
+
+        $url = env('URL_ERP')."api/VendaV2?NumRecords=$NumRecords&page=$page";
+
+            info("URL: $url");
+        $request = new Request('GET', $url, $headers);
+        $response = $client->sendAsync($request)->wait();
+        $body = $response->getBody();
+        $resposta = json_decode($body, true);
+        return $resposta;
+    }
+
 
 
     public function getVendasByOS($os){
