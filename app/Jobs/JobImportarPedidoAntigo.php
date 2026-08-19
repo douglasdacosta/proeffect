@@ -64,14 +64,9 @@ class JobImportarPedidoAntigo implements ShouldQueue
                 foreach ($vendas['os'] as $key => $venda) {
 
                     $idOs = $venda['idOs'];
-
-                    if(!$venda || empty($venda['prevEntrega'])) {
-                        info(" OS não encontrada ".$venda['numeroOS'] . " ou sem data de prevEntrega");
-                        continue;
-                    }
-
+                    
                     foreach($venda['itens'] as $itens) {
-                        // info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
+                        info("EP: ". $itens['codigo']. '; OS:'.$venda['numeroOS']. '; IdOs:'.$idOs);
 
 
                         $pedidos = new Pedidos();

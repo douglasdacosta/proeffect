@@ -68,11 +68,17 @@ class HomeController extends Controller
                             ->get();
 
         if(in_array('6', $perfis_dashboards)){
+            $hoje = Carbon::now()->format('Y-m-d');
+
             $renovacoes = Renovacoes::query()
                 ->select('renovacoes.*', 'perfis.nome as departamento_nome')
                 ->leftJoin('perfis', 'perfis.id', '=', 'renovacoes.departamento_id')
                 ->where('renovacoes.status', '=', 'P')
-                ->where('renovacoes.data_vencimento', '<=', Carbon::now()->format('Y-m-d'))
+                ->where(function ($query) use ($hoje) {
+                    // alerta também deve considerar inicio_renovacao vencido, mesmo com data_vencimento futura ou nula
+                    $query->where('renovacoes.data_vencimento', '<=', $hoje)
+                        ->orWhere('renovacoes.inicio_renovacao', '<=', $hoje);
+                })
                 ->orderBy('renovacoes.data_vencimento', 'asc')
                 ->orderBy('renovacoes.data_abertura', 'desc')
                 ->limit(10)
