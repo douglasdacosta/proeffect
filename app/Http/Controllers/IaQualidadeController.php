@@ -49,7 +49,8 @@ class IaQualidadeController extends Controller
                 'ia_qualidade_leads.datahora_envio_ultimo_lead',
                 'pessoas.nome_cliente as contato_pos_venda',
                 'pessoas.numero_whatsapp_pos_venda',
-                'ia_qualidade_leads.responsavel_qualidade'
+                'ia_qualidade_leads.responsavel_qualidade',
+                'pedidos.numero_nota'
             )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id')
             ->leftJoin('pedidos', 'ia_qualidade_leads.pedido_id', '=', 'pedidos.id');
 
@@ -104,6 +105,7 @@ class IaQualidadeController extends Controller
                     'data_entrega' => $pedido->data_entrega,
                     'os' => $pedido->os,
                     'descricao' => $pedido->descricao,
+                    'numero_nota' => $pedido->numero_nota,
                     'ep' => [],
                     'qtde_total' => 0,
                     'pessoas_id' => $pedido->pessoas_id,
@@ -136,6 +138,7 @@ class IaQualidadeController extends Controller
             return (object) [
                 'id' => implode(',', $grupo['pedidos_ids']),
                 'data_entrega' => $grupo['data_entrega'],
+                'numero_nota' => $grupo['numero_nota'] ?? null,
                 'os' => $grupo['os'],
                 'ep' => implode(",", array_map(function($ep) {
                     return $ep['codigo'];
@@ -221,7 +224,8 @@ class IaQualidadeController extends Controller
                         'ia_qualidade_leads.qtde',
                         'pessoas.nome_cliente as contato_pos_venda',
                         'pessoas.numero_whatsapp_pos_venda',
-                        'ia_qualidade_leads.responsavel_qualidade'
+                        'ia_qualidade_leads.responsavel_qualidade',
+                        'pedidos.numero_nota as numero_nota',
                     )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id')
                     ->join('pedidos', 'ia_qualidade_leads.pedido_id', '=', 'pedidos.id')
 
@@ -239,6 +243,7 @@ class IaQualidadeController extends Controller
                             'id' => $pedido->id,
                             'data_entrega' => $pedido->data_entrega,
                             'os' => $pedido->os,
+                            'numero_nota' => $pedido->numero_nota,
                             'ep' => [],
                             'qtde_total' => 0,
                             'responsavel_qualidade' => $pedido->responsavel_qualidade,
@@ -251,7 +256,8 @@ class IaQualidadeController extends Controller
                         $pedidosAgrupados[$os]['eps'][$pedido->ep] = [
                             'codigo' => $pedido->ep,
                             'descricao' => $pedido->descricao,
-                            'quantidade' => $pedido->qtde
+                            'quantidade' => $pedido->qtde,
+                            'numero_nota' => $pedido->numero_nota
                         ];
                     }
 
@@ -265,6 +271,7 @@ class IaQualidadeController extends Controller
                         'os' => [
                             'numero' => $grupo['os'],
                             'data_entrega' => $grupo['data_entrega'],
+                            'numero_nota' => $grupo['numero_nota'] ?? null,
                             'responsavel_qualidade' => $grupo['responsavel_qualidade'] ?? $request->input('responsavel_qualidade'),
                             'whats_cliente' => $grupo['whats_cliente'],
                             'eps' => array_values($grupo['eps'])
