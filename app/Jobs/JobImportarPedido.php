@@ -60,6 +60,8 @@ class JobImportarPedido implements ShouldQueue
                     continue;
                 }
 
+                // info(json_encode($venda));
+                
                 foreach($venda['itens'] as $itens) {
                     
 
@@ -77,7 +79,7 @@ class JobImportarPedido implements ShouldQueue
                     $cliente_id = $venda['numCli'];
                     $cliente = $venda['idCliente'];
                     $idVendedor = $venda['idVendedor'];
-
+                    $numero_nota = $venda['numeroNota'] ?? null;
                     $cliente= $ApiERPController->getClienteById($cliente);
                     $Vendedor= $ApiERPController->getVendedorById($idVendedor);
                     $transportadora= $ApiERPController->getTransportadoraById($venda['idTransportadora']);
@@ -108,7 +110,8 @@ class JobImportarPedido implements ShouldQueue
                         'prevEntrega' => $prevEntrega,
                         'quantidade' => $itens['quantidade'],
                         'descricao' => $itens['descricao'],
-                        'valor_unitario_adv' => $valor_unitario
+                        'valor_unitario_adv' => $valor_unitario,
+                        'numero_nota' => $numero_nota
                     ];
 
                     $this->savePedidos($pedido, $dados);
@@ -138,6 +141,9 @@ class JobImportarPedido implements ShouldQueue
             $pedidos->data_gerado = substr($dados['dataOS'], 0, 10);
             $pedidos->data_entrega = substr($dados['prevEntrega'], 0, 10);
             $pedidos->valor_unitario_adv = $dados['valor_unitario_adv'];
+            if (!empty($dados['numero_nota'])) {
+                $pedidos->numero_nota = $dados['numero_nota'];
+            }
             $pedidos->status ='A';
             $pedidos->save();
 
@@ -145,12 +151,15 @@ class JobImportarPedido implements ShouldQueue
             $this->salvaAlerta($pedidos->id);
             return $pedidos->id;
         } else {
-            if(empty($pedido->descricao)) {
+            if(empty($pedido->descricao) || (empty($pedido->numero_nota) && !empty($dados['numero_nota']))) {
                 //alterar o pedido pelo id    
                 $pedidos = Pedidos::find($pedido->id);
                 $pedidos->descricao = substr($dados['descricao'], 0, 255);
+                if (!empty($dados['numero_nota'])) {
+                    $pedidos->numero_nota = $dados['numero_nota'];
+                }
                 $pedidos->save();
-                info("Descricao atualizada para o pedido: ".$pedidos->id);
+                info("Descricao e numero nota atualizada para o pedido: ".$pedidos->id);
             }
         }
 
