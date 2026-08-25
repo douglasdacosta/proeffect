@@ -79,7 +79,7 @@ class JobImportarPedido implements ShouldQueue
                     $cliente_id = $venda['numCli'];
                     $cliente = $venda['idCliente'];
                     $idVendedor = $venda['idVendedor'];
-                    $numero_nota = $venda['numeroNota'] ?? null;
+                    $numero_nota = $venda['dadosAdicionais'] ?? null;
                     $cliente= $ApiERPController->getClienteById($cliente);
                     $Vendedor= $ApiERPController->getVendedorById($idVendedor);
                     $transportadora= $ApiERPController->getTransportadoraById($venda['idTransportadora']);
