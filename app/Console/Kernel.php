@@ -26,7 +26,8 @@ class Kernel extends ConsoleKernel
 
         try {
             $schedule->command('command:importarPedido')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '20:00');
-            $schedule->command('command:ImportarPedidoAntigo')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '22:00');
+            // $schedule->command('command:ImportarPedidoAntigo')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '22:00');
+            $schedule->command('command:atualizarNumeroNotaPedidosFinalizados')->everyFifteenMinutes()->withoutOverlapping()->between('8:00', '22:00');
             $schedule->command('pessoas:gerar-hash')->everyFiveMinutes()->withoutOverlapping()->between('8:00', '22:00');
             $schedule->command('configuracoes:atualisar-materiais')->cron('0 0 1 * *')->withoutOverlapping(); // minuto hora dia-do-mês mês dia-da-semana
             $schedule->command('configuracoes:atualisar-tempos')->everyFifteenMinutes()->withoutOverlapping();
