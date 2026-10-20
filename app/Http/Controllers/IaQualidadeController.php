@@ -205,12 +205,17 @@ class IaQualidadeController extends Controller
             }
 
             $retorno = DB::transaction(function () use ($request, $ids) {
+                $atualizacao = [
+                    'status_lead' => 'finalizado',
+                    'datahora_envio_ultimo_lead' => now()
+                ];
+                if (!empty($request->input('responsavel_qualidade'))) {
+                    $atualizacao['responsavel_qualidade'] = $request->input('responsavel_qualidade');
+                }
+
                 DB::table('ia_qualidade_leads')
                     ->whereIn('pedido_id', $ids)
-                    ->update([
-                        'status_lead' => 'finalizado',
-                        'datahora_envio_ultimo_lead' => now()
-                    ]);
+                    ->update($atualizacao);
 
                 //enviar para a API de que envia leads em formato Json
                 //ID 	Data de Entrega 	OS 	EP 	Quantidade 	Responsável Qualidade 	Whats do Cliente

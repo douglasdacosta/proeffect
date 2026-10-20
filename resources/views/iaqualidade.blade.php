@@ -121,7 +121,7 @@
                                             <td><a href="/alterar-clientes?id={{ $pedido->pessoas_id }}" target="_blank">{{ $pedido->contato_pos_venda }}</a></td>
                                             <td>{{ $pedido->os }}</td>
                                             <td title="{{ strlen($pedido->ep) > 12 ? $pedido->ep_texto : '' }}">{{ strlen($pedido->ep) > 12 ? substr($pedido->ep, 0, 12) . '...' : $pedido->ep }}</td>
-                                            <td>{{ $pedido->contato_pos_venda }}</td>
+                                            <td>{{ $pedido->responsavel_qualidade }}</td>
                                             @if($pedido->numero_whatsapp_pos_venda)
                                                 <td class="mask_phone">
                                                     {{ $pedido->numero_whatsapp_pos_venda }}
@@ -226,6 +226,12 @@ document.addEventListener('DOMContentLoaded', function() {
             input.name = 'ids';
             input.value = ids.join(',');
             form.appendChild(input);
+
+            const responsavel = document.createElement('input');
+            responsavel.type = 'hidden';
+            responsavel.name = 'responsavel_qualidade';
+            responsavel.value = document.getElementById('responsavel_qualidade').value;
+            form.appendChild(responsavel);
 
             form.action = '{{ route("iaqualidade.enviar") }}';
             form.submit();
