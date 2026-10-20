@@ -49,7 +49,7 @@ class IaQualidadeController extends Controller
                 'ia_qualidade_leads.datahora_envio_ultimo_lead',
                 'pessoas.nome_cliente as contato_pos_venda',
                 'pessoas.numero_whatsapp_pos_venda',
-                'ia_qualidade_leads.responsavel_qualidade',
+                'pessoas.contato_pos_venda as responsavel_qualidade',
                 'pedidos.numero_nota'
             )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id')
             ->leftJoin('pedidos', 'ia_qualidade_leads.pedido_id', '=', 'pedidos.id');
@@ -78,7 +78,7 @@ class IaQualidadeController extends Controller
         }
 
         if ($responsavelQualidade) {
-            $query->where('ia_qualidade_leads.responsavel_qualidade', 'like', '%' . $responsavelQualidade . '%');
+            $query->where('pessoas.contato_pos_venda', 'like', '%' . $responsavelQualidade . '%');
         }
 
         $query->limit(100);
@@ -205,17 +205,12 @@ class IaQualidadeController extends Controller
             }
 
             $retorno = DB::transaction(function () use ($request, $ids) {
-                $atualizacao = [
-                    'status_lead' => 'finalizado',
-                    'datahora_envio_ultimo_lead' => now()
-                ];
-                if (!empty($request->input('responsavel_qualidade'))) {
-                    $atualizacao['responsavel_qualidade'] = $request->input('responsavel_qualidade');
-                }
-
                 DB::table('ia_qualidade_leads')
                     ->whereIn('pedido_id', $ids)
-                    ->update($atualizacao);
+                    ->update([
+                        'status_lead' => 'finalizado',
+                        'datahora_envio_ultimo_lead' => now()
+                    ]);
 
                 //enviar para a API de que envia leads em formato Json
                 //ID 	Data de Entrega 	OS 	EP 	Quantidade 	Responsável Qualidade 	Whats do Cliente
@@ -229,7 +224,7 @@ class IaQualidadeController extends Controller
                         'ia_qualidade_leads.qtde',
                         'pessoas.nome_cliente as contato_pos_venda',
                         'pessoas.numero_whatsapp_pos_venda',
-                        'ia_qualidade_leads.responsavel_qualidade',
+                        'pessoas.contato_pos_venda as responsavel_qualidade',
                         'pedidos.numero_nota as numero_nota',
                     )->join('pessoas', 'ia_qualidade_leads.pessoas_id', '=', 'pessoas.id')
                     ->join('pedidos', 'ia_qualidade_leads.pedido_id', '=', 'pedidos.id')
@@ -277,7 +272,7 @@ class IaQualidadeController extends Controller
                             'numero' => $grupo['os'],
                             'data_entrega' => $grupo['data_entrega'],
                             'numero_nota' => $grupo['numero_nota'] ?? null,
-                            'responsavel_qualidade' => $grupo['responsavel_qualidade'] ?? $request->input('responsavel_qualidade'),
+                            'responsavel_qualidade' => $grupo['responsavel_qualidade'],
                             'whats_cliente' => $grupo['whats_cliente'],
                             'eps' => array_values($grupo['eps'])
                         ]

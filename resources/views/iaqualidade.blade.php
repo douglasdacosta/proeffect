@@ -227,12 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
             input.value = ids.join(',');
             form.appendChild(input);
 
-            const responsavel = document.createElement('input');
-            responsavel.type = 'hidden';
-            responsavel.name = 'responsavel_qualidade';
-            responsavel.value = document.getElementById('responsavel_qualidade').value;
-            form.appendChild(responsavel);
-
             form.action = '{{ route("iaqualidade.enviar") }}';
             form.submit();
         }
